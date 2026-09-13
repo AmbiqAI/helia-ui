@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
 /*
  * The HELIA Starlight plugin: the stylesheets and the parts of the Starlight
  * shell that carry no site vocabulary.

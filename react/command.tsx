@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
 import * as React from 'react';
 import { Command as CommandPrimitive } from 'cmdk';
 import { cn } from 'cn';

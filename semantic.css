@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: BSD-3-Clause */
+/* Copyright (c) 2026, Ambiq */
 /*
  * Hub semantic layer. The shared primitives and the Starlight colour mapping
  * live in ./tokens.css, which astro.config.mjs loads immediately before this
