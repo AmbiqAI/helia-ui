@@ -22,7 +22,7 @@ Ambiq-authored code is licensed separately under the BSD 3-Clause License; see L
 
 ### shadcn/ui (MIT)
 
-Parts under packages/helia-ui/react are derived from shadcn/ui source and carry Ambiq modifications.
+Parts under the react/ directory of @ambiqai/helia-ui are derived from shadcn/ui source and carry Ambiq modifications.
 
 Origin: https://github.com/shadcn-ui/ui
 
