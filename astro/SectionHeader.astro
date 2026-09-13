@@ -1,0 +1,83 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  href?: string;
+  linkLabel?: string;
+}
+
+const {
+  eyebrow,
+  title,
+  description,
+  href,
+  linkLabel = 'View all',
+} = Astro.props;
+---
+
+<header class="section-header">
+  <div>
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h2>{title}</h2>
+    {description && <p class="description">{description}</p>}
+  </div>
+  {
+    href && (
+      <a href={href}>
+        {linkLabel}{' '}
+        <span class="helia-arrow-right" aria-hidden="true">
+          →
+        </span>
+      </a>
+    )
+  }
+</header>
+
+<style>
+  .section-header {
+    align-items: end;
+    display: flex;
+    gap: var(--helia-space-6);
+    justify-content: space-between;
+    margin: calc(var(--helia-space-6) + var(--helia-space-5)) 0
+      var(--helia-space-4);
+  }
+
+  .eyebrow {
+    color: var(--sl-color-accent-high);
+    font-size: var(--helia-text-caption);
+    font-weight: var(--helia-weight-bold);
+    letter-spacing: 0.1em;
+    margin: 0 0 var(--helia-space-2);
+    text-transform: uppercase;
+  }
+
+  h2 {
+    font-size: var(--helia-text-section);
+    margin: 0;
+  }
+
+  .description {
+    color: var(--sl-color-gray-2);
+    margin: var(--helia-space-2) 0 0;
+    max-width: 42rem;
+  }
+
+  a {
+    flex: none;
+    font-size: var(--helia-text-small);
+    font-weight: var(--helia-weight-semibold);
+    text-decoration: none;
+  }
+
+  @media (width < 42rem) {
+    .section-header {
+      align-items: start;
+      flex-direction: column;
+      gap: var(--helia-space-3);
+    }
+  }
+</style>
