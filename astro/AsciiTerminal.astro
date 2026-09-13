@@ -1,0 +1,501 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+export type AsciiTerminalLineKind =
+  'command' | 'muted' | 'output' | 'success' | 'warning';
+
+export interface AsciiTerminalLine {
+  text: string;
+  kind?: AsciiTerminalLineKind;
+  prompt?: string;
+}
+
+interface Props {
+  lines: readonly AsciiTerminalLine[];
+  title?: string;
+  ariaLabel?: string;
+  animated?: boolean;
+  autoplay?: boolean;
+  copy?: boolean;
+  replay?: boolean;
+  /** `adaptive` follows the site theme; `light` and `dark` are fixed. */
+  tone?: 'adaptive' | 'light' | 'dark';
+  typingSpeed?: number;
+  lineDelay?: number;
+}
+
+const {
+  lines,
+  title = 'Terminal',
+  ariaLabel = `${title} transcript`,
+  animated = false,
+  autoplay = true,
+  copy = false,
+  replay = animated,
+  tone = 'adaptive',
+  typingSpeed = 28,
+  lineDelay = 130,
+} = Astro.props;
+
+/*
+ * The whole behaviour layer is optional, and the default form -- a static
+ * transcript with no controls -- has to cost nothing. A hoisted `<script>` is
+ * bundled for every page that imports the component whether or not it renders,
+ * so the only way to make the cost conditional is `is:inline`. The price is
+ * that a page with several interactive terminals repeats the source; the
+ * `customElements.get` guard means only the first copy defines anything.
+ */
+const interactive = animated || copy || replay;
+
+/*
+ * Held as a string and written with `set:html` so the element renders the
+ * source verbatim. An expression child of a `<script>` is escaped, which would
+ * turn every arrow and comparison in here into an entity.
+ */
+const BEHAVIOR = `
+(() => {
+  if (customElements.get('helia-ascii-terminal')) return;
+
+  const copyText = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.append(textarea);
+      textarea.select();
+      const copied = document.execCommand('copy');
+      textarea.remove();
+      return copied;
+    }
+  };
+
+  const wait = (duration) =>
+    new Promise((resolve) => window.setTimeout(resolve, duration));
+
+  class HeliaAsciiTerminal extends HTMLElement {
+    constructor() {
+      super();
+      this.runId = 0;
+      this.hasPlayed = false;
+    }
+
+    connectedCallback() {
+      if (this.dataset.ready === 'true') return;
+      this.dataset.ready = 'true';
+
+      const lines = Array.from(this.querySelectorAll('[data-line]'));
+      const copyButton = this.querySelector('[data-copy-button]');
+      const replayButton = this.querySelector('[data-replay-button]');
+      const transcript =
+        this.querySelector('[data-transcript]')?.textContent ?? '';
+      const status = this.querySelector('[data-status]');
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      copyButton?.addEventListener('click', async () => {
+        const copied = await copyText(transcript);
+        if (!status) return;
+        if (!copied) {
+          status.textContent = 'Unable to copy terminal transcript';
+          return;
+        }
+
+        copyButton.dataset.copied = 'true';
+        copyButton.setAttribute('aria-label', 'Terminal transcript copied');
+        copyButton.title = 'Terminal transcript copied';
+        status.textContent = 'Terminal transcript copied';
+        window.setTimeout(() => {
+          delete copyButton.dataset.copied;
+          copyButton.setAttribute('aria-label', 'Copy terminal transcript');
+          copyButton.title = 'Copy terminal transcript';
+          status.textContent = '';
+        }, 2400);
+      });
+
+      const showCompleteTranscript = () => {
+        this.runId += 1;
+        this.removeAttribute('data-playing');
+        lines.forEach((line) => {
+          const text = line.querySelector('[data-line-text]');
+          if (text) text.textContent = line.dataset.text || ' ';
+          line.dataset.state = 'visible';
+        });
+      };
+
+      const play = async () => {
+        if (reducedMotion.matches || this.dataset.animate !== 'true') {
+          showCompleteTranscript();
+          return;
+        }
+
+        const currentRun = ++this.runId;
+        const typingSpeed = Number(this.dataset.typingSpeed ?? 28);
+        const lineDelay = Number(this.dataset.lineDelay ?? 130);
+        this.dataset.enhanced = 'true';
+        this.dataset.playing = 'true';
+        this.hasPlayed = true;
+
+        lines.forEach((line) => {
+          const text = line.querySelector('[data-line-text]');
+          if (text) text.textContent = '';
+          line.dataset.state = 'pending';
+        });
+
+        for (const line of lines) {
+          if (currentRun !== this.runId) return;
+          const text = line.querySelector('[data-line-text]');
+          const value = line.dataset.text ?? '';
+          if (!text) continue;
+
+          line.dataset.state = 'visible';
+          if (line.dataset.kind === 'command') {
+            line.dataset.active = 'true';
+            for (const character of value) {
+              if (currentRun !== this.runId) return;
+              text.textContent += character;
+              if (typingSpeed > 0) await wait(typingSpeed);
+            }
+            delete line.dataset.active;
+          } else {
+            text.textContent = value || ' ';
+          }
+
+          if (lineDelay > 0) await wait(lineDelay);
+        }
+
+        if (currentRun === this.runId) this.removeAttribute('data-playing');
+      };
+
+      replayButton?.addEventListener('click', () => {
+        if (status) status.textContent = '';
+        void play();
+      });
+
+      reducedMotion.addEventListener('change', (event) => {
+        if (event.matches) showCompleteTranscript();
+      });
+
+      if (this.dataset.animate !== 'true') return;
+      if (reducedMotion.matches) {
+        showCompleteTranscript();
+        return;
+      }
+
+      this.dataset.enhanced = 'true';
+      if (this.dataset.autoplay !== 'true') return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting) || this.hasPlayed)
+            return;
+          observer.disconnect();
+          void play();
+        },
+        { threshold: 0.35 },
+      );
+      observer.observe(this);
+    }
+  }
+
+  customElements.define('helia-ascii-terminal', HeliaAsciiTerminal);
+})();
+`;
+
+const normalizedLines = lines.map((line) => ({
+  kind: line.kind ?? 'output',
+  prompt: line.kind === 'command' ? (line.prompt ?? '$') : '',
+  text: line.text,
+}));
+const transcript = normalizedLines
+  .map((line) =>
+    line.kind === 'command'
+      ? `${line.prompt}${line.prompt ? ' ' : ''}${line.text}`
+      : line.text,
+  )
+  .join('\n');
+---
+
+<helia-ascii-terminal
+  aria-label={ariaLabel}
+  class:list={[
+    'ascii-terminal',
+    'helia-surface',
+    'not-content',
+    `tone-${tone}`,
+  ]}
+  data-animate={animated ? 'true' : 'false'}
+  data-autoplay={autoplay ? 'true' : 'false'}
+  data-line-delay={Math.max(0, lineDelay)}
+  data-typing-speed={Math.max(0, typingSpeed)}
+  role="region"
+>
+  <div class="ascii-terminal__toolbar">
+    <span class="ascii-terminal__title">{title}</span>
+    <div class="ascii-terminal__actions">
+      {
+        replay && (
+          <button
+            aria-label="Replay terminal animation"
+            class="helia-focus-ring"
+            title="Replay terminal animation"
+            type="button"
+            data-replay-button
+          >
+            <svg aria-hidden="true" viewBox="0 0 20 20">
+              <path d="M16.5 7.25A7 7 0 1 0 17 11" />
+              <path d="M16.5 3.5v3.75h-3.75" />
+            </svg>
+          </button>
+        )
+      }
+      {
+        copy && (
+          <button
+            aria-label="Copy terminal transcript"
+            class="helia-focus-ring"
+            title="Copy terminal transcript"
+            type="button"
+            data-copy-button
+          >
+            <svg aria-hidden="true" class="copy-icon" viewBox="0 0 20 20">
+              <path d="M6.25 6.25V4.5A1.75 1.75 0 0 1 8 2.75h7.5a1.75 1.75 0 0 1 1.75 1.75V12A1.75 1.75 0 0 1 15.5 13.75h-1.75" />
+              <rect x="2.75" y="6.25" width="11" height="11" rx="1.75" />
+            </svg>
+            <svg aria-hidden="true" class="check-icon" viewBox="0 0 20 20">
+              <path d="m4.25 10.25 3.5 3.5 8-8" />
+            </svg>
+          </button>
+        )
+      }
+    </div>
+  </div>
+
+  <div class="ascii-terminal__viewport">
+    <pre
+      aria-hidden="true"><code>{normalizedLines.map((line) => (
+      <span class:list={['ascii-terminal__line', `is-${line.kind}`]} data-kind={line.kind} data-line data-text={line.text}>
+        {line.kind === 'command' && (
+          <span class="ascii-terminal__prompt" data-prompt>{line.prompt}</span>
+        )}
+        <span data-line-text>{line.text || ' '}</span>
+      </span>
+    ))}</code></pre>
+  </div>
+
+  {
+    /* The <pre> is aria-hidden so the caret and per-line reveal are not
+  announced; this carries the reading order instead, and doubles as the
+  clipboard source. */
+  }
+  <span class="sr-only" data-transcript>{transcript}</span>
+  {interactive && <span class="sr-only" aria-live="polite" data-status />}
+
+  {interactive && <script is:inline set:html={BEHAVIOR} />}
+</helia-ascii-terminal>
+
+<style>
+  /* style-lint: allow-file color -- the light and dark tones are fixed terminal palettes that must not follow the site theme */
+  .ascii-terminal {
+    --ascii-bg: var(--helia-surface-card);
+    --ascii-border: var(--helia-surface-border);
+    --ascii-ink: var(--helia-ink-primary);
+    --ascii-muted: var(--helia-ink-muted);
+    --ascii-prompt: var(--helia-product-accent, var(--helia-accent-cyan));
+    --helia-surface-border-color: var(--ascii-border);
+    /* A fixed tone keeps its backdrop in both themes, so the ring follows the
+       terminal ink rather than the page's. */
+    --helia-focus-ring-color: var(--ascii-ink);
+
+    background: var(--ascii-bg);
+    color: var(--ascii-ink);
+    display: block;
+    overflow: hidden;
+  }
+
+  .tone-dark {
+    --ascii-bg: #0d1017;
+    --ascii-border: #2b303b;
+    --ascii-ink: #f5f6f7;
+    --ascii-muted: #9ca3af;
+  }
+
+  .tone-light {
+    --ascii-bg: var(--helia-paper-white);
+    --ascii-border: #d7dade;
+    --ascii-ink: var(--helia-ink-black);
+    --ascii-muted: #626870;
+  }
+
+  .ascii-terminal__toolbar {
+    align-items: center;
+    border-bottom: 1px solid var(--ascii-border);
+    display: flex;
+    justify-content: space-between;
+    min-height: 2.65rem;
+    padding: var(--helia-space-1) var(--helia-space-2) var(--helia-space-1)
+      var(--helia-space-3);
+  }
+
+  .ascii-terminal__title {
+    color: var(--ascii-ink);
+    font-size: var(--helia-text-small);
+    font-weight: var(--helia-weight-semibold);
+    line-height: 1.25;
+  }
+
+  .ascii-terminal__actions {
+    align-items: center;
+    display: flex;
+    gap: var(--helia-space-px);
+    margin: 0;
+  }
+
+  button {
+    align-items: center;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    border-radius: var(--helia-radius-sm);
+    color: var(--ascii-muted);
+    cursor: pointer;
+    display: inline-flex;
+    height: 1.9rem;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    transition:
+      background-color 140ms ease,
+      color 140ms ease;
+    width: 1.9rem;
+  }
+
+  button:hover {
+    background: color-mix(in srgb, var(--ascii-ink) 8%, transparent);
+    color: var(--ascii-ink);
+  }
+
+  button svg {
+    fill: none;
+    height: 1rem;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.35;
+    width: 1rem;
+  }
+
+  button .check-icon {
+    display: none;
+  }
+
+  button[data-copied='true'] .copy-icon {
+    display: none;
+  }
+
+  button[data-copied='true'] .check-icon {
+    display: block;
+  }
+
+  .ascii-terminal__viewport {
+    margin: 0;
+    overflow: auto;
+  }
+
+  pre {
+    background: var(--ascii-bg);
+    border: 0;
+    border-radius: 0;
+    color: var(--ascii-ink);
+    font-family: var(--helia-font-mono);
+    /* style-lint: allow font-size -- monospace terminal ramp, not the prose scale */
+    font-size: clamp(0.76rem, 1.4vw, 0.86rem);
+    line-height: 1.55;
+    margin: 0;
+    min-width: max-content;
+    padding: var(--helia-space-4);
+  }
+
+  code {
+    color: inherit;
+    font: inherit;
+  }
+
+  .ascii-terminal__line {
+    align-items: baseline;
+    display: flex;
+    min-height: 1.55em;
+    white-space: pre;
+  }
+
+  .ascii-terminal[data-enhanced='true']
+    .ascii-terminal__line[data-state='pending'] {
+    visibility: hidden;
+  }
+
+  .ascii-terminal__line.is-muted {
+    color: var(--ascii-muted);
+  }
+
+  .ascii-terminal__line.is-success {
+    color: #20a464;
+  }
+
+  .ascii-terminal__line.is-warning {
+    color: #d68b28;
+  }
+
+  .ascii-terminal__prompt {
+    color: var(--ascii-prompt);
+    /* style-lint: allow spacing -- em nudge, tracks the monospace glyph width */
+    margin-right: 0.6em;
+  }
+
+  .ascii-terminal__line[data-active='true'] [data-line-text]::after {
+    animation: ascii-caret 850ms steps(1, end) infinite;
+    background: currentColor;
+    content: '';
+    display: inline-block;
+    height: 1.05em;
+    /* style-lint: allow spacing -- em nudge, tracks the monospace glyph width */
+    margin-left: 0.16em;
+    transform: translateY(0.15em);
+    width: 0.5em;
+  }
+
+  .sr-only {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+
+  @keyframes ascii-caret {
+    0%,
+    48% {
+      opacity: 1;
+    }
+
+    49%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    button {
+      transition: none;
+    }
+
+    .ascii-terminal__line[data-active='true'] [data-line-text]::after {
+      animation: none;
+      display: none;
+    }
+  }
+</style>
