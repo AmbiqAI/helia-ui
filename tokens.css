@@ -8,7 +8,7 @@
  * defined here must not be redefined there; nothing site-specific belongs in
  * this file.
  *
- * CANONICAL COPY: helia-developer-hub/src/styles/tokens.css
+ * CANONICAL COPY: helia-developer-hub/packages/helia-ui/tokens.css
  * This file is VENDORED byte-for-byte into aitg-handbook/src/styles/tokens.css.
  * Edit it in the hub only, then run `npm run sync:tokens` there to push the
  * copy. `npm run check:tokens` diffs the two and fails on drift (it skips
