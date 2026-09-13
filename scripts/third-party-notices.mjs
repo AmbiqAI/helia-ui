@@ -7,8 +7,12 @@
  *   npm run notices           rewrite the notices files
  *   npm run check:notices     exit 1 when one of them is stale
  *
- * Which files that covers follows the scan scope: the package's own notices
- * alone, plus the workspace site's when the caller passes `--root`.
+ * Each root generates the notices its own lockfile determines, and only those:
+ * the package's when the package is the root, the site's when a workspace root
+ * is passed. Two lockfiles resolve the same ranges to different versions, so a
+ * root that regenerated the other's file would overwrite a record of a tree it
+ * did not install. The site's notices cover the package's runtime dependencies
+ * anyway, because the walk follows first-party links into their dependencies.
  *
  * The walk reads the installed tree in node_modules, following `dependencies`
  * only. Development dependencies are excluded because they do not ship.
@@ -55,7 +59,7 @@ const PACKAGE_TARGET = {
   output: join(repoRoot, PACKAGE_DIR, 'THIRD-PARTY-NOTICES.md'),
 };
 
-const TARGETS = WORKSPACE ? [HUB_TARGET, PACKAGE_TARGET] : [PACKAGE_TARGET];
+const TARGETS = WORKSPACE ? [HUB_TARGET] : [PACKAGE_TARGET];
 
 /**
  * shadcn/ui is not an npm dependency: its parts are copied into the tree and

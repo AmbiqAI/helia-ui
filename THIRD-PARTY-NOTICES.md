@@ -8,9 +8,9 @@ Ambiq-authored code is licensed separately under the BSD 3-Clause License; see L
 
 ## Summary
 
-- Packages: 169
+- Packages: 168
 - Distinct license identifiers: 7
-  - MIT: 151
+  - MIT: 150
   - ISC: 13
   - (CC-BY-4.0 AND MIT): 1
   - 0BSD: 1
@@ -120,13 +120,13 @@ SOFTWARE.
 - **@radix-ui/react-visually-hidden** 1.2.11 — MIT — license from package.json license field — text from LICENSE — https://github.com/radix-ui/primitives
 - **@radix-ui/rect** 1.1.3 — MIT — license from package.json license field — text from LICENSE — https://github.com/radix-ui/primitives
 - **@reduxjs/toolkit** 2.12.0 — MIT — license from package.json license field — text from LICENSE — https://github.com/reduxjs/redux-toolkit
-- **@shikijs/core** 4.3.1 — MIT — license from package.json license field — text from LICENSE — https://github.com/shikijs/shiki
-- **@shikijs/engine-javascript** 4.3.1 — MIT — license from package.json license field — text from LICENSE — https://github.com/shikijs/shiki
-- **@shikijs/engine-oniguruma** 4.3.1 — MIT — license from package.json license field — text from LICENSE — https://github.com/shikijs/shiki
-- **@shikijs/langs** 4.3.1 — MIT — license from package.json license field — text from LICENSE — https://github.com/shikijs/shiki
-- **@shikijs/primitive** 4.3.1 — MIT — license from package.json license field — text from LICENSE — https://github.com/shikijs/shiki
-- **@shikijs/themes** 4.3.1 — MIT — license from package.json license field — text from LICENSE — https://github.com/shikijs/shiki
-- **@shikijs/types** 4.3.1 — MIT — license from package.json license field — text from LICENSE — https://github.com/shikijs/shiki
+- **@shikijs/core** 4.4.3 — MIT — license from package.json license field — text from LICENSE — https://github.com/shikijs/shiki
+- **@shikijs/engine-javascript** 4.4.3 — MIT — license from package.json license field — text from LICENSE — https://github.com/shikijs/shiki
+- **@shikijs/engine-oniguruma** 4.4.3 — MIT — license from package.json license field — text from LICENSE — https://github.com/shikijs/shiki
+- **@shikijs/langs** 4.4.3 — MIT — license from package.json license field — text from LICENSE — https://github.com/shikijs/shiki
+- **@shikijs/primitive** 4.4.3 — MIT — license from package.json license field — text from LICENSE — https://github.com/shikijs/shiki
+- **@shikijs/themes** 4.4.3 — MIT — license from package.json license field — text from LICENSE — https://github.com/shikijs/shiki
+- **@shikijs/types** 4.4.3 — MIT — license from package.json license field — text from LICENSE — https://github.com/shikijs/shiki
 - **@shikijs/vscode-textmate** 10.0.2 — MIT — license from package.json license field — text from LICENSE.md — https://github.com/shikijs/vscode-textmate
 - **@standard-schema/spec** 1.1.0 — MIT — license from package.json license field — text from LICENSE — https://github.com/standard-schema/standard-schema
 - **@standard-schema/utils** 0.3.0 — MIT — license from package.json license field — text from LICENSE — https://github.com/standard-schema/standard-schema
@@ -138,14 +138,14 @@ SOFTWARE.
 - **@types/d3-interpolate** 3.0.4 — MIT — license from package.json license field — text from LICENSE — https://github.com/DefinitelyTyped/DefinitelyTyped
 - **@types/d3-path** 3.1.1 — MIT — license from package.json license field — text from LICENSE — https://github.com/DefinitelyTyped/DefinitelyTyped
 - **@types/d3-scale** 4.0.9 — MIT — license from package.json license field — text from LICENSE — https://github.com/DefinitelyTyped/DefinitelyTyped
-- **@types/d3-shape** 3.1.8 — MIT — license from package.json license field — text from LICENSE — https://github.com/DefinitelyTyped/DefinitelyTyped
+- **@types/d3-shape** 3.2.0 — MIT — license from package.json license field — text from LICENSE — https://github.com/DefinitelyTyped/DefinitelyTyped
 - **@types/d3-time** 3.0.4 — MIT — license from package.json license field — text from LICENSE — https://github.com/DefinitelyTyped/DefinitelyTyped
 - **@types/d3-timer** 3.0.2 — MIT — license from package.json license field — text from LICENSE — https://github.com/DefinitelyTyped/DefinitelyTyped
 - **@types/hast** 3.0.5 — MIT — license from package.json license field — text from LICENSE — https://github.com/DefinitelyTyped/DefinitelyTyped
 - **@types/mdast** 4.0.4 — MIT — license from package.json license field — text from LICENSE — https://github.com/DefinitelyTyped/DefinitelyTyped
 - **@types/unist** 3.0.3 — MIT — license from package.json license field — text from LICENSE — https://github.com/DefinitelyTyped/DefinitelyTyped
 - **@types/use-sync-external-store** 0.0.6 — MIT — license from package.json license field — text from LICENSE — https://github.com/DefinitelyTyped/DefinitelyTyped
-- **@ungap/structured-clone** 1.3.3 — ISC — license from package.json license field — text from LICENSE — https://github.com/ungap/structured-clone
+- **@ungap/structured-clone** 1.4.0 — ISC — license from package.json license field — text from LICENSE — https://github.com/ungap/structured-clone
 - **aria-hidden** 1.2.6 — MIT — license from package.json license field — text from LICENSE — https://github.com/theKashey/aria-hidden
 - **ccount** 2.0.1 — MIT — license from package.json license field — text from license — wooorm/ccount
 - **character-entities-html4** 2.1.0 — MIT — license from package.json license field — text from license — wooorm/character-entities-html4
@@ -201,8 +201,7 @@ SOFTWARE.
 - **regex-utilities** 2.3.0 — MIT — license from package.json license field — text from LICENSE — https://github.com/slevithan/regex-utilities
 - **regex** 6.1.0 — MIT — license from package.json license field — text from LICENSE — https://github.com/slevithan/regex
 - **reselect** 5.1.1 — MIT — license from package.json license field — text from LICENSE — https://github.com/reduxjs/reselect
-- **reselect** 5.2.0 — MIT — license from package.json license field — text from LICENSE — https://github.com/reduxjs/reselect
-- **shiki** 4.3.1 — MIT — license from package.json license field — text from LICENSE — https://github.com/shikijs/shiki
+- **shiki** 4.4.3 — MIT — license from package.json license field — text from LICENSE — https://github.com/shikijs/shiki
 - **sonner** 2.0.8 — MIT — license from package.json license field — text from LICENSE.md — https://github.com/emilkowalski/sonner
 - **space-separated-tokens** 2.0.2 — MIT — license from package.json license field — text from license — wooorm/space-separated-tokens
 - **stringify-entities** 4.0.4 — MIT — license from package.json license field — text from license — wooorm/stringify-entities
@@ -216,7 +215,7 @@ SOFTWARE.
 - **unist-util-visit** 5.1.0 — MIT — license from package.json license field — text from license — syntax-tree/unist-util-visit
 - **use-callback-ref** 1.3.3 — MIT — license from package.json license field — text from LICENSE — https://github.com/theKashey/use-callback-ref/
 - **use-sidecar** 1.1.3 — MIT — license from package.json license field — text from LICENSE — https://github.com/theKashey/use-sidecar
-- **use-sync-external-store** 1.6.0 — MIT — license from package.json license field — text from LICENSE — https://github.com/facebook/react
+- **use-sync-external-store** 1.7.0 — MIT — license from package.json license field — text from LICENSE — https://github.com/react/react
 - **vfile-message** 4.0.3 — MIT — license from package.json license field — text from license — vfile/vfile-message
 - **vfile** 6.0.3 — MIT — license from package.json license field — text from license — vfile/vfile
 - **victory-vendor** 37.3.6 — MIT AND ISC — license from package.json license field — no license text bundled — https://github.com/FormidableLabs/victory
@@ -483,7 +482,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### MIT — @shikijs/core@4.3.1, @shikijs/engine-javascript@4.3.1, @shikijs/engine-oniguruma@4.3.1, @shikijs/langs@4.3.1, @shikijs/primitive@4.3.1, @shikijs/themes@4.3.1, @shikijs/types@4.3.1, shiki@4.3.1
+### MIT — @shikijs/core@4.4.3, @shikijs/engine-javascript@4.4.3, @shikijs/engine-oniguruma@4.4.3, @shikijs/langs@4.4.3, @shikijs/primitive@4.4.3, @shikijs/themes@4.4.3, @shikijs/types@4.4.3, shiki@4.4.3
 
 ```
 MIT License
@@ -614,7 +613,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### MIT — @types/d3-array@3.2.2, @types/d3-color@3.1.3, @types/d3-ease@3.0.2, @types/d3-interpolate@3.0.4, @types/d3-path@3.1.1, @types/d3-scale@4.0.9, @types/d3-shape@3.1.8, @types/d3-time@3.0.4, @types/d3-timer@3.0.2, @types/hast@3.0.5, @types/mdast@4.0.4, @types/unist@3.0.3, @types/use-sync-external-store@0.0.6
+### MIT — @types/d3-array@3.2.2, @types/d3-color@3.1.3, @types/d3-ease@3.0.2, @types/d3-interpolate@3.0.4, @types/d3-path@3.1.1, @types/d3-scale@4.0.9, @types/d3-shape@3.2.0, @types/d3-time@3.0.4, @types/d3-timer@3.0.2, @types/hast@3.0.5, @types/mdast@4.0.4, @types/unist@3.0.3, @types/use-sync-external-store@0.0.6
 
 ```
 MIT License
@@ -640,7 +639,7 @@ MIT License
     SOFTWARE
 ```
 
-### ISC — @ungap/structured-clone@1.3.3
+### ISC — @ungap/structured-clone@1.4.0
 
 ```
 ISC License
@@ -1610,7 +1609,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### MIT — reselect@5.1.1, reselect@5.2.0
+### MIT — reselect@5.1.1
 
 ```
 The MIT License (MIT)
@@ -1759,7 +1758,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### MIT — use-sync-external-store@1.6.0
+### MIT — use-sync-external-store@1.7.0
 
 ```
 MIT License
