@@ -3,8 +3,13 @@
 // Copyright (c) 2026, Ambiq
 ---
 
+<!--
+  not-content on the root: Starlight gives every non-first sibling inside
+  .sl-markdown-content a top margin, which lands on the grid children here and
+  pushes each row out of line with the first.
+-->
 <section
-  class="type-showcase helia-surface"
+  class="type-showcase helia-surface not-content"
   aria-label="HELIA typography roles"
 >
   <div class="type-specimen type-specimen--display">
