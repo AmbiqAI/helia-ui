@@ -1,0 +1,45 @@
+---
+export type AmbiqLogoTone = 'adaptive' | 'blue' | 'black' | 'white';
+
+interface Props {
+  tone?: AmbiqLogoTone;
+  label?: string;
+  class?: string;
+}
+
+const { tone = 'blue', label = 'Ambiq', class: className } = Astro.props;
+const logoUrl = `${import.meta.env.BASE_URL}/media/ambiq-logo.svg`;
+---
+
+<span
+  class:list={['ambiq-logo', `ambiq-logo--${tone}`, className]}
+  style={`--ambiq-logo-image: url("${logoUrl}")`}
+  role="img"
+  aria-label={label}></span>
+
+<style>
+  .ambiq-logo {
+    aspect-ratio: 1280 / 366;
+    background: currentColor;
+    display: inline-block;
+    flex: none;
+    mask: var(--ambiq-logo-image) center / contain no-repeat;
+    width: 8rem;
+  }
+
+  .ambiq-logo--blue {
+    color: var(--helia-brand-ambiq-blue);
+  }
+
+  .ambiq-logo--black {
+    color: var(--helia-ink-black);
+  }
+
+  .ambiq-logo--white {
+    color: var(--helia-paper-white);
+  }
+
+  .ambiq-logo--adaptive {
+    color: var(--helia-ink-adaptive);
+  }
+</style>

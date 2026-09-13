@@ -1,0 +1,210 @@
+<theme-menu>
+  <button
+    class="theme-trigger"
+    type="button"
+    aria-label="Choose color theme"
+    aria-haspopup="menu"
+    aria-expanded="false"
+    data-theme-trigger
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="8"></circle>
+      <path d="M12 4a8 8 0 0 0 0 16V4Z"></path>
+    </svg>
+  </button>
+
+  <div class="theme-menu" role="menu" hidden data-theme-menu>
+    <button type="button" role="menuitemradio" data-theme-choice="light">
+      <span>Light</span><span class="check" aria-hidden="true">✓</span>
+    </button>
+    <button type="button" role="menuitemradio" data-theme-choice="dark">
+      <span>Dark</span><span class="check" aria-hidden="true">✓</span>
+    </button>
+    <button type="button" role="menuitemradio" data-theme-choice="auto">
+      <span>Auto</span><span class="check" aria-hidden="true">✓</span>
+    </button>
+  </div>
+</theme-menu>
+
+<script>
+  type Theme = 'auto' | 'dark' | 'light';
+
+  class ThemeMenu extends HTMLElement {
+    connectedCallback() {
+      const trigger = this.querySelector<HTMLButtonElement>(
+        '[data-theme-trigger]',
+      );
+      const menu = this.querySelector<HTMLElement>('[data-theme-menu]');
+      const choices = Array.from(
+        this.querySelectorAll<HTMLButtonElement>('[data-theme-choice]'),
+      );
+      if (!trigger || !menu) return;
+
+      const loadTheme = (): Theme => {
+        const stored = window.localStorage.getItem('starlight-theme');
+        return stored === 'light' || stored === 'dark' ? stored : 'auto';
+      };
+
+      const systemTheme = (): 'dark' | 'light' =>
+        window.matchMedia('(prefers-color-scheme: light)').matches
+          ? 'light'
+          : 'dark';
+
+      const updateChoices = (theme: Theme) => {
+        for (const choice of choices) {
+          const checked = choice.dataset.themeChoice === theme;
+          choice.setAttribute('aria-checked', String(checked));
+        }
+        trigger.dataset.theme = theme;
+        trigger.setAttribute(
+          'aria-label',
+          `Color theme: ${theme}. Choose color theme`,
+        );
+      };
+
+      const applyTheme = (theme: Theme) => {
+        document.documentElement.dataset.theme =
+          theme === 'auto' ? systemTheme() : theme;
+        window.localStorage.setItem(
+          'starlight-theme',
+          theme === 'auto' ? '' : theme,
+        );
+        updateChoices(theme);
+      };
+
+      const close = () => {
+        menu.hidden = true;
+        trigger.setAttribute('aria-expanded', 'false');
+      };
+
+      trigger.addEventListener('click', () => {
+        const open = menu.hidden;
+        menu.hidden = !open;
+        trigger.setAttribute('aria-expanded', String(open));
+        if (open) {
+          choices
+            .find((choice) => choice.getAttribute('aria-checked') === 'true')
+            ?.focus();
+        }
+      });
+
+      for (const choice of choices) {
+        choice.addEventListener('click', () => {
+          const theme = choice.dataset.themeChoice as Theme;
+          applyTheme(theme);
+          close();
+          trigger.focus();
+        });
+      }
+
+      document.addEventListener('click', (event) => {
+        if (event.target instanceof Node && !this.contains(event.target))
+          close();
+      });
+
+      this.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          close();
+          trigger.focus();
+        }
+      });
+
+      window
+        .matchMedia('(prefers-color-scheme: light)')
+        .addEventListener('change', () => {
+          if (loadTheme() === 'auto') applyTheme('auto');
+        });
+
+      applyTheme(loadTheme());
+    }
+  }
+
+  if (!customElements.get('theme-menu')) {
+    customElements.define('theme-menu', ThemeMenu);
+  }
+</script>
+
+<style>
+  theme-menu {
+    display: block;
+    position: relative;
+  }
+
+  .theme-trigger {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: var(--helia-radius-sm);
+    color: var(--sl-color-gray-1);
+    cursor: pointer;
+    display: flex;
+    height: 2.25rem;
+    justify-content: center;
+    padding: 0;
+    width: 2.25rem;
+  }
+
+  .theme-trigger:hover,
+  .theme-trigger[aria-expanded='true'] {
+    background: var(--sl-color-gray-6);
+  }
+
+  .theme-trigger svg {
+    fill: none;
+    height: 1.2rem;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    width: 1.2rem;
+  }
+
+  .theme-trigger path {
+    fill: currentColor;
+    opacity: 0.35;
+  }
+
+  .theme-menu {
+    background: var(--sl-color-bg-nav);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: var(--helia-radius);
+    box-shadow: 0 0.5rem 1.5rem var(--helia-shadow-color-strong);
+    min-width: 8rem;
+    padding: var(--helia-space-1);
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.45rem);
+    z-index: 30;
+  }
+
+  .theme-menu[hidden] {
+    display: none;
+  }
+
+  .theme-menu button {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: var(--helia-radius-sm);
+    color: var(--sl-color-gray-1);
+    cursor: pointer;
+    display: flex;
+    font: inherit;
+    font-size: var(--helia-text-caption);
+    justify-content: space-between;
+    padding: var(--helia-space-2) var(--helia-space-3);
+    width: 100%;
+  }
+
+  .theme-menu button:hover,
+  .theme-menu button:focus-visible {
+    background: var(--sl-color-gray-6);
+    outline: none;
+  }
+
+  .check {
+    opacity: 0;
+  }
+
+  [aria-checked='true'] .check {
+    opacity: 1;
+  }
+</style>
