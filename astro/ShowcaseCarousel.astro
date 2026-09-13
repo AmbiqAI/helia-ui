@@ -246,6 +246,18 @@ const { tabs, variant = 'feature' } = Astro.props;
     touch-action: pan-x;
   }
 
+  /*
+   * The rail sizes what it is handed. The cards are slotted, so they carry the
+   * consuming page's scope rather than this one and the selector has to leave
+   * the component scope to reach them; without this every consumer re-declares
+   * the rail's own geometry on its own card.
+   */
+  /* style-lint: allow global -- slotted children cannot be reached from the component scope */
+  .track > :global(*) {
+    flex: 0 0 var(--carousel-card-basis);
+    scroll-snap-align: start;
+  }
+
   .track::-webkit-scrollbar {
     display: none;
   }

@@ -1,0 +1,191 @@
+/* SPDX-License-Identifier: BSD-3-Clause */
+/* Copyright (c) 2026, Ambiq */
+/*
+ * This site's own sheet, loaded after the package sheets so a rule here needs
+ * no extra specificity to win.
+ *
+ * Everything below is demonstration scaffolding: the grids and rows that hold
+ * the examples apart on a page, and the swatches that render a token by using
+ * it. None of it is package API, which is why it lives on the consumer's side
+ * of the boundary in the same way the hub's site.css does. A consuming site
+ * writes its own; it does not inherit these.
+ */
+
+/*
+ * Starlight gives every non-first sibling inside .sl-markdown-content a top
+ * margin, exempting descendants of .not-content. A grid or flex root in a page
+ * therefore carries not-content, and these rules assume it.
+ */
+.helia-card-grid,
+.helia-media-surface-grid {
+  display: grid;
+  gap: var(--helia-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+
+.helia-media-surface-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  margin-top: var(--helia-space-4);
+}
+
+.helia-media-surface-grid figure {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: var(--helia-radius);
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.helia-media-surface-grid figcaption {
+  color: var(--sl-color-gray-2);
+  font-size: var(--helia-text-caption);
+  font-weight: var(--helia-weight-medium);
+  line-height: 1.35;
+  margin-top: var(--helia-space-4);
+  padding: var(--helia-space-3);
+}
+
+.helia-equal-grid {
+  align-items: stretch;
+  grid-auto-rows: 1fr;
+}
+
+.helia-equal-grid > * {
+  align-self: stretch;
+  height: 100%;
+  margin-block: 0;
+  min-width: 0;
+}
+
+.helia-badge-row,
+.helia-display-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helia-space-2);
+}
+
+.helia-display-row {
+  gap: var(--helia-space-3);
+}
+
+.helia-callout-stack {
+  display: grid;
+  gap: var(--helia-space-3);
+}
+
+/* A token rendered by being used: the bar's width is the step it names. */
+.token-scale {
+  display: grid;
+  gap: var(--helia-space-2);
+  margin-top: var(--helia-space-4);
+}
+
+.token-scale__row {
+  align-items: center;
+  display: grid;
+  gap: var(--helia-space-3);
+  grid-template-columns: 12rem 1fr;
+}
+
+.token-scale__bar {
+  background: var(--sl-color-accent);
+  border-radius: var(--helia-radius-xs);
+  display: block;
+  height: var(--helia-space-3);
+  min-width: 1px;
+}
+
+.token-swatches {
+  display: grid;
+  gap: var(--helia-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  margin-top: var(--helia-space-4);
+}
+
+.token-swatches--small {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+}
+
+.token-swatches figure {
+  margin: 0;
+  min-width: 0;
+}
+
+.token-swatches figcaption {
+  color: var(--sl-color-gray-2);
+  font-size: var(--helia-text-caption);
+  margin-top: var(--helia-space-2);
+  overflow-wrap: anywhere;
+}
+
+.token-swatch {
+  background: var(--sl-color-accent);
+  height: 4.5rem;
+}
+
+.token-swatch--bordered {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: var(--helia-radius);
+}
+
+.token-ink-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helia-space-4);
+  margin-top: var(--helia-space-4);
+}
+
+.logo-grid {
+  display: grid;
+  gap: var(--helia-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  margin-top: var(--helia-space-4);
+}
+
+.logo-swatch {
+  align-items: center;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: var(--helia-radius);
+  display: flex;
+  flex-direction: column;
+  gap: var(--helia-space-3);
+  justify-content: center;
+  min-height: 8.5rem;
+  padding: var(--helia-space-4);
+}
+
+.logo-swatch--light {
+  background: var(--helia-paper-white);
+}
+
+.logo-swatch--dark {
+  background: var(--helia-ink-black);
+  /* style-lint: allow color -- swatch edge on the fixed dark brand surface */
+  border-color: #30343b;
+}
+
+.logo-swatch > span:not(.ambiq-logo) {
+  /* style-lint: allow color -- swatch caption reads on both fixed surfaces */
+  color: #626870;
+  font-size: var(--helia-text-label);
+  font-weight: var(--helia-weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.logo-swatch--dark > span:not(.ambiq-logo) {
+  /* style-lint: allow color -- swatch caption reads on the fixed dark surface */
+  color: #c9cdd2;
+}
+
+@media (width < 42rem) {
+  .helia-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .token-scale__row {
+    grid-template-columns: 1fr;
+    gap: var(--helia-space-1);
+  }
+}

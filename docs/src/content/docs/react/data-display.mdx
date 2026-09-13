@@ -1,0 +1,36 @@
+---
+title: Data display
+description: The static data table and the shadcn chart wrapper over Recharts.
+---
+
+import DataTable from '@ambiqai/helia-ui/astro/DataTable';
+import ChartShowcase from '../../../islands/ChartShowcase';
+
+## Dense data table
+
+Tables are for comparison and dense structured data—not primary navigation.
+
+<DataTable
+  caption="Representative engine comparison"
+  columns={['Engine', 'Latency', 'Peak RAM', 'Flash', 'Status']}
+  rows={[
+    ['heliaRT', '5.2 ms', '196 KB', '412 KB', 'Released'],
+    ['heliaAOT', '4.8 ms', '184 KB', '286 KB', 'Beta'],
+    ['TFLM', '7.9 ms', '212 KB', '438 KB', 'Reference'],
+    ['CMSIS-NN', '6.7 ms', '204 KB', '354 KB', 'Reference'],
+    ['Reference C', '12.4 ms', '176 KB', '248 KB', 'Baseline'],
+  ]}
+  pageSize={3}
+/>
+
+A table that becomes a tool rather than a comparison belongs on the React
+side instead: the shadcn table primitives draw it, TanStack drives the sorting
+and the paging, and the page pays for an island.
+
+## Plots
+
+These standard examples use the shadcn chart wrapper over Recharts. Use bars for
+direct comparison and scatter plots for tradeoffs between two measures; keep the
+framing compact and the number of series restrained.
+
+<ChartShowcase animate client:only="react" />

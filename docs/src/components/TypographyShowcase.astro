@@ -1,0 +1,264 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+---
+
+<section
+  class="type-showcase helia-surface"
+  aria-label="HELIA typography roles"
+>
+  <div class="type-specimen type-specimen--display">
+    <div class="type-meta">
+      <strong>Display</strong>
+      <span>System sans · 650</span>
+    </div>
+    <p>Intelligence at the edge</p>
+  </div>
+
+  <div class="type-specimen type-specimen--page">
+    <div class="type-meta">
+      <strong>Page title</strong>
+      <span>System sans · 650</span>
+    </div>
+    <p>Deploy a model</p>
+  </div>
+
+  <div class="type-specimen type-specimen--section">
+    <div class="type-meta">
+      <strong>Section title</strong>
+      <span>System sans · 650</span>
+    </div>
+    <p>Choose a runtime</p>
+  </div>
+
+  <div class="type-specimen type-specimen--content">
+    <div class="type-meta">
+      <strong>Content hierarchy</strong>
+      <span>Lead · body · supporting</span>
+    </div>
+    <div class="content-samples">
+      <p class="lead">
+        Start with the workflow that matches how your model will ship.
+      </p>
+      <p class="body">
+        Use heliaRT for a familiar runtime path or heliaAOT when build-time
+        control is the priority.
+      </p>
+      <p class="supporting">
+        Supporting text adds constraints, provenance, or secondary context.
+      </p>
+    </div>
+  </div>
+
+  <div class="type-specimen type-specimen--utility">
+    <div class="type-meta">
+      <strong>Utility roles</strong>
+      <span>Label · code</span>
+    </div>
+    <div class="utility-samples">
+      <span class="label">Released runtime</span>
+      <code>profile_model(board="apollo510")</code>
+    </div>
+  </div>
+
+  <div class="color-roles" aria-label="Text color roles">
+    <div class="color-role">
+      <span class="swatch swatch--primary"></span>
+      <span class="color-role__copy">
+        <strong>Primary</strong>
+        <small>Titles and essential values</small>
+      </span>
+    </div>
+    <div class="color-role">
+      <span class="swatch swatch--secondary"></span>
+      <span class="color-role__copy">
+        <strong>Secondary</strong>
+        <small>Descriptions and guidance</small>
+      </span>
+    </div>
+    <div class="color-role">
+      <span class="swatch swatch--muted"></span>
+      <span class="color-role__copy">
+        <strong>Muted</strong>
+        <small>Metadata and supporting text</small>
+      </span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .type-showcase {
+    overflow: hidden;
+  }
+
+  .type-specimen {
+    align-items: baseline;
+    display: grid;
+    gap: var(--helia-space-5);
+    grid-template-columns: minmax(8rem, 0.28fr) minmax(0, 1fr);
+    padding: var(--helia-space-4);
+  }
+
+  .type-specimen + .type-specimen,
+  .color-roles {
+    border-top: 1px solid var(--sl-color-gray-5);
+  }
+
+  .type-meta {
+    display: grid;
+    gap: var(--helia-space-1);
+  }
+
+  .type-meta strong {
+    color: var(--helia-ink-primary);
+    font-size: var(--helia-text-small);
+    font-weight: var(--helia-weight-semibold);
+  }
+
+  .type-meta span {
+    color: var(--helia-ink-muted);
+    font-family: var(--helia-font-mono);
+    font-size: var(--helia-text-label);
+  }
+
+  .type-specimen > p,
+  .content-samples p {
+    margin: 0;
+  }
+
+  .type-specimen--display > p {
+    color: var(--helia-ink-primary);
+    font-size: var(--helia-text-display);
+    font-weight: var(--helia-weight-semibold);
+    letter-spacing: -0.055em;
+    line-height: var(--helia-leading-tight);
+  }
+
+  .type-specimen--page > p {
+    color: var(--helia-ink-primary);
+    font-size: var(--helia-text-page);
+    font-weight: var(--helia-weight-semibold);
+    letter-spacing: -0.04em;
+    line-height: var(--helia-leading-heading);
+  }
+
+  .type-specimen--section > p {
+    color: var(--helia-ink-primary);
+    font-size: var(--helia-text-section);
+    font-weight: var(--helia-weight-semibold);
+    letter-spacing: -0.03em;
+    line-height: var(--helia-leading-heading);
+  }
+
+  .content-samples {
+    display: grid;
+    gap: var(--helia-space-3);
+    max-width: 42rem;
+  }
+
+  .lead {
+    color: var(--helia-ink-primary);
+    font-size: var(--helia-text-lead);
+    font-weight: var(--helia-weight-regular);
+    line-height: 1.55;
+  }
+
+  .body {
+    color: var(--helia-ink-secondary);
+    font-size: var(--helia-text-body);
+    line-height: var(--helia-leading-body);
+  }
+
+  .supporting {
+    color: var(--helia-ink-muted);
+    font-size: var(--helia-text-small);
+    line-height: 1.5;
+  }
+
+  .utility-samples {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--helia-space-3) var(--helia-space-4);
+  }
+
+  .label {
+    color: var(--helia-ink-secondary);
+    font-size: var(--helia-text-label);
+    font-weight: var(--helia-weight-bold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  code {
+    background: var(--sl-color-gray-6);
+    border-radius: var(--helia-radius-sm);
+    color: var(--helia-ink-primary);
+    font-family: var(--helia-font-mono);
+    font-size: var(--helia-text-small);
+    padding: var(--helia-space-1) var(--helia-space-2);
+  }
+
+  .color-roles {
+    display: grid;
+    gap: var(--helia-space-3);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: var(--helia-space-4);
+  }
+
+  .color-role {
+    align-items: center;
+    display: flex;
+    gap: var(--helia-space-2);
+    min-width: 0;
+  }
+
+  .color-role__copy {
+    align-items: start;
+    display: flex;
+    flex-direction: column;
+    gap: var(--helia-space-px);
+    min-width: 0;
+  }
+
+  .swatch {
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: var(--helia-radius-pill);
+    flex: 0 0 auto;
+    height: 1.7rem;
+    width: 1.7rem;
+  }
+
+  .swatch--primary {
+    background: var(--helia-ink-primary);
+  }
+  .swatch--secondary {
+    background: var(--helia-ink-secondary);
+  }
+  .swatch--muted {
+    background: var(--helia-ink-muted);
+  }
+
+  .color-roles strong {
+    color: var(--helia-ink-primary);
+    font-size: var(--helia-text-small);
+  }
+
+  .color-roles small {
+    color: var(--helia-ink-muted);
+    font-size: var(--helia-text-label);
+    line-height: 1.35;
+  }
+
+  @media (width < 42rem) {
+    .type-specimen {
+      align-items: start;
+      gap: var(--helia-space-3);
+      grid-template-columns: 1fr;
+    }
+
+    .color-roles {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

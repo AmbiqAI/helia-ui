@@ -1,0 +1,31 @@
+/* SPDX-License-Identifier: BSD-3-Clause */
+/* Copyright (c) 2026, Ambiq */
+/*
+ * The docs site's Tailwind v4 entry.
+ *
+ * Same shape as any consuming site's: the theme mapping, the layer order and
+ * the Starlight compat round trip come from the package, and what stays here
+ * is the scan list. Tailwind resolves a `@source` glob relative to the file
+ * that declares it, so the package cannot name a path in a consumer's tree or
+ * a path out of node_modules; the consumer's entry holds both.
+ *
+ * `@ambiqai/helia-ui/shadcn.css` is not imported here. The package's Tailwind
+ * entry imports it last on purpose, after the `*: initial` theme resets that
+ * would otherwise wipe its keys, so a second import would emit the bridge
+ * twice for no gain.
+ */
+
+@import '@ambiqai/helia-ui/tailwind.css';
+
+/*
+ * Explicit scan list; automatic detection is off, so the emitted stylesheet is
+ * a function of this list and nothing else. Unlike the hub there is no
+ * production exclusion: every page here exists to demonstrate a package part,
+ * so every part's utilities belong in the bundle.
+ */
+@source '../content/**/*.{md,mdx}';
+@source '../components/**/*.astro';
+@source '../islands/**/*.tsx';
+@source '../../../astro/**/*.astro';
+@source '../../../starlight/**/*.astro';
+@source '../../../react/**/*.tsx';

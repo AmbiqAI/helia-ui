@@ -1,0 +1,28 @@
+{
+  "name": "@ambiqai/helia-ui-docs",
+  "description": "Documentation site for @ambiqai/helia-ui",
+  "license": "BSD-3-Clause",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build && npm run assert",
+    "preview": "astro preview",
+    "check": "astro check",
+    "assert": "node scripts/assert-docs-build.mjs",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "@ambiqai/helia-ui": "*",
+    "@astrojs/react": "^6.0.2",
+    "@astrojs/starlight": "^0.41.5",
+    "@astrojs/starlight-tailwind": "5.0.0",
+    "@tailwindcss/vite": "4.3.3",
+    "astro": "^7.0.2",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tailwindcss": "4.3.3"
+  }
+}

@@ -1,0 +1,108 @@
+---
+title: Primitives
+description: Surface, Chip, Eyebrow, and Button, plus the shared focus and hover recipes.
+---
+
+import Button from '@ambiqai/helia-ui/astro/Button';
+import Chip from '@ambiqai/helia-ui/astro/Chip';
+import Eyebrow from '@ambiqai/helia-ui/astro/Eyebrow';
+import Surface from '@ambiqai/helia-ui/astro/Surface';
+
+Four primitives carry the shapes that every other component used to redeclare:
+the card surface, the pill, the uppercase label, and the call to action. Each
+one renders a class defined in `packages/helia-ui/recipes.css`, so an element that
+cannot be produced by the component — a grid `<li>`, a Starlight shell
+override, a scroll frame — reaches the same recipe by applying the class.
+
+## Surface
+
+One border, one radius, three backgrounds. Reach for `tone="muted"` when the
+surface sits on the card background and has to recede, and `tone="paper"` for a
+full-width band.
+
+<div className="helia-card-grid helia-equal-grid not-content">
+  <Surface>
+    <strong>Card</strong>
+    <p>The default raised surface for a discrete interface object.</p>
+  </Surface>
+  <Surface tone="muted">
+    <strong>Muted</strong>
+    <p>A recessed fill for a panel inside another surface.</p>
+  </Surface>
+  <Surface tone="paper">
+    <strong>Paper</strong>
+    <p>The quiet canvas used for page bands.</p>
+  </Surface>
+</div>
+
+`padding` names a spacing step rather than a length, so a surface cannot drift
+off the scale. `interactive` adds the shared hover background and the focus
+ring; `href` renders an anchor.
+
+<div className="helia-card-grid helia-equal-grid not-content">
+  <Surface href="#surface" interactive padding="5">
+    <strong>Interactive</strong>
+    <p>Hover and focus this card to see the shared affordance.</p>
+  </Surface>
+  <Surface as="article" padding="2">
+    <strong>Tight padding</strong>
+    <p>Step 2 instead of the default step 4.</p>
+  </Surface>
+</div>
+
+## Chip
+
+`neutral` is the outlined default and reacts to pointer state when it links.
+`accent` is the filled badge. `static` is read-only metadata and never
+suggests it can be clicked.
+
+<div className="helia-badge-row">
+  <Chip>Neutral</Chip>
+  <Chip tone="accent">Accent</Chip>
+  <Chip tone="static">Static</Chip>
+  <Chip href="#chip">Linked</Chip>
+  <Chip size="md">Medium</Chip>
+  <Chip size="md" tone="static">
+    Medium static
+  </Chip>
+</div>
+
+Horizontal padding sits one step above vertical at both sizes, which is what
+makes the shape read as a pill rather than a rounded box.
+
+## Eyebrow
+
+The uppercase label above a heading. It renders a `<p>` by default; pass
+`as="span"` inside a link or a flow that already owns the paragraph.
+
+<Eyebrow>Section label</Eyebrow>
+
+## Button
+
+<div className="helia-display-row">
+  <Button href="#button">Primary</Button>
+  <Button href="#button" variant="secondary">
+    Secondary
+  </Button>
+  <Button href="#button" variant="ghost">
+    Ghost
+  </Button>
+  <Button href="#button" size="sm">
+    Small
+  </Button>
+</div>
+
+Without `href` the component renders a `<button type="button">`.
+
+## Shared recipes
+
+Two classes exist on their own because components apply them to elements the
+primitives do not own.
+
+- `.helia-focus-ring` is the site's single focus-visible treatment. Add
+  `.helia-focus-ring--inset` when the control sits flush inside a clipping
+  parent, where an outset ring would be cut off.
+- `.helia-hover-surface` is the hover and focus affordance for a card: the
+  background steps to the muted fill and the border lightens. It never
+  transforms, because a card that moves under the pointer inside a grid
+  reflows its neighbours.

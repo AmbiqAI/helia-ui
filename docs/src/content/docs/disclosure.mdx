@@ -1,0 +1,36 @@
+---
+title: Disclosure
+description: Accordions and expandable content sections.
+---
+
+import AccordionGroup from '@ambiqai/helia-ui/astro/AccordionGroup';
+
+Use disclosure for optional details, FAQs, advanced configuration, and dense
+reference content. Avoid hiding information users need to complete the primary
+task.
+
+<AccordionGroup
+  items={[
+    {
+      title: 'When should I use an accordion?',
+      content:
+        'Use one when several secondary topics share the same context and users usually need only one or two at a time.',
+    },
+    {
+      title: 'Should multiple sections stay open?',
+      content:
+        'Yes by default. Native details elements let users compare sections and preserve predictable browser behavior.',
+    },
+    {
+      title: 'What should remain visible?',
+      content:
+        'Keep primary instructions, critical warnings, and required setup outside collapsed regions.',
+    },
+  ]}
+/>
+
+## Initial set
+
+- Accordion group
+- Single expandable details section
+- Later: tree navigation and nested disclosure only if real content requires them

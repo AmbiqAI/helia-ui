@@ -1,0 +1,114 @@
+---
+title: Timeline
+description: Editorial timelines for recent updates, release history, and roadmaps.
+---
+
+import Timeline from '@ambiqai/helia-ui/astro/Timeline';
+
+Timelines show sequence without turning updates into a stack of cards. Use
+grouped entries when several changes share a date or roadmap phase, and keep
+descriptions concise enough to scan.
+
+## Recent updates
+
+Use chronological labels for changelogs, release histories, and editorial
+update feeds. A group can contain one or several related entries.
+
+<Timeline
+  heading="What's new"
+  actionLabel="View all updates"
+  actionHref="#recent-updates"
+  groups={[
+    {
+      label: 'July 20–24, 2026',
+      datetime: '2026-07-20/2026-07-24',
+      items: [
+        {
+          title: 'Compare deployment engines with measured results',
+          description:
+            'Review latency, memory, and flash measurements together before selecting a deployment path.',
+          href: '#recent-updates',
+        },
+        {
+          title: 'Copy configuration examples directly from guides',
+          description:
+            'Code blocks now keep the filename, language, and relevant lines visible.',
+        },
+      ],
+    },
+    {
+      label: 'July 13–17, 2026',
+      datetime: '2026-07-13/2026-07-17',
+      items: [
+        {
+          title: 'Follow the HELIA workflow from model to device',
+          description:
+            'A clearer journey connects model preparation, runtime selection, profiling, and deployment.',
+          href: '#recent-updates',
+        },
+      ],
+    },
+  ]}
+/>
+
+## Roadmap
+
+Use phase labels instead of dates when timing is directional. Accent color may
+clarify state, but the content and sequence should remain primary.
+
+<Timeline
+  variant="roadmap"
+  ariaLabel="Example product roadmap"
+  groups={[
+    {
+      label: 'Now',
+      tone: 'green',
+      items: [
+        {
+          meta: 'In progress',
+          title: 'Reusable developer-site foundations',
+          description:
+            'Polish navigation, code, data display, tutorial, and editorial components.',
+        },
+      ],
+    },
+    {
+      label: 'Next',
+      tone: 'blue',
+      items: [
+        {
+          meta: 'Planned',
+          title: 'Ecosystem and customer-journey pages',
+          description:
+            'Explain product relationships and guide developers toward the right runtime.',
+        },
+        {
+          meta: 'Planned',
+          title: 'SDK and native symbol reference',
+          description:
+            'Document C and C++ APIs, configuration, compatibility, and command-line workflows.',
+        },
+      ],
+    },
+    {
+      label: 'Later',
+      tone: 'purple',
+      items: [
+        {
+          meta: 'Exploring',
+          title: 'Interactive notebook examples',
+          description:
+            'Evaluate browser-hosted examples when WebAssembly package compatibility is sufficient.',
+        },
+      ],
+    },
+  ]}
+/>
+
+## Usage guidance
+
+- Prefer a timeline when sequence or recency is part of the meaning.
+- Group related changes under one date or phase rather than repeating labels.
+- Keep the rail visually subordinate to titles and descriptions.
+- Link only entries that have a meaningful destination.
+- On small screens, place the date or phase above its entries.

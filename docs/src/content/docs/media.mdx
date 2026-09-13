@@ -1,0 +1,66 @@
+---
+title: Media
+description: Generative card artwork and the poster-first embed for hosted video.
+---
+
+import Media from '@ambiqai/helia-ui/astro/Media';
+import MediaEmbed from '@ambiqai/helia-ui/astro/MediaEmbed';
+
+Two parts fill the space a card leaves for a picture. `Media` draws artwork
+when there is no real image to show, and `MediaEmbed` stands in for a hosted
+video until the visitor asks for it.
+
+## Generative artwork
+
+Generative artwork for a card with no real image. The accent is a CSS custom
+property rather than a prop, so the component never learns a product or brand
+name. Every form of the colour field is derived from that one accent, so the
+accent you pass sets the whole surface:
+
+```astro
+<Media treatment="color-field" style="--accent: var(--helia-accent-cyan)" />
+```
+
+<div className="helia-media-surface-grid not-content">
+  <figure>
+    <Media
+      treatment="color-field"
+      ratio="16/9"
+      style="--accent: var(--helia-accent-cyan)"
+    />
+    <figcaption>Color field · one accent, four forms</figcaption>
+  </figure>
+  <figure>
+    <Media treatment="graphite" ratio="16/9" />
+    <figcaption>Graphite · conceptual systems</figcaption>
+  </figure>
+  <figure>
+    <Media treatment="slate" ratio="16/9" />
+    <figcaption>Slate · architecture and tooling</figcaption>
+  </figure>
+  <figure>
+    <Media treatment="wire" ratio="16/9" />
+    <figcaption>Wire · data flows and connections</figcaption>
+  </figure>
+</div>
+
+The artwork carries no information, so it is hidden from assistive technology.
+Where a caption is needed, wrap it in a `<figure>` as above.
+
+## Hosted video
+
+Use a poster-first embed for externally hosted video. The third-party player is
+not requested until the visitor presses play, which keeps the initial page
+weight and the provider's requests out of the critical path. Always give the
+embed a useful title and an external fallback link.
+
+<MediaEmbed
+  title="YouTube embed sample"
+  videoId="M7lc1UVf-VE"
+  caption="Provider integration sample; replace the video ID and the poster with your own asset."
+  duration="1:24"
+/>
+
+The embed knows nothing about what it is showing. The poster, the caption and
+the duration are props, so the part never reaches for a demo or a product to
+describe itself.

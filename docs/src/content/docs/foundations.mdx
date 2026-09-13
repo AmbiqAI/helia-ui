@@ -1,0 +1,279 @@
+---
+title: Foundations
+description: The token layers, the scales every part compiles against, and the Ambiq wordmark.
+---
+
+import AmbiqLogo from '@ambiqai/helia-ui/starlight/AmbiqLogo.astro';
+import Callout from '@ambiqai/helia-ui/astro/Callout';
+import TypographyShowcase from '../../components/TypographyShowcase.astro';
+
+Three stylesheets carry the vocabulary. `tokens.css` holds the primitives for
+both themes and maps them onto Starlight's `--sl-*` variables. `semantic.css`
+names the steps that authoring uses: spacing, radius, type, weight, leading,
+ink, surfaces, tones, accents. `recipes.css` turns those into the shapes the
+parts share.
+
+They are unlayered on purpose, so they outrank every cascade layer a Tailwind
+entry declares. That is what keeps a token authoritative over whatever the
+Starlight Tailwind compat package wires up underneath.
+
+## Spacing
+
+One scale, six steps and a hairline. A part that takes a spacing prop names a
+step rather than a length, so the same value reaches the part, the recipe, and
+the Tailwind utility.
+
+<div className="token-scale not-content">
+  <div className="token-scale__row">
+    <code>--helia-space-px</code>
+    <span className="token-scale__bar" style="width: var(--helia-space-px)" />
+  </div>
+  <div className="token-scale__row">
+    <code>--helia-space-1</code>
+    <span className="token-scale__bar" style="width: var(--helia-space-1)" />
+  </div>
+  <div className="token-scale__row">
+    <code>--helia-space-2</code>
+    <span className="token-scale__bar" style="width: var(--helia-space-2)" />
+  </div>
+  <div className="token-scale__row">
+    <code>--helia-space-3</code>
+    <span className="token-scale__bar" style="width: var(--helia-space-3)" />
+  </div>
+  <div className="token-scale__row">
+    <code>--helia-space-4</code>
+    <span className="token-scale__bar" style="width: var(--helia-space-4)" />
+  </div>
+  <div className="token-scale__row">
+    <code>--helia-space-5</code>
+    <span className="token-scale__bar" style="width: var(--helia-space-5)" />
+  </div>
+  <div className="token-scale__row">
+    <code>--helia-space-6</code>
+    <span className="token-scale__bar" style="width: var(--helia-space-6)" />
+  </div>
+</div>
+
+The Tailwind entry maps each step onto `--spacing-*`, so `p-3` and
+`padding: var(--helia-space-3)` are the same value by construction rather than
+by convention.
+
+## Radius
+
+<div className="token-swatches not-content">
+  <figure>
+    <div
+      className="token-swatch"
+      style="border-radius: var(--helia-radius-xs)"
+    />
+    <figcaption>
+      <code>--helia-radius-xs</code>
+    </figcaption>
+  </figure>
+  <figure>
+    <div
+      className="token-swatch"
+      style="border-radius: var(--helia-radius-sm)"
+    />
+    <figcaption>
+      <code>--helia-radius-sm</code>
+    </figcaption>
+  </figure>
+  <figure>
+    <div className="token-swatch" style="border-radius: var(--helia-radius)" />
+    <figcaption>
+      <code>--helia-radius</code>
+    </figcaption>
+  </figure>
+  <figure>
+    <div
+      className="token-swatch"
+      style="border-radius: var(--helia-radius-lg)"
+    />
+    <figcaption>
+      <code>--helia-radius-lg</code>
+    </figcaption>
+  </figure>
+  <figure>
+    <div
+      className="token-swatch"
+      style="border-radius: var(--helia-radius-pill)"
+    />
+    <figcaption>
+      <code>--helia-radius-pill</code>
+    </figcaption>
+  </figure>
+</div>
+
+## Surfaces and ink
+
+Four surfaces and four inks, both sets swapped by the theme flip. Nothing in
+the package writes a colour literal; everything resolves through these.
+
+<div className="token-swatches not-content">
+  <figure>
+    <div
+      className="token-swatch token-swatch--bordered"
+      style="background: var(--helia-surface-canvas)"
+    />
+    <figcaption>
+      <code>--helia-surface-canvas</code>
+    </figcaption>
+  </figure>
+  <figure>
+    <div
+      className="token-swatch token-swatch--bordered"
+      style="background: var(--helia-surface-paper)"
+    />
+    <figcaption>
+      <code>--helia-surface-paper</code>
+    </figcaption>
+  </figure>
+  <figure>
+    <div
+      className="token-swatch token-swatch--bordered"
+      style="background: var(--helia-surface-card)"
+    />
+    <figcaption>
+      <code>--helia-surface-card</code>
+    </figcaption>
+  </figure>
+  <figure>
+    <div
+      className="token-swatch token-swatch--bordered"
+      style="background: var(--helia-surface-card-muted)"
+    />
+    <figcaption>
+      <code>--helia-surface-card-muted</code>
+    </figcaption>
+  </figure>
+</div>
+
+<div className="token-ink-row not-content">
+  <span style="color: var(--helia-ink-primary)">
+    <code>--helia-ink-primary</code>
+  </span>
+  <span style="color: var(--helia-ink-secondary)">
+    <code>--helia-ink-secondary</code>
+  </span>
+  <span style="color: var(--helia-ink-muted)">
+    <code>--helia-ink-muted</code>
+  </span>
+  <span style="color: var(--helia-ink-caution)">
+    <code>--helia-ink-caution</code>
+  </span>
+</div>
+
+## Accents
+
+The accent set is the package's whole colour vocabulary. There are no product
+names here: a consuming site maps its own subjects onto an accent in the
+composition that knows what they mean, and hands it to a part as `--accent`.
+
+<div className="token-swatches token-swatches--small not-content">
+  <figure>
+    <div
+      className="token-swatch"
+      style="background: var(--helia-accent-blue)"
+    />
+    <figcaption>
+      <code>blue</code>
+    </figcaption>
+  </figure>
+  <figure>
+    <div
+      className="token-swatch"
+      style="background: var(--helia-accent-cyan)"
+    />
+    <figcaption>
+      <code>cyan</code>
+    </figcaption>
+  </figure>
+  <figure>
+    <div
+      className="token-swatch"
+      style="background: var(--helia-accent-green)"
+    />
+    <figcaption>
+      <code>green</code>
+    </figcaption>
+  </figure>
+  <figure>
+    <div
+      className="token-swatch"
+      style="background: var(--helia-accent-orange)"
+    />
+    <figcaption>
+      <code>orange</code>
+    </figcaption>
+  </figure>
+  <figure>
+    <div
+      className="token-swatch"
+      style="background: var(--helia-accent-pink)"
+    />
+    <figcaption>
+      <code>pink</code>
+    </figcaption>
+  </figure>
+  <figure>
+    <div
+      className="token-swatch"
+      style="background: var(--helia-accent-purple)"
+    />
+    <figcaption>
+      <code>purple</code>
+    </figcaption>
+  </figure>
+  <figure>
+    <div className="token-swatch" style="background: var(--helia-accent-red)" />
+    <figcaption>
+      <code>red</code>
+    </figcaption>
+  </figure>
+  <figure>
+    <div
+      className="token-swatch"
+      style="background: var(--helia-accent-slate)"
+    />
+    <figcaption>
+      <code>slate</code>
+    </figcaption>
+  </figure>
+</div>
+
+<Callout tone="note" title="Accent is a custom property, not a prop">
+  `Media` takes its colour as `style="--accent: var(--helia-accent-cyan)"`
+  rather than `accent="cyan"`. That is deliberate: a prop would be an
+  enumeration the package has to own, and owning it would mean owning what each
+  name is for. As a custom property the part never learns the vocabulary.
+</Callout>
+
+## Typography
+
+Use the native system sans stack for interface and editorial copy, and the
+native monospace stack for code, filenames, versions, and machine-oriented
+identifiers. Choose a named role before introducing a local size or weight.
+
+<TypographyShowcase />
+
+## The Ambiq wordmark
+
+The plugin's footer renders the approved Ambiq wordmark, and the component is
+available on its own at `@ambiqai/helia-ui/starlight/AmbiqLogo.astro`. It keeps
+the source artwork intact while exposing only the three approved treatments.
+
+<div className="logo-grid not-content">
+  <div className="logo-swatch logo-swatch--light">
+    <AmbiqLogo tone="blue" />
+    <span>Blue</span>
+  </div>
+  <div className="logo-swatch logo-swatch--light">
+    <AmbiqLogo tone="black" />
+    <span>Black</span>
+  </div>
+  <div className="logo-swatch logo-swatch--dark">
+    <AmbiqLogo tone="white" />
+    <span>White</span>
+  </div>
+</div>

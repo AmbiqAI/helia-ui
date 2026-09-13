@@ -1,0 +1,133 @@
+---
+title: Layout
+description: The showcase carousel, the one layout part the package ships.
+---
+
+import Card from '@ambiqai/helia-ui/astro/Card';
+import CardContent from '@ambiqai/helia-ui/astro/CardContent';
+import CardHeader from '@ambiqai/helia-ui/astro/CardHeader';
+import CardMedia from '@ambiqai/helia-ui/astro/CardMedia';
+import Media from '@ambiqai/helia-ui/astro/Media';
+import ShowcaseCarousel from '@ambiqai/helia-ui/astro/ShowcaseCarousel';
+
+Page layout is the consuming site's job. The package ships one layout part,
+the carousel, because the scroll, snap, and tab behaviour is worth writing once
+and the rail never needs to know what it is carrying.
+
+## Showcase carousel
+
+Use it for a larger peer set where showing every item at once would dominate
+the page. Controls stay minimal and native horizontal scrolling stays
+available.
+
+The rail never sees its cards' data. `tabs` is one label per card in slot
+order, and the script matches a tab to a card by position among the track's
+children. Slot whatever card you like; the rail sizes it.
+
+<ShowcaseCarousel tabs={['Compile', 'Profile', 'Deploy']}>
+  <Card>
+    <CardMedia ratio="16/9">
+      <Media
+        treatment="color-field"
+        style="--accent: var(--helia-accent-purple)"
+      />
+    </CardMedia>
+    <CardHeader titleAs="h3">
+      <Fragment slot="overline">Step one</Fragment>
+      <span>Compile the model</span>
+    </CardHeader>
+    <CardContent>
+      The feature variant leads with a large media block and sets the text below
+      it, so use it where the carousel is the main event on the page.
+    </CardContent>
+  </Card>
+  <Card>
+    <CardMedia ratio="16/9">
+      <Media treatment="slate" />
+    </CardMedia>
+    <CardHeader titleAs="h3">
+      <Fragment slot="overline">Step two</Fragment>
+      <span>Measure what it costs</span>
+    </CardHeader>
+    <CardContent>
+      Cards are about three quarters of the track width, so the next one is
+      always visible at its edge.
+    </CardContent>
+  </Card>
+  <Card>
+    <CardMedia ratio="16/9">
+      <Media treatment="wire" />
+    </CardMedia>
+    <CardHeader titleAs="h3">
+      <Fragment slot="overline">Step three</Fragment>
+      <span>Put it on the device</span>
+    </CardHeader>
+    <CardContent>
+      The previous and next controls disable at the ends of the track, and the
+      active tab follows the first card at or past the visible left edge.
+    </CardContent>
+  </Card>
+</ShowcaseCarousel>
+
+## The compact variant
+
+`variant="compact"` is text-forward. The whole card is one bordered surface,
+the media becomes a short band at the top, and cards drop to about a third of
+the width so three read at once on a desktop viewport. Use it for update feeds
+and other secondary sections.
+
+<ShowcaseCarousel
+  tabs={['Runtime', 'Compiler', 'Profiler', 'Kits']}
+  variant="compact"
+>
+  <Card interactive>
+    <CardMedia ratio="16/9">
+      <Media
+        treatment="color-field"
+        style="--accent: var(--helia-accent-cyan)"
+      />
+    </CardMedia>
+    <CardHeader titleAs="h3">
+      <Fragment slot="overline">Update</Fragment>
+      <span>A shorter card</span>
+    </CardHeader>
+    <CardContent>One paragraph is the right length here.</CardContent>
+  </Card>
+  <Card interactive>
+    <CardMedia ratio="16/9">
+      <Media treatment="graphite" />
+    </CardMedia>
+    <CardHeader titleAs="h3">
+      <Fragment slot="overline">Update</Fragment>
+      <span>Three at a time</span>
+    </CardHeader>
+    <CardContent>The rail still scrolls past the third.</CardContent>
+  </Card>
+  <Card interactive>
+    <CardMedia ratio="16/9">
+      <Media treatment="slate" />
+    </CardMedia>
+    <CardHeader titleAs="h3">
+      <Fragment slot="overline">Update</Fragment>
+      <span>Same part, other shape</span>
+    </CardHeader>
+    <CardContent>Only the variant changed, not the cards.</CardContent>
+  </Card>
+  <Card interactive>
+    <CardMedia ratio="16/9">
+      <Media treatment="wire" />
+    </CardMedia>
+    <CardHeader titleAs="h3">
+      <Fragment slot="overline">Update</Fragment>
+      <span>Fourth card</span>
+    </CardHeader>
+    <CardContent>Enough to make the track overflow on a desktop.</CardContent>
+  </Card>
+</ShowcaseCarousel>
+
+## Sizing is the rail's
+
+The track sets `--carousel-card-basis` and applies the flex basis and the
+scroll-snap alignment to its own children, so a slotted card needs no carousel
+knowledge at all. A card that wants a different width can still set its own
+`flex` and win on specificity.

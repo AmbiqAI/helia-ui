@@ -1,0 +1,19 @@
+---
+title: Overlays
+description: Tooltips, popovers, dialogs, and side sheets.
+---
+
+import OverlayShowcase from '../../../islands/OverlayShowcase';
+
+Overlays temporarily raise supporting information or focused tasks above the
+page. They should preserve context, provide an obvious exit, and never conceal
+content merely for visual effect.
+
+<OverlayShowcase client:only="react" />
+
+## Selection guide
+
+- Use a tooltip for a short, non-essential label.
+- Use a popover for compact information related to one control.
+- Use a dialog when a decision must interrupt the current task.
+- Use a side sheet for a longer supporting task that benefits from page context.

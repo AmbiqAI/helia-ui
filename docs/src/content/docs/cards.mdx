@@ -1,0 +1,187 @@
+---
+title: Cards
+description: The composable card parts and Badge.
+---
+
+import Badge from '@ambiqai/helia-ui/astro/Badge';
+import Button from '@ambiqai/helia-ui/astro/Button';
+import Card from '@ambiqai/helia-ui/astro/Card';
+import CardActions from '@ambiqai/helia-ui/astro/CardActions';
+import CardContent from '@ambiqai/helia-ui/astro/CardContent';
+import CardHeader from '@ambiqai/helia-ui/astro/CardHeader';
+import CardMedia from '@ambiqai/helia-ui/astro/CardMedia';
+import Chip from '@ambiqai/helia-ui/astro/Chip';
+import Media from '@ambiqai/helia-ui/astro/Media';
+
+## The card parts
+
+`Card` is a `Surface` with no padding of its own. The padding belongs to the
+parts, which is what lets `CardMedia` reach the edge of the same card. Every
+part is optional and the order is yours: the card stacks what it is handed, and
+wherever two padded parts meet, in either order, it drops the doubled gap. Set
+`padding="none"` on a part and it owns its gaps from then on.
+
+Write a title or a label on the same line as its tag, or wrap it in a `<span>`.
+MDX reads children that start on a new line as flow content and wraps the text
+in a paragraph; children on the opening line stay phrasing.
+
+Nothing here knows what a product, a demo or a status is. The title, the
+metadata and the actions are children, so a card never decides where it links.
+
+The card itself is never an anchor. A whole-card link is `href` on `CardHeader`:
+the title carries the link and the recipe stretches it over the card, which
+leaves the actions and the metadata clickable in their own right.
+
+### A card with every part
+
+<div className="helia-card-grid helia-equal-grid not-content">
+  <Card>
+    <CardMedia ratio="16/9">
+      <Media
+        treatment="color-field"
+        style="--accent: var(--helia-accent-purple)"
+      />
+    </CardMedia>
+    <CardHeader titleAs="h4" href="#the-card-parts">
+      <Fragment slot="overline">Guide</Fragment>
+      <Fragment slot="meta">
+        <Badge tone="success" dot>
+          <span>Ready</span>
+        </Badge>
+        <span>8 min read</span>
+      </Fragment>
+      <Fragment slot="action">
+        <Badge tone="info">v2</Badge>
+      </Fragment>
+      <span>Deploy a model to hardware</span>
+    </CardHeader>
+    <CardContent>
+      A path from a trained model to an application running on the device, with
+      the checks that matter at each step.
+    </CardContent>
+    <CardActions align="between">
+      <Button href="#the-card-parts" size="sm">
+        <span>Read the guide</span>
+      </Button>
+      <Chip href="#the-card-parts">Reference</Chip>
+    </CardActions>
+  </Card>
+</div>
+
+### Without media
+
+A header and a body, and a whole-card link instead of an action. `interactive`
+adds the shared hover background, and the card takes the focus ring when the
+stretched header link is focused.
+
+<div className="helia-card-grid helia-equal-grid not-content">
+  <Card interactive>
+    <CardHeader titleAs="h4" href="#without-media">
+      <Fragment slot="overline">Concept</Fragment>
+      <span>Choose a deployment path</span>
+    </CardHeader>
+    <CardContent>
+      When to compile ahead of time and when to stay on the runtime.
+    </CardContent>
+  </Card>
+  <Card tone="muted">
+    <CardHeader titleAs="h4">
+      <Fragment slot="meta">
+        <Badge tone="warning" dot>
+          <span>Check first</span>
+        </Badge>
+      </Fragment>
+      <span>Supported hardware</span>
+    </CardHeader>
+    <CardContent>
+      A muted card recedes when it sits inside another surface.
+    </CardContent>
+  </Card>
+</div>
+
+### Actions only
+
+`CardActions` is a flex row around whatever you pass it. `align` is `start`,
+`end`, or `between`.
+
+<div className="helia-card-grid helia-equal-grid not-content">
+  <Card>
+    <CardActions>
+      <Button href="#actions-only" size="sm">
+        <span>Start</span>
+      </Button>
+      <Button href="#actions-only" size="sm" variant="secondary">
+        <span>Browse</span>
+      </Button>
+    </CardActions>
+  </Card>
+  <Card>
+    <CardActions align="end">
+      <Chip href="#actions-only">Docs</Chip>
+      <Chip href="#actions-only">Source</Chip>
+    </CardActions>
+  </Card>
+</div>
+
+### Media ratios
+
+`CardMedia` owns the frame; the media it receives fills it. `fit="contain"`
+keeps a logo or a diagram whole instead of cropping it.
+
+<div className="helia-card-grid helia-equal-grid not-content">
+  <Card>
+    <CardMedia ratio="1/1">
+      <Media treatment="slate" />
+    </CardMedia>
+    <CardContent>1/1</CardContent>
+  </Card>
+  <Card>
+    <CardMedia ratio="4/3">
+      <Media treatment="graphite" />
+    </CardMedia>
+    <CardContent>4/3</CardContent>
+  </Card>
+  <Card>
+    <CardMedia ratio="16/9">
+      <Media treatment="wire" />
+    </CardMedia>
+    <CardContent>16/9</CardContent>
+  </Card>
+</div>
+
+## Badge
+
+Six tones and an optional leading dot. The tones are semantic, not a status
+vocabulary: map your own statuses onto them in the composition that knows what
+they mean.
+
+The label is required: the dot is decorative and hidden from assistive
+technology, so a badge with no label renders nothing.
+
+<div className="helia-badge-row">
+  <Badge>Neutral</Badge>
+  <Badge tone="info">Info</Badge>
+  <Badge tone="success">Success</Badge>
+  <Badge tone="warning">Warning</Badge>
+  <Badge tone="danger">Danger</Badge>
+  <Badge tone="accent">Accent</Badge>
+</div>
+
+<div className="helia-badge-row">
+  <Badge dot>Neutral</Badge>
+  <Badge tone="success" dot>
+    <span>Success</span>
+  </Badge>
+  <Badge tone="danger" dot>
+    <span>Danger</span>
+  </Badge>
+  <Badge size="md" tone="info">
+    <span>Medium</span>
+  </Badge>
+  <Badge size="md" tone="warning" dot>
+    <span>Medium with dot</span>
+  </Badge>
+</div>
+
+The artwork in these examples comes from `Media`, which has a page of its
+own under [Media](/helia-ui/media/).

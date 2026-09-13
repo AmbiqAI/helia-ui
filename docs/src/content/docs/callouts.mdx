@@ -1,0 +1,58 @@
+---
+title: Callouts
+description: Persistent guidance, lifecycle notices, and critical documentation context.
+---
+
+import Callout from '@ambiqai/helia-ui/astro/Callout';
+
+Callouts belong in documentation when context must stay visible beside the
+content it qualifies. Use feedback components for application state and
+snackbars for transient confirmation.
+
+## Core guidance
+
+<div className="helia-callout-stack not-content">
+  <Callout title="Note">
+    Profiling results vary with board revision, clock configuration, and model
+    input shape.
+  </Callout>
+  <Callout title="Recommended path" tone="tip">
+    Start with heliaRT when an application already follows the LiteRT runtime
+    model.
+  </Callout>
+  <Callout title="Important" tone="important">
+    Generated model sources and the runtime library must use the same tensor
+    arena configuration.
+  </Callout>
+  <Callout title="Rebuild required" tone="warning">
+    Regenerate the deployment bundle after changing the target device or model
+    input shape.
+  </Callout>
+  <Callout title="Data will be replaced" tone="critical">
+    The generation command overwrites files in the configured output directory.
+  </Callout>
+</div>
+
+## Lifecycle and compatibility
+
+<div className="helia-callout-stack not-content">
+  <Callout title="Apollo510 only" tone="compatibility">
+    This kernel path requires an Apollo510 target and is not available on
+    Apollo4 Plus.
+  </Callout>
+  <Callout title="Experimental API" tone="experimental">
+    This interface may change between preview releases. Pin the package version
+    before using it in a shared workflow.
+  </Callout>
+  <Callout title="Deprecated in 1.5" tone="deprecated">
+    Replace `legacy_resolver()` with `create_resolver()` before support ends in
+    October 2026.
+  </Callout>
+</div>
+
+## Usage
+
+- Keep the title specific enough to scan without reading the body.
+- Reserve critical treatment for destructive or blocking consequences.
+- Pair compatibility, experimental, and deprecation notices with exact scope.
+- Do not stack multiple callouts when ordinary prose or a checklist is clearer.

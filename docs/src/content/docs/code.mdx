@@ -1,0 +1,111 @@
+---
+title: Code
+description: Code samples, command output, diffs, and language tabs.
+---
+
+import CodeBlock from '@ambiqai/helia-ui/astro/CodeBlock';
+import CodeTabs from '@ambiqai/helia-ui/astro/CodeTabs';
+
+Code samples should be easy to scan, copy, and compare. Keep labels useful,
+highlight only the lines that require attention, and avoid decorative editor
+chrome.
+
+## File example
+
+Use a filename when the sample belongs in a specific project location. Line
+numbers and highlights are optional.
+
+<CodeBlock
+  filename="src/measurements.ts"
+  language="typescript"
+  lineNumbers
+  highlightLines={[4, 5]}
+  code={`const samples = [5.2, 4.8, 5.0, 4.9];
+
+export function averageLatency(values: number[]) {
+  const total = values.reduce((sum, value) => sum + value, 0);
+  return total / values.length;
+}`}
+/>
+
+## Bare snippet
+
+Use the bare variant for short, self-contained examples that do not need a
+filename, terminal context, or language switcher.
+
+<CodeBlock
+  variant="bare"
+  language="typescript"
+  code={`const measurements = {
+  latencyMs: 4.8,
+  peakMemoryKb: 184,
+};
+
+console.log(measurements);`}
+/>
+
+## Terminal
+
+Terminal blocks keep commands and representative output together without
+imitating a complete terminal application.
+
+<CodeBlock
+  variant="terminal"
+  language="bash"
+  code={`$ npm run check
+
+Result (48 files):
+
+- 0 errors
+- 0 warnings`}
+  />
+
+## Language tabs
+
+Use tabs for equivalent implementations. Do not hide unrelated steps or
+materially different workflows behind language selection.
+
+<CodeTabs
+  ariaLabel="Average latency implementation"
+  tabs={[
+    {
+      label: 'TypeScript',
+      language: 'typescript',
+      code: `const average = values.reduce((sum, value) => sum + value, 0) / values.length;`,
+    },
+    {
+      label: 'Python',
+      language: 'python',
+      code: `average = sum(values) / len(values)`,
+    },
+    {
+      label: 'C',
+      language: 'c',
+      code: `float average = total / (float)sample_count;`,
+    },
+  ]}
+/>
+
+## Diff
+
+<CodeBlock
+  label="Configuration change"
+  language="diff"
+  code={`- engine: tflm
++ engine: heliaRT
+  measurements:
+    - latency
+    - peak_memory`}
+/>
+
+## What the parts cover
+
+- Copyable code and terminal blocks
+- Bare snippets with a floating copy action
+- Filename and language context
+- Optional line numbers and highlights
+- Keyboard-accessible language tabs
+- Diff presentation
+
+Both parts render through Shiki at build time, so a page pays no JavaScript for
+highlighting. The copy button is the only script either one ships.

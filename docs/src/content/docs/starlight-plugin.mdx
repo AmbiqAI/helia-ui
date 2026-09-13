@@ -1,0 +1,92 @@
+---
+title: Starlight plugin
+description: heliaStarlight() injects the package stylesheets and the shell components a site does not have to author.
+---
+
+import Callout from '@ambiqai/helia-ui/astro/Callout';
+
+`heliaStarlight()` is how a Starlight site adopts the theme. It does two
+things: it splices the package stylesheets into `customCss` in the order the
+cascade depends on, and it installs the shell components that carry no site
+vocabulary, which is the theme menu, the mobile menu toggle, and the footer.
+
+```js
+import starlight from '@astrojs/starlight';
+import { heliaStarlight } from '@ambiqai/helia-ui/starlight';
+
+starlight({
+  customCss: ['./src/styles/tailwind.css'],
+  plugins: [
+    heliaStarlight({
+      footer: {
+        links: [{ label: 'GitHub', href: 'https://github.com/AmbiqAI' }],
+        tagline: 'One line under the logo.',
+        logo: 'ambiq',
+      },
+    }),
+  ],
+});
+```
+
+## Options
+
+| Option                   | Type                | Default   | Effect                                                                                                                       |
+| ------------------------ | ------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `styles`                 | `boolean`           | `true`    | Splices the four package stylesheets into `customCss`. `false` leaves `customCss` untouched, and the site loads them itself. |
+| `shell.themeSelect`      | `boolean`           | `true`    | Installs the `ThemeSelect` override: the theme menu with its three choices.                                                  |
+| `shell.mobileMenuToggle` | `boolean`           | `true`    | Installs the `MobileMenuToggle` override.                                                                                    |
+| `shell.footer`           | `boolean`           | `true`    | Installs the `Footer` override, which renders the brand row and the pagination.                                              |
+| `footer.links`           | `{ label, href }[]` | `[]`      | Navigation shown on the right of the footer's brand row.                                                                     |
+| `footer.tagline`         | `string`            | undefined | One line printed under the logo.                                                                                             |
+| `footer.logo`            | `'ambiq' \| false`  | `'ambiq'` | `false` drops the brand lockup and renders the tagline on its own.                                                           |
+
+## Stylesheet order is the contract
+
+The four sheets the plugin injects are `tokens.css`, `semantic.css`,
+`recipes.css`, and `starlight.css`, in that order. They go after the leading
+Tailwind roots in your `customCss` and before everything else:
+
+```
+./src/styles/tailwind.css       your Tailwind entry
+@ambiqai/helia-ui/tokens.css    injected
+@ambiqai/helia-ui/semantic.css  injected
+@ambiqai/helia-ui/recipes.css   injected
+@ambiqai/helia-ui/starlight.css injected
+./src/styles/site.css           yours
+```
+
+Two properties depend on that position. The package sheets are unlayered, so
+they outrank every cascade layer the Tailwind entry declares, which is what
+keeps the tokens authoritative over the Starlight Tailwind compat package. And
+the site's own sheet lands last, so a page-specific override needs no extra
+specificity to win.
+
+The plugin finds the insertion point by treating any leading `customCss` entry
+whose filename matches `tailwind*.css` as a Tailwind root. If your entry is
+named something else, put it first and name it accordingly, or set
+`styles: false` and order the sheets yourself.
+
+## Overrides you already set win
+
+A Starlight plugin's `updateConfig` shallow-merges over the site's config, so
+an array or a map written by a plugin would replace the site's rather than add
+to it. Both values this plugin touches are read back from the config and merged
+by hand instead. `customCss` is spliced, not replaced, and a shell override is
+installed only under a key the site left alone.
+
+<Callout tone="note" title="Keeping your own Footer">
+  Name `Footer` in Starlight's `components` map and the plugin will not touch
+  it, with no need to set `shell.footer: false`. The same holds for
+  `ThemeSelect` and `MobileMenuToggle`. Use `shell.*: false` when you want
+  Starlight's stock component back rather than one of your own.
+</Callout>
+
+## How options reach the shell
+
+Starlight hands nothing to a component override, so the resolved options reach
+the Footer through the module graph. The plugin adds a small Astro integration
+that serves them from the virtual module `virtual:helia-ui/starlight-config`,
+which is how Starlight itself does this and keeps the values build-time
+constants rather than runtime lookups. Nothing outside the package should
+import that module: it is an implementation detail of the shell components, and
+its shape is not part of the export map.

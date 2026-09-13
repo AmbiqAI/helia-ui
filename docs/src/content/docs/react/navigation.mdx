@@ -1,0 +1,13 @@
+---
+title: Navigation
+description: Breadcrumbs, pagination, and the menu components, composed in one island.
+---
+
+import NavigationShowcase from '../../../islands/NavigationShowcase';
+
+Navigation structures are the consuming site's to design; what the package
+ships is the set of shadcn pieces they are built from. Breadcrumb, Pagination,
+NavigationMenu, and DropdownMenu are all compound components, so they are
+assembled in an island rather than inline on this page.
+
+<NavigationShowcase client:only="react" />

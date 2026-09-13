@@ -1,0 +1,27 @@
+---
+title: Feedback
+description: Alerts, snackbars, loading, empty, and error states.
+---
+
+import FeedbackShowcase from '../../../islands/FeedbackShowcase';
+import StateShowcase from '../../../islands/StateShowcase';
+
+## Alerts and snackbar
+
+Use alerts for persistent contextual feedback and snackbars for short
+confirmations that do not require immediate action.
+
+<FeedbackShowcase client:only="react" />
+
+## Loading, empty, and error states
+
+<StateShowcase client:only="react" />
+
+## Initial set
+
+- Informational, success, warning, and error alerts
+- Snackbar with optional dismissal
+- Inline field validation
+- Empty state
+- Loading state and progress
+- Error and retry state
