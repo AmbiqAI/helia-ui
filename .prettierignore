@@ -1,0 +1,7 @@
+.astro/
+dist/
+node_modules/
+playwright-report/
+test-results/
+package-lock.json
+THIRD-PARTY-NOTICES.md

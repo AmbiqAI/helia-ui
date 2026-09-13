@@ -1,13 +1,15 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "astro/tsconfigs/strict",
   "include": ["react/**/*"],
   "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
     "baseUrl": ".",
     // The shadcn CLI resolves the aliases in components.json through tsconfig
     // paths and rejects a config whose aliases do not map, so the package needs
     // a mapping of its own even though nothing here imports through it: the
     // components use relative paths. `@/react` therefore means this directory,
-    // and `npx shadcn add` run from packages/helia-ui writes into react/.
+    // and `npx shadcn add` run from the package root writes into react/.
     "paths": {
       "@/*": ["./*"]
     }

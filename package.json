@@ -1,10 +1,31 @@
 {
   "name": "@ambiqai/helia-ui",
-  "version": "0.0.0",
+  "version": "0.1.0-alpha.0",
   "description": "Shared HELIA design tokens and Starlight theme styling",
   "license": "BSD-3-Clause",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "docs"
+  ],
+  "engines": {
+    "node": ">=22.12.0",
+    "npm": ">=10"
+  },
+  "scripts": {
+    "validate": "npm run format:check && npm run check:spdx && npm run check:notices && npm run check:styles && npm run check:boundaries && npm run check:islands",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:spdx": "node scripts/check-spdx.mjs",
+    "notices": "node scripts/third-party-notices.mjs",
+    "check:notices": "node scripts/third-party-notices.mjs --check",
+    "check:styles": "node scripts/check-style-literals.mjs",
+    "check:boundaries": "node scripts/check-component-boundaries.mjs",
+    "check:islands": "node scripts/check-islands.mjs",
+    "docs:dev": "npm run dev --workspace @ambiqai/helia-ui-docs",
+    "docs:build": "npm run build --workspace @ambiqai/helia-ui-docs",
+    "docs:test": "npm run test --workspace @ambiqai/helia-ui-docs"
+  },
   "exports": {
     "./astro/*": "./astro/*.astro",
     "./react/*": "./react/*.tsx",
@@ -50,6 +71,8 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
-    "@astrojs/starlight": "^0.41.5"
+    "@astrojs/starlight": "^0.41.5",
+    "prettier": "^3.9.6",
+    "prettier-plugin-astro": "^0.14.1"
   }
 }

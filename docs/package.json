@@ -15,7 +15,7 @@
     "test": "playwright test"
   },
   "dependencies": {
-    "@ambiqai/helia-ui": "*",
+    "@ambiqai/helia-ui": "file:..",
     "@astrojs/react": "^6.0.2",
     "@astrojs/starlight": "^0.41.5",
     "@astrojs/starlight-tailwind": "5.0.0",
@@ -24,5 +24,9 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "tailwindcss": "4.3.3"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.62.1"
   }
 }
