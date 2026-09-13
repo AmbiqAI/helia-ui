@@ -1,0 +1,36 @@
+---
+/**
+ * The action row of a card: a flex row around whatever the consumer hands it —
+ * a `Button`, a `Chip`, a plain link, a pair of them.
+ *
+ * The card never decides where it links, so there is no action prop here.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import type { PaddingStep } from './Surface.astro';
+
+interface Props extends HTMLAttributes<'div'> {
+  /** Row alignment. `between` pushes the first and last child apart. */
+  align?: 'start' | 'end' | 'between';
+  /** Inner padding, named by spacing step. `none` leaves the part to own its gaps. */
+  padding?: PaddingStep;
+}
+
+const {
+  align = 'start',
+  padding = '4',
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<div
+  class:list={[
+    'helia-card-actions',
+    `helia-card-actions--${align}`,
+    padding !== 'none' && `helia-surface--pad-${padding}`,
+    className,
+  ]}
+  {...rest}
+>
+  <slot />
+</div>

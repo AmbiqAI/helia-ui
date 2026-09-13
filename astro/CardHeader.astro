@@ -1,0 +1,90 @@
+---
+/**
+ * The title block of a card: an optional overline, the title, optional
+ * metadata under it, and an optional trailing action.
+ *
+ * Every region is a slot, so the header never has to know what the metadata
+ * means or what the action does. A header with no title renders none, so a
+ * header used for metadata alone leaves no empty heading in the outline.
+ *
+ * `href` makes the title the card's link, stretched over the whole card by the
+ * recipe. It lives here rather than on `Card` because an anchor around the card
+ * would swallow the links and buttons the other parts carry.
+ *
+ * The title holds the card-title step and the regions are one space step apart.
+ * A composition that needs other values sets `--helia-card-title-size`,
+ * `--helia-card-title-leading` or `--helia-card-header-gap` on the header or above
+ * it.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import type { PaddingStep } from './Surface.astro';
+import Eyebrow from './Eyebrow.astro';
+
+interface Props extends HTMLAttributes<'div'> {
+  /** Heading level for the title. Pick the one the page outline needs. */
+  titleAs?: 'h2' | 'h3' | 'h4';
+  /** Inner padding, named by spacing step. `none` leaves the part to own its gaps. */
+  padding?: PaddingStep;
+  /** Links the title, and stretches that link over the whole card. */
+  href?: string;
+}
+
+const {
+  titleAs: Title = 'h3',
+  padding = '4',
+  href,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const hasTitle = Astro.slots.has('default');
+const hasOverline = Astro.slots.has('overline');
+const hasMeta = Astro.slots.has('meta');
+const hasAction = Astro.slots.has('action');
+---
+
+<div
+  class:list={[
+    'helia-card-header',
+    padding !== 'none' && `helia-surface--pad-${padding}`,
+    className,
+  ]}
+  {...rest}
+>
+  <div class="helia-card-header__text">
+    {
+      hasOverline && (
+        <Eyebrow>
+          <slot name="overline" />
+        </Eyebrow>
+      )
+    }
+    {
+      hasTitle && (
+        <Title class="helia-card-header__title">
+          {href ? (
+            <a class="helia-card-header__link" href={href}>
+              <slot />
+            </a>
+          ) : (
+            <slot />
+          )}
+        </Title>
+      )
+    }
+    {
+      hasMeta && (
+        <div class="helia-card-header__meta">
+          <slot name="meta" />
+        </div>
+      )
+    }
+  </div>
+  {
+    hasAction && (
+      <div class="helia-card-header__action">
+        <slot name="action" />
+      </div>
+    )
+  }
+</div>

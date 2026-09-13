@@ -1,0 +1,279 @@
+---
+/**
+ * The card rail: a scroll-snapping track of whatever cards the consumer slots
+ * in, with one tab per card and previous/next controls.
+ *
+ * The rail never sees the cards' data. Tabs are labels in slot order, and the
+ * script matches a tab to a card by position among the track's children, so a
+ * card can be any element the consumer likes.
+ *
+ * The variant sizes the cards through `--carousel-card-basis` and softens their
+ * artwork through `--helia-field-blur`, both inherited by the slotted cards.
+ */
+interface Props {
+  /** One label per card, in the order the cards are slotted. */
+  tabs: readonly string[];
+  /**
+   * `feature` is the large-media default used by the demos and catalog pages.
+   * `compact` is the text-forward variant: a short media band above eyebrow,
+   * title, description, and date, all inside a single bordered card.
+   */
+  variant?: 'feature' | 'compact';
+}
+
+const { tabs, variant = 'feature' } = Astro.props;
+---
+
+<showcase-carousel
+  class="not-content"
+  role="region"
+  aria-label="Card carousel"
+  data-variant={variant === 'compact' ? 'compact' : undefined}
+>
+  <div class="carousel-header">
+    <div class="slide-tabs" role="group" aria-label="Choose a showcase">
+      {
+        tabs.map((label, index) => (
+          <button
+            type="button"
+            data-slide-index={index}
+            aria-pressed={index === 0 ? 'true' : 'false'}
+          >
+            {label}
+          </button>
+        ))
+      }
+    </div>
+    <div class="controls">
+      <button type="button" data-previous disabled>
+        <span aria-hidden="true">←</span> Previous
+      </button>
+      <button type="button" data-next>
+        Next <span aria-hidden="true">→</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="track" data-carousel-track><slot /></div>
+</showcase-carousel>
+
+<script>
+  class ShowcaseCarousel extends HTMLElement {
+    connectedCallback() {
+      const track = this.querySelector<HTMLElement>('[data-carousel-track]');
+      const previous = this.querySelector<HTMLButtonElement>('[data-previous]');
+      const next = this.querySelector<HTMLButtonElement>('[data-next]');
+      const tabs = Array.from(
+        this.querySelectorAll<HTMLButtonElement>('[data-slide-index]'),
+      );
+      if (!track || !previous || !next) return;
+      // The cards are slotted, so they are known by position, not by a marker.
+      const cards = Array.from(track.children) as HTMLElement[];
+      const scrollBehavior = window.matchMedia(
+        '(prefers-reduced-motion: reduce)',
+      ).matches
+        ? 'auto'
+        : 'smooth';
+
+      // Tolerance for sub-pixel scroll offsets and fractional card widths.
+      const epsilon = 2;
+      // Card start position in the track's own scroll coordinates.
+      const cardStart = (card: HTMLElement) =>
+        card.offsetLeft - track.offsetLeft;
+
+      const updateControls = () => {
+        const maxScroll = track.scrollWidth - track.clientWidth;
+        previous.disabled = track.scrollLeft <= epsilon;
+        next.disabled = track.scrollLeft >= maxScroll - epsilon;
+        // The active tab tracks the first card whose leading edge is at or
+        // past the visible left edge, so a track at rest (scrollLeft 0, with
+        // or without overflow) always marks the first card.
+        const firstVisible = cards.findIndex(
+          (card) => cardStart(card) >= track.scrollLeft - epsilon,
+        );
+        const activeIndex =
+          firstVisible === -1 ? cards.length - 1 : firstVisible;
+        tabs.forEach((tab, index) => {
+          tab.setAttribute('aria-pressed', String(index === activeIndex));
+        });
+      };
+
+      const move = (direction: -1 | 1) => {
+        track.scrollBy({
+          left: direction * track.clientWidth * 0.72,
+          behavior: scrollBehavior,
+        });
+      };
+
+      previous.addEventListener('click', () => move(-1));
+      next.addEventListener('click', () => move(1));
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+          const card = cards[index];
+          if (!card) return;
+          track.scrollTo({
+            left: card.offsetLeft - track.offsetLeft,
+            behavior: scrollBehavior,
+          });
+        });
+      });
+      track.addEventListener('scroll', updateControls, { passive: true });
+      window.addEventListener('resize', updateControls);
+      new ResizeObserver(updateControls).observe(track);
+      window.requestAnimationFrame(updateControls);
+    }
+  }
+
+  if (!customElements.get('showcase-carousel')) {
+    customElements.define('showcase-carousel', ShowcaseCarousel);
+  }
+</script>
+
+<style>
+  showcase-carousel {
+    --carousel-control-height: 2.25rem;
+
+    display: block;
+  }
+
+  .carousel-header {
+    align-items: center;
+    display: flex;
+    gap: var(--helia-space-4);
+    justify-content: space-between;
+    margin-bottom: var(--helia-space-3);
+    min-height: var(--carousel-control-height);
+  }
+
+  .slide-tabs {
+    align-items: center;
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: nowrap;
+    gap: var(--helia-space-2);
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .slide-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .slide-tabs button {
+    align-items: center;
+    appearance: none;
+    background: var(--sl-color-gray-6);
+    border: 1px solid transparent;
+    border-radius: var(--helia-radius-pill);
+    box-sizing: border-box;
+    color: var(--sl-color-gray-2);
+    cursor: pointer;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font: inherit;
+    font-size: var(--helia-text-label);
+    height: var(--carousel-control-height);
+    justify-content: center;
+    line-height: 1;
+    margin: 0;
+    padding: 0 var(--helia-space-3);
+    white-space: nowrap;
+  }
+
+  .slide-tabs button[aria-pressed='true'] {
+    background: var(--sl-color-white);
+    border-color: var(--sl-color-white);
+    color: var(--sl-color-black);
+  }
+
+  .controls {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    gap: var(--helia-space-1);
+    min-height: var(--carousel-control-height);
+    white-space: nowrap;
+  }
+
+  .slide-tabs,
+  .controls {
+    margin: 0;
+  }
+
+  .controls button {
+    align-items: center;
+    appearance: none;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--helia-radius-sm);
+    box-sizing: border-box;
+    color: var(--sl-color-gray-2);
+    cursor: pointer;
+    display: flex;
+    font: inherit;
+    font-size: var(--helia-text-caption);
+    gap: var(--helia-space-1);
+    height: var(--carousel-control-height);
+    line-height: 1;
+    margin: 0;
+    padding: 0 var(--helia-space-2);
+    white-space: nowrap;
+  }
+
+  .controls button:hover:not(:disabled) {
+    background: var(--sl-color-bg-nav);
+    color: var(--sl-color-white);
+  }
+
+  .controls button:disabled {
+    color: var(--sl-color-gray-4);
+    cursor: default;
+  }
+
+  .track {
+    --carousel-card-basis: min(72%, 44rem);
+
+    display: flex;
+    gap: var(--helia-space-3);
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    padding-bottom: var(--helia-space-3);
+    scroll-snap-type: inline mandatory;
+    scrollbar-width: none;
+    touch-action: pan-x;
+  }
+
+  .track::-webkit-scrollbar {
+    display: none;
+  }
+
+  /*
+   * Compact variant: cards about a third of the width, so three read at once on
+   * a desktop viewport while the track still scrolls, and a softer blur to suit
+   * the shorter media band.
+   */
+  showcase-carousel[data-variant='compact'] .track {
+    --carousel-card-basis: min(100%, 21rem);
+    --helia-field-blur: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  @media (width < 42rem) {
+    .carousel-header {
+      align-items: start;
+      flex-direction: column;
+    }
+
+    .controls {
+      align-self: flex-end;
+    }
+
+    .track {
+      --carousel-card-basis: 88%;
+    }
+
+    showcase-carousel[data-variant='compact'] .track {
+      --carousel-card-basis: 100%;
+    }
+  }
+</style>

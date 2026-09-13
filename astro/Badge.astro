@@ -1,0 +1,45 @@
+---
+/**
+ * A read-only label on the `Chip` recipe, tinted by an advisory tone.
+ *
+ * The tones are semantic, not a status vocabulary: the component has no idea
+ * what "beta" or "deprecated" means, and a consumer maps its own statuses onto
+ * a tone. The label is the child, and it is required: the dot only repeats the
+ * tone, so a badge with nothing to say renders nothing at all rather than an
+ * empty pill.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import Chip from './Chip.astro';
+
+interface Props extends HTMLAttributes<'span'> {
+  tone?: 'neutral' | 'info' | 'success' | 'warning' | 'danger' | 'accent';
+  /** Leading status dot, drawn in the badge ink. Decorative: the label carries the meaning. */
+  dot?: boolean;
+  size?: 'sm' | 'md';
+}
+
+const {
+  tone = 'neutral',
+  dot = false,
+  size = 'sm',
+  class: className,
+  ...rest
+} = Astro.props;
+
+const tinted = tone !== 'neutral' && tone !== 'accent';
+const hasLabel = Astro.slots.has('default');
+---
+
+{
+  hasLabel && (
+    <Chip
+      tone={tone === 'accent' ? 'accent' : 'static'}
+      size={size}
+      class:list={['helia-badge', tinted && `helia-badge--${tone}`, className]}
+      {...rest}
+    >
+      {dot && <span class="helia-badge__dot" aria-hidden="true" />}
+      <slot />
+    </Chip>
+  )
+}

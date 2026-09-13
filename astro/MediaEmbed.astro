@@ -1,0 +1,264 @@
+---
+interface Props {
+  title: string;
+  videoId: string;
+  posterSrc?: string;
+  posterAlt?: string;
+  caption?: string;
+  duration?: string;
+  externalUrl?: string;
+  /** Forwarded to the figure, so a layout can size it without reaching inside. */
+  class?: string;
+}
+
+const {
+  title,
+  videoId,
+  posterSrc,
+  posterAlt = '',
+  caption,
+  duration,
+  externalUrl = `https://www.youtube.com/watch?v=${videoId}`,
+  class: className,
+} = Astro.props;
+
+if (!/^[A-Za-z0-9_-]{6,20}$/.test(videoId)) {
+  throw new Error('MediaEmbed requires a valid YouTube video ID.');
+}
+
+const resolvedPoster =
+  posterSrc && !/^(?:https?:|data:|\/)/.test(posterSrc)
+    ? `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}${posterSrc}`
+    : posterSrc;
+const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`;
+---
+
+<figure class:list={['media-embed', 'not-content', className]}>
+  <youtube-embed
+    aria-label={title}
+    class="media-embed__frame"
+    data-embed-url={embedUrl}
+    data-title={title}
+  >
+    {
+      resolvedPoster ? (
+        <img
+          src={resolvedPoster}
+          alt={posterAlt}
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <div class="media-embed__abstract" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+      )
+    }
+    <button
+      class="helia-focus-ring"
+      type="button"
+      aria-label={`Play ${title}`}
+      data-play
+    >
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="m9 7 8 5-8 5z"></path>
+      </svg>
+    </button>
+    {duration && <span class="media-embed__duration">{duration}</span>}
+    <noscript>
+      <a href={externalUrl}>Watch {title} on YouTube</a>
+    </noscript>
+  </youtube-embed>
+  {
+    caption && (
+      <figcaption>
+        <span>{caption}</span>
+        <a href={externalUrl}>Watch on YouTube ↗</a>
+      </figcaption>
+    )
+  }
+</figure>
+
+<script>
+  class YouTubeEmbed extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.ready === 'true') return;
+      this.dataset.ready = 'true';
+      const button = this.querySelector<HTMLButtonElement>('[data-play]');
+      if (!button) return;
+      button.addEventListener('click', () => {
+        if (this.dataset.loaded === 'true') return;
+        const iframe = document.createElement('iframe');
+        iframe.src = this.dataset.embedUrl ?? '';
+        iframe.title = this.dataset.title ?? 'Video player';
+        iframe.allow =
+          'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        iframe.allowFullscreen = true;
+        this.append(iframe);
+        this.dataset.loaded = 'true';
+      });
+    }
+  }
+
+  if (!customElements.get('youtube-embed')) {
+    customElements.define('youtube-embed', YouTubeEmbed);
+  }
+</script>
+
+<style>
+  /* style-lint: allow-file global -- the embed script creates the iframe at runtime, so it carries no scope */
+  /* style-lint: allow-file color -- catalog-only embed mock; the artwork is decorative */
+  .media-embed {
+    height: var(--media-embed-height, auto);
+    margin: 0;
+    width: var(--media-embed-width, auto);
+  }
+
+  /*
+   * The frame's proportions are the one thing a surrounding layout needs to
+   * change -- a viewer fills its column instead of holding a ratio -- so they
+   * are custom properties an ancestor can set rather than markup to reach into.
+   */
+  .media-embed__frame {
+    /* Fixed dark frame in both themes, so the ring cannot follow theme ink. */
+    --helia-focus-ring-color: var(--helia-paper-white);
+
+    aspect-ratio: var(--media-embed-ratio, 16 / 9);
+    background: #0d1017;
+    display: block;
+    height: var(--media-embed-height, auto);
+    min-height: var(--media-embed-min-height, 0);
+    overflow: hidden;
+    position: relative;
+    width: var(--media-embed-width, auto);
+  }
+
+  img,
+  .media-embed__abstract,
+  :global(iframe) {
+    height: 100%;
+    inset: 0;
+    position: absolute;
+    width: 100%;
+  }
+
+  img {
+    object-fit: cover;
+  }
+
+  .media-embed__abstract {
+    background: #1a2130;
+  }
+
+  .media-embed__abstract span {
+    border-radius: 50%;
+    filter: blur(4.5rem);
+    position: absolute;
+  }
+
+  .media-embed__abstract span:nth-child(1) {
+    background: #1769e0;
+    height: 80%;
+    left: -8%;
+    top: -20%;
+    width: 62%;
+  }
+
+  .media-embed__abstract span:nth-child(2) {
+    background: #6e5ae6;
+    bottom: -25%;
+    height: 78%;
+    right: -5%;
+    width: 70%;
+  }
+
+  .media-embed__abstract span:nth-child(3) {
+    background: #00a7b5;
+    height: 38%;
+    left: 42%;
+    top: 27%;
+    width: 34%;
+  }
+
+  button {
+    align-items: center;
+    appearance: none;
+    background: #ffffff;
+    border: 0;
+    border-radius: 50%;
+    color: #111318;
+    cursor: pointer;
+    display: flex;
+    height: 3.5rem;
+    inset: 50% auto auto 50%;
+    justify-content: center;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    transition: transform 180ms ease;
+    width: 3.5rem;
+    z-index: 2;
+  }
+
+  button:hover {
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+
+  button svg {
+    fill: currentColor;
+    height: 1.45rem;
+    stroke: currentColor;
+    stroke-linejoin: round;
+    width: 1.45rem;
+  }
+
+  .media-embed__duration {
+    background: color-mix(in srgb, #090b10 82%, transparent);
+    border-radius: var(--helia-radius-xs);
+    bottom: 0.75rem;
+    color: #ffffff;
+    font-size: var(--helia-text-label);
+    padding: var(--helia-space-1) var(--helia-space-2);
+    position: absolute;
+    right: 0.75rem;
+    z-index: 2;
+  }
+
+  youtube-embed[data-loaded='true'] > :not(iframe) {
+    display: none;
+  }
+
+  :global(iframe) {
+    border: 0;
+    z-index: 3;
+  }
+
+  figcaption {
+    align-items: start;
+    color: var(--helia-ink-muted);
+    display: flex;
+    font-size: var(--helia-text-small);
+    gap: var(--helia-space-4);
+    justify-content: space-between;
+    line-height: 1.45;
+    padding-top: var(--helia-space-3);
+  }
+
+  figcaption a {
+    color: var(--helia-ink-primary);
+    flex: 0 0 auto;
+    text-decoration: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    button {
+      transition: none;
+    }
+
+    button:hover {
+      transform: translate(-50%, -50%);
+    }
+  }
+</style>

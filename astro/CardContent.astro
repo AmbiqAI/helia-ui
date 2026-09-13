@@ -1,0 +1,28 @@
+---
+/**
+ * The body of a card: a padding region around whatever the consumer writes.
+ *
+ * It takes the remaining height inside a card, so a trailing `CardActions`
+ * sits on the baseline of every card in a row.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import type { PaddingStep } from './Surface.astro';
+
+interface Props extends HTMLAttributes<'div'> {
+  /** Inner padding, named by spacing step. `none` leaves the part to own its gaps. */
+  padding?: PaddingStep;
+}
+
+const { padding = '4', class: className, ...rest } = Astro.props;
+---
+
+<div
+  class:list={[
+    'helia-card-content',
+    padding !== 'none' && `helia-surface--pad-${padding}`,
+    className,
+  ]}
+  {...rest}
+>
+  <slot />
+</div>

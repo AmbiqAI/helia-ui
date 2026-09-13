@@ -1,0 +1,18 @@
+---
+/**
+ * The uppercase label that sits above a heading.
+ *
+ * The recipe itself is `.helia-eyebrow` in `src/styles/global.css`.
+ */
+import type { HTMLAttributes, HTMLTag } from 'astro/types';
+
+interface Props extends HTMLAttributes<'p'> {
+  as?: HTMLTag;
+}
+
+const { as: Element = 'p', class: className, ...rest } = Astro.props;
+---
+
+<Element class:list={['helia-eyebrow', className]} {...rest}>
+  <slot />
+</Element>

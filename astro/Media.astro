@@ -1,0 +1,85 @@
+---
+/**
+ * Generative artwork for a card that has no real image: oversized blurred
+ * forms, or a sparse field of planes, orbits and wires.
+ *
+ * The accent arrives as a CSS custom property rather than a prop, so the
+ * component never learns a brand or product vocabulary. Every form of the
+ * colour field is derived from that one accent, so two cards given different
+ * accents read as different cards:
+ *
+ *   <Media treatment="color-field" style="--accent: var(--helia-accent-purple)" />
+ *
+ * The artwork carries no information, so it is hidden from assistive
+ * technology. Wrap it in a `<figure>` where the composition needs a caption.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+type Treatment = 'color-field' | 'graphite' | 'slate' | 'wire';
+
+interface Props extends HTMLAttributes<'div'> {
+  /** Which artwork the surface draws. */
+  treatment?: Treatment;
+  /** Aspect ratio. Omit inside a `CardMedia`, which owns the frame. */
+  ratio?: '16/9' | '4/3' | '1/1';
+}
+
+/* Each form is a shared shape plus its placement, or placement alone. */
+const TREATMENTS: Record<Treatment, string[][]> = {
+  'color-field': [
+    ['field-one'],
+    ['field-two'],
+    ['field-three'],
+    ['field-four'],
+  ],
+  graphite: [
+    ['orbit', 'orbit-one'],
+    ['orbit', 'orbit-two'],
+    ['orbit', 'orbit-three'],
+    ['orbit-core'],
+  ],
+  slate: [
+    ['plane', 'plane-one'],
+    ['plane', 'plane-two'],
+    ['plane', 'plane-three'],
+    ['plane-rule'],
+  ],
+  wire: [
+    ['wire', 'wire-horizontal'],
+    ['wire', 'wire-vertical'],
+    ['wire', 'wire-diagonal'],
+    ['node', 'node-one'],
+    ['node', 'node-two'],
+    ['node', 'node-three'],
+  ],
+};
+
+const {
+  treatment = 'color-field',
+  ratio,
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<div
+  class:list={[
+    'helia-media',
+    `helia-media--${treatment}`,
+    ratio && `helia-media--${ratio.replace('/', '-')}`,
+    className,
+  ]}
+  aria-hidden="true"
+  {...rest}
+>
+  {
+    TREATMENTS[treatment].map((modifiers) => (
+      <span
+        class:list={[
+          'helia-media__form',
+          ...modifiers.map((modifier) => `helia-media__form--${modifier}`),
+        ]}
+      />
+    ))
+  }
+</div>

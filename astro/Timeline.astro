@@ -1,0 +1,359 @@
+---
+type TimelineTone = 'neutral' | 'blue' | 'cyan' | 'green' | 'orange' | 'purple';
+
+interface TimelineItem {
+  title: string;
+  description?: string;
+  href?: string;
+  meta?: string;
+}
+
+interface TimelineGroup {
+  label: string;
+  datetime?: string;
+  tone?: TimelineTone;
+  items: TimelineItem[];
+}
+
+interface Props {
+  groups: TimelineGroup[];
+  heading?: string;
+  actionLabel?: string;
+  actionHref?: string;
+  ariaLabel?: string;
+  variant?: 'updates' | 'roadmap';
+}
+
+const {
+  groups,
+  heading,
+  actionLabel,
+  actionHref,
+  ariaLabel = heading ?? 'Timeline',
+  variant = 'updates',
+} = Astro.props;
+---
+
+<section
+  class:list={['timeline', `timeline-${variant}`]}
+  aria-label={ariaLabel}
+>
+  {
+    (heading || (actionLabel && actionHref)) && (
+      <header class="timeline-header">
+        {heading && <h2>{heading}</h2>}
+        {actionLabel && actionHref && (
+          <a class="timeline-action helia-focus-ring" href={actionHref}>
+            <span>{actionLabel}</span>
+            <svg
+              aria-hidden="true"
+              class="timeline-arrow"
+              fill="none"
+              viewBox="0 0 20 20"
+            >
+              <path d="M4 10h11m-4-4 4 4-4 4" />
+            </svg>
+          </a>
+        )}
+      </header>
+    )
+  }
+
+  <ol class="timeline-groups">
+    {
+      groups.map((group) => (
+        <li class:list={['timeline-group', `tone-${group.tone ?? 'neutral'}`]}>
+          <div class="timeline-label">
+            {group.datetime ? (
+              <time datetime={group.datetime}>{group.label}</time>
+            ) : (
+              group.label
+            )}
+          </div>
+
+          <div class="timeline-rail" aria-hidden="true">
+            <span class="timeline-node" />
+          </div>
+
+          <div class="timeline-items">
+            {group.items.map((item) => (
+              <article class="timeline-item">
+                {item.href ? (
+                  <a class="timeline-item-link" href={item.href}>
+                    <span class="timeline-copy">
+                      {item.meta && (
+                        <span class="timeline-meta">{item.meta}</span>
+                      )}
+                      <h3>{item.title}</h3>
+                      {item.description && <p>{item.description}</p>}
+                    </span>
+                    <svg
+                      aria-hidden="true"
+                      class="timeline-arrow"
+                      fill="none"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M4 10h11m-4-4 4 4-4 4" />
+                    </svg>
+                  </a>
+                ) : (
+                  <div class="timeline-item-static">
+                    {item.meta && (
+                      <span class="timeline-meta">{item.meta}</span>
+                    )}
+                    <h3>{item.title}</h3>
+                    {item.description && <p>{item.description}</p>}
+                  </div>
+                )}
+              </article>
+            ))}
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  /* style-lint: allow-file spacing -- catalog-only connector geometry, measured against the rail not the scale */
+  .timeline {
+    --timeline-tone: var(--helia-tone-neutral);
+    margin-top: var(--helia-space-4);
+  }
+
+  .timeline-header {
+    align-items: baseline;
+    display: flex;
+    gap: var(--helia-space-5);
+    justify-content: space-between;
+    margin-bottom: clamp(2rem, 6vw, 4.25rem);
+  }
+
+  .timeline-header h2 {
+    font-size: var(--helia-text-page);
+    font-weight: var(--helia-weight-medium);
+    letter-spacing: -0.055em;
+    line-height: 1;
+    margin: 0;
+  }
+
+  .timeline-action {
+    align-items: center;
+    color: var(--sl-color-white);
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: var(--helia-text-body);
+    font-weight: var(--helia-weight-semibold);
+    gap: var(--helia-space-2);
+    text-decoration: none;
+  }
+
+  .timeline-groups {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .timeline-group {
+    display: grid;
+    gap: 0 var(--helia-space-4);
+    grid-template-columns: minmax(7.5rem, 10.5rem) 1.25rem minmax(0, 1fr);
+    margin: 0;
+    min-height: 8rem;
+    padding: 0 0 clamp(2.75rem, 7vw, 5rem);
+    position: relative;
+  }
+
+  .timeline-group:last-child {
+    padding-bottom: 0;
+  }
+
+  .timeline-label {
+    color: var(--sl-color-white);
+    font-size: var(--helia-text-body);
+    font-weight: var(--helia-weight-semibold);
+    line-height: 1.4;
+    padding-top: var(--helia-space-px);
+    text-align: end;
+  }
+
+  .timeline-rail {
+    display: flex;
+    justify-content: center;
+    position: relative;
+  }
+
+  .timeline-rail::after {
+    background: var(--sl-color-gray-5);
+    content: '';
+    inset: 0.85rem auto calc(-1 * clamp(2.75rem, 7vw, 5rem));
+    position: absolute;
+    width: 1px;
+  }
+
+  .timeline-group:last-child .timeline-rail::after {
+    display: none;
+  }
+
+  .timeline-node {
+    background: var(--timeline-tone);
+    border: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0.25rem var(--sl-color-bg);
+    height: 0.62rem;
+    margin-top: var(--helia-space-1);
+    position: relative;
+    width: 0.62rem;
+    z-index: 1;
+  }
+
+  .timeline-items {
+    display: grid;
+    gap: clamp(1.75rem, 4vw, 2.75rem);
+    min-width: 0;
+  }
+
+  .timeline-item {
+    margin: 0;
+    min-width: 0;
+  }
+
+  .timeline-item-link,
+  .timeline-item-static {
+    color: inherit;
+    display: grid;
+    gap: var(--helia-space-4);
+    grid-template-columns: minmax(0, 1fr) auto;
+    text-decoration: none;
+  }
+
+  .timeline-item-static {
+    display: block;
+  }
+
+  .timeline-copy {
+    min-width: 0;
+  }
+
+  .timeline-meta {
+    color: var(--timeline-tone);
+    display: block;
+    font-size: var(--helia-text-caption);
+    font-weight: var(--helia-weight-strong);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--helia-space-2);
+    text-transform: uppercase;
+  }
+
+  .timeline-item h3 {
+    color: var(--sl-color-white);
+    font-size: var(--helia-text-heading);
+    font-weight: var(--helia-weight-medium);
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+    margin: 0;
+  }
+
+  .timeline-item p {
+    color: var(--sl-color-gray-2);
+    line-height: 1.65;
+    margin: var(--helia-space-2) 0 0;
+    max-width: 52rem;
+  }
+
+  .timeline-arrow {
+    flex: 0 0 auto;
+    height: 1.25rem;
+    margin-top: var(--helia-space-px);
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.6;
+    transition: transform 160ms ease;
+    width: 1.25rem;
+  }
+
+  .timeline-item-link .timeline-arrow {
+    color: var(--sl-color-gray-2);
+  }
+
+  .timeline-action:hover .timeline-arrow,
+  .timeline-action:focus-visible .timeline-arrow,
+  .timeline-item-link:hover .timeline-arrow,
+  .timeline-item-link:focus-visible .timeline-arrow {
+    transform: translateX(0.2rem);
+  }
+
+  .timeline-item-link:focus-visible,
+  .tone-blue {
+    --timeline-tone: var(--helia-tone-blue);
+  }
+
+  .tone-cyan {
+    --timeline-tone: var(--helia-tone-cyan);
+  }
+
+  .tone-green {
+    --timeline-tone: var(--helia-tone-green);
+  }
+
+  .tone-orange {
+    --timeline-tone: var(--helia-tone-orange);
+  }
+
+  .tone-purple {
+    --timeline-tone: var(--helia-tone-purple);
+  }
+
+  @media (width < 42rem) {
+    .timeline-header {
+      align-items: flex-start;
+      flex-direction: column;
+      margin-bottom: calc(var(--helia-space-6) + var(--helia-space-1));
+    }
+
+    .timeline-header h2 {
+      /* style-lint: allow font-size -- bespoke compact ramp for the catalog-only timeline hero */
+      font-size: clamp(2rem, 11vw, 2.8rem);
+    }
+
+    .timeline-group {
+      gap: var(--helia-space-2) var(--helia-space-3);
+      grid-template-columns: 1.1rem minmax(0, 1fr);
+      min-height: 0;
+      padding-bottom: calc(var(--helia-space-6) + var(--helia-space-3));
+    }
+
+    .timeline-label {
+      grid-column: 2;
+      grid-row: 1;
+      padding: 0;
+      text-align: start;
+    }
+
+    .timeline-rail {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+    }
+
+    .timeline-rail::after {
+      inset-block: var(--helia-space-3) -3.2rem;
+    }
+
+    .timeline-items {
+      grid-column: 2;
+      grid-row: 2;
+    }
+
+    .timeline-item-link,
+    .timeline-item-static {
+      gap: var(--helia-space-3);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .timeline-arrow {
+      transition: none;
+    }
+  }
+</style>

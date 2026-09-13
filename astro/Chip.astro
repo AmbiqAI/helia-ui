@@ -1,0 +1,53 @@
+---
+/**
+ * The pill: a rounded inline label or link.
+ *
+ * The recipe itself is `.helia-chip` in `src/styles/global.css`, so a list item
+ * or other element that has to stay in place can carry the same class.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface ChipBase {
+  /**
+   * `neutral` is the default outlined pill and reacts to pointer state when it
+   * links; `accent` is the filled badge; `static` is read-only metadata.
+   */
+  tone?: 'neutral' | 'accent' | 'static';
+  /** `sm` is the metadata size, `md` the standalone one. */
+  size?: 'sm' | 'md';
+}
+
+/**
+ * Discriminated on `href`: with it this is an anchor that accepts `target` and
+ * `rel`; without it an inert `<span>`.
+ */
+type Props =
+  | (ChipBase & Omit<HTMLAttributes<'a'>, 'href'> & { href: string })
+  | (ChipBase & HTMLAttributes<'span'> & { href?: undefined });
+
+const {
+  tone = 'neutral',
+  size = 'sm',
+  class: className,
+  ...rest
+} = Astro.props;
+
+const { href, ...attrs } = rest as Omit<HTMLAttributes<'a'>, 'href'> &
+  HTMLAttributes<'span'> & { href?: string };
+
+const Element = href ? 'a' : 'span';
+---
+
+<Element
+  class:list={[
+    'helia-chip',
+    `helia-chip--${tone}`,
+    `helia-chip--${size}`,
+    href && 'helia-focus-ring',
+    className,
+  ]}
+  href={href}
+  {...attrs}
+>
+  <slot />
+</Element>

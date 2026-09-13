@@ -1,0 +1,385 @@
+---
+import { Code } from 'astro:components';
+
+type CodeLanguage =
+  | 'bash'
+  | 'c'
+  | 'cpp'
+  | 'json'
+  | 'plaintext'
+  | 'python'
+  | 'sh'
+  | 'tsx'
+  | 'typescript';
+
+interface CodeTab {
+  label: string;
+  language: CodeLanguage;
+  code: string;
+}
+
+interface Props {
+  tabs: readonly CodeTab[];
+  ariaLabel?: string;
+  variant?: 'tabs' | 'select';
+}
+
+const { tabs, ariaLabel = 'Code examples', variant = 'tabs' } = Astro.props;
+const groupId = `code-tabs-${crypto.randomUUID()}`;
+---
+
+<helia-code-tabs
+  class:list={['code-tabs', 'helia-surface', `variant-${variant}`]}
+>
+  <div class="tabs-toolbar">
+    {
+      variant === 'tabs' ? (
+        <div class="tab-list" role="tablist" aria-label={ariaLabel}>
+          {tabs.map((tab, index) => (
+            <button
+              class="helia-focus-ring helia-focus-ring--inset"
+              id={`${groupId}-tab-${index}`}
+              type="button"
+              role="tab"
+              aria-controls={`${groupId}-panel-${index}`}
+              aria-selected={index === 0 ? 'true' : 'false'}
+              tabindex={index === 0 ? 0 : -1}
+              data-tab-index={index}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <label class="select-control">
+          <span>Language</span>
+          <select
+            class="helia-focus-ring"
+            aria-label={ariaLabel}
+            data-code-select
+          >
+            {tabs.map((tab, index) => (
+              <option value={index}>{tab.label}</option>
+            ))}
+          </select>
+        </label>
+      )
+    }
+    <button
+      aria-label="Copy code"
+      class="copy-button helia-focus-ring helia-focus-ring--inset"
+      title="Copy code"
+      type="button"
+      data-copy-button
+    >
+      <svg aria-hidden="true" class="copy-icon" viewBox="0 0 20 20">
+        <path
+          d="M6.25 6.25V4.5A1.75 1.75 0 0 1 8 2.75h7.5a1.75 1.75 0 0 1 1.75 1.75V12A1.75 1.75 0 0 1 15.5 13.75h-1.75"
+        ></path>
+        <rect x="2.75" y="6.25" width="11" height="11" rx="1.75"></rect>
+      </svg>
+      <svg aria-hidden="true" class="check-icon" viewBox="0 0 20 20">
+        <path d="m4.25 10.25 3.5 3.5 8-8"></path>
+      </svg>
+    </button>
+  </div>
+  {
+    tabs.map((tab, index) => (
+      <div
+        id={`${groupId}-panel-${index}`}
+        role={variant === 'tabs' ? 'tabpanel' : 'region'}
+        aria-labelledby={
+          variant === 'tabs' ? `${groupId}-tab-${index}` : undefined
+        }
+        aria-label={
+          variant === 'select' ? `${tab.label} code example` : undefined
+        }
+        data-code-panel
+        data-code={tab.code}
+        hidden={index !== 0}
+      >
+        <Code
+          code={tab.code}
+          lang={tab.language}
+          themes={{ light: 'github-light', dark: 'github-dark' }}
+          defaultColor={false}
+        />
+      </div>
+    ))
+  }
+  <span class="sr-status" aria-live="polite" data-copy-status></span>
+</helia-code-tabs>
+
+<script>
+  const copyText = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.append(textarea);
+      textarea.select();
+      const legacyCopy = Reflect.get(document, 'execCommand') as (
+        command: string,
+      ) => boolean;
+      const copied = legacyCopy.call(document, 'copy');
+      textarea.remove();
+      return copied;
+    }
+  };
+
+  class HubCodeTabs extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.ready === 'true') return;
+      this.dataset.ready = 'true';
+
+      const tabs = Array.from(
+        this.querySelectorAll<HTMLButtonElement>('[role="tab"]'),
+      );
+      const select =
+        this.querySelector<HTMLSelectElement>('[data-code-select]');
+      const panels = Array.from(
+        this.querySelectorAll<HTMLElement>('[data-code-panel]'),
+      );
+      const copyButton =
+        this.querySelector<HTMLButtonElement>('[data-copy-button]');
+      const status = this.querySelector<HTMLElement>('[data-copy-status]');
+      if ((!tabs.length && !select) || !copyButton || !status) return;
+
+      const selectTab = (index: number, focus = false) => {
+        tabs.forEach((tab, tabIndex) => {
+          const active = tabIndex === index;
+          tab.setAttribute('aria-selected', String(active));
+          tab.tabIndex = active ? 0 : -1;
+          panels[tabIndex].hidden = !active;
+        });
+        panels.forEach((panel, panelIndex) => {
+          panel.hidden = panelIndex !== index;
+        });
+        if (select) select.value = String(index);
+        if (focus) tabs[index].focus();
+      };
+
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => selectTab(index));
+        tab.addEventListener('keydown', (event) => {
+          const keys = ['ArrowLeft', 'ArrowRight', 'Home', 'End'];
+          if (!keys.includes(event.key)) return;
+          event.preventDefault();
+          const nextIndex =
+            event.key === 'Home'
+              ? 0
+              : event.key === 'End'
+                ? tabs.length - 1
+                : (index +
+                    (event.key === 'ArrowRight' ? 1 : -1) +
+                    tabs.length) %
+                  tabs.length;
+          selectTab(nextIndex, true);
+        });
+      });
+
+      select?.addEventListener('change', () => {
+        selectTab(Number(select.value));
+      });
+
+      copyButton.addEventListener('click', async () => {
+        const activePanel = panels.find((panel) => !panel.hidden);
+        const copied = await copyText(activePanel?.dataset.code ?? '');
+        if (copied) {
+          copyButton.dataset.copied = 'true';
+          copyButton.setAttribute('aria-label', 'Copied');
+          copyButton.title = 'Copied';
+          status.textContent = 'Code copied to clipboard';
+          window.setTimeout(() => {
+            delete copyButton.dataset.copied;
+            copyButton.setAttribute('aria-label', 'Copy code');
+            copyButton.title = 'Copy code';
+            status.textContent = '';
+          }, 2400);
+        } else {
+          status.textContent = 'Unable to copy code';
+        }
+      });
+    }
+  }
+
+  if (!customElements.get('helia-code-tabs')) {
+    customElements.define('helia-code-tabs', HubCodeTabs);
+  }
+</script>
+
+<style>
+  /* style-lint: allow-file global -- Shiki writes the pre.astro-code markup, so it carries no component scope */
+  .code-tabs {
+    display: block;
+    overflow: hidden;
+  }
+
+  .tabs-toolbar {
+    align-items: center;
+    background: var(--sl-color-bg-nav);
+    border-bottom: 1px solid var(--sl-color-gray-5);
+    display: flex;
+    gap: var(--helia-space-3);
+    justify-content: space-between;
+    min-height: 2.8rem;
+    padding: 0 var(--helia-space-2) 0 var(--helia-space-1);
+  }
+
+  .tab-list {
+    align-items: stretch;
+    display: flex;
+    min-width: 0;
+    overflow-x: auto;
+  }
+
+  .select-control {
+    align-items: center;
+    display: flex;
+    gap: var(--helia-space-3);
+    min-width: 0;
+    position: relative;
+  }
+
+  .select-control::after {
+    border-bottom: 1.4px solid currentColor;
+    border-right: 1.4px solid currentColor;
+    color: var(--sl-color-gray-3);
+    content: '';
+    height: 0.38rem;
+    pointer-events: none;
+    position: absolute;
+    right: 0.8rem;
+    top: 50%;
+    transform: translateY(-65%) rotate(45deg);
+    width: 0.38rem;
+  }
+
+  .select-control span {
+    color: var(--sl-color-gray-3);
+    font-size: var(--helia-text-label);
+    font-weight: var(--helia-weight-semibold);
+    letter-spacing: 0.02em;
+  }
+
+  .select-control select {
+    appearance: none;
+    background: var(--sl-color-bg);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: var(--helia-radius-sm);
+    color: var(--sl-color-white);
+    font: inherit;
+    font-size: var(--helia-text-caption);
+    font-weight: var(--helia-weight-medium);
+    height: 2rem;
+    min-width: 8rem;
+    padding: 0 var(--helia-space-6) 0 var(--helia-space-3);
+  }
+
+  button {
+    background: transparent;
+    border: 0;
+    color: var(--sl-color-gray-2);
+    cursor: pointer;
+    font: inherit;
+    margin: 0;
+  }
+
+  [role='tab'] {
+    align-items: center;
+    border-bottom: 2px solid transparent;
+    display: inline-flex;
+    font-size: var(--helia-text-caption);
+    font-weight: var(--helia-weight-medium);
+    height: 2.8rem;
+    justify-content: center;
+    line-height: 1;
+    padding: 0 var(--helia-space-3);
+    white-space: nowrap;
+  }
+
+  [role='tab']:hover {
+    color: var(--sl-color-white);
+  }
+
+  [role='tab'][aria-selected='true'] {
+    border-bottom-color: var(--sl-color-white);
+    color: var(--sl-color-white);
+  }
+
+  .copy-button {
+    align-items: center;
+    border-radius: var(--helia-radius-sm);
+    display: inline-flex;
+    flex: 0 0 auto;
+    height: 1.9rem;
+    justify-content: center;
+    padding: 0;
+    width: 1.9rem;
+  }
+
+  .copy-button:hover {
+    background: var(--sl-color-gray-6);
+    color: var(--sl-color-white);
+  }
+
+  .copy-button svg {
+    fill: none;
+    height: 1rem;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.35;
+    width: 1rem;
+  }
+
+  .copy-button .check-icon {
+    display: none;
+  }
+
+  .copy-button[data-copied='true'] .copy-icon {
+    display: none;
+  }
+
+  .copy-button[data-copied='true'] .check-icon {
+    display: block;
+  }
+
+  [data-code-panel] {
+    overflow-x: auto;
+  }
+
+  [data-code-panel][hidden] {
+    display: none;
+  }
+
+  .code-tabs :global(pre.astro-code) {
+    background: var(--helia-surface-card);
+    border: 0;
+    border-radius: 0;
+    color: light-dark(var(--shiki-light), var(--shiki-dark));
+    font-size: var(--helia-text-small);
+    line-height: 1.65;
+    margin: 0;
+    min-width: max-content;
+    overflow: visible;
+    padding: var(--helia-space-3) var(--helia-space-4);
+  }
+
+  .code-tabs :global(pre.astro-code span) {
+    color: light-dark(var(--shiki-light), var(--shiki-dark));
+  }
+
+  .sr-status {
+    height: 1px;
+    margin: calc(var(--helia-space-px) * -1);
+    overflow: hidden;
+    position: absolute;
+    width: 1px;
+  }
+</style>

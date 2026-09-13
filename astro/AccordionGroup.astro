@@ -1,0 +1,131 @@
+---
+import { icon } from '@fortawesome/fontawesome-svg-core';
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
+
+interface AccordionItem {
+  title: string;
+  content: string;
+}
+
+interface Props {
+  items: readonly AccordionItem[];
+}
+
+const { items } = Astro.props;
+const chevronMarkup = icon(faChevronDown).html.join('');
+---
+
+<div class="accordion-group helia-surface">
+  {
+    items.map((item, index) => (
+      <details open={index === 0}>
+        <summary class="helia-focus-ring helia-focus-ring--inset">
+          {item.title}
+          <span
+            class="accordion-chevron"
+            aria-hidden="true"
+            set:html={chevronMarkup}
+          />
+        </summary>
+        <p>{item.content}</p>
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .accordion-group {
+    overflow: hidden;
+  }
+
+  details {
+    border: 0;
+    border-bottom: 1px solid var(--sl-color-gray-5);
+    margin: 0;
+    padding: 0;
+  }
+
+  details:last-child {
+    border-bottom: 0;
+  }
+
+  summary {
+    align-items: center;
+    color: var(--helia-ink-primary);
+    cursor: pointer;
+    display: flex;
+    font-size: var(--helia-text-body);
+    font-weight: var(--helia-weight-semibold);
+    gap: var(--helia-space-4);
+    justify-content: space-between;
+    list-style: none;
+    margin: 0;
+    min-height: 3.25rem;
+    padding: var(--helia-space-3) var(--helia-space-4);
+    transition: background-color 140ms ease;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary::marker {
+    content: '';
+  }
+
+  summary::before {
+    display: none;
+  }
+
+  summary:hover {
+    background: color-mix(in srgb, var(--helia-surface-paper) 72%, transparent);
+  }
+
+  .accordion-chevron {
+    align-items: center;
+    color: var(--helia-ink-muted);
+    display: inline-flex;
+    flex: 0 0 1.5rem;
+    height: 1.5rem;
+    justify-content: center;
+    line-height: 1;
+    transition: transform 140ms ease;
+  }
+
+  /* style-lint: allow global -- the chevron is set:html from Font Awesome, so the svg carries no scope */
+  .accordion-chevron :global(svg) {
+    height: 0.8rem;
+    width: 0.8rem;
+  }
+
+  details[open] .accordion-chevron {
+    transform: rotate(180deg);
+  }
+
+  p {
+    color: var(--helia-ink-secondary);
+    font-size: var(--helia-text-small);
+    line-height: 1.6;
+    margin: 0;
+    max-width: 46rem;
+    padding: 0 calc(var(--helia-space-6) + var(--helia-space-5))
+      var(--helia-space-4) var(--helia-space-4);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    summary,
+    summary span {
+      transition: none;
+    }
+  }
+
+  @media (width < 42rem) {
+    summary {
+      padding-inline: var(--helia-space-3);
+    }
+
+    p {
+      padding: 0 var(--helia-space-3) var(--helia-space-4);
+    }
+  }
+</style>

@@ -1,0 +1,39 @@
+---
+/**
+ * The media region of a card: a fixed-ratio frame around whatever the consumer
+ * puts in it — an `<img>`, a `<Media>`, an inline SVG, a video poster.
+ *
+ * The component never picks the media. It owns the ratio and the fit, so cards
+ * in a row line up whatever each one shows. The fit reaches the media at any
+ * depth, so a `<picture>` or an `<img>` inside a link fills the frame too.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  /** Aspect ratio of the frame. */
+  ratio?: '16/9' | '4/3' | '1/1';
+  /** How slotted media fills the frame. */
+  fit?: 'cover' | 'contain';
+}
+
+const {
+  ratio = '16/9',
+  fit = 'cover',
+  class: className,
+  ...rest
+} = Astro.props;
+
+const ratioClass = `helia-card-media--${ratio.replace('/', '-')}`;
+---
+
+<div
+  class:list={[
+    'helia-card-media',
+    ratioClass,
+    `helia-card-media--${fit}`,
+    className,
+  ]}
+  {...rest}
+>
+  <slot />
+</div>

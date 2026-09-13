@@ -1,0 +1,224 @@
+---
+interface Props {
+  columns: readonly string[];
+  rows: readonly (readonly string[])[];
+  caption: string;
+  pageSize?: number;
+}
+
+const { columns, rows, caption, pageSize = 0 } = Astro.props;
+const pageCount = pageSize > 0 ? Math.ceil(rows.length / pageSize) : 1;
+const isPaginated = pageCount > 1;
+---
+
+<helia-data-table class="data-table helia-surface" data-page-size={pageSize}>
+  <div class="table-scroll">
+    <table>
+      <caption>{caption}</caption>
+      <thead>
+        <tr>{columns.map((column) => <th scope="col">{column}</th>)}</tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((row) => (
+            <tr data-table-row>
+              {row.map((cell) => (
+                <td>{cell}</td>
+              ))}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  {
+    isPaginated && (
+      <nav
+        class="pagination"
+        aria-label={`${caption} pagination`}
+        data-pagination
+        hidden
+      >
+        <button class="helia-focus-ring" type="button" data-previous>
+          <span aria-hidden="true">←</span>
+          Previous
+        </button>
+        <span class="page-status" aria-live="polite">
+          Page <span data-current-page>1</span> of {pageCount}
+        </span>
+        <button class="helia-focus-ring" type="button" data-next>
+          Next
+          <span aria-hidden="true">→</span>
+        </button>
+      </nav>
+    )
+  }
+</helia-data-table>
+
+<script>
+  class HubDataTable extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.ready === 'true') return;
+
+      const pageSize = Number(this.dataset.pageSize);
+      const rows = Array.from(
+        this.querySelectorAll<HTMLTableRowElement>('[data-table-row]'),
+      );
+      const pagination = this.querySelector<HTMLElement>('[data-pagination]');
+
+      if (!pagination || pageSize < 1 || rows.length <= pageSize) return;
+
+      const previous =
+        pagination.querySelector<HTMLButtonElement>('[data-previous]');
+      const next = pagination.querySelector<HTMLButtonElement>('[data-next]');
+      const currentPage = pagination.querySelector<HTMLElement>(
+        '[data-current-page]',
+      );
+
+      if (!previous || !next || !currentPage) return;
+
+      const pageCount = Math.ceil(rows.length / pageSize);
+      let page = 0;
+
+      const render = () => {
+        const firstRow = page * pageSize;
+
+        rows.forEach((row, index) => {
+          row.hidden = index < firstRow || index >= firstRow + pageSize;
+        });
+
+        currentPage.textContent = String(page + 1);
+        previous.disabled = page === 0;
+        next.disabled = page === pageCount - 1;
+      };
+
+      previous.addEventListener('click', () => {
+        page = Math.max(0, page - 1);
+        render();
+      });
+
+      next.addEventListener('click', () => {
+        page = Math.min(pageCount - 1, page + 1);
+        render();
+      });
+
+      pagination.hidden = false;
+      this.dataset.ready = 'true';
+      render();
+    }
+  }
+
+  if (!customElements.get('helia-data-table')) {
+    customElements.define('helia-data-table', HubDataTable);
+  }
+</script>
+
+<style>
+  .data-table {
+    display: block;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .table-scroll {
+    background: var(--sl-color-bg);
+    overflow-x: auto;
+  }
+
+  table {
+    background: var(--sl-color-bg);
+    border-collapse: collapse;
+    display: table;
+    font-size: var(--helia-text-small);
+    min-width: 42rem;
+    width: 100%;
+  }
+
+  caption {
+    color: var(--sl-color-gray-2);
+    font-size: var(--helia-text-caption);
+    padding: var(--helia-space-3);
+    text-align: left;
+  }
+
+  th,
+  td {
+    border-top: 1px solid var(--sl-color-gray-5);
+    padding: var(--helia-space-3);
+    text-align: left;
+  }
+
+  th {
+    background: var(--sl-color-bg-nav);
+    color: var(--sl-color-gray-2);
+    font-size: var(--helia-text-label);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  td {
+    background: var(--sl-color-bg);
+    color: var(--sl-color-gray-1);
+  }
+
+  tbody tr:hover td {
+    background: var(--sl-color-bg-nav);
+  }
+
+  tbody tr[hidden] {
+    display: none;
+  }
+
+  .pagination {
+    align-items: center;
+    background: var(--sl-color-bg-nav);
+    border-top: 1px solid var(--sl-color-gray-5);
+    display: flex;
+    gap: var(--helia-space-3);
+    justify-content: flex-end;
+    padding: var(--helia-space-3);
+  }
+
+  .pagination[hidden] {
+    display: none;
+  }
+
+  .pagination button {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: var(--helia-radius-sm);
+    color: var(--sl-color-white);
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    font-size: var(--helia-text-caption);
+    font-weight: var(--helia-weight-medium);
+    gap: var(--helia-space-2);
+    min-height: 2rem;
+    padding: var(--helia-space-1) var(--helia-space-2);
+  }
+
+  .pagination button:hover:not(:disabled) {
+    background: var(--sl-color-gray-6);
+  }
+
+  .pagination button:disabled {
+    color: var(--sl-color-gray-3);
+    cursor: default;
+  }
+
+  .page-status {
+    color: var(--sl-color-gray-2);
+    font-size: var(--helia-text-label);
+    min-width: 4.8rem;
+    text-align: center;
+  }
+
+  @media (width < 42rem) {
+    .pagination {
+      justify-content: space-between;
+    }
+  }
+</style>

@@ -1,0 +1,50 @@
+---
+/**
+ * The call to action: a pill-shaped link or button.
+ *
+ * The recipe itself is `.helia-button` in `src/styles/global.css`.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface ButtonBase {
+  /** `primary` is the filled ink pill, `secondary` outlined, `ghost` bare. */
+  variant?: 'primary' | 'secondary' | 'ghost';
+  /** `md` is the hero and page-level size, `sm` the in-content one. */
+  size?: 'sm' | 'md';
+}
+
+/**
+ * Discriminated on `href`: with it this is an anchor that accepts `target` and
+ * `rel`; without it a `<button>` that accepts `disabled` and `type`.
+ */
+type Props =
+  | (ButtonBase & Omit<HTMLAttributes<'a'>, 'href'> & { href: string })
+  | (ButtonBase & HTMLAttributes<'button'> & { href?: undefined });
+
+const {
+  variant = 'primary',
+  size = 'md',
+  class: className,
+  ...rest
+} = Astro.props;
+
+const { href, type, ...attrs } = rest as Omit<HTMLAttributes<'a'>, 'href'> &
+  HTMLAttributes<'button'> & { href?: string };
+
+const Element = href ? 'a' : 'button';
+---
+
+<Element
+  class:list={[
+    'helia-button',
+    `helia-button--${variant}`,
+    `helia-button--${size}`,
+    'helia-focus-ring',
+    className,
+  ]}
+  href={href}
+  type={href ? undefined : (type ?? 'button')}
+  {...attrs}
+>
+  <slot />
+</Element>

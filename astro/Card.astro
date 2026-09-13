@@ -1,0 +1,43 @@
+---
+/**
+ * The card container: a `Surface` that carries no padding of its own.
+ *
+ * Padding belongs to the parts (`CardHeader`, `CardContent`, `CardActions`) so
+ * a `CardMedia` can reach the edge of the same card. Any subset of the parts
+ * composes, in any order; the card only stacks what it is handed.
+ *
+ * The card is never an anchor. A whole-card link is `CardHeader href`, whose
+ * link stretches over the card: an anchor here would nest the actions' own
+ * links inside it.
+ */
+import type { HTMLAttributes, HTMLTag } from 'astro/types';
+import Surface from './Surface.astro';
+
+interface Props extends HTMLAttributes<'div'> {
+  /** Element to render. Never an anchor: the whole-card link is `CardHeader href`. */
+  as?: Exclude<HTMLTag, 'a'>;
+  /** Background: the raised card, the recessed muted fill, or paper. */
+  tone?: 'card' | 'muted' | 'paper';
+  /** Adds the shared hover background shift and the focus-visible ring. */
+  interactive?: boolean;
+}
+
+const {
+  as = 'div',
+  tone = 'card',
+  interactive = false,
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<Surface
+  as={as}
+  tone={tone}
+  padding="none"
+  interactive={interactive}
+  class:list={['helia-card', 'not-content', className]}
+  {...rest}
+>
+  <slot />
+</Surface>

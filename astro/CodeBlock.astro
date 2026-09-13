@@ -1,0 +1,392 @@
+---
+import { Code } from 'astro:components';
+import type { ShikiTransformer } from 'shiki';
+
+type CodeLanguage =
+  | 'bash'
+  | 'c'
+  | 'cpp'
+  | 'diff'
+  | 'json'
+  | 'plaintext'
+  | 'python'
+  | 'sh'
+  | 'tsx'
+  | 'typescript';
+
+interface Props {
+  code: string;
+  language?: CodeLanguage;
+  filename?: string;
+  label?: string;
+  highlightLines?: readonly number[];
+  lineNumbers?: boolean;
+  variant?: 'bare' | 'code' | 'terminal';
+  /** Forwarded to the frame, so a layout can size it without reaching inside. */
+  class?: string;
+}
+
+const {
+  code,
+  language = 'plaintext',
+  filename,
+  label,
+  highlightLines = [],
+  lineNumbers = false,
+  variant = 'code',
+  class: className,
+} = Astro.props;
+
+const highlightedLines = new Set(highlightLines);
+const lineTransformer: ShikiTransformer = {
+  name: 'helia-code-lines',
+  line(node, line) {
+    const className = node.properties.class;
+    const classes = Array.isArray(className)
+      ? className
+      : typeof className === 'string'
+        ? className.split(' ')
+        : [];
+
+    node.properties.class = [
+      ...classes,
+      ...(highlightedLines.has(line) ? ['is-highlighted'] : []),
+    ];
+    node.properties['data-line'] = line;
+  },
+};
+---
+
+<helia-code-block
+  class:list={['code-frame', 'helia-surface', `variant-${variant}`, className]}
+>
+  {
+    variant !== 'bare' && (
+      <div class="code-toolbar">
+        <div class:list={['code-context', { 'has-filename': filename }]}>
+          <span class="code-label">
+            {filename ??
+              label ??
+              (variant === 'terminal' ? 'Terminal' : language)}
+          </span>
+          {filename && <span class="code-language">{language}</span>}
+        </div>
+        <button
+          aria-label="Copy code"
+          class="helia-focus-ring"
+          title="Copy code"
+          type="button"
+          data-copy-button
+          data-code={code}
+        >
+          <svg aria-hidden="true" class="copy-icon" viewBox="0 0 20 20">
+            <path d="M6.25 6.25V4.5A1.75 1.75 0 0 1 8 2.75h7.5a1.75 1.75 0 0 1 1.75 1.75V12A1.75 1.75 0 0 1 15.5 13.75h-1.75" />
+            <rect x="2.75" y="6.25" width="11" height="11" rx="1.75" />
+          </svg>
+          <svg aria-hidden="true" class="check-icon" viewBox="0 0 20 20">
+            <path d="m4.25 10.25 3.5 3.5 8-8" />
+          </svg>
+        </button>
+      </div>
+    )
+  }
+  {
+    variant === 'bare' && (
+      <button
+        aria-label="Copy code"
+        class="bare-copy helia-focus-ring"
+        title="Copy code"
+        type="button"
+        data-copy-button
+        data-code={code}
+      >
+        <svg aria-hidden="true" class="copy-icon" viewBox="0 0 20 20">
+          <path d="M6.25 6.25V4.5A1.75 1.75 0 0 1 8 2.75h7.5a1.75 1.75 0 0 1 1.75 1.75V12A1.75 1.75 0 0 1 15.5 13.75h-1.75" />
+          <rect x="2.75" y="6.25" width="11" height="11" rx="1.75" />
+        </svg>
+        <svg aria-hidden="true" class="check-icon" viewBox="0 0 20 20">
+          <path d="m4.25 10.25 3.5 3.5 8-8" />
+        </svg>
+      </button>
+    )
+  }
+  <div class="code-scroll">
+    <Code
+      code={code}
+      lang={language}
+      themes={{ light: 'github-light', dark: 'github-dark' }}
+      defaultColor={false}
+      data-line-numbers={lineNumbers ? 'true' : undefined}
+      transformers={[lineTransformer]}
+    />
+  </div>
+  <span class="sr-status" aria-live="polite" data-copy-status></span>
+</helia-code-block>
+
+<script>
+  const copyText = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.append(textarea);
+      textarea.select();
+      const legacyCopy = Reflect.get(document, 'execCommand') as (
+        command: string,
+      ) => boolean;
+      const copied = legacyCopy.call(document, 'copy');
+      textarea.remove();
+      return copied;
+    }
+  };
+
+  class HubCodeBlock extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.ready === 'true') return;
+      this.dataset.ready = 'true';
+
+      const button =
+        this.querySelector<HTMLButtonElement>('[data-copy-button]');
+      const status = this.querySelector<HTMLElement>('[data-copy-status]');
+      if (!button || !status) return;
+
+      button.addEventListener('click', async () => {
+        const copied = await copyText(button.dataset.code ?? '');
+        if (copied) {
+          button.dataset.copied = 'true';
+          button.setAttribute('aria-label', 'Copied');
+          button.title = 'Copied';
+          status.textContent = 'Code copied to clipboard';
+          window.setTimeout(() => {
+            delete button.dataset.copied;
+            button.setAttribute('aria-label', 'Copy code');
+            button.title = 'Copy code';
+            status.textContent = '';
+          }, 2400);
+        } else {
+          status.textContent = 'Unable to copy code';
+        }
+      });
+    }
+  }
+
+  if (!customElements.get('helia-code-block')) {
+    customElements.define('helia-code-block', HubCodeBlock);
+  }
+</script>
+
+<style>
+  /* style-lint: allow-file global -- Shiki writes the pre.astro-code markup, so it carries no component scope */
+  .code-frame {
+    display: block;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .code-toolbar {
+    align-items: center;
+    background: var(--sl-color-bg-nav);
+    border-bottom: 1px solid var(--sl-color-gray-5);
+    box-sizing: border-box;
+    display: flex;
+    gap: var(--helia-space-4);
+    justify-content: space-between;
+    min-height: 2.8rem;
+    padding: var(--helia-space-2) var(--helia-space-3);
+  }
+
+  .code-context {
+    align-items: center;
+    display: flex;
+    gap: var(--helia-space-3);
+    min-width: 0;
+  }
+
+  .code-label,
+  .code-language {
+    font-size: var(--helia-text-small);
+  }
+
+  .code-label {
+    color: var(--helia-ink-primary);
+    font-family: var(--helia-font-sans);
+    font-weight: var(--helia-weight-semibold);
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .code-context.has-filename .code-label,
+  .code-language {
+    font-family: var(--helia-font-mono);
+  }
+
+  .code-context.has-filename .code-label {
+    font-weight: var(--helia-weight-medium);
+  }
+
+  .code-language {
+    color: var(--helia-ink-muted);
+    font-size: var(--helia-text-label);
+  }
+
+  button {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: var(--helia-radius-sm);
+    color: var(--sl-color-gray-2);
+    cursor: pointer;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font: inherit;
+    height: 1.9rem;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    width: 1.9rem;
+  }
+
+  button:hover {
+    background: var(--sl-color-gray-6);
+    color: var(--sl-color-white);
+  }
+
+  button svg {
+    fill: none;
+    height: 1rem;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.35;
+    width: 1rem;
+  }
+
+  button .check-icon {
+    display: none;
+  }
+
+  button[data-copied='true'] .copy-icon {
+    display: none;
+  }
+
+  button[data-copied='true'] .check-icon {
+    display: block;
+  }
+
+  .code-scroll {
+    margin: 0;
+    overflow-x: auto;
+  }
+
+  .code-frame :global(pre.astro-code) {
+    background: var(--helia-surface-card);
+    border: 0;
+    border-radius: 0;
+    color: light-dark(var(--shiki-light), var(--shiki-dark));
+    font-size: var(--helia-text-small);
+    line-height: 1.65;
+    margin: 0;
+    min-width: max-content;
+    overflow: visible;
+    padding: var(--helia-space-3) var(--helia-space-4);
+  }
+
+  .code-frame :global(pre.astro-code span) {
+    color: light-dark(var(--shiki-light), var(--shiki-dark));
+  }
+
+  .code-frame :global(pre[data-line-numbers='true'] code) {
+    counter-reset: code-line;
+  }
+
+  .code-frame :global(pre[data-line-numbers='true'] .line) {
+    counter-increment: code-line;
+  }
+
+  .code-frame :global(pre[data-line-numbers='true'] .line::before) {
+    color: var(--sl-color-gray-4);
+    content: counter(code-line);
+    display: inline-block;
+    margin-right: var(--helia-space-4);
+    text-align: right;
+    width: 1.25rem;
+  }
+
+  .code-frame :global(.line.is-highlighted) {
+    background: color-mix(in srgb, var(--sl-color-accent) 7%, transparent);
+    border-left: 2px solid var(--sl-color-accent);
+    display: inline-block;
+    margin-inline: calc(var(--helia-space-4) * -1);
+    padding-inline: calc(var(--helia-space-4) - 2px) var(--helia-space-4);
+    width: calc(100% + 2rem);
+  }
+
+  .variant-bare {
+    background: var(--sl-color-bg-nav);
+    border: 0;
+    border-radius: var(--helia-radius);
+  }
+
+  .variant-bare .bare-copy {
+    color: var(--sl-color-gray-1);
+    height: 2.1rem;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.75rem;
+    width: 2.1rem;
+    z-index: 1;
+  }
+
+  .variant-bare .bare-copy svg {
+    height: 1.2rem;
+    stroke-width: 1.5;
+    width: 1.2rem;
+  }
+
+  .variant-bare :global(pre.astro-code) {
+    background: var(--sl-color-bg-nav);
+    font-size: var(--helia-text-small);
+    line-height: 1.7;
+    padding: var(--helia-space-5)
+      calc(var(--helia-space-6) + var(--helia-space-5)) var(--helia-space-5)
+      var(--helia-space-5);
+  }
+
+  .variant-terminal .code-toolbar {
+    min-height: 2.35rem;
+    padding: var(--helia-space-1) var(--helia-space-3);
+  }
+
+  .variant-terminal .code-context {
+    min-height: 1.75rem;
+  }
+
+  .variant-terminal .code-label {
+    align-items: center;
+    display: inline-flex;
+    font-family: var(--helia-font-sans);
+    font-size: var(--helia-text-small);
+    font-weight: var(--helia-weight-semibold);
+    min-height: 1.75rem;
+  }
+
+  .variant-terminal .code-toolbar button {
+    height: 1.75rem;
+    width: 1.75rem;
+  }
+
+  .sr-status {
+    height: 1px;
+    margin: calc(var(--helia-space-px) * -1);
+    overflow: hidden;
+    position: absolute;
+    width: 1px;
+  }
+</style>
