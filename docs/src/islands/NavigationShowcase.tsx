@@ -47,13 +47,13 @@ export default function NavigationShowcase() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/helia-developer-hub/ecosystem/">
+                <BreadcrumbLink href="/helia-ui/ecosystem/">
                   Platform
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href="/helia-developer-hub/products/core/">
+                <BreadcrumbLink href="/helia-ui/products/core/">
                   Products
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -69,7 +69,7 @@ export default function NavigationShowcase() {
           <Breadcrumb aria-label="Long breadcrumb">
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/helia-developer-hub/ecosystem/">
+                <BreadcrumbLink href="/helia-ui/ecosystem/">
                   Platform
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -79,7 +79,7 @@ export default function NavigationShowcase() {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href="/helia-developer-hub/products/aot/">
+                <BreadcrumbLink href="/helia-ui/products/aot/">
                   heliaAOT
                 </BreadcrumbLink>
               </BreadcrumbItem>

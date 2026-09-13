@@ -1,6 +1,14 @@
 ---
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
+/*
+ * The artwork travels with the component. Resolving it from the consuming
+ * site's BASE_URL pointed the mask at a file every consumer had to place in
+ * its own public directory, and a mask whose image 404s renders nothing at
+ * all, so a site that had not been told simply had no wordmark.
+ */
+import logoUrl from './ambiq-logo.svg?url';
+
 export type AmbiqLogoTone = 'adaptive' | 'blue' | 'black' | 'white';
 
 interface Props {
@@ -10,7 +18,6 @@ interface Props {
 }
 
 const { tone = 'blue', label = 'Ambiq', class: className } = Astro.props;
-const logoUrl = `${import.meta.env.BASE_URL}/media/ambiq-logo.svg`;
 ---
 
 <span
@@ -20,13 +27,20 @@ const logoUrl = `${import.meta.env.BASE_URL}/media/ambiq-logo.svg`;
   aria-label={label}></span>
 
 <style>
+  /*
+   * The width is a default, not a decision, and it has to be settable from
+   * outside without a specificity contest. A consumer that writes `width` on
+   * the element lands at the same specificity as this rule, so which one wins
+   * depends on where Astro chunks the two stylesheets rather than on what the
+   * consumer asked for. `--ambiq-logo-width` inherits and always wins.
+   */
   .ambiq-logo {
     aspect-ratio: 1280 / 366;
     background: currentColor;
     display: inline-block;
     flex: none;
     mask: var(--ambiq-logo-image) center / contain no-repeat;
-    width: 8rem;
+    width: var(--ambiq-logo-width, 8rem);
   }
 
   .ambiq-logo--blue {
