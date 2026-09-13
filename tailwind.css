@@ -1,0 +1,142 @@
+/*
+ * Tailwind v4 entry.
+ *
+ * A consuming site imports this from its own entry, which it loads before the
+ * token and recipe sheets. Those are unlayered and unlayered rules beat every
+ * cascade layer, so the token layer stays the source of truth no matter what
+ * the Starlight compat package wires up below.
+ *
+ * The scan list is the consumer's, not ours: Tailwind resolves a `@source`
+ * glob relative to the file that declares it, so one written here would point
+ * inside node_modules. The importing entry holds those rules.
+ *
+ * The arrow in @astrojs/starlight-tailwind points the other way from ours: it
+ * sets the Starlight `--sl-*` variables FROM Tailwind's theme. The variables
+ * tokens.css already owns (accent, bg, bg-nav, bg-sidebar, hairline) win on
+ * the unlayered rule. The rest — the gray ramp, white, black, the two font
+ * stacks — are restated here so the round trip through the compat package is a
+ * no-op. Adopting Tailwind therefore moves ownership of Starlight's gray ramp
+ * into this file.
+ *
+ * See docs/design-system.md "Tailwind" for the mapping and the authoring rules.
+ */
+
+@layer base, starlight, theme, components, utilities;
+
+/* style-lint: allow-file color -- the gray ramp below is the one value the compat package reads that cannot be a var() without closing a cycle; allow-file rather than SHELL_FILES so only the colour rule is relaxed and the suppression is counted */
+
+@import '@astrojs/starlight-tailwind';
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+
+/*
+ * The compat package reads these as plain custom properties, so they have to be
+ * emitted rather than inlined, and the gray steps have to be literals: pointing
+ * a step back at `--sl-color-gray-*` would close a custom-property cycle
+ * through the compat package's own `--sl-color-gray-N: var(--color-gray-M)`.
+ * The literals are Starlight's own palette from
+ * node_modules/@astrojs/starlight/style/props.css, restated so the round trip
+ * lands where it started. Steps 50 and 950 are removed rather than invented;
+ * Starlight defines nine greys and these are those nine.
+ */
+@theme {
+  --color-gray-*: initial;
+  --color-gray-100: hsl(224, 19%, 97%);
+  --color-gray-200: hsl(224, 20%, 94%);
+  --color-gray-300: hsl(224, 6%, 77%);
+  --color-gray-400: hsl(224, 6%, 56%);
+  --color-gray-500: hsl(224, 7%, 36%);
+  --color-gray-600: hsl(224, 7%, 36%);
+  --color-gray-700: hsl(224, 10%, 23%);
+  --color-gray-800: hsl(224, 14%, 16%);
+  --color-gray-900: hsl(224, 10%, 10%);
+
+  /*
+   * `--helia-font-*` alias `--__sl-font*`, which Starlight derives from
+   * `--sl-font*`, which the compat package sets from these. Pointing at the
+   * system stacks Starlight falls back to breaks that cycle and leaves the
+   * computed font unchanged.
+   */
+  --font-*: initial;
+  --font-sans: var(--sl-font-system);
+  --font-mono: var(--sl-font-system-mono);
+}
+
+/*
+ * `inline` keeps the utility referencing the hub token directly instead of a
+ * snapshot taken at `:root`, so every utility follows the theme toggle.
+ */
+@theme inline {
+  --color-accent-*: initial;
+  --color-accent-low: var(--helia-accent-low);
+  --color-accent: var(--helia-accent);
+  --color-accent-high: var(--helia-accent-high);
+
+  --color-ink: var(--helia-ink-primary);
+  --color-ink-secondary: var(--helia-ink-secondary);
+  --color-ink-muted: var(--helia-ink-muted);
+  /*
+   * `surface-` prefixed on purpose. A colour key called `card` would have
+   * emitted `.text-card`, which TextCard.astro already uses as its own class
+   * name, and the emitted `color` would have applied to it — our rule there
+   * only sets min-height, so there was nothing to win the property back with.
+   */
+  --color-surface-canvas: var(--helia-surface-canvas);
+  --color-surface-paper: var(--helia-surface-paper);
+  --color-surface-card: var(--helia-surface-card);
+  --color-surface-card-muted: var(--helia-surface-card-muted);
+  --color-hairline: var(--helia-surface-border);
+
+  --spacing-*: initial;
+  --spacing-px: var(--helia-space-px);
+  --spacing-1: var(--helia-space-1);
+  --spacing-2: var(--helia-space-2);
+  --spacing-3: var(--helia-space-3);
+  --spacing-4: var(--helia-space-4);
+  --spacing-5: var(--helia-space-5);
+  --spacing-6: var(--helia-space-6);
+
+  --radius-*: initial;
+  --radius-xs: var(--helia-radius-xs);
+  --radius-sm: var(--helia-radius-sm);
+  --radius-base: var(--helia-radius);
+  --radius-lg: var(--helia-radius-lg);
+  --radius-pill: var(--helia-radius-pill);
+
+  --text-*: initial;
+  --text-meta: var(--helia-text-meta);
+  --text-label: var(--helia-text-label);
+  --text-caption: var(--helia-text-caption);
+  --text-small: var(--helia-text-small);
+  --text-body: var(--helia-text-body);
+  --text-lead: var(--helia-text-lead);
+  --text-card-title: var(--helia-text-card-title);
+  --text-subhead: var(--helia-text-subhead);
+  --text-heading: var(--helia-text-heading);
+  --text-section: var(--helia-text-section);
+  --text-page: var(--helia-text-page);
+  --text-display: var(--helia-text-display);
+  --text-hero: var(--helia-text-hero);
+
+  --font-weight-*: initial;
+  --font-weight-regular: var(--helia-weight-regular);
+  --font-weight-medium: var(--helia-weight-medium);
+  --font-weight-semibold: var(--helia-weight-semibold);
+  --font-weight-strong: var(--helia-weight-strong);
+  --font-weight-bold: var(--helia-weight-bold);
+
+  --leading-*: initial;
+  --leading-tight: var(--helia-leading-tight);
+  --leading-heading: var(--helia-leading-heading);
+  --leading-body: var(--helia-leading-body);
+}
+
+/*
+ * The shadcn bridge is imported here rather than added to `customCss` so there
+ * is one Tailwind root: a second root would emit its own copy of the utility
+ * layer. It is imported last on purpose. The `*: initial` resets above clear
+ * whole theme namespaces, so a bridge imported with the other files would have
+ * its keys wiped by the resets that follow it -- the radius, spacing and text
+ * steps in particular.
+ */
+@import './shadcn.css';

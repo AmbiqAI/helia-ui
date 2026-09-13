@@ -1,0 +1,193 @@
+.sl-markdown-content a:not([class]) {
+  text-underline-offset: 0.18em;
+}
+
+/*
+ * Starlight built-ins, skinned rather than forked. Starlight's own rules sit in
+ * `@layer starlight.components`, so these unlayered declarations win outright
+ * and no `!important` is needed. See the table in docs/design-system.md.
+ */
+
+/* Steps: a filled numeral, so the sequence still reads against a page of cards. */
+.sl-steps > li::before {
+  background: var(--helia-ink-primary);
+  box-shadow: none;
+  color: var(--helia-surface-canvas);
+  font-size: var(--helia-text-caption);
+  font-weight: var(--helia-weight-strong);
+}
+
+.sl-steps > li::after {
+  background: var(--helia-surface-border);
+}
+
+.content-panel {
+  container-type: inline-size;
+}
+
+/*
+ * Product breadcrumbs and workspace tabs are rendered through Starlight's
+ * PageTitle slot. Remove only that slot's short-lived layout boxes so the
+ * workspace tabs remain sticky against the full page instead of stopping at
+ * the page title. The breadcrumb, tabs, and title keep their authored order.
+ */
+.content-panel:has(> .sl-container > .product-section-nav + h1),
+.content-panel:has(> .sl-container > .product-section-nav + h1)
+  > .sl-container {
+  display: contents;
+}
+
+.content-panel:has(> .sl-container > .product-section-nav + h1)
+  .product-breadcrumbs {
+  box-sizing: border-box;
+  margin-bottom: var(--helia-space-4);
+  padding-top: var(--helia-space-5);
+  width: 100%;
+}
+
+.content-panel:has(> .sl-container > .product-section-nav + h1)
+  > .sl-container
+  > h1 {
+  box-sizing: border-box;
+  margin: 0 auto;
+  max-width: calc(var(--sl-content-width) + 2 * var(--sl-content-pad-x));
+  padding: 0 var(--sl-content-pad-x) var(--helia-space-5);
+  width: 100%;
+}
+
+.sl-markdown-content section + section {
+  margin-top: calc(var(--helia-space-6) * 2);
+}
+
+.sl-markdown-content > p {
+  max-width: 48rem;
+}
+
+.hero .tagline {
+  max-width: 48rem;
+}
+
+.hero h1 .product-prefix {
+  font-weight: var(--helia-weight-regular);
+}
+
+.hero h1 strong {
+  font-weight: var(--helia-weight-bold);
+}
+
+@media (width >= 62rem) {
+  site-search button[data-open-modal] {
+    background: var(--sl-color-bg-nav) !important;
+    border-radius: var(--helia-radius) !important;
+    max-width: 28rem !important;
+  }
+}
+
+@media (width < 62rem) {
+  body[data-helia-sidebar-open] {
+    overflow: hidden;
+  }
+
+  body[data-helia-sidebar-open] .sidebar-pane {
+    display: block !important;
+    visibility: visible !important;
+  }
+}
+
+@media (width >= 62rem) {
+  :root {
+    --sl-sidebar-width: 15rem;
+  }
+
+  html:has([data-helia-sidebar-layout='mobile-only']) {
+    --sl-content-width: 82rem;
+    --sl-sidebar-width: 0rem;
+  }
+
+  html:has([data-helia-sidebar-layout='mobile-only']) .sidebar-pane {
+    display: none !important;
+  }
+}
+
+.sidebar-pane {
+  background: var(--helia-surface-canvas) !important;
+  border-inline-end: 0 !important;
+}
+
+@media (width >= 72rem) {
+  html[data-has-toc] .right-sidebar-container {
+    flex: 0 0 var(--helia-toc-width);
+    width: var(--helia-toc-width) !important;
+  }
+
+  html[data-has-toc] .right-sidebar {
+    border-inline-start: 0 !important;
+    width: var(--helia-toc-width) !important;
+  }
+
+  html[data-has-toc] .right-sidebar-panel .sl-container {
+    max-width: none !important;
+    width: calc(
+      var(--helia-toc-width) - 2 * var(--sl-sidebar-pad-x)
+    ) !important;
+  }
+
+  html[data-has-sidebar][data-has-toc] .main-pane {
+    --sl-content-margin-inline: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+    width: calc(100% - var(--helia-toc-width)) !important;
+  }
+
+  .right-sidebar-panel #starlight__on-this-page {
+    display: none;
+  }
+
+  .right-sidebar-panel starlight-toc nav > ul {
+    border-inline-start: 1px solid var(--sl-color-hairline);
+    margin: 0;
+    padding: 0;
+  }
+
+  .right-sidebar-panel starlight-toc nav > ul li {
+    margin: 0;
+  }
+
+  .right-sidebar-panel starlight-toc nav > ul a {
+    border-radius: 0;
+    color: var(--sl-color-gray-3);
+    line-height: 1.35;
+    padding: var(--helia-space-2) var(--helia-space-1) var(--helia-space-2)
+      var(--helia-space-4);
+    position: relative;
+    transition: color 140ms ease;
+  }
+
+  .right-sidebar-panel starlight-toc nav > ul ul a {
+    padding-inline-start: var(--helia-space-5);
+  }
+
+  .right-sidebar-panel starlight-toc nav > ul a::before {
+    background: transparent;
+    content: '';
+    inset-block: 0;
+    inset-inline-start: calc(var(--helia-space-px) * -1);
+    position: absolute;
+    width: 2px;
+  }
+
+  .right-sidebar-panel starlight-toc nav > ul a:hover,
+  .right-sidebar-panel starlight-toc nav > ul a[aria-current='true'] {
+    color: var(--sl-color-white);
+  }
+
+  .right-sidebar-panel starlight-toc nav > ul a[aria-current='true']::before {
+    background: currentColor;
+  }
+}
+
+@media (width >= 72rem) and (prefers-reduced-motion: reduce) {
+  .right-sidebar-panel starlight-toc nav > ul a {
+    transition: none;
+  }
+}

@@ -1,0 +1,71 @@
+/*
+ * HELIA shared design tokens.
+ *
+ * The primitive layer: the values the HELIA Developer Hub and the AITG
+ * Handbook share, plus the mapping of those primitives onto the Starlight
+ * `--sl-*` variables both sites consume. Each site's semantic layer builds on
+ * these from its own stylesheet under the same `--helia-` prefix, so a name
+ * defined here must not be redefined there; nothing site-specific belongs in
+ * this file.
+ *
+ * CANONICAL COPY: helia-developer-hub/src/styles/tokens.css
+ * This file is VENDORED byte-for-byte into aitg-handbook/src/styles/tokens.css.
+ * Edit it in the hub only, then run `npm run sync:tokens` there to push the
+ * copy. `npm run check:tokens` diffs the two and fails on drift (it skips
+ * cleanly when the sibling repo is not checked out). Do not edit the vendored
+ * copy in place; it will be overwritten.
+ *
+ * NOTE: deliberately left UNLAYERED. Starlight's own variables live in the
+ * `starlight.base` cascade layer, and unlayered rules always win over layered
+ * ones, so wrapping these in `@layer` would let Starlight's defaults win.
+ *
+ * Load order matters: tokens.css must come first, then the site stylesheet.
+ * Both are unlayered `:root` rules of equal specificity, so the later
+ * declaration wins and each site can still override a mapped variable.
+ *
+ * `--sl-color-hairline-light` is deliberately NOT mapped here. The two sites
+ * agree on #242936 in dark but diverge in light (hub #dfe3e8, handbook
+ * #e7e8ea), so each site sets that variable in its own stylesheet.
+ */
+
+:root {
+  /* Near-monochrome accent: light ink on dark */
+  --helia-accent-low: #25272a;
+  --helia-accent: #f0f1f2;
+  --helia-accent-high: #ffffff;
+
+  /* Slate surfaces */
+  --helia-surface-canvas: #090b10;
+  --helia-surface-raised: #0d1017;
+  --helia-surface-muted: #11151d;
+  --helia-hairline: #242936;
+
+  /* Shape and measure */
+  --helia-radius: 0.65rem;
+  --helia-toc-width: 13rem;
+
+  /*
+   * Starlight mapping. Custom properties are substituted per element, so the
+   * light-theme `--helia-*` overrides below flow through these declarations
+   * without needing to repeat them in the light selector.
+   */
+  --sl-color-accent-low: var(--helia-accent-low);
+  --sl-color-accent: var(--helia-accent);
+  --sl-color-accent-high: var(--helia-accent-high);
+  --sl-color-bg: var(--helia-surface-canvas);
+  --sl-color-bg-nav: var(--helia-surface-raised);
+  --sl-color-bg-sidebar: var(--helia-surface-canvas);
+  --sl-color-hairline: var(--helia-hairline);
+}
+
+:root[data-theme='light'] {
+  /* Near-black ink accent on white */
+  --helia-accent-low: #e7e8ea;
+  --helia-accent: #1f2226;
+  --helia-accent-high: #111318;
+
+  --helia-surface-canvas: #ffffff;
+  --helia-surface-raised: #ffffff;
+  --helia-surface-muted: #f5f5f7;
+  --helia-hairline: #dfe3e8;
+}

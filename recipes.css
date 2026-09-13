@@ -1,0 +1,727 @@
+.accent-blue {
+  --card-accent: var(--helia-accent-blue);
+}
+
+.accent-cyan {
+  --card-accent: var(--helia-accent-cyan);
+}
+
+.accent-green {
+  --card-accent: var(--helia-accent-green);
+}
+
+.accent-orange {
+  --card-accent: var(--helia-accent-orange);
+}
+
+.accent-pink {
+  --card-accent: var(--helia-accent-pink);
+}
+
+.accent-purple {
+  --card-accent: var(--helia-accent-purple);
+}
+
+.accent-red {
+  --card-accent: var(--helia-accent-red);
+}
+
+.accent-slate {
+  --card-accent: var(--helia-accent-slate);
+}
+
+/*
+ * Primitive recipes. Surface, Chip, Eyebrow, and Button render these classes.
+ * They live here rather than in the components because a component whose root
+ * element cannot be replaced by the primitive -- a grid cell, a Starlight shell
+ * override, a scroll frame -- has to reach the same recipe by class. One
+ * definition either way.
+ */
+
+.helia-focus-ring:focus-visible {
+  outline: 2px solid var(--helia-focus-ring-color, var(--helia-ink-primary));
+  outline-offset: 2px;
+}
+
+/*
+ * Same ring, drawn inside the element. For controls that sit flush inside a
+ * clipping parent (`overflow: hidden` frames, tab strips), where the outset
+ * ring would be cut off.
+ */
+.helia-focus-ring--inset:focus-visible {
+  outline-offset: -3px;
+}
+
+.helia-hover-surface {
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease;
+}
+
+/*
+ * Background and border only. A transform here would move the element out from
+ * under the pointer in a grid, and reflow neighbours that share its row.
+ */
+.helia-hover-surface:hover,
+.helia-hover-surface:focus-visible {
+  background: var(--helia-surface-card-muted);
+  border-color: var(--sl-color-gray-4);
+}
+
+.helia-surface {
+  background: var(--helia-surface-card);
+  /* Tinted variants (Callout) set the border colour without forking the recipe. */
+  border: 1px solid
+    var(--helia-surface-border-color, var(--helia-surface-border));
+  border-radius: var(--helia-radius);
+}
+
+/*
+ * Padding is a separate modifier rather than part of the recipe: the elements
+ * that need the class rather than the Surface component are frames that
+ * already own their layout, and a padding declaration on the base class would
+ * tie with theirs at equal specificity.
+ */
+.helia-surface--pad-px {
+  padding: var(--helia-space-px);
+}
+
+.helia-surface--pad-1 {
+  padding: var(--helia-space-1);
+}
+
+.helia-surface--pad-2 {
+  padding: var(--helia-space-2);
+}
+
+.helia-surface--pad-3 {
+  padding: var(--helia-space-3);
+}
+
+.helia-surface--pad-4 {
+  padding: var(--helia-space-4);
+}
+
+.helia-surface--pad-5 {
+  padding: var(--helia-space-5);
+}
+
+.helia-surface--pad-6 {
+  padding: var(--helia-space-6);
+}
+
+.helia-surface--muted {
+  background: var(--helia-surface-card-muted);
+}
+
+.helia-surface--paper {
+  background: var(--helia-surface-paper);
+}
+
+.helia-chip {
+  align-items: center;
+  border: 1px solid var(--helia-chip-border, var(--helia-surface-border));
+  border-radius: var(--helia-radius-pill);
+  box-sizing: border-box;
+  color: var(--helia-chip-ink, var(--helia-ink-secondary));
+  display: inline-flex;
+  gap: var(--helia-space-1);
+  justify-content: center;
+  line-height: 1;
+  margin: 0;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Horizontal padding one step above vertical, so the pill reads as a pill. */
+.helia-chip--sm {
+  font-size: var(--helia-text-label);
+  padding: var(--helia-space-1) var(--helia-space-2);
+}
+
+.helia-chip--md {
+  font-size: var(--helia-text-small);
+  padding: var(--helia-space-2) var(--helia-space-3);
+}
+
+.helia-chip--accent {
+  --helia-chip-border: transparent;
+  --helia-chip-ink: var(--helia-ink-primary);
+
+  background: var(--helia-surface-card-muted);
+}
+
+.helia-chip--static {
+  --helia-chip-ink: var(--helia-ink-secondary);
+}
+
+a.helia-chip--neutral:hover,
+a.helia-chip--neutral:focus-visible {
+  background: var(--helia-surface-card-muted);
+  color: var(--helia-ink-primary);
+}
+
+.helia-eyebrow {
+  color: var(--helia-ink-muted);
+  font-size: var(--helia-text-label);
+  font-weight: var(--helia-weight-bold);
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.helia-button {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--helia-radius-pill);
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: var(--helia-weight-semibold);
+  justify-content: center;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.helia-button--md {
+  font-size: var(--helia-text-body);
+  min-height: 2.85rem;
+  padding: 0 var(--helia-space-5);
+}
+
+.helia-button--sm {
+  font-size: var(--helia-text-small);
+  min-height: 2.35rem;
+  padding: 0 var(--helia-space-4);
+}
+
+/* Inverted ink: a black pill in the light theme, a white pill in the dark. */
+.helia-button--primary {
+  background: var(--helia-ink-primary);
+  color: var(--sl-color-text-invert);
+}
+
+.helia-button--primary:hover,
+.helia-button--primary:focus-visible {
+  background: color-mix(in oklab, var(--helia-ink-primary) 82%, transparent);
+}
+
+.helia-button--secondary {
+  border-color: var(--helia-surface-border);
+  color: var(--helia-ink-primary);
+}
+
+.helia-button--ghost {
+  color: var(--helia-ink-primary);
+}
+
+.helia-button--secondary:hover,
+.helia-button--secondary:focus-visible,
+.helia-button--ghost:hover,
+.helia-button--ghost:focus-visible {
+  background: var(--helia-surface-card-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .helia-button,
+  .helia-hover-surface {
+    transition: none;
+  }
+}
+
+/*
+ * Composable card family. The recipes live here for the same reason the
+ * primitives do, and for one more: the parts are separate components, so the
+ * rules that depend on what a part sits next to, and the ones that size media
+ * a part only receives through a slot, cannot be written in a scoped block.
+ * See docs/design-system.md, "Composable components".
+ */
+
+.helia-card {
+  display: flex;
+  flex-direction: column;
+  /* Clips a leading media frame to the shared radius. An element's own outline
+     is not clipped by its own overflow, so the focus ring still draws. */
+  overflow: hidden;
+  /* Anchors the stretched header link. */
+  position: relative;
+}
+
+.helia-card-media {
+  display: block;
+  overflow: hidden;
+  position: relative;
+}
+
+.helia-card-media--16-9 {
+  aspect-ratio: 16 / 9;
+}
+
+.helia-card-media--4-3 {
+  aspect-ratio: 4 / 3;
+}
+
+.helia-card-media--1-1 {
+  aspect-ratio: 1;
+}
+
+/*
+ * Whatever the consumer slots in fills the frame; the frame owns the ratio.
+ * Matched at any depth, because the media is as often wrapped -- in a link, a
+ * `<picture>`, a `<figure>` -- as it is handed over bare.
+ */
+.helia-card-media > * {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.helia-card-media :is(img, video, svg, picture) {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.helia-card-media--cover :is(img, video) {
+  object-fit: cover;
+}
+
+.helia-card-media--contain :is(img, video) {
+  object-fit: contain;
+}
+
+.helia-card-header {
+  align-items: start;
+  display: flex;
+  gap: var(--helia-space-3);
+  justify-content: space-between;
+}
+
+.helia-card-header__text {
+  display: flex;
+  flex-direction: column;
+  /* The step between overline, title and metadata is the card's: a dense row
+     closes it up, an editorial tile opens it out. */
+  gap: var(--helia-card-header-gap, var(--helia-space-2));
+  /* Lets a long title wrap instead of pushing the action out of the card. */
+  min-width: 0;
+}
+
+/*
+ * The step is the card's rather than the part's: an editorial tile asks for the
+ * heading step and a dense row for the body step, neither of them by forking
+ * the recipe or reaching into this markup.
+ */
+.helia-card-header__title {
+  color: var(--helia-ink-primary);
+  font-size: var(--helia-card-title-size, var(--helia-text-card-title));
+  font-weight: var(--helia-weight-semibold);
+  line-height: var(--helia-card-title-leading, 1.3);
+  margin: 0;
+}
+
+/* MDX wraps flow children in a paragraph. Keep the text, drop the box. */
+.helia-card-header__title > p {
+  display: contents;
+}
+
+/*
+ * Stretched link. The card is never an anchor -- that would nest the actions'
+ * own links inside it -- so the title's link takes the whole card as its hit
+ * area instead.
+ */
+.helia-card-header__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.helia-card-header__link::after {
+  content: '';
+  inset: 0;
+  position: absolute;
+}
+
+/* Above the stretched link, so their links and buttons stay reachable. */
+.helia-card-actions,
+.helia-card-header__action,
+.helia-card-header__meta {
+  position: relative;
+  z-index: 1;
+}
+
+/* The link covers the card, so the ring belongs to the card. */
+.helia-card:has(.helia-card-header__link:focus-visible) {
+  outline: 2px solid var(--helia-focus-ring-color, var(--helia-ink-primary));
+  outline-offset: 2px;
+}
+
+/* The link's own ring would sit inside the card's. Drop it only where the rule
+   above can draw, so a browser without `:has()` keeps an indicator. */
+@supports selector(:has(*)) {
+  .helia-card-header__link:focus-visible {
+    outline: none;
+  }
+}
+
+.helia-card-header__meta {
+  align-items: center;
+  color: var(--helia-ink-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--helia-text-caption);
+  gap: var(--helia-space-2);
+}
+
+.helia-card-header__action {
+  flex-shrink: 0;
+}
+
+.helia-card-content {
+  color: var(--helia-ink-secondary);
+  /* Takes the slack inside a card, so trailing actions share a baseline across
+     a row of cards of unequal length. */
+  flex: 1 1 auto;
+  font-size: var(--helia-text-body);
+  line-height: 1.55;
+}
+
+.helia-card-content > :first-child {
+  margin-block-start: 0;
+}
+
+.helia-card-content > :last-child {
+  margin-block-end: 0;
+}
+
+.helia-card-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helia-space-2);
+}
+
+.helia-card-actions--start {
+  justify-content: flex-start;
+}
+
+.helia-card-actions--end {
+  justify-content: flex-end;
+}
+
+.helia-card-actions--between {
+  justify-content: space-between;
+}
+
+/*
+ * Two parts that meet inside a card share one gap rather than stacking two,
+ * whatever order they are in. Only parts that carry a padding step take part:
+ * media has none, so the part after it keeps its own top padding, and a part
+ * set to `padding="none"` neither gives up a gap nor takes the next one away.
+ */
+.helia-card
+  > [class*='helia-surface--pad-']:not(.helia-card-media)
+  + [class*='helia-surface--pad-']:not(.helia-card-media) {
+  padding-block-start: 0;
+}
+
+.helia-badge {
+  font-weight: var(--helia-weight-semibold);
+  letter-spacing: 0.02em;
+}
+
+.helia-badge--info,
+.helia-badge--success,
+.helia-badge--warning,
+.helia-badge--danger {
+  --helia-chip-border: color-mix(
+    in oklab,
+    var(--helia-badge-tone) 42%,
+    var(--helia-surface-border)
+  );
+  /* The advisory tones are fixed values; pulling them toward the theme's own
+     ink is what keeps them legible on both paper and the dark canvas. */
+  --helia-chip-ink: color-mix(
+    in oklab,
+    var(--helia-badge-tone) 74%,
+    var(--helia-ink-primary)
+  );
+}
+
+.helia-badge--info {
+  --helia-badge-tone: var(--helia-tone-important);
+}
+
+.helia-badge--success {
+  --helia-badge-tone: var(--helia-tone-tip);
+}
+
+.helia-badge--warning {
+  --helia-badge-tone: var(--helia-tone-warning);
+}
+
+.helia-badge--danger {
+  --helia-badge-tone: var(--helia-tone-critical);
+}
+
+.helia-badge__dot {
+  background: currentcolor;
+  border-radius: 50%;
+  flex-shrink: 0;
+  height: 0.4em;
+  width: 0.4em;
+}
+
+/*
+ * Generative media artwork. Oversized solid forms under a heavy blur, or a
+ * sparse line field: enough rhythm for a card with no real image, with nothing
+ * that reads as a literal depiction. The accent arrives as `--accent`.
+ */
+
+.helia-media {
+  --helia-media-accent: var(--accent, var(--helia-accent-slate));
+
+  background: color-mix(
+    in srgb,
+    var(--helia-media-accent) var(--helia-field-accent-mix),
+    var(--helia-field-base)
+  );
+  display: block;
+  isolation: isolate;
+  overflow: hidden;
+  position: relative;
+}
+
+.helia-media--16-9 {
+  aspect-ratio: 16 / 9;
+}
+
+.helia-media--4-3 {
+  aspect-ratio: 4 / 3;
+}
+
+.helia-media--1-1 {
+  aspect-ratio: 1;
+}
+
+.helia-media--graphite {
+  background: var(--helia-media-graphite);
+}
+
+.helia-media--slate {
+  background: var(--helia-media-slate);
+}
+
+.helia-media--wire {
+  background: var(--helia-media-wire);
+}
+
+.helia-media__form {
+  position: absolute;
+}
+
+/*
+ * The four forms are one colour seen four ways. Rotating the hue of the given
+ * accent rather than naming brand colours is what keeps the artwork tied to the
+ * card it sits in: two cards with different accents read as different cards,
+ * and no brand token is hidden inside the component.
+ *
+ * The angles are fitted, not chosen: they are the rotations that land closest
+ * to the purple, teal and pink the hub's cards used to name outright, across
+ * the accents the cards actually carry. Changing them changes the palette, so
+ * they are the owner's to move, not a component's.
+ */
+.helia-media--color-field .helia-media__form {
+  background: var(--helia-media-accent);
+  filter: blur(var(--helia-field-blur))
+    hue-rotate(var(--helia-media-form-shift, 0deg));
+}
+
+.helia-media__form--field-one {
+  border-radius: 43% 57% 68% 32% / 58% 42% 58% 42%;
+  height: 112%;
+  left: -35%;
+  opacity: 0.68;
+  top: -48%;
+  transform: rotate(-18deg);
+  width: 108%;
+}
+
+.helia-media__form--field-two {
+  --helia-media-form-shift: -3deg;
+
+  border-radius: 65% 35% 46% 54% / 38% 58% 42% 62%;
+  bottom: -55%;
+  height: 118%;
+  opacity: 0.62;
+  right: -32%;
+  transform: rotate(22deg);
+  width: 110%;
+}
+
+.helia-media__form--field-three {
+  --helia-media-form-shift: -67deg;
+
+  border-radius: 37% 63% 52% 48% / 66% 35% 65% 34%;
+  height: 78%;
+  left: 28%;
+  opacity: 0.48;
+  top: 14%;
+  transform: rotate(31deg);
+  width: 76%;
+}
+
+.helia-media__form--field-four {
+  --helia-media-form-shift: 85deg;
+
+  border-radius: 58% 42% 31% 69% / 45% 61% 39% 55%;
+  bottom: -28%;
+  height: 62%;
+  left: 8%;
+  opacity: 0.38;
+  transform: rotate(-28deg);
+  width: 72%;
+}
+
+.helia-media__form--orbit {
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--helia-media-stroke) var(--helia-media-stroke-mix),
+      transparent
+    );
+  border-radius: 50%;
+}
+
+.helia-media__form--orbit-one {
+  height: 118%;
+  left: -18%;
+  top: -42%;
+  width: 80%;
+}
+
+.helia-media__form--orbit-two {
+  bottom: -52%;
+  height: 132%;
+  right: -15%;
+  width: 88%;
+}
+
+.helia-media__form--orbit-three {
+  height: 46%;
+  left: 43%;
+  top: 25%;
+  width: 31%;
+}
+
+.helia-media__form--orbit-core {
+  background: color-mix(
+    in oklab,
+    var(--helia-media-accent) 45%,
+    var(--helia-media-ink)
+  );
+  border-radius: 50%;
+  height: 10%;
+  left: 54%;
+  top: 43%;
+  width: 6.8%;
+}
+
+.helia-media__form--plane {
+  background: var(--helia-media-plane);
+  border: 1px solid var(--helia-media-plane-border);
+  border-radius: var(--helia-radius-sm);
+  transform: rotate(-8deg);
+}
+
+.helia-media__form--plane-one {
+  height: 62%;
+  left: -8%;
+  top: -22%;
+  width: 56%;
+}
+
+.helia-media__form--plane-two {
+  background: var(--helia-media-plane-alt);
+  bottom: -25%;
+  height: 68%;
+  right: -5%;
+  width: 62%;
+}
+
+.helia-media__form--plane-three {
+  background: var(--helia-media-plane-high);
+  height: 48%;
+  left: 30%;
+  top: 26%;
+  width: 48%;
+}
+
+.helia-media__form--plane-rule {
+  background: color-mix(
+    in oklab,
+    var(--helia-media-accent) 45%,
+    var(--helia-media-ink)
+  );
+  height: 1px;
+  left: 12%;
+  top: 68%;
+  transform: rotate(-8deg);
+  transform-origin: left;
+  width: 76%;
+}
+
+.helia-media__form--wire {
+  background: var(--helia-media-wire-line);
+  height: 1px;
+  transform-origin: left;
+}
+
+.helia-media__form--wire-horizontal {
+  left: 8%;
+  top: 37%;
+  width: 84%;
+}
+
+.helia-media__form--wire-vertical {
+  left: 34%;
+  top: 10%;
+  transform: rotate(90deg);
+  width: 78%;
+}
+
+.helia-media__form--wire-diagonal {
+  left: 12%;
+  top: 78%;
+  transform: rotate(-24deg);
+  width: 86%;
+}
+
+.helia-media__form--node {
+  background: color-mix(
+    in oklab,
+    var(--helia-media-accent) 45%,
+    var(--helia-media-ink)
+  );
+  border: 3px solid var(--helia-media-wire);
+  border-radius: 50%;
+  height: 0.72rem;
+  width: 0.72rem;
+}
+
+.helia-media__form--node-one {
+  left: 33%;
+  top: 34%;
+}
+
+.helia-media__form--node-two {
+  left: 60%;
+  top: 49%;
+}
+
+.helia-media__form--node-three {
+  left: 76%;
+  top: 30%;
+}

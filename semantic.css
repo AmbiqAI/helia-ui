@@ -1,0 +1,167 @@
+/*
+ * Hub semantic layer. The shared primitives and the Starlight colour mapping
+ * live in ./tokens.css, which astro.config.mjs loads immediately before this
+ * file. Both layers use the one `--helia-` package prefix, so a token's file
+ * tells you which layer it belongs to and a name defined in tokens.css must
+ * not be redefined here: an alias of the same name is a cycle, and CSS drops
+ * the property rather than resolving it.
+ */
+
+:root {
+  /* Spacing scale. Steps 1-6 are the rhythm; px is the hairline nudge. */
+  --helia-space-px: 1px;
+  --helia-space-1: 0.25rem;
+  --helia-space-2: 0.5rem;
+  --helia-space-3: 0.75rem;
+  --helia-space-4: 1rem;
+  --helia-space-5: 1.5rem;
+  --helia-space-6: 2rem;
+
+  /*
+   * Radius scale, derived so one primitive still sets the shape language. The
+   * base step is `--helia-radius` from tokens.css: now that both layers share
+   * the prefix an alias of it here would be a self-reference, which CSS treats
+   * as a cycle and drops.
+   */
+  --helia-radius-xs: calc(var(--helia-radius) - 0.35rem);
+  --helia-radius-sm: calc(var(--helia-radius) - 0.2rem);
+  --helia-radius-lg: calc(var(--helia-radius) + 0.35rem);
+  --helia-radius-pill: 999px;
+
+  --helia-font-sans: var(--__sl-font);
+  --helia-font-mono: var(--__sl-font-mono);
+  --helia-text-meta: 0.64rem;
+  --helia-text-label: 0.68rem;
+  --helia-text-caption: 0.74rem;
+  --helia-text-small: 0.78rem;
+  --helia-text-body: 0.94rem;
+  --helia-text-lead: clamp(1.02rem, 1.6vw, 1.14rem);
+  --helia-text-card-title: 1.05rem;
+  --helia-text-subhead: clamp(1.05rem, 1.8vw, 1.35rem);
+  --helia-text-heading: clamp(1.35rem, 3vw, 2rem);
+  --helia-text-section: clamp(1.5rem, 3vw, 2.1rem);
+  --helia-text-page: clamp(2rem, 5vw, 3rem);
+  --helia-text-display: clamp(2.6rem, 7vw, 4.8rem);
+  --helia-text-hero: clamp(2.4rem, 7.5vw, 5.25rem);
+  --helia-weight-regular: 430;
+  --helia-weight-medium: 550;
+  --helia-weight-semibold: 650;
+  --helia-weight-strong: 700;
+  --helia-weight-bold: 750;
+  --helia-leading-tight: 1.08;
+  --helia-leading-heading: 1.18;
+  --helia-leading-body: 1.6;
+  --helia-ink-primary: var(--sl-color-white);
+  --helia-ink-secondary: var(--sl-color-gray-2);
+  --helia-ink-muted: var(--sl-color-gray-3);
+  --helia-surface-paper: var(--helia-surface-raised);
+  --helia-surface-card: var(--helia-surface-raised);
+  --helia-surface-card-muted: var(--helia-surface-muted);
+  --helia-surface-border: var(--helia-hairline);
+
+  /* Fixed brand ink and paper: these do not follow the theme. */
+  --helia-ink-black: #111318;
+  --helia-paper-white: #ffffff;
+  --helia-brand-ambiq-blue: #0047ba;
+
+  --helia-shadow-color-soft: rgb(0 0 0 / 12%);
+  --helia-shadow-color: rgb(0 0 0 / 16%);
+  --helia-shadow-color-strong: rgb(0 0 0 / 18%);
+
+  /* Card accent palette, selected by the .accent-* classes below. */
+  --helia-accent-blue: #1769e0;
+  --helia-accent-cyan: #00a7b5;
+  --helia-accent-green: #00a36c;
+  --helia-accent-orange: #e17827;
+  --helia-accent-pink: #d34c80;
+  --helia-accent-purple: #6e5ae6;
+  --helia-accent-red: #d9414e;
+  --helia-accent-slate: #667085;
+
+  /* Darkened accents for text and icons, which need contrast on paper. */
+  --helia-accent-cyan-ink: #008f9d;
+  --helia-accent-green-ink: #008d5d;
+  --helia-accent-orange-ink: #c6611c;
+  --helia-ink-caution: #b96526;
+
+  /* Advisory tones, one per callout variant. */
+  --helia-tone-tip: #008d68;
+  --helia-tone-important: #3970c3;
+  --helia-tone-warning: #c66a22;
+  --helia-tone-critical: #b92f3b;
+  --helia-tone-compatibility: #16889a;
+  --helia-tone-experimental: #7460c8;
+  --helia-tone-deprecated: #ad612b;
+
+  /* Abstract media art: surfaces, strokes and fills for the field treatments. */
+  --helia-field-base: #171a20;
+  --helia-field-mix-cool: #545ee8;
+  --helia-field-mix-light: #f7fbff;
+  --helia-media-graphite: #17191d;
+  --helia-media-slate: #10141a;
+  --helia-media-wire: #111216;
+  --helia-media-ink: #f0f2f4;
+  --helia-media-stroke: #f4f5f6;
+  --helia-media-plane: #252b33;
+  --helia-media-plane-border: #353d48;
+  --helia-media-plane-alt: #697381;
+  --helia-media-plane-high: #171c22;
+  --helia-media-wire-line: #6c737e;
+
+  /* Theme-conditional values a component cannot resolve on its own: without
+     these pairs a scoped style has to reach out to :root with :global(). */
+  --helia-ink-adaptive: var(--helia-paper-white);
+  --helia-field-blur: clamp(4rem, 9vw, 7rem);
+  --helia-field-accent-mix: 14%;
+  --helia-thumb-accent-mix: 14%;
+  --helia-media-stroke-mix: 28%;
+  --helia-identifier-accent-mix: 84%;
+
+  /* Theme-aware counterpart to the flat --helia-accent-* set: these tones have to
+     darken on paper to stay legible. */
+  --helia-tone-neutral: var(--sl-color-white);
+  --helia-tone-blue: #4d9bff;
+  --helia-tone-cyan: #28b8c2;
+  --helia-tone-green: #2fb878;
+  --helia-tone-orange: #e88b43;
+  --helia-tone-purple: #8b7aff;
+
+  --sl-content-width: 64rem;
+  --sl-sidebar-width: 0rem;
+  /* Hub-only: the handbook uses #e7e8ea in light, so this is not shared. */
+  --sl-color-hairline-light: #242936;
+}
+
+:root[data-theme='light'] {
+  /* Light paper is the muted surface, not the raised one. */
+  --helia-surface-paper: var(--helia-surface-muted);
+  /* Hub-only light border, one step lighter than the shared hairline. */
+  --helia-surface-border: #d2d2d7;
+  --sl-color-hairline-light: #dfe3e8;
+
+  --helia-field-base: #e5e9ec;
+  --helia-media-graphite: #e8eaed;
+  --helia-media-slate: #eff1f3;
+  --helia-media-wire: #f5f5f3;
+  --helia-media-ink: #24272c;
+  --helia-media-stroke: #15171a;
+  --helia-media-plane: #cbd0d6;
+  --helia-media-plane-border: #b5bcc5;
+  --helia-media-plane-alt: #747c87;
+  --helia-media-plane-high: #e1e4e7;
+  --helia-media-wire-line: #858b93;
+
+  --helia-ink-adaptive: var(--helia-ink-black);
+  --helia-field-blur: clamp(3.5rem, 8vw, 6.5rem);
+  --helia-field-accent-mix: 12%;
+  --helia-thumb-accent-mix: 13%;
+  --helia-media-stroke-mix: 30%;
+  --helia-identifier-accent-mix: 70%;
+
+  --helia-tone-neutral: var(--helia-ink-black);
+  --helia-tone-blue: #1769e0;
+  --helia-tone-cyan: #008c96;
+  --helia-tone-green: #087a51;
+  --helia-tone-orange: #ba5c16;
+  --helia-tone-purple: #6651d9;
+}

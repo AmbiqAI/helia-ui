@@ -1,0 +1,157 @@
+/*
+ * shadcn/ui theme bridge.
+ *
+ * shadcn ships a palette of its own (`--background`, `--primary`, ...) plus a
+ * light/dark pair of `:root` and `.dark` blocks. Neither is used here. Every
+ * variable below aliases a hub token, so tokens.css stays the single source of
+ * truth and the theme flip comes for free: `--helia-*` already swaps under
+ * `:root[data-theme='light']`, so no second `.dark` block is needed for the
+ * colours.
+ *
+ * The `dark:` variant that shadcn writes into its class strings still needs a
+ * definition. `@astrojs/starlight-tailwind` already points it at Starlight's
+ * `[data-theme=dark]`; it is restated here so this file stands alone if the
+ * compat package is ever dropped.
+ *
+ * `@theme inline` is required, not cosmetic: it makes `bg-card` compile to
+ * `var(--card)` instead of baking the value in, which is what lets the runtime
+ * theme toggle move the colour.
+ *
+ * See docs/design-system.md "React layer" for when to reach for these.
+ */
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+:root {
+  --background: var(--sl-color-bg);
+  --foreground: var(--helia-ink-primary);
+
+  --card: var(--helia-surface-card);
+  --card-foreground: var(--helia-ink-primary);
+  --popover: var(--helia-surface-paper);
+  --popover-foreground: var(--helia-ink-primary);
+
+  /* Near-monochrome accent: ink on canvas, inverted by the theme flip. */
+  --primary: var(--sl-color-accent);
+  --primary-foreground: var(--sl-color-bg);
+
+  --secondary: var(--helia-surface-card-muted);
+  --secondary-foreground: var(--helia-ink-primary);
+  --muted: var(--helia-surface-card-muted);
+  --muted-foreground: var(--helia-ink-muted);
+
+  /*
+   * shadcn's `accent` is its hover surface, not a brand accent. Keeping that
+   * name here would have made `--color-accent` two different colours: this
+   * file is imported last, so its key beat the brand accent tailwind.css
+   * defines and `bg-accent` compiled to the hover grey. Renamed to `subtle`
+   * so `accent` means the brand accent everywhere.
+   */
+  --subtle: var(--sl-color-bg-nav);
+  --subtle-foreground: var(--helia-ink-primary);
+
+  --destructive: var(--helia-accent-red);
+  --destructive-foreground: var(--helia-paper-white);
+
+  --border: var(--helia-surface-border);
+  --input: var(--helia-surface-border);
+  --ring: var(--helia-focus-ring-color, var(--helia-ink-primary));
+
+  --radius: var(--helia-radius);
+
+  /*
+   * The chart ramp is the hub's accent set in the order the catalog reads
+   * best: two cool series first so a two-series chart is legible before any
+   * series names it.
+   */
+  --chart-1: var(--helia-accent-cyan);
+  --chart-2: var(--helia-accent-purple);
+  --chart-3: var(--helia-accent-blue);
+  --chart-4: var(--helia-accent-orange);
+  --chart-5: var(--helia-accent-pink);
+
+  /* Sheet and command reuse the site chrome rather than a second frame. */
+  --sidebar: var(--sl-color-bg-sidebar);
+  --sidebar-foreground: var(--helia-ink-primary);
+  --sidebar-primary: var(--sl-color-accent);
+  --sidebar-primary-foreground: var(--sl-color-bg);
+  --sidebar-accent: var(--sl-color-bg-nav);
+  --sidebar-accent-foreground: var(--helia-ink-primary);
+  --sidebar-border: var(--helia-surface-border);
+  --sidebar-ring: var(--helia-focus-ring-color, var(--helia-ink-primary));
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-subtle: var(--subtle);
+  --color-subtle-foreground: var(--subtle-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /*
+   * shadcn's class strings reach for a sm/md/lg/xl radius ladder that it
+   * derives from one `--radius`. tailwind.css already owns `sm` and `lg` from
+   * the hub scale; only the two steps it has no key for are added, onto the
+   * same scale rather than a second one. `md` and `xl` therefore land on the
+   * hub's base and large radius, which is what shadcn uses them for: controls
+   * and cards respectively.
+   */
+  --radius-md: var(--helia-radius);
+  --radius-xl: var(--helia-radius-lg);
+
+  /*
+   * Generated shadcn code is written against Tailwind's stock scales, which
+   * tailwind.css clears so the hub's are the only ones. Without a base spacing
+   * unit `h-9`, `min-w-0` and `size-4` compile to nothing and the components
+   * arrive with no dimensions at all -- a silent failure, since Tailwind does
+   * not warn on an unmatched utility.
+   *
+   * 0.25rem is the hub's own unit: `--helia-space-1` through `--helia-space-4` are
+   * exactly one through four of it. The named steps stay authoritative where
+   * they exist, so `p-5` and `p-6` remain the hub's coarser steps rather than
+   * this multiple.
+   */
+  --spacing: 0.25rem;
+
+  /*
+   * The type ramp shadcn writes is mapped onto the hub steps rather than
+   * restored: these are the sizes the generated components ask for, pointed at
+   * the scale that owns them. A shadcn component therefore cannot introduce a
+   * size the hub has not already named.
+   */
+  --text-xs: var(--helia-text-caption);
+  --text-sm: var(--helia-text-small);
+  --text-base: var(--helia-text-body);
+  --text-lg: var(--helia-text-card-title);
+  --text-xl: var(--helia-text-subhead);
+  --text-2xl: var(--helia-text-heading);
+}
