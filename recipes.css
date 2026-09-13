@@ -77,16 +77,6 @@
 }
 
 /*
- * A surface with an href is a frame that happens to link, not a run of link
- * text, so it reads as the prose around it. Stating that here rather than
- * letting the host's anchor styling reach in is what lets the part render the
- * same inside markdown and outside it.
- */
-a.helia-surface {
-  color: inherit;
-}
-
-/*
  * Padding is a separate modifier rather than part of the recipe: the elements
  * that need the class rather than the Surface component are frames that
  * already own their layout, and a padding declaration on the base class would
