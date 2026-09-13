@@ -44,3 +44,13 @@ here would point inside `node_modules`. The consuming site declares its own
 scan list in its Tailwind entry and imports this file from it. That list has to
 name `astro/**/*.astro` in this package as well as the site's own tree, or a
 utility class written in a part will not reach the stylesheet.
+
+## License
+
+Ambiq-authored code in this package is licensed under the BSD 3-Clause License;
+see [LICENSE](LICENSE). [NOTICE](NOTICE) carries the attribution that travels
+with the package, and [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) lists
+the runtime dependency tree with its licenses. Several React parts are derived
+from shadcn/ui source (MIT) and carry Ambiq modifications; the notices record
+that origin. [RELEASE.md](RELEASE.md) is the release manifest recording
+license and provenance.

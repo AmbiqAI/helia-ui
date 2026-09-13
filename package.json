@@ -2,6 +2,7 @@
   "name": "@ambiqai/helia-ui",
   "version": "0.0.0",
   "description": "Shared HELIA design tokens and Starlight theme styling",
+  "license": "BSD-3-Clause",
   "private": true,
   "type": "module",
   "exports": {
@@ -22,7 +23,11 @@
     "starlight",
     "*.css",
     "components.json",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "NOTICE",
+    "THIRD-PARTY-NOTICES.md",
+    "RELEASE.md"
   ],
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.3.1",
