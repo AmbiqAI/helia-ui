@@ -62,6 +62,10 @@ export default defineConfig({
         { label: 'Foundations', slug: 'foundations' },
         { label: 'Starlight plugin', slug: 'starlight-plugin' },
         {
+          label: 'Migrating from MkDocs',
+          slug: 'migrating-from-mkdocs',
+        },
+        {
           label: 'Astro parts',
           collapsed: false,
           items: [

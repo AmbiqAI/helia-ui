@@ -51,6 +51,34 @@ function lineOf(source, index) {
   return source.slice(0, index).split('\n').length;
 }
 
+/*
+ * Blanks the body of every fenced code block, keeping the line count so the
+ * reported line numbers still point at the source.
+ *
+ * A page that documents the React layer has to be able to show the import it
+ * is telling the reader to write. A fence is inert -- nothing in it is
+ * compiled or executed -- so an import inside one is prose, not a boundary
+ * crossing. The closing fence has to be at least as long as the opening one,
+ * which is what lets a fence contain a shorter fence.
+ */
+function stripFences(source) {
+  const lines = source.split('\n');
+  let fence = null;
+  return lines
+    .map((line) => {
+      const match = /^\s*(`{3,}|~{3,})/.exec(line);
+      if (fence === null) {
+        if (!match) return line;
+        fence = match[1];
+        return '';
+      }
+      if (match && match[1][0] === fence[0] && match[1].length >= fence.length)
+        fence = null;
+      return '';
+    })
+    .join('\n');
+}
+
 function specifiers(source) {
   const found = [];
   for (const pattern of [
@@ -117,7 +145,8 @@ const pages = [
 for (const rel of pages) {
   const home =
     ISLAND_DIR && !isUnder(rel, DOCS_DIR) ? ISLAND_DIR : DOCS_ISLAND_DIR;
-  const source = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+  const raw = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+  const source = rel.endsWith('.mdx') ? stripFences(raw) : raw;
   for (const { specifier, line } of specifiers(source)) {
     if (reachesUi(rel, specifier)) {
       failures.push(

@@ -1,0 +1,260 @@
+---
+title: Migrating from MkDocs
+description: What each MkDocs Material feature becomes on a Starlight site built with this package.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Icon from '@ambiqai/helia-ui/astro/Icon';
+import DataTable from '@ambiqai/helia-ui/astro/DataTable';
+
+Every MkDocs Material feature in use across the HELIA product docs has a
+counterpart here. This page is the mapping, one section per feature, so a
+conversion is mechanical rather than a judgement call each time.
+
+Start from `templates/product-docs` in this package: it is a working Starlight
+site with the plugin, the Tailwind entry, the product accent and a Pages
+workflow already wired. Copy it in as the product repository's `docs/`, then
+move content into it.
+
+<Aside type="note" title="Not covered here">
+  The `mkdocstrings`-generated API pages are a separate problem with no
+  Starlight equivalent. They are their own piece of work, not part of this
+  mapping.
+</Aside>
+
+## Admonitions
+
+`!!! note "Title"` becomes Starlight's `Aside`. Material has twelve admonition
+types and `Aside` has four, so several Material types land on the same tone.
+Where the distinction matters, the package's `Callout` has eight and takes a
+free-text title.
+
+<DataTable
+  caption="Material admonition types and what they become"
+  columns={['Material', 'Aside type', 'Package Callout tone']}
+  rows={[
+    ['note, abstract, summary, tldr', 'note', 'note'],
+    ['info', 'note', 'note'],
+    ['tip, hint', 'tip', 'tip'],
+    ['important', 'tip', 'important'],
+    ['success, check, done', 'tip', 'tip'],
+    ['question, help, faq', 'note', 'note'],
+    ['warning, caution, attention', 'caution', 'warning'],
+    ['failure, fail, missing', 'caution', 'warning'],
+    ['danger, error', 'danger', 'critical'],
+    ['bug', 'danger', 'critical'],
+    ['example', 'note', 'note'],
+    ['quote, cite', 'none — use a blockquote', 'none'],
+  ]}
+/>
+
+`Aside` is the default because it is the built-in: it is styled by the theme,
+it is translated, and it needs no import in Markdown. Reach for `Callout` when
+the page needs `compatibility`, `experimental` or `deprecated`, which have no
+`Aside` equivalent, or when the title is not one of the four fixed words.
+
+```md
+<!-- MkDocs -->
+
+!!! warning "Check the input rate"
+The converter assumes 16 kHz.
+```
+
+```mdx
+{/* Starlight */}
+:::caution[Check the input rate]
+The converter assumes 16 kHz.
+:::
+```
+
+The directive form needs no import. The component form (`<Aside type="caution"
+title="...">`) is equivalent and is what MDX pages already importing components
+tend to use.
+
+## Content tabs
+
+`=== "Label"` becomes `Tabs` and `TabItem`. Material's linked tabs — the ones
+that switch together across a page — are `syncKey` on `Tabs`.
+
+```md
+<!-- MkDocs -->
+
+=== "pip"
+`sh
+    pip install product-name
+    `
+
+=== "uv"
+`sh
+    uv add product-name
+    `
+```
+
+````mdx
+{/* Starlight */}
+
+<Tabs syncKey="installer">
+  <TabItem label="pip">```sh pip install product-name ```</TabItem>
+  <TabItem label="uv">```sh uv add product-name ```</TabItem>
+</Tabs>
+````
+
+Blank lines matter: leave one after the opening `<TabItem>` and one before the
+closing tag, or the fenced block is parsed as JSX children rather than
+Markdown.
+
+The package's `CodeTabs` is a different thing and not the migration target. It
+is driven by a data array rather than by markup, and it has a `select` variant
+for long tab lists. Use it when the tab set comes from data; use `Tabs` when it
+is written in the page.
+
+## Icons
+
+Material's `:material-gauge:` shortcodes have no direct equivalent: Starlight's
+own `Icon` carries a small set chosen for its UI, not a general icon library.
+This package therefore ships `Icon`, a build-time wrapper over Font Awesome's
+free solid set — the same dependency `Callout` and `AccordionGroup` already
+use, so it adds nothing to install and nothing to the client.
+
+```mdx
+import Icon from '@ambiqai/helia-ui/astro/Icon';
+
+<Icon name="gauge-high" /> Latency
+<Icon name="triangle-exclamation" label="Warning" />
+```
+
+<p>
+  <Icon name="gauge-high" /> gauge-high &nbsp;
+  <Icon name="microchip" /> microchip &nbsp;
+  <Icon name="chart-line" /> chart-line &nbsp;
+  <Icon name="triangle-exclamation" /> triangle-exclamation
+</p>
+
+Names are Font Awesome's, in kebab case, and an unknown name fails the build
+rather than rendering nothing. The Material and Font Awesome vocabularies
+overlap heavily but not exactly, so the icons in use need a pass by hand;
+`:material-memory:` is `memory`, `:material-speedometer:` is `gauge-high`,
+`:material-alert:` is `triangle-exclamation`.
+
+Omit `label` for an icon that sits beside text saying the same thing, which is
+most of them. Supply it when the icon is alone in a table cell or a heading.
+
+<Aside type="tip">
+  An icon inside a heading or a table cell is usually decoration. If deleting it
+  would lose information, it needs a `label`; if not, it does not.
+</Aside>
+
+## Math
+
+Material rendered math with KaTeX, and so does this. Expressions move across
+unchanged. `remark-math` parses `$…$` and `$$…$$`, `rehype-katex` renders it, and
+`katex/dist/katex.min.css` goes in `customCss`. All three go on Astro's
+`markdown` config, not Starlight's:
+
+```js
+markdown: {
+  remarkPlugins: [remarkMath],
+  rehypePlugins: [rehypeKatex],
+},
+```
+
+Starlight's own `markdown` option covers heading links and extra processed
+directories only; it takes no plugins. The template has this wired already.
+
+## Footnotes and task lists
+
+Both are supported with no configuration. `[^1]` references, `[^1]:`
+definitions, and `- [ ]` / `- [x]` items all render as written.
+
+## Snippets
+
+`--8<-- "file.md"` becomes an import. There is no snippet plugin; MDX already
+does this, and the result is typed and traceable rather than a string
+substitution.
+
+For shared prose, put the fragment in `src/components/` as an `.astro` or
+`.mdx` file and import it. For shared code, import the real source file as raw
+text so the sample cannot drift from what it documents:
+
+```mdx
+import example from '../../../examples/measure.py?raw';
+
+<CodeBlock filename="measure.py" language="python" code={example} />
+```
+
+`?raw` is Vite's, so it works anywhere in the site. It is the better form for
+code: the file stays runnable and testable.
+
+## Data tables
+
+Almost every table is plain Markdown and stays plain Markdown. Two cases are
+not.
+
+A table that needs a caption, a scroll frame on narrow screens, or paging is
+the `DataTable` part. It is static markup with an optional pager and costs no
+JavaScript until `pageSize` is set:
+
+```mdx
+import DataTable from '@ambiqai/helia-ui/astro/DataTable';
+
+<DataTable
+  caption="Fields in result.json"
+  columns={['Field', 'Unit', 'Meaning']}
+  rows={[['mean', 'ms', 'Arithmetic mean across runs']]}
+  pageSize={10}
+/>
+```
+
+A table that needs sorting, filtering or column controls — what
+`simple-datatables` was doing — is the React data table, hydrated as an island:
+
+```tsx
+// src/islands/ResultsTable.tsx
+import { DataTable, type ColumnDef } from '@ambiqai/helia-ui/react/data-table';
+```
+
+```mdx
+<ResultsTable client:visible />
+```
+
+Prefer the Astro part. A sortable table is worth an island when a reader is
+expected to search it, and not otherwise.
+
+## Charts
+
+Plotly and Chart.js become Recharts islands. The package ships the shadcn chart
+wrapper over Recharts as `@ambiqai/helia-ui/react/chart`, and the existing data
+moves over unchanged: what changes is the renderer, not the numbers.
+
+```tsx
+// src/islands/LatencyChart.tsx
+import { ChartContainer, ChartTooltip } from '@ambiqai/helia-ui/react/chart';
+```
+
+Hydrate with `client:visible` so a chart below the fold costs nothing until it
+is scrolled to. Chart colours come from the token set, so a chart follows the
+theme without a palette of its own.
+
+## Terminals
+
+Termynal becomes `AsciiTerminal`. A static transcript is the default and ships
+no JavaScript; `animated` types the command lines and reveals output by line,
+and honours `prefers-reduced-motion` by showing everything at once. See
+[Code](../code/) for the forms.
+
+## Raw HTML
+
+This is the part that does not map mechanically. MDX is stricter than Markdown: attributes are JSX, so `class`
+is `className` in components, `style` takes an object, and every tag must
+close. Most of the raw HTML in these pages exists because Material had no
+component for something — a two-column layout, a card, a badge — and those have
+parts here. Read them page by page and replace rather than convert.
+
+## Navigation
+
+`mkdocs.yml`'s `nav` becomes Starlight's `sidebar`. A directory of pages is a
+group whose `items` hold an autogenerate object — `{ label: 'How-to', items:
+[{ autogenerate: { directory: 'how-to' } }] }` — which orders by the
+`sidebar.order` frontmatter key; an explicit list is an `items` array of
+entries. Routes that change need a
+redirect, since the product sites are already linked to from the hub.

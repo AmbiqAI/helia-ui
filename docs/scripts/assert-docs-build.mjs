@@ -31,6 +31,7 @@ const ASTRO_LANE = [
   '',
   'foundations',
   'starlight-plugin',
+  'migrating-from-mkdocs',
   'primitives',
   'cards',
   'media',

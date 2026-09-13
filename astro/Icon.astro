@@ -1,0 +1,66 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A named icon from Font Awesome's free solid set, resolved at build time.
+ *
+ * `Callout` and `AccordionGroup` reach for their own icon definitions because
+ * the icon is part of what they mean. This part exists for the other case: a
+ * page that needs an icon inline, by name, the way MkDocs Material's
+ * `:material-*:` shortcodes did. Nothing ships to the client — the SVG is a
+ * string by the time the page is written.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import {
+  findIconDefinition,
+  icon as renderIcon,
+  library,
+  type IconName,
+} from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+
+library.add(fas);
+
+interface Props extends HTMLAttributes<'span'> {
+  /** Font Awesome solid name in kebab case, e.g. `gauge-high`. */
+  name: IconName;
+  /**
+   * Accessible name. Omit it for decoration next to text that already says the
+   * same thing; supply it when the icon is the only thing carrying the meaning.
+   */
+  label?: string;
+}
+
+const { name, label, class: className, ...rest } = Astro.props;
+
+const definition = findIconDefinition({ prefix: 'fas', iconName: name });
+if (!definition) {
+  throw new Error(
+    `Icon: "${name}" is not in @fortawesome/free-solid-svg-icons. Names are kebab case, e.g. "gauge-high".`,
+  );
+}
+const markup = renderIcon(definition).html.join('');
+---
+
+<span
+  class:list={['helia-icon', className]}
+  {...label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': 'true' }}
+  {...rest}
+  set:html={markup}
+/>
+
+<style>
+  /* style-lint: allow-file global -- the SVG arrives through set:html */
+  .helia-icon {
+    display: inline-flex;
+  }
+
+  /* Sized and coloured by the text it sits in, so an icon never needs a rule
+     of its own at the call site. */
+  .helia-icon :global(svg) {
+    fill: currentColor;
+    height: 1em;
+    vertical-align: -0.125em;
+    width: 1em;
+  }
+</style>

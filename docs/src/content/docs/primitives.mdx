@@ -1,11 +1,12 @@
 ---
 title: Primitives
-description: Surface, Chip, Eyebrow, and Button, plus the shared focus and hover recipes.
+description: Surface, Chip, Eyebrow, Button, and Icon, plus the shared focus and hover recipes.
 ---
 
 import Button from '@ambiqai/helia-ui/astro/Button';
 import Chip from '@ambiqai/helia-ui/astro/Chip';
 import Eyebrow from '@ambiqai/helia-ui/astro/Eyebrow';
+import Icon from '@ambiqai/helia-ui/astro/Icon';
 import Surface from '@ambiqai/helia-ui/astro/Surface';
 
 Four primitives carry the shapes that every other component used to redeclare:
@@ -106,3 +107,26 @@ primitives do not own.
   background steps to the muted fill and the border lightens. It never
   transforms, because a card that moves under the pointer inside a grid
   reflows its neighbours.
+
+## Icon
+
+`Icon` is the one part here that backs no recipe. It resolves a name from Font
+Awesome's free solid set at build time and writes the SVG into the page, so an
+icon costs nothing at runtime and an unknown name fails the build instead of
+rendering an empty box.
+
+<p>
+  <Icon name="gauge-high" /> gauge-high &nbsp;
+  <Icon name="memory" /> memory &nbsp;
+  <Icon name="circle-info" /> circle-info
+</p>
+
+```mdx
+<Icon name="gauge-high" /> Latency
+<Icon name="triangle-exclamation" label="Warning" />
+```
+
+It sizes and colours itself from the text it sits in, so it needs no rule at
+the call site. Leave `label` off when the icon repeats the adjacent text, which
+is most uses; supply it when the icon is alone in a cell or a heading and is
+carrying the meaning by itself.

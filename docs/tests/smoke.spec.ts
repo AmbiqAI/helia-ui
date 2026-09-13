@@ -11,6 +11,10 @@ const routes = [
   { path: `${base}/`, heading: 'helia-ui' },
   { path: `${base}/foundations/`, heading: 'Foundations' },
   { path: `${base}/starlight-plugin/`, heading: 'Starlight plugin' },
+  {
+    path: `${base}/migrating-from-mkdocs/`,
+    heading: 'Migrating from MkDocs',
+  },
   { path: `${base}/primitives/`, heading: 'Primitives' },
   { path: `${base}/cards/`, heading: 'Cards' },
   { path: `${base}/media/`, heading: 'Media' },
