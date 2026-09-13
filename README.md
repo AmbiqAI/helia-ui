@@ -103,6 +103,16 @@ npm run docs:test # Playwright smoke suite over the built docs site
 package only through the export map, so anything it cannot render is a gap in
 the package rather than in the site.
 
+## Starting a product docs site
+
+`templates/product-docs/` is a working Starlight site wired to this package:
+the plugin, the Tailwind entry, the product accent, KaTeX and a Pages workflow.
+Copy it into a product repository as `docs/` and read its README.
+
+It is deliberately absent from `files`, so it is not in the published tarball:
+it depends on this package, and a copy of it inside the package's own
+node_modules would serve no one. Take it from the repository.
+
 ## License
 
 Ambiq-authored code in this package is licensed under the BSD 3-Clause License;

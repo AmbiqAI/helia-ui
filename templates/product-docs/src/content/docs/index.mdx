@@ -1,0 +1,61 @@
+---
+title: PRODUCT NAME
+description: One line describing what the product does.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Card from '@ambiqai/helia-ui/astro/Card';
+import CardHeader from '@ambiqai/helia-ui/astro/CardHeader';
+import CardContent from '@ambiqai/helia-ui/astro/CardContent';
+import CardActions from '@ambiqai/helia-ui/astro/CardActions';
+import Badge from '@ambiqai/helia-ui/astro/Badge';
+
+Say what the product is and who it is for in two or three sentences. Lead with
+the outcome a reader gets, not the inventory of features. Replace every
+placeholder on this page before the first deploy.
+
+<Aside type="caution" title="Placeholder copy">
+  Nothing on this page is approved copy. Product status, support and performance
+  statements come from the approved export of the handbook's `portfolio.yaml`,
+  not from this template.
+</Aside>
+
+## Where to start
+
+<Card>
+  <CardHeader titleAs="h3" href="install/">
+    <Fragment slot="overline">Step one</Fragment>
+    Install
+    <Fragment slot="meta">
+      <Badge tone="info" dot>
+        Start here
+      </Badge>
+    </Fragment>
+  </CardHeader>
+  <CardContent>
+    What a reader needs on their machine, and the one command that proves the
+    install worked.
+  </CardContent>
+</Card>
+
+<Card>
+  <CardHeader titleAs="h3" href="how-to/first-measurement/">
+    <Fragment slot="overline">Step two</Fragment>
+    Take a first measurement
+  </CardHeader>
+  <CardContent>
+    A single task, start to finish, with the output a reader should expect to
+    see.
+  </CardContent>
+  <CardActions align="end">
+    <Badge tone="neutral">10 minutes</Badge>
+  </CardActions>
+</Card>
+
+## How this site is organised
+
+- **Install** is setup only. Everything a reader does once.
+- **How-to** is task-shaped. One page per job, each with a visible outcome.
+- **Reference** is generated or exhaustive. Nothing here needs to be readable
+  end to end.
+- **Guides** is the long-form explanation: concepts, tradeoffs, background.

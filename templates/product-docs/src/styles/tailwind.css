@@ -1,0 +1,32 @@
+/* SPDX-License-Identifier: BSD-3-Clause */
+/* Copyright (c) 2026, Ambiq */
+/*
+ * This site's Tailwind v4 entry.
+ *
+ * The theme mapping, the layer order and the Starlight compat round trip come
+ * from the package. What stays here is the scan list, because Tailwind resolves
+ * a `@source` glob relative to the file that declares it: a glob written inside
+ * the package would point into node_modules, so only this file can name both
+ * this tree and the package's.
+ */
+
+@import '@ambiqai/helia-ui/tailwind.css';
+
+/* Automatic detection is off, so the emitted stylesheet is a function of this
+ * list and nothing else. Add a directory here the moment you author in it. */
+@source '../content/**/*.{md,mdx}';
+@source '../components/**/*.astro';
+@source '../islands/**/*.tsx';
+
+/* The package parts render into this site's pages, so they are this site's
+ * templates wherever they live. */
+@source '../../node_modules/@ambiqai/helia-ui/astro/**/*.astro';
+@source '../../node_modules/@ambiqai/helia-ui/starlight/**/*.astro';
+
+/*
+ * The React layer carries by far the largest class vocabulary in the package:
+ * shadcn writes long variant strings into every generated file. Scan it only
+ * once an island on this site actually imports from it, and prefer naming the
+ * individual components over the whole directory.
+ */
+/* @source '../../node_modules/@ambiqai/helia-ui/react/data-table.tsx'; */

@@ -1,0 +1,83 @@
+---
+title: Install
+description: Get the product onto a machine and prove it runs.
+---
+
+import { Aside, Steps, TabItem, Tabs } from '@astrojs/starlight/components';
+import AsciiTerminal from '@ambiqai/helia-ui/astro/AsciiTerminal';
+
+State the prerequisites plainly, then give the shortest path that ends in a
+command whose output proves the install worked.
+
+<Aside type="note" title="Prerequisites">
+  Name the versions, not the ranges. A reader who has something older should be
+  able to tell from this box alone.
+</Aside>
+
+## Install
+
+<Tabs syncKey="installer">
+  <TabItem label="pip">
+
+```sh
+pip install product-name
+```
+
+  </TabItem>
+  <TabItem label="uv">
+
+```sh
+uv add product-name
+```
+
+  </TabItem>
+  <TabItem label="From source">
+
+```sh
+git clone https://github.com/AmbiqAI/PRODUCT-REPO-NAME.git
+cd PRODUCT-REPO-NAME
+pip install -e .
+```
+
+  </TabItem>
+</Tabs>
+
+## Verify
+
+<Steps>
+
+1. Check the version the installer resolved.
+
+   ```sh
+   product-name --version
+   ```
+
+2. Run the built-in self check.
+
+   ```sh
+   product-name doctor
+   ```
+
+3. Confirm the output matches the transcript below. If it does not, the
+   prerequisites above are the first thing to re-read.
+
+</Steps>
+
+<AsciiTerminal
+  title="Expected output"
+  tone="dark"
+  lines={[
+    { kind: 'command', text: 'product-name doctor' },
+    { kind: 'muted', text: 'Checking environment…' },
+    { kind: 'output', text: '' },
+    { kind: 'output', text: '  PYTHON      3.12.4' },
+    { kind: 'output', text: '  PRODUCT     0.1.0' },
+    { kind: 'output', text: '' },
+    { kind: 'success', text: '✓ Environment looks good' },
+  ]}
+/>
+
+<Aside type="tip">
+  Keep this transcript honest. If the output changes, change the page in the
+  same commit.
+</Aside>

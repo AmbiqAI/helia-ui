@@ -1,0 +1,17 @@
+/* SPDX-License-Identifier: BSD-3-Clause */
+/* Copyright (c) 2026, Ambiq */
+/*
+ * This site's own sheet, loaded after the package sheets so a rule here needs
+ * no extra specificity to win.
+ *
+ * One declaration is the whole product identity: the accent the parts reach for
+ * when they need a colour that is this product's rather than the system's. Set
+ * it from the approved product colour and leave the rest of the system alone —
+ * everything else on the page is already a token, and overriding tokens here is
+ * how two HELIA sites stop looking like one system.
+ */
+
+:root {
+  /* style-lint: allow color -- the one brand value a product site owns; it has no token because it differs per product */
+  --helia-product-accent: #009ca0;
+}

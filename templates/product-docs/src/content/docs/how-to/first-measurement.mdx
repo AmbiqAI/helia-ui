@@ -1,0 +1,75 @@
+---
+title: Take a first measurement
+description: One task, start to finish, with the output to expect.
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+import Badge from '@ambiqai/helia-ui/astro/Badge';
+import DataTable from '@ambiqai/helia-ui/astro/DataTable';
+
+<Badge tone="info" dot>
+  How-to
+</Badge>
+
+A how-to page is one job. Name the job in the title, state the outcome in the
+first paragraph, and stop when the outcome is on screen.
+
+<Steps>
+
+1. Prepare the input.
+
+   ```sh
+   product-name prepare ./input
+   ```
+
+2. Run the measurement.
+
+   ```sh
+   product-name measure ./input --out ./result.json
+   ```
+
+3. Read the result.
+
+   ```sh
+   product-name report ./result.json
+   ```
+
+</Steps>
+
+## Reading the result
+
+<DataTable
+  caption="Fields in result.json"
+  columns={['Field', 'Unit', 'Meaning']}
+  rows={[
+    ['samples', 'count', 'Number of runs the summary was computed over'],
+    ['mean', 'ms', 'Arithmetic mean across those runs'],
+    ['stddev', 'ms', 'Sample standard deviation, denominator n − 1'],
+  ]}
+/>
+
+The summary uses the sample standard deviation, so the spread reported for $n$
+runs $x_1 \dots x_n$ with mean $\bar{x}$ is
+
+$$
+s = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{x})^2}
+$$
+
+which is why a single run reports no spread at all.
+
+<Aside type="caution" title="Numbers are examples">
+  Every figure on this page is illustrative. Measured results about Ambiq
+  silicon belong in a page that cites the run that produced them.
+</Aside>
+
+## Footnotes and checklists
+
+Markdown footnotes[^1] and task lists work without configuration.
+
+- [x] Input prepared
+- [ ] Measurement run
+- [ ] Result reviewed
+
+[^1]:
+    Footnote syntax is standard GitHub-flavoured Markdown; Starlight renders
+    the backreference and the list at the foot of the page.
