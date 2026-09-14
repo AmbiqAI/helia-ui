@@ -132,6 +132,7 @@
   "devDependencies": {
     "@astrojs/starlight": "^0.41.5",
     "prettier": "^3.9.6",
-    "prettier-plugin-astro": "^0.14.1"
+    "prettier-plugin-astro": "^0.14.1",
+    "typescript": "^5.9.3"
   }
 }
