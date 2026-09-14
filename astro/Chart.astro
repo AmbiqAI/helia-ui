@@ -1,0 +1,133 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A chart drawn at build and shipped as inline SVG. No client script.
+ *
+ * Observable Plot lays a figure out against a DOM, so the part gives it one --
+ * `linkedom`, which never reaches the browser -- and writes the result into the
+ * page. What comes out carries the palette as `var(--helia-chart-*)` rather
+ * than resolved colours, so the theme toggle moves a chart that will never be
+ * redrawn.
+ *
+ * The title, the subtitle, the legend and the caption are this part's HTML, not
+ * Plot's SVG: they are page type and belong on the package type scale. The
+ * subtitle is where "Y against X" goes, which is why no axis is titled.
+ *
+ * The chart carries no frame of its own. Put it in a `Card` where the page
+ * wants one.
+ *
+ * @slot default -- Anything that belongs under the chart and above the caption.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import { parseHTML } from 'linkedom';
+import * as Plot from '@observablehq/plot';
+
+import {
+  CHART_HEIGHT,
+  CHART_WIDTH,
+  chartLegendEntries,
+  chartPlotOptions,
+  inlineChartColors,
+  labelChartSvg,
+  type ChartDensity,
+  type ChartKind,
+  type ChartLegend,
+  type ChartRecord,
+} from '../chart-plot-spec';
+
+interface Props extends HTMLAttributes<'figure'> {
+  /** The chart's heading. Also the accessible name of the SVG. */
+  title: string;
+  /** What is plotted against what. Stands in for the axis titles. */
+  subtitle?: string;
+  /** A note under the chart: provenance, units, a caveat. */
+  caption?: string;
+  /** Which marks to draw. `dot` and `scatter` draw the same mark; only `scatter` grids both axes. */
+  kind?: ChartKind;
+  /** The rows. Every row carries the `x`, `y` and `series` keys. */
+  data: readonly ChartRecord[];
+  /** Key on each row for the horizontal position. */
+  x: string;
+  /** Key on each row for the vertical position. */
+  y: string;
+  /** Key whose distinct values split the rows into series. Omit it for one series. */
+  series?: string;
+  /** The height, in pixels, Plot lays the chart out at. */
+  height?: number;
+  /** The width, in pixels, Plot lays the chart out at. The SVG then scales to its container and keeps that aspect ratio, so pick a width near the one it is shown at. */
+  width?: number;
+  /** Moves the margins and the tick count. */
+  density?: ChartDensity;
+  /** `auto` names the series when there is more than one; `none` never does. */
+  legend?: ChartLegend;
+}
+
+const {
+  title,
+  subtitle,
+  caption,
+  kind = 'line',
+  data,
+  x,
+  y,
+  series,
+  height = CHART_HEIGHT,
+  width = CHART_WIDTH,
+  density = 'default',
+  legend = 'auto',
+  class: className,
+  ...rest
+} = Astro.props;
+
+const { document } = parseHTML('<!doctype html><html><body></body></html>');
+
+const figure = Plot.plot(
+  chartPlotOptions({
+    kind,
+    data,
+    x,
+    y,
+    series,
+    height,
+    width,
+    density,
+    document: document as unknown as Document,
+  }),
+);
+
+inlineChartColors(figure as unknown as Element);
+labelChartSvg(figure as unknown as Element, title, subtitle);
+
+const svg = (figure as unknown as { outerHTML: string }).outerHTML;
+const entries = chartLegendEntries({ data, series }, legend);
+---
+
+<figure
+  class:list={['helia-chart', className]}
+  data-chart-kind={kind}
+  {...rest}
+>
+  <div class="helia-chart__head">
+    <p class="helia-chart__title">{title}</p>
+    {subtitle && <p class="helia-chart__subtitle">{subtitle}</p>}
+  </div>
+  {
+    entries.length > 0 && (
+      <ul class="helia-chart__legend">
+        {entries.map((entry) => (
+          <li>
+            <span
+              class="helia-chart__swatch"
+              style={`--helia-chart-swatch: ${entry.color}`}
+            />
+            {entry.label}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+  <div class="helia-chart__plot" set:html={svg} />
+  <slot />
+  {caption && <figcaption class="helia-chart__caption">{caption}</figcaption>}
+</figure>

@@ -340,6 +340,58 @@ Also accepts `HTMLAttributes<'figure'>`.
 
 [See it rendered on Gallery](/helia-ui/gallery/#content-first)
 
+## Chart
+
+**Use it for:** A chart drawn at build and shipped as inline SVG. No client script.
+
+```ts
+import Chart from '@ambiqai/helia-ui/astro/Chart';
+```
+
+| Prop           | Type                     | Default        | Description                                                                                                                                                      |
+| -------------- | ------------------------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `title` (req.) | `string`                 | --             | The chart's heading. Also the accessible name of the SVG.                                                                                                        |
+| `subtitle`     | `string`                 | --             | What is plotted against what. Stands in for the axis titles.                                                                                                     |
+| `caption`      | `string`                 | --             | A note under the chart: provenance, units, a caveat.                                                                                                             |
+| `kind`         | `ChartKind`              | `'line'`       | Which marks to draw. `dot` and `scatter` draw the same mark; only `scatter` grids both axes.                                                                     |
+| `data` (req.)  | `readonly ChartRecord[]` | --             | The rows. Every row carries the `x`, `y` and `series` keys.                                                                                                      |
+| `x` (req.)     | `string`                 | --             | Key on each row for the horizontal position.                                                                                                                     |
+| `y` (req.)     | `string`                 | --             | Key on each row for the vertical position.                                                                                                                       |
+| `series`       | `string`                 | --             | Key whose distinct values split the rows into series. Omit it for one series.                                                                                    |
+| `height`       | `number`                 | `CHART_HEIGHT` | The height, in pixels, Plot lays the chart out at.                                                                                                               |
+| `width`        | `number`                 | `CHART_WIDTH`  | The width, in pixels, Plot lays the chart out at. The SVG then scales to its container and keeps that aspect ratio, so pick a width near the one it is shown at. |
+| `density`      | `ChartDensity`           | `'default'`    | Moves the margins and the tick count.                                                                                                                            |
+| `legend`       | `ChartLegend`            | `'auto'`       | `auto` names the series when there is more than one; `none` never does.                                                                                          |
+
+Also accepts `HTMLAttributes<'figure'>`.
+
+**Slots**
+
+- `default` -- Anything that belongs under the chart and above the caption.
+
+[See it rendered on Gallery](/helia-ui/gallery/#charts)
+
+## ChartGroup
+
+**Use it for:** A row of two or three charts that read as one figure.
+
+```ts
+import ChartGroup from '@ambiqai/helia-ui/astro/ChartGroup';
+```
+
+| Prop      | Type                                      | Default     | Description                    |
+| --------- | ----------------------------------------- | ----------- | ------------------------------ |
+| `columns` | `2 \| 3`                                  | `3`         | Charts across at the wide end. |
+| `density` | `'compact' \| 'default' \| 'comfortable'` | `'default'` | The gap between charts.        |
+
+Also accepts `HTMLAttributes<'div'>`.
+
+**Slots**
+
+- `default` -- The charts, in reading order.
+
+[See it rendered on Gallery](/helia-ui/gallery/#three-across)
+
 ## Chip
 
 **Use it for:** The pill: a rounded inline label or link.

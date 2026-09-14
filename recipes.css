@@ -1462,3 +1462,131 @@ a.helia-chip--neutral:focus-visible {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/*
+ * Charts. `Chart` and `ChartGroup` render these, and so does the React
+ * counterpart: one frame whether the SVG was drawn at build or in the browser.
+ *
+ * The rules reach into the SVG because that markup arrives as a string -- Plot
+ * writes it, `set:html` inserts it, and no component scope survives the trip.
+ * That is also why the gridline weight and the tick size live here rather than
+ * in a scoped block: this is the only stylesheet that can see them.
+ */
+.helia-chart {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-width: 0;
+}
+
+.helia-chart__title {
+  color: var(--helia-ink-primary);
+  font-size: var(--helia-text-card-title);
+  font-weight: var(--helia-weight-semibold);
+  letter-spacing: var(--helia-tracking-heading);
+  line-height: var(--helia-leading-heading);
+  margin: 0;
+}
+
+.helia-chart__subtitle {
+  color: var(--helia-ink-muted);
+  font-size: var(--helia-text-caption);
+  line-height: var(--helia-leading-body);
+  margin: var(--helia-space-1) 0 0;
+}
+
+.helia-chart__legend {
+  color: var(--helia-ink-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--helia-text-label);
+  gap: var(--helia-space-1) var(--helia-space-3);
+  list-style: none;
+  margin: var(--helia-space-3) 0 0;
+  padding: 0;
+}
+
+.helia-chart__legend li {
+  align-items: center;
+  display: flex;
+  gap: var(--helia-space-1);
+}
+
+/* A bar rather than a dot: it is the shape of the mark it names in three of
+   the five kinds, and it reads at this size where a circle does not. */
+.helia-chart__swatch {
+  background: var(--helia-chart-swatch);
+  block-size: 0.2rem;
+  border-radius: var(--helia-radius-xs);
+  flex: none;
+  inline-size: 0.9rem;
+}
+
+.helia-chart__plot {
+  margin: var(--helia-space-3) 0 0;
+  min-width: 0;
+}
+
+/*
+ * The figure was laid out at one width and is shown at another, so it scales.
+ * Plot's own `:where()` rule says the same thing at zero specificity; this one
+ * is here so the behaviour does not depend on a rule the library could stop
+ * emitting.
+ */
+.helia-chart__plot svg {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+.helia-chart__plot svg text {
+  font-family: var(--helia-font-sans);
+  font-size: var(--helia-chart-tick-size);
+}
+
+/* `non-scaling-stroke` keeps the hairline a hairline: the SVG is scaled to its
+   container, and a gridline that scaled with it would land off the pixel grid
+   and blur at exactly the weight that is meant to be barely there. */
+.helia-chart__plot svg [data-plot-label$='grid'] line {
+  stroke-width: var(--helia-chart-grid-width);
+  vector-effect: non-scaling-stroke;
+}
+
+.helia-chart__caption {
+  color: var(--helia-ink-muted);
+  font-size: var(--helia-text-caption);
+  line-height: var(--helia-leading-body);
+  margin: var(--helia-space-2) 0 0;
+}
+
+.helia-chart-group {
+  display: grid;
+  gap: var(--helia-layout-gap, var(--helia-space-4));
+  grid-template-columns: repeat(
+    var(--helia-chart-group-columns),
+    minmax(0, 1fr)
+  );
+  min-width: 0;
+}
+
+.helia-chart-group--2 {
+  --helia-chart-group-columns: 2;
+}
+
+.helia-chart-group--3 {
+  --helia-chart-group-columns: 3;
+}
+
+@media (width < 62rem) {
+  .helia-chart-group--3 {
+    --helia-chart-group-columns: 2;
+  }
+}
+
+@media (width < 42rem) {
+  .helia-chart-group--2,
+  .helia-chart-group--3 {
+    --helia-chart-group-columns: 1;
+  }
+}

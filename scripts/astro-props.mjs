@@ -84,6 +84,8 @@ const EXAMPLES = {
     label: 'Cards',
     anchor: 'a-card-with-every-part',
   },
+  Chart: { page: 'gallery', label: 'Gallery', anchor: 'charts' },
+  ChartGroup: { page: 'gallery', label: 'Gallery', anchor: 'three-across' },
   Chip: { page: 'primitives', label: 'Primitives', anchor: 'chip' },
   CodeBlock: { page: 'code', label: 'Code', anchor: 'file-example' },
   CodeTabs: { page: 'code', label: 'Code', anchor: 'language-tabs' },

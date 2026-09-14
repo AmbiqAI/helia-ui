@@ -273,6 +273,33 @@
   --helia-tone-orange: #e88b43;
   --helia-tone-purple: #8b7aff;
 
+  /*
+   * The chart palette. Six series off the accent scale, taken as the
+   * theme-aware tones above rather than the flat accents, because a series
+   * colour is read against the surface it is drawn on and a hue tuned for a
+   * dark canvas is not legible on paper.
+   *
+   * The order is the order a chart uses them, so the first two are the pair
+   * that has to separate at a glance and the warm step is late: a sequence
+   * that runs through the spectrum turns every chart into a legend lookup.
+   * Six is a ceiling, not a target.
+   */
+  --helia-chart-1: var(--helia-tone-cyan);
+  --helia-chart-2: var(--helia-tone-blue);
+  --helia-chart-3: var(--helia-tone-purple);
+  --helia-chart-4: var(--helia-tone-green);
+  --helia-chart-5: var(--helia-tone-orange);
+  /* Slate lifted towards the page ink, because `--helia-accent-slate` sits too
+     close to both grounds to read as a series on either. */
+  --helia-chart-6: #98a2b3;
+
+  /* Gridlines are the hairline, at the weight the rest of the page draws an
+     edge, so a chart's rules are as quiet as a card's border. */
+  --helia-chart-grid: var(--helia-hairline);
+  --helia-chart-grid-width: 1px;
+  --helia-chart-ink: var(--helia-ink-muted);
+  --helia-chart-tick-size: var(--helia-text-label);
+
   --sl-content-width: 64rem;
   --sl-sidebar-width: 0rem;
   /* Hub-only: the handbook uses #e7e8ea in light, so this is not shared. */
@@ -370,6 +397,9 @@
   --helia-tone-green: #087a51;
   --helia-tone-orange: #ba5c16;
   --helia-tone-purple: #6651d9;
+
+  /* The other five chart series follow the tones above on their own. */
+  --helia-chart-6: #5d6b82;
 
   --helia-tone-success-ink: #0b7048;
   --helia-tone-warning-ink: #8f5300;

@@ -553,3 +553,74 @@ test('every charting candidate draws all three charts', async ({ page }) => {
     expect(await drawn.count()).toBeGreaterThanOrEqual(3);
   }
 });
+
+/*
+ * The whole claim of the Astro chart part is that the SVG is in the response.
+ * A chart that only appears once the page has run is a chart that got there
+ * some other way, so this reads the served HTML rather than the DOM: seven
+ * figures across the five examples, four standing alone and three in the group.
+ */
+const GALLERY_CHARTS = 7;
+
+test('the gallery charts are inline SVG in the served HTML', async ({
+  page,
+  request,
+}) => {
+  const response = await request.get(`${base}/gallery/`);
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+
+  const plots = html.match(/helia-chart__plot/g) ?? [];
+  expect(plots).toHaveLength(GALLERY_CHARTS);
+
+  /* The accessible name is set on the SVG element itself, so finding it in the
+     response proves the figure and not just its frame was rendered. */
+  expect(html).toContain(
+    'aria-label="Weekly page views. Page views against week of the quarter, by section"',
+  );
+
+  await page.goto(`${base}/gallery/`);
+  const drawn = page.locator('.helia-chart__plot svg');
+  await expect(drawn).toHaveCount(GALLERY_CHARTS);
+  await expect(drawn.first()).toBeVisible();
+});
+
+/*
+ * The colours are custom properties rather than resolved hues, which is the
+ * only reason a figure drawn at build can follow the theme toggle. Reading a
+ * series stroke back in both themes is the assertion that they still are.
+ */
+test('a build-time chart recolours with the theme', async ({ page }) => {
+  await page.goto(`${base}/gallery/`);
+
+  const stroke = async () =>
+    page.evaluate(() => {
+      const line = document.querySelector(
+        '.helia-chart__plot svg [data-plot-label="line"] path',
+      );
+      return line ? getComputedStyle(line).stroke : null;
+    });
+
+  const before = await stroke();
+  await page.evaluate(() => {
+    const root = document.documentElement;
+    const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+    root.dataset.theme = next;
+  });
+  const after = await stroke();
+
+  expect(before).not.toBeNull();
+  expect(after).not.toBe(before);
+});
+
+/* The React counterpart mounts and draws, which is the half of the contract the
+ * build-time part cannot prove. */
+test('the React Plot chart draws on the data display page', async ({
+  page,
+}) => {
+  await page.goto(`${base}/react/data-display/`);
+
+  const drawn = page.locator('[data-chart-plot-demo] .helia-chart__plot svg');
+  await expect(drawn).toHaveCount(2);
+  await expect(drawn.first()).toBeVisible();
+});

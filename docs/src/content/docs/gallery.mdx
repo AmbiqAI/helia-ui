@@ -17,6 +17,8 @@ import CardHeader from '@ambiqai/helia-ui/astro/CardHeader';
 import CardList from '@ambiqai/helia-ui/astro/CardList';
 import CardMedia from '@ambiqai/helia-ui/astro/CardMedia';
 import CardQuote from '@ambiqai/helia-ui/astro/CardQuote';
+import Chart from '@ambiqai/helia-ui/astro/Chart';
+import ChartGroup from '@ambiqai/helia-ui/astro/ChartGroup';
 import Chip from '@ambiqai/helia-ui/astro/Chip';
 import CodeTabs from '@ambiqai/helia-ui/astro/CodeTabs';
 import DataTable from '@ambiqai/helia-ui/astro/DataTable';
@@ -35,6 +37,12 @@ import SectionHeader from '@ambiqai/helia-ui/astro/SectionHeader';
 import ShowcaseCarousel from '@ambiqai/helia-ui/astro/ShowcaseCarousel';
 import StatCard from '@ambiqai/helia-ui/astro/StatCard';
 import Timeline from '@ambiqai/helia-ui/astro/Timeline';
+import {
+  buildSeries,
+  pagesSeries,
+  trafficSeries,
+  weightSeries,
+} from '../../lib/chart-gallery-data';
 
 This page is for choosing. Every option the card parts and the motion system
 offer is on it, side by side, each one showing the exact source that produces
@@ -1744,6 +1752,225 @@ set of parts.
     theme over a ground that does not is a section that reads half the time.
   </p>
 </Band>
+
+## Charts
+
+`Chart` draws with Observable Plot at build and ships the result as inline SVG,
+so a page with five charts on it still ships no chart JavaScript. The palette is
+written as `var(--helia-chart-*)`, which is what lets a figure that will never be
+redrawn follow the theme toggle.
+
+The title and the subtitle are the part's HTML rather than Plot's type, and the
+subtitle says what is plotted against what — which is why no axis is titled.
+Gridlines run across the measure; only a scatter, which has a measure on both
+axes, gets the second set.
+
+Every number below is invented and describes this documentation site. Nothing
+here is a measurement of any part.
+
+<Example
+  title='kind="line" with two series'
+  code={`
+    <Chart
+      title="Weekly page views"
+      subtitle="Page views against week of the quarter, by section"
+      caption="Synthetic series."
+      kind="line"
+      data={trafficSeries}
+      x="week"
+      y="views"
+      series="section"
+      width={900}
+      height={280}
+    />
+  `}
+>
+  <Chart
+    title="Weekly page views"
+    subtitle="Page views against week of the quarter, by section"
+    caption="Synthetic series."
+    kind="line"
+    data={trafficSeries}
+    x="week"
+    y="views"
+    series="section"
+    width={900}
+    height={280}
+  />
+</Example>
+
+<Example
+  title='kind="bar" grouped by series'
+  code={`
+    <Chart
+      title="Build time by stage"
+      subtitle="Wall-clock seconds against build stage, by cache profile"
+      kind="bar"
+      data={buildSeries}
+      x="stage"
+      y="seconds"
+      series="profile"
+      width={900}
+      height={280}
+    />
+  `}
+>
+  <Chart
+    title="Build time by stage"
+    subtitle="Wall-clock seconds against build stage, by cache profile"
+    kind="bar"
+    data={buildSeries}
+    x="stage"
+    y="seconds"
+    series="profile"
+    width={900}
+    height={280}
+  />
+</Example>
+
+<Example
+  title='kind="area", one series'
+  code={`
+    <Chart
+      title="Pages published"
+      subtitle="Pages on the site against week of the quarter"
+      kind="area"
+      data={pagesSeries}
+      x="week"
+      y="pages"
+      width={900}
+      height={260}
+    />
+  `}
+>
+  <Chart
+    title="Pages published"
+    subtitle="Pages on the site against week of the quarter"
+    kind="area"
+    data={pagesSeries}
+    x="week"
+    y="pages"
+    width={900}
+    height={260}
+  />
+</Example>
+
+<Example
+  title='kind="scatter", gridlines on both axes'
+  code={`
+    <Chart
+      title="Weight against score"
+      subtitle="Performance score against transferred kilobytes, by template"
+      kind="scatter"
+      data={weightSeries}
+      x="transferKb"
+      y="score"
+      series="template"
+      width={900}
+      height={280}
+    />
+  `}
+>
+  <Chart
+    title="Weight against score"
+    subtitle="Performance score against transferred kilobytes, by template"
+    kind="scatter"
+    data={weightSeries}
+    x="transferKb"
+    y="score"
+    series="template"
+    width={900}
+    height={280}
+  />
+</Example>
+
+### Three across
+
+`ChartGroup` gives the charts equal columns, so three drawn at the same `width`
+and `height` line up across the row and read as one figure. Draw them at a width
+near the column, not at the page width: the SVG scales into its column and takes
+its type with it.
+
+<Example
+  title="<ChartGroup> of three"
+  code={`
+    <ChartGroup>
+      <Chart
+        title="Page views"
+        subtitle="Views against week, by section"
+        kind="line"
+        data={trafficSeries}
+        x="week"
+        y="views"
+        series="section"
+        width={300}
+        height={200}
+        density="compact"
+      />
+      <Chart
+        title="Build time"
+        subtitle="Seconds against stage, by cache profile"
+        kind="bar"
+        data={buildSeries}
+        x="stage"
+        y="seconds"
+        series="profile"
+        width={300}
+        height={200}
+        density="compact"
+      />
+      <Chart
+        title="Pages published"
+        subtitle="Pages against week"
+        kind="area"
+        data={pagesSeries}
+        x="week"
+        y="pages"
+        width={300}
+        height={200}
+        density="compact"
+      />
+    </ChartGroup>
+  `}
+>
+  <ChartGroup>
+    <Chart
+      title="Page views"
+      subtitle="Views against week, by section"
+      kind="line"
+      data={trafficSeries}
+      x="week"
+      y="views"
+      series="section"
+      width={300}
+      height={200}
+      density="compact"
+    />
+    <Chart
+      title="Build time"
+      subtitle="Seconds against stage, by cache profile"
+      kind="bar"
+      data={buildSeries}
+      x="stage"
+      y="seconds"
+      series="profile"
+      width={300}
+      height={200}
+      density="compact"
+    />
+    <Chart
+      title="Pages published"
+      subtitle="Pages against week"
+      kind="area"
+      data={pagesSeries}
+      x="week"
+      y="pages"
+      width={300}
+      height={200}
+      density="compact"
+    />
+  </ChartGroup>
+</Example>
 
 ## Other parts
 

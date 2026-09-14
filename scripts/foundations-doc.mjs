@@ -426,6 +426,13 @@ const GROUPS = [
     matches: (name) => /^--helia-tone-/.test(name),
   },
   {
+    id: 'charts',
+    title: 'Chart palette',
+    blurb:
+      'Six series colours off the accent scale, plus the gridline and the tick ink. The order is the order a chart uses them, so the first two are the pair that has to separate at a glance; a chart that needs a seventh hue is a chart that needs splitting.',
+    matches: (name) => /^--helia-chart-/.test(name),
+  },
+  {
     id: 'elevation',
     title: 'Shadow inks',
     blurb:

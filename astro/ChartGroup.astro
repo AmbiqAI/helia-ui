@@ -1,0 +1,45 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A row of two or three charts that read as one figure.
+ *
+ * The columns are equal, so charts given the same `height` and `width` land at
+ * the same drawn size and their gridlines line up across the row -- which is
+ * what makes the row comparable rather than three charts that happen to be
+ * adjacent. Give the charts a `width` near the column width; a chart laid out
+ * at the page width and shown in a third of it draws its type a third as big.
+ *
+ * Below 62rem the row halves and below 42rem it stacks, the same steps
+ * `CardGrid` takes.
+ *
+ * @slot default -- The charts, in reading order.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  /** Charts across at the wide end. */
+  columns?: 2 | 3;
+  /** The gap between charts. */
+  density?: 'compact' | 'default' | 'comfortable';
+}
+
+const {
+  columns = 3,
+  density = 'default',
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<div
+  class:list={[
+    'helia-chart-group',
+    `helia-chart-group--${columns}`,
+    density !== 'default' && `helia-layout--${density}`,
+    className,
+  ]}
+  {...rest}
+>
+  <slot />
+</div>

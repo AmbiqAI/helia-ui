@@ -1,9 +1,10 @@
 ---
 title: Data display
-description: The static data table and the shadcn chart wrapper over Recharts.
+description: The static data table, the Plot chart, and the shadcn chart wrapper over Recharts.
 ---
 
 import DataTable from '@ambiqai/helia-ui/astro/DataTable';
+import ChartPlotShowcase from '../../../islands/ChartPlotShowcase';
 import ChartShowcase from '../../../islands/ChartShowcase';
 import MkDocsChartMigration from '../../../islands/MkDocsChartMigration';
 
@@ -27,6 +28,24 @@ Tables are for comparison and dense structured data—not primary navigation.
 A table that becomes a tool rather than a comparison belongs on the React
 side instead: the shadcn table primitives draw it, TanStack drives the sorting
 and the paging, and the page pays for an island.
+
+## Charts
+
+`ChartPlot` is the React counterpart of the `Chart` Astro part: the same props,
+the same frame, the same marks, drawn in the browser instead of at build. Reach
+for it when the data is not known until the page runs — a filter, a range the
+reader picks, a live feed. When the data is known at build, use the Astro part
+instead and the page ships no chart JavaScript at all.
+
+Plot is the default for new charts. The Recharts wrapper below stays for the
+shadcn compatibility path: it is the registry component, so a shadcn block or a
+generated dashboard that expects `ChartContainer` keeps working.
+
+```tsx
+import { ChartPlot } from '@ambiqai/helia-ui/react/chart-plot';
+```
+
+<ChartPlotShowcase client:load />
 
 ## Plots
 

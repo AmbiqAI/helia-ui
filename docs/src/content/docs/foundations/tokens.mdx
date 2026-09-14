@@ -416,6 +416,64 @@ One fill per callout and badge variant, plus the theme-aware set a chip rim read
   ]}
 />
 
+## Chart palette
+
+Six series colours off the accent scale, plus the gridline and the tick ink. The order is the order a chart uses them, so the first two are the pair that has to separate at a glance; a chart that needs a seventh hue is a chart that needs splitting.
+
+<TokenSwatchGrid
+  group="charts"
+  tokens={[
+    {
+      name: '--helia-chart-1',
+      light: '#008c96',
+      dark: '#28b8c2',
+      file: 'semantic.css',
+    },
+    {
+      name: '--helia-chart-2',
+      light: '#1769e0',
+      dark: '#4d9bff',
+      file: 'semantic.css',
+    },
+    {
+      name: '--helia-chart-3',
+      light: '#6651d9',
+      dark: '#8b7aff',
+      file: 'semantic.css',
+    },
+    {
+      name: '--helia-chart-4',
+      light: '#087a51',
+      dark: '#2fb878',
+      file: 'semantic.css',
+    },
+    {
+      name: '--helia-chart-5',
+      light: '#ba5c16',
+      dark: '#e88b43',
+      file: 'semantic.css',
+    },
+    {
+      name: '--helia-chart-6',
+      light: '#5d6b82',
+      dark: '#98a2b3',
+      file: 'semantic.css',
+    },
+    {
+      name: '--helia-chart-grid',
+      light: '#dfe3e8',
+      dark: '#242936',
+      file: 'semantic.css',
+    },
+    {
+      name: '--helia-chart-ink',
+      light: 'hsl(224, 7%, 36%)',
+      dark: 'hsl(224, 6%, 56%)',
+      file: 'semantic.css',
+    },
+  ]}
+/>
+
 ## Shadow inks
 
 The three shadow colours the elevation steps are built from. Each one is a black at a low alpha, so a shadow darkens whatever it falls on rather than tinting it.

@@ -74,6 +74,12 @@ const CSS_IMPORT = /@import\s+(?:url\(\s*)?['"]([^'"]+)['"]/g;
  * a site, and `Code` is how a part renders through the same Expressive Code
  * instance the plugin themes instead of drawing a second code frame. Nothing
  * else under `@astrojs/starlight/` is open to this lane.
+ *
+ * `@observablehq/plot` and `linkedom` are the chart part's, and they are the
+ * one pair here that runs only at build: Plot draws the figure against the DOM
+ * linkedom provides and the part ships the SVG, so neither is reachable from a
+ * browser and neither can tie a part to a site. Both are declared dependencies
+ * of the package, so a consuming site installs them the same way.
  */
 const ALLOWED_PACKAGES = [
   'astro/types',
@@ -82,6 +88,8 @@ const ALLOWED_PACKAGES = [
   '@astrojs/starlight/components',
   '@fortawesome/fontawesome-svg-core',
   '@fortawesome/free-solid-svg-icons',
+  '@observablehq/plot',
+  'linkedom',
 ];
 
 /*
