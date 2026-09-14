@@ -199,7 +199,13 @@ const CODE_FRAME_OVERRIDES: NonNullable<CodeStyleOverrides['frames']> = {
   editorTabBarBackground: 'var(--helia-surface-card-muted)',
   editorTabBarBorderBottomColor: 'var(--helia-surface-border)',
   editorTabBarBorderColor: 'var(--helia-surface-border)',
-  editorTabBorderRadius: '0px',
+  /*
+   * The tab is the first thing drawn in the tab bar, so its inline-start
+   * corner sits exactly on the frame's. Squaring it left that corner painted
+   * outside the frame's curve; matching `borderRadius` keeps it inside, and
+   * the tab still reads flat because it shares the bar's colour.
+   */
+  editorTabBorderRadius: 'var(--helia-radius-md)',
   frameBoxShadowCssValue: 'none',
   terminalBackground: 'var(--helia-surface-card)',
   terminalTitlebarBackground: 'var(--helia-surface-card-muted)',

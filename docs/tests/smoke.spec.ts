@@ -414,3 +414,71 @@ test('the two worked themes draw the same cards differently', async ({
   expect(warm.background).not.toBe(hub.background);
   expect(warm.ink).not.toBe(hub.ink);
 });
+
+/*
+ * Expressive Code draws the active editor tab as the first child of the frame
+ * header, with no clip between them, so the tab's inline-start corner sits on
+ * the frame's own. A tab radius that does not match the frame's therefore
+ * paints outside the curve. Read in both themes because the frame radius is a
+ * token and the tab used to carry a literal. See AmbiqAI/helia-ui#41.
+ */
+test('the code frame title tab follows the frame corner', async ({ page }) => {
+  await page.goto(`${base}/code/`);
+
+  const frame = page.locator('.frame.has-title:not(.is-terminal)').first();
+  await expect(frame).toBeVisible();
+
+  for (const theme of ['light', 'dark'] as const) {
+    await page.evaluate((value) => {
+      document.documentElement.dataset.theme = value;
+    }, theme);
+
+    const corner = await frame.evaluate((node) => {
+      const tab = node.querySelector('.header .title');
+      return {
+        frame: getComputedStyle(node).borderTopLeftRadius,
+        tab: tab ? getComputedStyle(tab).borderTopLeftRadius : null,
+      };
+    });
+
+    expect(corner.frame, theme).not.toBe('0px');
+    expect(corner.tab, theme).toBe(corner.frame);
+  }
+});
+
+/*
+ * A terminal frame with a title draws no tab: the title bar is the header
+ * itself, and it is the header that has to hold the corner. The page carries
+ * only untitled terminals, so the titled combination is measured on a probe
+ * built from the frame the page does carry.
+ */
+test('a titled terminal frame holds the frame corner', async ({ page }) => {
+  await page.goto(`${base}/code/`);
+
+  const frame = page.locator('.frame.is-terminal').first();
+  await expect(frame).toBeVisible();
+
+  const corner = await frame.evaluate((node) => {
+    const probe = node.cloneNode(true) as HTMLElement;
+    probe.classList.add('has-title');
+    const header = probe.querySelector('.header') as HTMLElement;
+    const title = document.createElement('span');
+    title.className = 'title';
+    title.textContent = 'deploy.sh';
+    header.replaceChildren(title);
+    node.after(probe);
+
+    const measured = {
+      frame: getComputedStyle(probe).borderTopLeftRadius,
+      header: getComputedStyle(header).borderTopLeftRadius,
+      display: getComputedStyle(header).display,
+    };
+
+    probe.remove();
+    return measured;
+  });
+
+  expect(corner.display).not.toBe('none');
+  expect(corner.frame).not.toBe('0px');
+  expect(corner.header).toBe(corner.frame);
+});
