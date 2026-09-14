@@ -5,7 +5,7 @@
  * A single figure with its label, and an optional change beside it.
  *
  * It is a composition of the card parts rather than a card of its own: every
- * tone, density, media and accent modifier reaches it, because they are passed
+ * tone, density and media modifier reaches it, because they are passed
  * straight through to `Card`.
  *
  * The number is the child, so it can carry a unit, a `<span>`, or markup the
@@ -29,7 +29,6 @@ interface Props extends HTMLAttributes<'div'> {
   /* The card modifiers, passed straight through. */
   tone?: CardTone;
   density?: 'default' | 'compact' | 'comfortable';
-  accent?: boolean;
   lift?: boolean;
   interactive?: boolean;
 }

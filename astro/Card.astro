@@ -14,9 +14,12 @@
  *
  * Everything past `as` is a modifier on the one recipe rather than a fork of
  * it: tone changes what stands in for the edge, `media` changes where the
- * frame sits, `density` moves the padding step, `accent` adds the rule. They
- * compose, and each has a class a consumer can apply directly to an element
- * this component cannot produce.
+ * frame sits, `density` moves the padding step. They compose, and each has a
+ * class a consumer can apply directly to an element this component cannot
+ * produce.
+ *
+ * A card never carries an accent edge or brim. Accent belongs to the media
+ * artwork, a badge, an icon or the type.
  */
 import type { HTMLAttributes, HTMLTag } from 'astro/types';
 import Surface from './Surface.astro';
@@ -37,8 +40,6 @@ interface Props extends HTMLAttributes<'div'> {
   media?: 'top' | 'side' | 'background';
   /** Moves the padding step the parts default to: 3, 4, or 5. */
   density?: 'default' | 'compact' | 'comfortable';
-  /** Draws the accent rule on the leading edge, from `--helia-product-accent`. */
-  accent?: boolean;
   /** Adds the hover lift. Pair it with `interactive` only when the card links. */
   lift?: boolean;
   /** Adds the shared hover background shift and the focus-visible ring. */
@@ -50,7 +51,6 @@ const {
   tone = 'card',
   media = 'top',
   density = 'default',
-  accent = false,
   lift = false,
   interactive = false,
   class: className,
@@ -95,7 +95,6 @@ const edge = tone === 'elevated' || tone === 'ghost' ? EDGE[tone] : undefined;
     tone === 'ghost' && 'helia-motion-surface',
     media !== 'top' && `helia-card--media-${media}`,
     density !== 'default' && DENSITY[density],
-    accent && 'helia-card--accent',
     lift && 'helia-motion-lift',
     className,
   ]}

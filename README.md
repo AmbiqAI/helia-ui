@@ -57,6 +57,9 @@ Those nine dials — accent, radius scale, motion scale, fonts, surface tint,
 hero treatment, density — are what a site may vary on its own. Anything else
 is a package change.
 
+Cards and panels never carry an accent edge or brim; accent lives in artwork,
+badges, icons and type.
+
 ## Export map
 
 | Export                     | Contents                                                                                                 |

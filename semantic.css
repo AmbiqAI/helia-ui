@@ -123,9 +123,6 @@
   /* The card padding step, so the density dial has one place to apply. */
   --helia-card-pad: var(--helia-space-4);
 
-  /* The accent rule drawn on a card's leading edge. */
-  --helia-rule-width: 3px;
-
   /* A background-media card has no intrinsic height of its own. */
   --helia-card-background-min: 13rem;
 

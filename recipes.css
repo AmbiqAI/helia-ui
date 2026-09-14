@@ -375,21 +375,6 @@ a.helia-chip--neutral:focus-visible {
 }
 
 /*
- * The accent rule: a pseudo-element rather than a border, because a border
- * would move the card's own edge and break the row it sits in. The colour is
- * the site accent unless a composition names one for this card.
- */
-.helia-card--accent::before {
-  background: var(--helia-card-accent, var(--helia-product-accent));
-  block-size: var(--helia-rule-width);
-  content: '';
-  inset-block-start: 0;
-  inset-inline: 0;
-  position: absolute;
-  z-index: 2;
-}
-
-/*
  * Background media: the frame fills the card and the parts ride over it. The
  * ink is inverted to the fixed paper tone rather than the theme's, because the
  * overlay below is dark in both themes.
@@ -462,13 +447,6 @@ a.helia-chip--neutral:focus-visible {
     inset-inline-start: 0;
     position: absolute;
     width: 40%;
-  }
-
-  .helia-card--accent.helia-card--media-side::before {
-    block-size: auto;
-    inline-size: var(--helia-rule-width);
-    inset-block: 0;
-    inset-inline-end: auto;
   }
 }
 

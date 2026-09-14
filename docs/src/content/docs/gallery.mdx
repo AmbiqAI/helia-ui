@@ -214,42 +214,6 @@ draws an overlay over it, and inverts the ink onto the fixed paper tone.
   </div>
 </div>
 
-## Accent
-
-`accent` draws a 3px rule from `--helia-product-accent` on the leading edge:
-the top of a stacked card, the left of a side one. It is a pseudo-element, not
-a border, so the card's own edge does not move and the row holds.
-
-A composition that needs a different colour for one card sets
-`--helia-card-accent` on it rather than reaching for a second prop.
-
-<div className="gallery-grid not-content">
-  <div className="gallery-item">
-    <Card>
-      <CardContent>No rule.</CardContent>
-    </Card>
-    <code>{'<Card>'}</code>
-  </div>
-  <div className="gallery-item">
-    <Card accent>
-      <CardContent>The site accent.</CardContent>
-    </Card>
-    <code>{'<Card accent>'}</code>
-  </div>
-  <div className="gallery-item">
-    <Card accent style="--helia-card-accent: var(--helia-accent-green)">
-      <CardContent>One card, one colour.</CardContent>
-    </Card>
-    <code>style="--helia-card-accent: var(--helia-accent-green)"</code>
-  </div>
-  <div className="gallery-item">
-    <Card accent tone="elevated">
-      <CardContent>The rule survives a tone with no border.</CardContent>
-    </Card>
-    <code>{'<Card accent tone="elevated">'}</code>
-  </div>
-</div>
-
 ## StatCard
 
 A figure, its label, and an optional change. The number is the child, so it can
@@ -268,10 +232,10 @@ because the component has no idea whether up is good.
     <code>delta="-18%" deltaTone="success"</code>
   </div>
   <div className="gallery-item">
-    <StatCard label="Open findings" delta="+3" deltaTone="warning" accent>
+    <StatCard label="Open findings" delta="+3" deltaTone="warning">
       <span>12</span>
     </StatCard>
-    <code>deltaTone="warning" accent</code>
+    <code>deltaTone="warning"</code>
   </div>
   <div className="gallery-item">
     <StatCard label="Bundle" tone="elevated" density="compact">
@@ -315,11 +279,10 @@ card is the target and the cue is inside the same hit area.
       title="Primitives"
       tone="elevated"
       lift
-      accent
     >
       The four shapes the rest of the system reuses.
     </LinkCard>
-    <code>tone="elevated" lift accent</code>
+    <code>tone="elevated" lift</code>
   </div>
 </div>
 
@@ -509,13 +472,20 @@ other.
   </div>
 </div>
 
-The accent dial is the one that does not need a wrapper of its own, because
-every card already reads it:
+The accent dial reaches a card through its artwork rather than its edge: no
+card part carries an accent rule or brim, so a subtree that names an accent
+shows it in the media, the badges and the type.
 
 <div className="gallery-grid not-content">
   <div className="gallery-item">
     <div style="--helia-product-accent: var(--helia-accent-orange)">
-      <Card accent>
+      <Card>
+        <CardMedia>
+          <Media
+            treatment="color-field"
+            style="--accent: var(--helia-product-accent)"
+          />
+        </CardMedia>
         <CardContent>An orange site.</CardContent>
       </Card>
     </div>
@@ -523,7 +493,13 @@ every card already reads it:
   </div>
   <div className="gallery-item">
     <div style="--helia-product-accent: var(--helia-accent-purple)">
-      <Card accent>
+      <Card>
+        <CardMedia>
+          <Media
+            treatment="color-field"
+            style="--accent: var(--helia-product-accent)"
+          />
+        </CardMedia>
         <CardContent>A purple site.</CardContent>
       </Card>
     </div>
