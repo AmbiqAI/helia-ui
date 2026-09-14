@@ -1,0 +1,153 @@
+---
+title: Web apps
+description: The templates/web-app starter for streaming demo applications, the responsiveness rules it encodes, and the Source interface a device driver implements.
+---
+
+import Callout from '@ambiqai/helia-ui/astro/Callout';
+
+Live WebUSB and Bluetooth demos, streaming dashboards and interactive tooling
+are React and TypeScript applications built with Vite, not Starlight sites. They
+consume `tokens.css`, `tailwind.css` and `react/*` so they look like the docs
+that link to them, and they live in their own repositories.
+
+`templates/web-app/` is the starter. It ships a working example: a top bar with
+a connection Badge and a theme toggle, a control Card with a source Select, a
+sample-rate Slider and a connect Button, a live Recharts trace fed at 50 to 250
+Hz, and a status footer with toasts.
+
+<Callout tone="note" title="The static-by-default rule does not apply here">
+  Docs and marketing pages ship no JavaScript, and that is a hard rule. An app's
+  bar is a different one: responsiveness under streaming. Trading a maintained
+  component for a smaller bundle is the wrong trade in this lane.
+</Callout>
+
+## Which template
+
+| The thing you are building                | Template                 |
+| ----------------------------------------- | ------------------------ |
+| Product documentation, reference, guides  | `templates/product-docs` |
+| Live hardware, streaming data, dashboards | `templates/web-app`      |
+
+Both are repo-only: neither is in the package's `files`, so neither is in the
+published tarball. Copy them out of `AmbiqAI/helia-ui`.
+
+## What the starter wires up
+
+- **Vite, React 19 and strict TypeScript.** `npm run check` is `tsc --noEmit`
+  and `npm run lint` is ESLint with the type-checked typescript-eslint rules
+  plus `eslint-plugin-react-hooks`.
+- **Tailwind v4 through `@tailwindcss/vite`**, with an entry that imports
+  `tokens.css`, `semantic.css` and `tailwind.css` in the order the Starlight
+  plugin uses, then Tailwind's Preflight, because an app has no docs shell to
+  inherit a baseline from.
+- **A theme toggle that owns `data-theme` on `<html>`.** Light, dark and system,
+  persisted, applied before first paint by a small script in `index.html`.
+- **A Pages deploy.** `vite.config.ts` reads `base` from `BASE_PATH`, and
+  `.github/workflows/deploy.yml` passes the repository name so a project site's
+  asset URLs carry the prefix.
+- **A Playwright smoke test** that loads the built app, starts the simulated
+  source, and asserts the chart receives data.
+
+<Callout tone="caution" title="Name each React component in the scan list">
+  Tailwind 4.3 applies its ignore rules to `@source` paths inside
+  `node_modules`. Both `.../react` and `.../react/*.tsx` silently match nothing,
+  so `text-foreground` and the rest are never emitted and the components render
+  with the inherited text colour — which looks like a broken dark mode rather
+  than a missing utility. One `@source` line per component file is the only form
+  that gets through.
+</Callout>
+
+## Outside Starlight
+
+A docs site gets a handful of variables from Starlight's own `props.css`. An app
+has no Starlight, so the template's entry supplies them: the two system font
+stacks and `--sl-color-text-invert`, restated at Starlight's values.
+
+`data-theme` matters for the same reason. The tokens flip under
+`:root[data-theme='light']` and the package's `dark:` variant keys on
+`[data-theme='dark']`, so an app that leaves the attribute unset gets the dark
+palette from the tokens while every `dark:` utility evaluates false. That is why
+the template resolves `system` to a concrete value rather than clearing the
+attribute.
+
+## The responsiveness rules
+
+A streaming app that ignores these feels broken on the machine the demo runs on,
+which is not the machine it was written on.
+
+1. **Generate and parse off the main thread.** The simulated signal runs in a
+   Web Worker, and a real driver's packet decode belongs there too. A sample
+   clock that shares the main thread drifts whenever React renders.
+2. **Transfer, do not copy.** The worker posts `Float32Array` chunks with the
+   buffer in the transfer list.
+3. **Chunks, never samples.** A per-sample callback puts one JavaScript call on
+   the main thread per sample, which is where the frame budget goes at the top
+   of the rate range.
+4. **Update state at display rate, not sample rate.** Chunks go straight into a
+   fixed ring buffer, which is not React state and triggers nothing. One
+   `requestAnimationFrame` publishes what is there. Everything that lands before
+   the frame fires is already in the buffer, so coalescing loses no samples —
+   only pictures nobody could have seen.
+5. **Decimate before the chart, not in it.** The buffer returns a fixed number
+   of points chosen against the trace's pixel width, so render cost stops being
+   a function of the sample rate.
+6. **No animation on a live series.** `isAnimationActive={false}`,
+   `dot={false}`, a fixed axis domain, a linear line type. Recharts will
+   otherwise restart an entry animation on every data change and never finish
+   one.
+
+The smoke test asserts the outcome rather than the mechanism: raising the source
+from 100 Hz to 250 Hz must multiply the samples received without moving the
+number of chart updates per second.
+
+## The Source interface
+
+One contract sits between the app shell and whatever produces samples. It is the
+interface a real device driver implements, not a simplification of one.
+
+```ts
+export interface Source {
+  readonly id: SourceId;
+  readonly label: string;
+
+  /** Synchronous feature detection. Never prompts, never touches the device. */
+  support(): SourceSupport;
+
+  /** Acquire the transport and start streaming. Rejects with a message fit for a toast. */
+  connect(sampleRate: number): Promise<void>;
+
+  /** Retune while connected. A control transfer or a GATT write on real hardware. */
+  setSampleRate(sampleRate: number): void;
+
+  /** Release the transport. Safe to call when already disconnected. */
+  disconnect(): Promise<void>;
+
+  /** Subscribe. Returns the unsubscribe function. */
+  onChunk(listener: (chunk: StreamChunk) => void): () => void;
+}
+```
+
+A chunk carries the samples and the rate they were produced at, and ownership
+passes to the listener — a transferable arriving from a worker is already
+detached on the producer's side.
+
+The template ships three implementations. `SimulatedSource` is complete and
+worker-backed. `WebUsbSource` and `BluetoothSource` are stubbed at exactly one
+point each: everything above it is real, including the filtered chooser, the
+interface claim or the GATT walk, and the teardown order. What is missing is the
+decode, because the packet layout belongs to the board's firmware. Fill in the
+read loop or the notification handler and nothing outside that file changes.
+
+`support()` returning a reason rather than a bare boolean is deliberate. WebUSB
+and Web Bluetooth are Chromium-only and secure-context-only, so "it did not
+connect" and "this browser cannot connect" are different states and the
+interface has to tell them apart. Both also gate the device chooser on a live
+user activation, which an `await` consumes, so `connect()` must be called
+directly from a click handler.
+
+## Claims
+
+Product status, support, maturity and performance statements are not authored in
+a demo app any more than in a docs site. They come from the approved export of
+the handbook's `portfolio.yaml`. The sample copy in the template is shape, not
+copy.

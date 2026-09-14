@@ -42,6 +42,10 @@ const ASTRO_LANE = [
   'layout',
 ];
 
+/* Prose about the starters. They document an app lane that does hydrate, but
+ * these pages are docs and must not. */
+const TEMPLATE_LANE = ['templates/docs-sites', 'templates/web-apps'];
+
 const REACT_LANE = [
   'react/inputs',
   'react/form-depth',
@@ -60,7 +64,7 @@ if (!existsSync(dist)) {
 
 const ISLAND = /<astro-island\b/;
 
-for (const route of [...ASTRO_LANE, ...REACT_LANE]) {
+for (const route of [...ASTRO_LANE, ...TEMPLATE_LANE, ...REACT_LANE]) {
   const path = join(dist, route, 'index.html');
   if (!existsSync(path)) {
     failures.push(`/${route} was not emitted (${path} is missing).`);
@@ -92,5 +96,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `assert: ${ASTRO_LANE.length + REACT_LANE.length} routes emitted, React confined to ${REACT_LANE.length}.`,
+  `assert: ${ASTRO_LANE.length + TEMPLATE_LANE.length + REACT_LANE.length} routes emitted, React confined to ${REACT_LANE.length}.`,
 );

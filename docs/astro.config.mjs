@@ -80,6 +80,14 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Templates',
+          collapsed: false,
+          items: [
+            { label: 'Docs sites', slug: 'templates/docs-sites' },
+            { label: 'Web apps', slug: 'templates/web-apps' },
+          ],
+        },
+        {
           label: 'React components',
           collapsed: false,
           items: [

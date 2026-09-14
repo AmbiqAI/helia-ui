@@ -23,6 +23,8 @@ const routes = [
   { path: `${base}/disclosure/`, heading: 'Disclosure' },
   { path: `${base}/timeline/`, heading: 'Timeline' },
   { path: `${base}/layout/`, heading: 'Layout' },
+  { path: `${base}/templates/docs-sites/`, heading: 'Docs sites' },
+  { path: `${base}/templates/web-apps/`, heading: 'Web apps' },
   { path: `${base}/react/inputs/`, heading: 'Inputs' },
   { path: `${base}/react/form-depth/`, heading: 'Form depth' },
   { path: `${base}/react/overlays/`, heading: 'Overlays' },

@@ -1,0 +1,30 @@
+---
+title: Docs sites
+description: The templates/product-docs starter for a HELIA product documentation site.
+---
+
+`templates/product-docs/` is a minimal Starlight site already wired to the
+package. Copy it into a product repository as `docs/`, change the placeholders,
+and delete its README.
+
+It wires up the `heliaStarlight()` plugin — the package stylesheets in the right
+order, plus the shared footer, theme menu and mobile menu — Tailwind v4 through
+a site-owned entry that holds the scan list, KaTeX through `remark-math` and
+`rehype-katex`, and `@astrojs/react` for the pages that need an island. Nothing
+hydrates until one does.
+
+Four placeholders: the package name, the `site` and `base` in
+`astro.config.mjs`, `--helia-product-accent` in `src/styles/site.css`, and all
+of `src/content/docs/**`. The sample pages are shape, not copy.
+
+`base` is the repository name with a leading slash, and every link in the
+content is written relative so it follows `base` without repeating it. A
+root-relative link (`/install/`) will 404 in production; a relative one
+(`install/`) will not.
+
+This template is repo-only: it is not listed in the package's `files`, so it is
+not in the published tarball. Copy it out of `AmbiqAI/helia-ui`. Its own README
+carries the full instructions.
+
+Building something that streams from hardware rather than something that
+documents it? Use [the web app template](/helia-ui/templates/web-apps/) instead.

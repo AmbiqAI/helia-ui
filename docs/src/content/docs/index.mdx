@@ -109,6 +109,21 @@ one spacing and colour scale. `@theme inline` keeps a generated utility
 referencing the token directly rather than a value snapshotted at `:root`,
 which is what lets utilities follow the theme toggle.
 
+## Templates
+
+Two starters ship in the repository rather than in the published tarball, so a
+new surface begins wired up rather than assembled by hand.
+
+[**Docs sites**](/helia-ui/templates/docs-sites/) (`templates/product-docs`) is
+a Starlight site with the plugin, the Tailwind entry and KaTeX already in place.
+
+[**Web apps**](/helia-ui/templates/web-apps/) (`templates/web-app`) is a Vite,
+React and TypeScript application for live hardware and streaming data: a worker
+that produces samples, a ring buffer that publishes one frame at a time, a
+Recharts trace, and the `Source` interface a device driver implements. Docs and
+marketing pages ship no JavaScript; an app's bar is responsiveness under
+streaming instead.
+
 ## The component contract
 
 Every part in `./astro/*` holds to four rules. They are what makes the package
