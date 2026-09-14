@@ -11,7 +11,7 @@
     "npm": ">=10"
   },
   "scripts": {
-    "validate": "npm run format:check && npm run check:spdx && npm run check:notices && npm run check:styles && npm run check:boundaries && npm run check:islands && npm run check:astro-props && npm run check:site-theme",
+    "validate": "npm run format:check && npm run check:spdx && npm run check:notices && npm run check:styles && npm run check:boundaries && npm run check:islands && npm run check:astro-props && npm run check:site-theme && npm run check:foundations",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check:spdx": "node scripts/check-spdx.mjs",
@@ -22,6 +22,7 @@
     "check:islands": "node scripts/check-islands.mjs",
     "check:astro-props": "node scripts/astro-props.mjs --check",
     "check:site-theme": "node scripts/site-theme-doc.mjs --check",
+    "check:foundations": "node scripts/foundations-doc.mjs --check",
     "docs:dev": "npm --prefix docs run dev",
     "docs:build": "npm --prefix docs run build",
     "docs:test": "npm --prefix docs run test",

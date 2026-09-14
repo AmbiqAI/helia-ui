@@ -84,6 +84,7 @@ export default defineConfig({
           collapsed: false,
           items: [
             { label: 'Tokens and scales', slug: 'foundations' },
+            { label: 'Colour tokens', slug: 'foundations/tokens' },
             { label: 'Site theme', slug: 'foundations/site-theme' },
             {
               label: 'Typeface candidates',

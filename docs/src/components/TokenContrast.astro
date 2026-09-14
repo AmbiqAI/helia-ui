@@ -1,0 +1,131 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * Each ink drawn on each ground at the colours both themes resolve to, beside
+ * the ratio those two values compute to. The sample is painted from the
+ * literals rather than from `var()`, so a row shows the off-theme pairing as
+ * well as the one the reader is in.
+ *
+ * Documentation furniture, not a part: `scripts/foundations-doc.mjs` supplies
+ * the values and computes the ratios.
+ */
+interface Cell {
+  /** Which theme resolved the pair. */
+  theme: string;
+  /** The surface token the ink is drawn on. */
+  surface: string;
+  /** The resolved ink value. */
+  ink: string;
+  /** The resolved surface value. */
+  background: string;
+  /** Contrast of the two, to two decimals. */
+  ratio: number;
+  /** Whether the ratio clears WCAG AA for body text. */
+  passes: boolean;
+}
+
+interface Props {
+  rows: { name: string; cells: Cell[] }[];
+}
+
+const { rows } = Astro.props;
+
+const label = (cell: Cell) =>
+  `${cell.surface.replace('--helia-surface-', '')} · ${cell.theme}`;
+const columns = rows[0]?.cells.map(label) ?? [];
+---
+
+<div class="contrast-frame not-content">
+  <table class="contrast">
+    <thead>
+      <tr>
+        <th scope="col">Ink</th>
+        {columns.map((column) => <th scope="col">{column}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((row) => (
+          <tr data-contrast-row={row.name}>
+            <th scope="row">
+              <code>{row.name}</code>
+            </th>
+            {row.cells.map((cell) => (
+              <td>
+                <span
+                  class="contrast__sample"
+                  style={`background: ${cell.background}; color: ${cell.ink}`}
+                >
+                  Aa
+                </span>
+                <span class="contrast__ratio">
+                  {cell.ratio.toFixed(2)}
+                  {cell.passes ? <b>AA</b> : null}
+                </span>
+              </td>
+            ))}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  /* The table is wider than the reading column on a phone, and a ratio is only
+     a ratio next to its sample, so the frame scrolls rather than wrapping. */
+  .contrast-frame {
+    margin-top: var(--helia-space-4);
+    overflow-x: auto;
+  }
+
+  .contrast {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    border-bottom: 1px solid var(--sl-color-gray-5);
+    padding: var(--helia-space-2) var(--helia-space-3);
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  thead th {
+    color: var(--helia-ink-muted);
+    font-size: var(--helia-text-label);
+    font-weight: var(--helia-weight-semibold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  tbody th {
+    font-weight: var(--helia-weight-regular);
+  }
+
+  code {
+    font-size: var(--helia-text-caption);
+  }
+
+  .contrast__sample {
+    border-radius: var(--helia-radius-xs);
+    display: inline-block;
+    font-size: var(--helia-text-caption);
+    font-weight: var(--helia-weight-semibold);
+    margin-right: var(--helia-space-2);
+    padding: var(--helia-space-px) var(--helia-space-2);
+  }
+
+  .contrast__ratio {
+    color: var(--helia-ink-secondary);
+    font-family: var(--helia-font-mono);
+    font-size: var(--helia-text-label);
+  }
+
+  .contrast__ratio b {
+    color: var(--helia-tone-success-ink);
+    margin-left: var(--helia-space-1);
+  }
+</style>

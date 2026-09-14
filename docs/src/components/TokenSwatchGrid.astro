@@ -1,0 +1,117 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A colour token shown as the pair of values it has: one chip per theme, so
+ * both are readable at once rather than one of them being whatever the reader
+ * happens to have selected.
+ *
+ * The chips are painted from the resolved literal rather than from `var()`,
+ * which is what makes the off-theme half visible. Documentation furniture, not
+ * a part: `scripts/foundations-doc.mjs` supplies the values.
+ */
+interface Token {
+  /** The custom property, as declared. */
+  name: string;
+  /** The value the light theme resolves it to. */
+  light: string;
+  /** The value the dark theme resolves it to. */
+  dark: string;
+  /** Which token file declares it, so the layer is visible on the card. */
+  file: string;
+}
+
+interface Props {
+  /** Names the grid for the page's own tests and anchors. */
+  group: string;
+  tokens: Token[];
+}
+
+const { group, tokens } = Astro.props;
+---
+
+<div class="token-grid not-content" data-token-group={group}>
+  {
+    tokens.map((token) => (
+      <figure class="token-card" data-token-swatch={token.name}>
+        <div class="token-card__chips">
+          <span class="token-card__chip" style={`background: ${token.light}`} />
+          <span class="token-card__chip" style={`background: ${token.dark}`} />
+        </div>
+        <figcaption>
+          <code>{token.name}</code>
+          <span class="token-card__values">
+            <span>
+              <abbr title="Light theme">L</abbr> {token.light}
+            </span>
+            <span>
+              <abbr title="Dark theme">D</abbr> {token.dark}
+            </span>
+          </span>
+          <span class="token-card__file">{token.file}</span>
+        </figcaption>
+      </figure>
+    ))
+  }
+</div>
+
+<style>
+  .token-grid {
+    display: grid;
+    gap: var(--helia-space-3);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+    margin-top: var(--helia-space-4);
+  }
+
+  .token-card {
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: var(--helia-radius-md);
+    margin: 0;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  /* The pair reads as one block of colour split down the middle, which is why
+     the chips carry no gap and no rim of their own. */
+  .token-card__chips {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 3.75rem;
+  }
+
+  .token-card__chip {
+    display: block;
+    height: 100%;
+  }
+
+  figcaption {
+    display: grid;
+    gap: var(--helia-space-1);
+    padding: var(--helia-space-3);
+  }
+
+  code {
+    font-size: var(--helia-text-caption);
+    overflow-wrap: anywhere;
+  }
+
+  .token-card__values {
+    color: var(--helia-ink-secondary);
+    display: flex;
+    flex-wrap: wrap;
+    font-family: var(--helia-font-mono);
+    font-size: var(--helia-text-label);
+    gap: var(--helia-space-1) var(--helia-space-3);
+    overflow-wrap: anywhere;
+  }
+
+  abbr {
+    color: var(--helia-ink-muted);
+    text-decoration: none;
+  }
+
+  .token-card__file {
+    color: var(--helia-ink-muted);
+    font-size: var(--helia-text-label);
+  }
+</style>

@@ -1,0 +1,198 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * The type scale rendered by being used: every named size, weight, leading,
+ * and tracking step drawn at the value it names, beside what it is for.
+ *
+ * Documentation furniture, not a part. The specimens read the tokens through
+ * `var()`, so a step that moves in `semantic.css` moves here.
+ */
+const sizes = [
+  { token: '--helia-text-meta', role: 'Dense metadata and counters' },
+  { token: '--helia-text-label', role: 'Uppercase labels' },
+  { token: '--helia-text-caption', role: 'Captions, chips, table cells' },
+  { token: '--helia-text-small', role: 'Supporting text' },
+  { token: '--helia-text-body', role: 'Body copy' },
+  { token: '--helia-text-card-title', role: 'Card titles' },
+  { token: '--helia-text-lead', role: 'Lead paragraphs' },
+  { token: '--helia-text-subhead', role: 'Subheads' },
+  { token: '--helia-text-heading', role: 'Component headings' },
+  { token: '--helia-text-section', role: 'Section titles' },
+  { token: '--helia-text-page', role: 'Page titles' },
+  { token: '--helia-text-display', role: 'Display type' },
+  { token: '--helia-text-hero', role: 'Home hero' },
+];
+
+const weights = [
+  { token: '--helia-weight-regular', role: 'Body and long-form copy' },
+  { token: '--helia-weight-medium', role: 'Labels and dense metadata' },
+  { token: '--helia-weight-semibold', role: 'Titles and headings' },
+  { token: '--helia-weight-strong', role: 'Emphasis inside a title' },
+  { token: '--helia-weight-bold', role: 'Uppercase eyebrows' },
+];
+
+const leadings = [
+  { token: '--helia-leading-tight', role: 'Display and hero type' },
+  { token: '--helia-leading-heading', role: 'Headings over one line' },
+  { token: '--helia-leading-body', role: 'Paragraphs' },
+];
+
+const trackings = [
+  { token: '--helia-tracking-display', role: 'Display and hero' },
+  { token: '--helia-tracking-page', role: 'Page titles' },
+  { token: '--helia-tracking-section', role: 'Section titles' },
+  { token: '--helia-tracking-heading', role: 'Component headings' },
+];
+
+const specimen = 'Intelligence at the edge';
+const paragraph =
+  'A model reaches the board through a runtime, a compiler, and a profile of what it costs there.';
+---
+
+<div class="ramp not-content" data-type-ramp>
+  <section class="ramp__group" aria-label="Type sizes">
+    {
+      sizes.map((size) => (
+        <div class="ramp__row" data-type-size={size.token}>
+          <div class="ramp__meta">
+            <code>{size.token}</code>
+            <span>{size.role}</span>
+          </div>
+          <p class="ramp__specimen" style={`font-size: var(${size.token})`}>
+            {specimen}
+          </p>
+        </div>
+      ))
+    }
+  </section>
+
+  <section class="ramp__group" aria-label="Type weights">
+    {
+      weights.map((weight) => (
+        <div class="ramp__row" data-type-weight={weight.token}>
+          <div class="ramp__meta">
+            <code>{weight.token}</code>
+            <span>{weight.role}</span>
+          </div>
+          <p class="ramp__weight" style={`font-weight: var(${weight.token})`}>
+            {specimen}
+          </p>
+        </div>
+      ))
+    }
+  </section>
+
+  <section class="ramp__group" aria-label="Leading">
+    {
+      leadings.map((leading) => (
+        <div class="ramp__row" data-type-leading={leading.token}>
+          <div class="ramp__meta">
+            <code>{leading.token}</code>
+            <span>{leading.role}</span>
+          </div>
+          <p
+            class="ramp__paragraph"
+            style={`line-height: var(${leading.token})`}
+          >
+            {paragraph}
+          </p>
+        </div>
+      ))
+    }
+  </section>
+
+  <section class="ramp__group" aria-label="Tracking">
+    {
+      trackings.map((tracking) => (
+        <div class="ramp__row" data-type-tracking={tracking.token}>
+          <div class="ramp__meta">
+            <code>{tracking.token}</code>
+            <span>{tracking.role}</span>
+          </div>
+          <p
+            class="ramp__tracking"
+            style={`letter-spacing: var(${tracking.token})`}
+          >
+            {specimen}
+          </p>
+        </div>
+      ))
+    }
+  </section>
+</div>
+
+<style>
+  .ramp {
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: var(--helia-radius-md);
+    margin-top: var(--helia-space-4);
+    overflow: hidden;
+  }
+
+  .ramp__group + .ramp__group {
+    border-top: 1px solid var(--sl-color-gray-5);
+  }
+
+  .ramp__row {
+    align-items: baseline;
+    display: grid;
+    gap: var(--helia-space-4);
+    grid-template-columns: minmax(9rem, 0.3fr) minmax(0, 1fr);
+    padding: var(--helia-space-3) var(--helia-space-4);
+  }
+
+  .ramp__row + .ramp__row {
+    border-top: 1px solid var(--sl-color-gray-6);
+  }
+
+  .ramp__meta {
+    display: grid;
+    gap: var(--helia-space-px);
+    min-width: 0;
+  }
+
+  .ramp__meta code {
+    font-size: var(--helia-text-label);
+    overflow-wrap: anywhere;
+  }
+
+  .ramp__meta span {
+    color: var(--helia-ink-muted);
+    font-size: var(--helia-text-label);
+  }
+
+  .ramp p {
+    color: var(--helia-ink-primary);
+    margin: 0;
+    min-width: 0;
+  }
+
+  /* The size row is the one place the specimen may run past the column: a hero
+     step drawn at its own size is the point of the row. */
+  .ramp__specimen {
+    font-weight: var(--helia-weight-semibold);
+    letter-spacing: var(--helia-tracking-heading);
+    line-height: var(--helia-leading-tight);
+    overflow-wrap: anywhere;
+  }
+
+  .ramp__weight,
+  .ramp__tracking {
+    font-size: var(--helia-text-subhead);
+  }
+
+  .ramp__paragraph {
+    color: var(--helia-ink-secondary);
+    font-size: var(--helia-text-body);
+    max-width: 34rem;
+  }
+
+  @media (width < 42rem) {
+    .ramp__row {
+      align-items: start;
+      gap: var(--helia-space-2);
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

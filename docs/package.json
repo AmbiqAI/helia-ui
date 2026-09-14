@@ -13,7 +13,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "prebuild": "node ../scripts/astro-props.mjs && node ../scripts/site-theme-doc.mjs",
+    "prebuild": "node ../scripts/astro-props.mjs && node ../scripts/site-theme-doc.mjs && node ../scripts/foundations-doc.mjs",
     "build": "astro build && npm run assert",
     "preview": "astro preview",
     "check": "astro check",

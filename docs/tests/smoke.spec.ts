@@ -10,6 +10,7 @@ const base = '/helia-ui';
 const routes = [
   { path: `${base}/`, heading: 'helia-ui' },
   { path: `${base}/foundations/`, heading: 'Foundations' },
+  { path: `${base}/foundations/tokens/`, heading: 'Colour tokens' },
   { path: `${base}/foundations/site-theme/`, heading: 'Site theme' },
   {
     path: `${base}/foundations/typeface-candidates/`,
@@ -229,6 +230,46 @@ test('a card overline stays out of the title', async ({ page }) => {
   expect(overlineBox!.y + overlineBox!.height).toBeLessThanOrEqual(
     headingBox!.y + 1,
   );
+});
+
+/*
+ * The two halves of the token tour, asserted where each one is generated or
+ * drawn. The colour grid is written from `tokens.css`, so the primitive count
+ * is the proof that the generator read the file rather than an empty list; the
+ * ramp is the proof that every named size has a specimen, which is the one
+ * thing a reader cannot check by eye against a table.
+ */
+test('the token pages render every primitive and every type step', async ({
+  page,
+}) => {
+  await page.goto(`${base}/foundations/tokens/`);
+
+  const primitives = page.locator(
+    '[data-token-group="primitives"] [data-token-swatch]',
+  );
+  expect(await primitives.count()).toBeGreaterThanOrEqual(9);
+
+  /* A ratio with no sample beside it is a number nobody can judge. */
+  await expect(page.locator('[data-contrast-row]').first()).toBeVisible();
+
+  await page.goto(`${base}/foundations/`);
+
+  const sizes = page.locator('[data-type-ramp] [data-type-size]');
+  await expect(sizes).toHaveCount(13);
+
+  const named = await sizes.evaluateAll((nodes) =>
+    nodes.map((node) => node.getAttribute('data-type-size')),
+  );
+  const drawn = await sizes.evaluateAll((nodes) =>
+    nodes.map((node) =>
+      parseFloat(getComputedStyle(node.querySelector('p') as Element).fontSize),
+    ),
+  );
+
+  /* Every step resolves to a size of its own, in order, so a token that stopped
+     reaching the page shows as a duplicate rather than as a missing row. */
+  expect(new Set(named).size).toBe(named.length);
+  expect(drawn).toEqual([...drawn].sort((a, b) => a - b));
 });
 
 /* The comparison is only a comparison if every candidate is on the page: a

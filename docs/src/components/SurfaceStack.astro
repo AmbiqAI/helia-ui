@@ -1,0 +1,108 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * The two ways a panel separates from what is behind it: the surface tone it
+ * is filled with, and the elevation step it casts.
+ *
+ * Documentation furniture, not a part. Each panel reads its tokens through
+ * `var()`, so both sets follow the theme the reader is in.
+ */
+const surfaces = [
+  { token: '--helia-surface-canvas', role: 'The page behind everything' },
+  { token: '--helia-surface-paper', role: 'A section band on the canvas' },
+  { token: '--helia-surface-card', role: 'A card, a panel, a callout' },
+  { token: '--helia-surface-card-muted', role: 'A card at rest under hover' },
+];
+
+const elevations = [
+  { token: '--helia-shadow-1', role: 'A card sitting on the page' },
+  { token: '--helia-shadow-2', role: 'A card under the pointer' },
+  { token: '--helia-shadow-3', role: 'A menu or dialog over the page' },
+];
+---
+
+<div class="tones not-content">
+  <div class="tones__row" data-surface-tones>
+    {
+      surfaces.map((surface) => (
+        <figure class="tone" data-surface-tone={surface.token}>
+          <div
+            class="tone__panel"
+            style={`background: var(${surface.token})`}
+          />
+          <figcaption>
+            <code>{surface.token}</code>
+            <span>{surface.role}</span>
+          </figcaption>
+        </figure>
+      ))
+    }
+  </div>
+
+  <div class="tones__row" data-elevation-steps>
+    {
+      elevations.map((elevation) => (
+        <figure class="tone" data-elevation-step={elevation.token}>
+          <div
+            class="tone__panel tone__panel--raised"
+            style={`box-shadow: var(${elevation.token})`}
+          />
+          <figcaption>
+            <code>{elevation.token}</code>
+            <span>{elevation.role}</span>
+          </figcaption>
+        </figure>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .tones {
+    display: grid;
+    gap: var(--helia-space-5);
+    margin-top: var(--helia-space-4);
+  }
+
+  .tones__row {
+    display: grid;
+    gap: var(--helia-space-3);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  }
+
+  .tone {
+    margin: 0;
+    min-width: 0;
+  }
+
+  .tone__panel {
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: var(--helia-radius-md);
+    height: 5rem;
+  }
+
+  /* The shadow row draws on the card tone so the step is read as depth rather
+     than as a second fill. The gap above it leaves the cast room to land. */
+  .tone__panel--raised {
+    background: var(--helia-surface-card);
+    margin: var(--helia-space-2);
+  }
+
+  figcaption {
+    display: grid;
+    gap: var(--helia-space-px);
+    margin-top: var(--helia-space-2);
+    min-width: 0;
+  }
+
+  code {
+    font-size: var(--helia-text-label);
+    overflow-wrap: anywhere;
+  }
+
+  figcaption span {
+    color: var(--helia-ink-muted);
+    font-size: var(--helia-text-label);
+  }
+</style>

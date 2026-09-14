@@ -1,0 +1,122 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * The motion tokens shown moving: a card that lifts under the pointer over the
+ * fast step, and a section that rises into place over the base step.
+ *
+ * Documentation furniture, not a part. Both examples run the recipes a page
+ * uses, so a visitor who asks for reduced motion sees the same nothing here as
+ * everywhere else.
+ */
+import Reveal from '@ambiqai/helia-ui/astro/Reveal';
+import RevealReplay from './RevealReplay.astro';
+
+const tokens = [
+  { token: '--helia-motion-fast', role: 'Hover, focus, and press feedback' },
+  { token: '--helia-motion-base', role: 'Entry and exit of a block' },
+  { token: '--helia-motion-slow', role: 'A whole section arriving' },
+  { token: '--helia-ease-out', role: 'The one easing curve' },
+  { token: '--helia-motion-lift-distance', role: 'How far a card lifts' },
+  { token: '--helia-motion-cue-distance', role: 'How far a cue nudges' },
+  { token: '--helia-motion-reveal-distance', role: 'How far an entry rises' },
+  { token: '--helia-motion-scale', role: "The site's tempo dial" },
+  { token: '--helia-motion-enabled', role: "The visitor's half of it" },
+];
+---
+
+<div class="motion not-content">
+  <ul class="motion__tokens">
+    {
+      tokens.map((entry) => (
+        <li data-motion-token={entry.token}>
+          <code>{entry.token}</code>
+          <span>{entry.role}</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="motion__stage">
+    <div
+      class="helia-surface helia-surface--pad-4 helia-motion-lift motion__card"
+      tabindex="0"
+      data-motion-lift
+    >
+      <strong>Hover or focus this card</strong>
+      <span>
+        It lifts by <code>--helia-motion-lift-distance</code> over
+        <code>--helia-motion-fast</code>.
+      </span>
+    </div>
+
+    <Reveal threshold={0.2}>
+      <div
+        class="helia-surface helia-surface--pad-4 motion__card"
+        data-motion-reveal
+      >
+        <strong>This block rises into view</strong>
+        <span>
+          It travels <code>--helia-motion-reveal-distance</code> over
+          <code>--helia-motion-base</code>. Replay it below.
+        </span>
+      </div>
+    </Reveal>
+  </div>
+
+  <RevealReplay />
+</div>
+
+<style>
+  .motion {
+    display: grid;
+    gap: var(--helia-space-4);
+    margin-top: var(--helia-space-4);
+  }
+
+  .motion__tokens {
+    display: grid;
+    gap: var(--helia-space-2);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .motion__tokens li {
+    display: grid;
+    gap: var(--helia-space-px);
+    min-width: 0;
+  }
+
+  .motion__tokens code {
+    font-size: var(--helia-text-caption);
+    overflow-wrap: anywhere;
+  }
+
+  .motion__tokens span {
+    color: var(--helia-ink-muted);
+    font-size: var(--helia-text-label);
+  }
+
+  .motion__stage {
+    display: grid;
+    gap: var(--helia-space-3);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  }
+
+  .motion__card {
+    display: grid;
+    gap: var(--helia-space-2);
+  }
+
+  .motion__card strong {
+    font-size: var(--helia-text-card-title);
+    font-weight: var(--helia-weight-semibold);
+  }
+
+  .motion__card span {
+    color: var(--helia-ink-secondary);
+    font-size: var(--helia-text-small);
+  }
+</style>

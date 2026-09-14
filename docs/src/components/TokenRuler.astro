@@ -1,0 +1,106 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A measure scale drawn at the measure it names: a bar as wide as a spacing
+ * step, a corner as round as a radius step, a box as tall as a control step.
+ *
+ * Documentation furniture, not a part. Each step reads its token through
+ * `var()`, so the drawing is the value rather than a picture of it.
+ */
+interface Props {
+  /** Which measure the steps are, which decides what is drawn. */
+  kind: 'space' | 'radius' | 'control';
+  /** The tokens of the scale, in scale order. */
+  tokens: string[];
+}
+
+const { kind, tokens } = Astro.props;
+---
+
+<div class={`ruler ruler--${kind} not-content`} data-ruler={kind}>
+  {
+    tokens.map((token) => (
+      <div class="ruler__step" data-ruler-step={token}>
+        <code>{token}</code>
+        {kind === 'space' && (
+          <span class="ruler__bar" style={`width: var(${token})`} />
+        )}
+        {kind === 'radius' && (
+          <span class="ruler__corner" style={`border-radius: var(${token})`} />
+        )}
+        {kind === 'control' && (
+          <span class="ruler__control" style={`height: var(${token})`}>
+            Button
+          </span>
+        )}
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .ruler {
+    display: grid;
+    gap: var(--helia-space-2);
+    margin-top: var(--helia-space-4);
+  }
+
+  .ruler__step {
+    align-items: center;
+    display: grid;
+    gap: var(--helia-space-3);
+    grid-template-columns: 13rem 1fr;
+  }
+
+  code {
+    font-size: var(--helia-text-caption);
+    overflow-wrap: anywhere;
+  }
+
+  .ruler__bar {
+    background: var(--sl-color-accent);
+    border-radius: var(--helia-radius-xs);
+    display: block;
+    height: var(--helia-space-3);
+    min-width: 1px;
+  }
+
+  .ruler--radius,
+  .ruler--control {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  }
+
+  .ruler--radius .ruler__step,
+  .ruler--control .ruler__step {
+    gap: var(--helia-space-2);
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .ruler__corner {
+    background: var(--helia-surface-card-muted);
+    border: 1px solid var(--sl-color-gray-5);
+    display: block;
+    height: 4rem;
+    width: 100%;
+  }
+
+  .ruler__control {
+    align-items: center;
+    background: var(--helia-surface-card-muted);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: var(--helia-radius-md);
+    color: var(--helia-ink-secondary);
+    display: inline-flex;
+    font-size: var(--helia-text-small);
+    padding-inline: var(--helia-space-4);
+  }
+
+  @media (width < 42rem) {
+    .ruler__step {
+      gap: var(--helia-space-1);
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
