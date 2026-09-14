@@ -7,13 +7,31 @@ required facts in the package root next to LICENSE and NOTICE.
 | Field             | Value                                                                       |
 | ----------------- | --------------------------------------------------------------------------- |
 | Package           | `@ambiqai/helia-ui`                                                         |
-| Version           | 0.1.0-alpha.3                                                               |
-| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.3`.         |
+| Version           | 0.1.0-alpha.4                                                               |
+| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.4`.         |
 | License           | BSD-3-Clause (`LICENSE`)                                                    |
 | Licensing tier    | Tier 1, ADR-0005                                                            |
 | Source repository | https://github.com/AmbiqAI/helia-ui                                         |
 | Source path       | Repository root, mirrored from `packages/helia-ui` in `helia-developer-hub` |
 | Source commit     | Recorded at tag time.                                                       |
+
+## What changed in 0.1.0-alpha.4
+
+- `helia-ui-mkdocs-convert`, a second bin beside `helia-ui-pyref`. It is the
+  mechanical MkDocs Material to Starlight MDX conversion — admonitions and
+  collapsible admonitions to asides, content tabs to `Tabs`/`TabItem`,
+  `:material-*:` shortcodes to `Icon`, Termynal blocks to `AsciiTerminal`,
+  relative links to route form — written once for heliaAOT and now shared, so
+  the next product's docs migration is a command rather than a rewrite. What it
+  cannot do mechanically it reports: raw HTML, charts, and any icon name with
+  no Font Awesome equivalent, which becomes a visible marker instead of a
+  guess. `--sidebar` writes the MkDocs nav as a Starlight sidebar fragment.
+- The Material icon table moved out of the script to
+  `scripts/lib/material-icons.json`, and `--icons` merges a product's own names
+  over it.
+- The product-docs template gains route tests: a Playwright config, a
+  dependency-free static server for the built site, and a spec that reads the
+  sidebar fragment and asserts every nav route serves 200.
 
 ## What changed in 0.1.0-alpha.3
 

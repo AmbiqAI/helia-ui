@@ -30,8 +30,8 @@ git tag in the package's own repository, whose root is the package:
 ```jsonc
 {
   "dependencies": {
-    // Replace with "^0.1.0-alpha.3" once the package is on npm.
-    "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v0.1.0-alpha.3",
+    // Replace with "^0.1.0-alpha.4" once the package is on npm.
+    "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v0.1.0-alpha.4",
   },
 }
 ```
@@ -58,12 +58,14 @@ npm ci
 
 ## Change the placeholders
 
-| Where                 | What                                                                |
-| --------------------- | ------------------------------------------------------------------- |
-| `package.json`        | `name`                                                              |
-| `astro.config.mjs`    | `site`, `base`, `title`, `description`, the footer and social links |
-| `src/styles/site.css` | `--helia-product-accent`, the one value this site owns              |
-| `src/content/docs/**` | All of it. The sample pages are shape, not copy.                    |
+| Where                  | What                                                                |
+| ---------------------- | ------------------------------------------------------------------- |
+| `package.json`         | `name`                                                              |
+| `astro.config.mjs`     | `site`, `base`, `title`, `description`, the footer and social links |
+| `playwright.config.ts` | `base`, to match `astro.config.mjs`                                 |
+| `tests/routes.spec.ts` | `BASE`, to match `astro.config.mjs`                                 |
+| `src/styles/site.css`  | `--helia-product-accent`, the one value this site owns              |
+| `src/content/docs/**`  | All of it. The sample pages are shape, not copy.                    |
 
 `base` is the repository name with a leading slash, and every link in the
 content is written relative so it follows `base` without repeating it. A
@@ -84,6 +86,41 @@ root-relative link (`/install/`) will 404 in production; a relative one
   does not take plugins.
 - `@astrojs/react`, for pages that need an island. Nothing hydrates until one
   does.
+
+## Bringing MkDocs content across
+
+`helia-ui-mkdocs-convert` does the mechanical part — admonitions, content tabs,
+`:material-*:` icons, Termynal blocks, relative links, front matter — and prints
+what needs a human:
+
+```sh
+npx helia-ui-mkdocs-convert --docs ../docs --out src/content/docs \
+  --base /PRODUCT-REPO-NAME --public public \
+  --sidebar src/generated/docs-sidebar.json
+```
+
+Spread the sidebar fragment into `sidebar` in `astro.config.mjs`. The options,
+the full list of rewrites and the hand-pass list are in the package's
+["Migrating from MkDocs"](https://ambiqai.github.io/helia-ui/migrating-from-mkdocs/)
+guide.
+
+## Route tests
+
+`npm test` runs Playwright against the built site: `tests/routes.spec.ts` reads
+the sidebar fragment above and asserts every nav route returns 200, falling
+back to this template's own pages until there is a fragment.
+
+Build first — the test server serves `dist/` and will not build for you:
+
+```sh
+npm run build
+npm test
+```
+
+`scripts/serve-dist.mjs` is that server: dependency-free, and used instead of
+`astro preview` because preview can detach from the test runner and fail the
+suite before any test reports. The browser is Playwright's headless shell, so
+CI needs `npx playwright install chromium-headless-shell` once.
 
 ## Claims
 
