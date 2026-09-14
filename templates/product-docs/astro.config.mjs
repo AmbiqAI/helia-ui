@@ -7,6 +7,7 @@ import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import rehypeMermaid from 'rehype-mermaid';
 import { heliaStarlight } from '@ambiqai/helia-ui/starlight';
 
 /*
@@ -30,7 +31,15 @@ export default defineConfig({
    */
   markdown: {
     remarkPlugins: [remarkMath],
-    rehypePlugins: [rehypeKatex],
+    /*
+     * `rehype-mermaid` turns a ```mermaid fence into an inline SVG at build, so
+     * a diagram costs no client JS and is in the HTML before any script runs.
+     * It renders in Chromium: CI gets one from Playwright, a local build reads
+     * PLAYWRIGHT_BROWSERS_PATH, and a missing browser fails the build rather
+     * than deploying an empty figure. Drop this entry and the mermaid.css line
+     * below together if the site has no diagrams.
+     */
+    rehypePlugins: [rehypeKatex, [rehypeMermaid, { strategy: 'inline-svg' }]],
   },
   integrations: [
     starlight({
@@ -44,6 +53,7 @@ export default defineConfig({
       customCss: [
         './src/styles/tailwind.css',
         'katex/dist/katex.min.css',
+        '@ambiqai/helia-ui/mermaid.css',
         './src/styles/site.css',
       ],
       plugins: [

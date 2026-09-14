@@ -1,6 +1,6 @@
 {
   "name": "@ambiqai/helia-ui",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "description": "Shared HELIA design tokens and Starlight theme styling",
   "license": "BSD-3-Clause",
   "private": true,
@@ -36,6 +36,7 @@
     "./semantic.css": "./semantic.css",
     "./recipes.css": "./recipes.css",
     "./starlight.css": "./starlight.css",
+    "./mermaid.css": "./mermaid.css",
     "./tailwind.css": "./tailwind.css",
     "./starlight-tailwind.css": "./starlight-tailwind.css",
     "./shadcn.css": "./shadcn.css"

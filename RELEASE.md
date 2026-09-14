@@ -7,13 +7,27 @@ required facts in the package root next to LICENSE and NOTICE.
 | Field             | Value                                                                       |
 | ----------------- | --------------------------------------------------------------------------- |
 | Package           | `@ambiqai/helia-ui`                                                         |
-| Version           | 0.1.0-alpha.2                                                               |
-| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.2`.         |
+| Version           | 0.1.0-alpha.3                                                               |
+| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.3`.         |
 | License           | BSD-3-Clause (`LICENSE`)                                                    |
 | Licensing tier    | Tier 1, ADR-0005                                                            |
 | Source repository | https://github.com/AmbiqAI/helia-ui                                         |
 | Source path       | Repository root, mirrored from `packages/helia-ui` in `helia-developer-hub` |
 | Source commit     | Recorded at tag time.                                                       |
+
+## What changed in 0.1.0-alpha.3
+
+- Diagrams. A ` ```mermaid ` fence renders to an inline SVG at build time
+  through `rehype-mermaid`, painted from the token set by the new
+  `@ambiqai/helia-ui/mermaid.css` export. The sheet is opt-in rather than
+  spliced in by the Starlight plugin, because it only means anything on a site
+  that also runs the rehype plugin, and that plugin needs a headless browser at
+  build time. The product-docs template is wired for it.
+- `Callout` gains a `success` tone. Starlight 0.41's `Aside` takes a fixed four
+  types and throws on anything else, so `success` has no `Aside` equivalent and
+  the migration guide maps it to `tip` there.
+- `CardHeader` takes the overline as a prop. The named slot is still supported,
+  but in MDX it could not survive a title on the following line.
 
 ## Provenance
 

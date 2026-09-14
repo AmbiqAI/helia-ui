@@ -1,0 +1,174 @@
+/* SPDX-License-Identifier: BSD-3-Clause */
+/* Copyright (c) 2026, Ambiq */
+
+/*
+ * Theme for diagrams rendered at build time by `rehype-mermaid` in `inline-svg`
+ * mode. Pair it with the `markdown.rehypePlugins` snippet in the package docs.
+ *
+ * Mermaid bakes a per-diagram `<style>` into the SVG it returns, scoped by the
+ * diagram's own id. Astro's MDX pipeline does not re-emit that element's text,
+ * so on a Starlight site the baked palette never applies and an unthemed
+ * diagram renders as solid black shapes. This sheet is therefore the whole
+ * palette rather than an override of one, and it declares `!important` on the
+ * paint properties so the diagram still follows the tokens on any pipeline that
+ * does emit the baked style -- its selectors carry an id and would otherwise
+ * outrank everything here.
+ *
+ * Colours come from the semantic layer, so a diagram follows the light and dark
+ * themes with no second palette and no client JS.
+ */
+
+.sl-markdown-content svg[aria-roledescription] {
+  --helia-diagram-ink: var(--helia-ink-primary);
+  --helia-diagram-ink-muted: var(--helia-ink-secondary);
+  --helia-diagram-surface: var(--helia-surface-card);
+  --helia-diagram-surface-muted: var(--helia-surface-card-muted);
+  --helia-diagram-line: var(--helia-ink-muted);
+  --helia-diagram-border: var(--helia-surface-border);
+  --helia-diagram-accent: var(--helia-accent-blue);
+
+  display: block;
+  height: auto;
+  margin-block: var(--helia-space-5);
+  max-width: 100%;
+}
+
+/* Labels. Mermaid puts text in `<text>`, and in a `foreignObject` div when the
+   label holds markup, so both have to be claimed. */
+.sl-markdown-content svg[aria-roledescription] text,
+.sl-markdown-content svg[aria-roledescription] .nodeLabel,
+.sl-markdown-content svg[aria-roledescription] .edgeLabel,
+.sl-markdown-content svg[aria-roledescription] foreignObject div,
+.sl-markdown-content svg[aria-roledescription] span.nodeLabel {
+  fill: var(--helia-diagram-ink) !important;
+  color: var(--helia-diagram-ink) !important;
+  font-family: inherit !important;
+  font-size: var(--helia-text-caption, 0.875rem) !important;
+}
+
+/* Flowchart and state node bodies. */
+.sl-markdown-content svg[aria-roledescription] .node rect,
+.sl-markdown-content svg[aria-roledescription] .node circle,
+.sl-markdown-content svg[aria-roledescription] .node ellipse,
+.sl-markdown-content svg[aria-roledescription] .node polygon,
+.sl-markdown-content svg[aria-roledescription] .node path,
+.sl-markdown-content svg[aria-roledescription] .basic.label-container {
+  fill: var(--helia-diagram-surface) !important;
+  stroke: var(--helia-diagram-border) !important;
+  stroke-width: 1px !important;
+}
+
+/* Edges and their arrowheads. */
+.sl-markdown-content svg[aria-roledescription] .edgePath .path,
+.sl-markdown-content svg[aria-roledescription] .flowchart-link,
+.sl-markdown-content svg[aria-roledescription] .transition,
+.sl-markdown-content svg[aria-roledescription] .relation {
+  stroke: var(--helia-diagram-line) !important;
+  stroke-width: 1.25px !important;
+  fill: none !important;
+}
+
+.sl-markdown-content svg[aria-roledescription] .arrowheadPath,
+.sl-markdown-content svg[aria-roledescription] marker path,
+.sl-markdown-content svg[aria-roledescription] defs marker * {
+  fill: var(--helia-diagram-line) !important;
+  stroke: none !important;
+}
+
+/* Edge labels sit on top of the line, so they need the page behind them. */
+.sl-markdown-content svg[aria-roledescription] .edgeLabel rect,
+.sl-markdown-content svg[aria-roledescription] .labelBkg {
+  fill: var(--helia-surface-canvas) !important;
+  background-color: var(--helia-surface-canvas) !important;
+  opacity: 1 !important;
+}
+
+/* Subgraphs and composite states. */
+.sl-markdown-content svg[aria-roledescription] .cluster rect,
+.sl-markdown-content svg[aria-roledescription] .statediagram-cluster rect {
+  fill: var(--helia-diagram-surface-muted) !important;
+  stroke: var(--helia-diagram-border) !important;
+}
+
+/* State diagram start and end markers are the one place a solid fill reads. */
+.sl-markdown-content svg[aria-roledescription] .statediagram-state .start-state,
+.sl-markdown-content svg[aria-roledescription] .node .state-start,
+.sl-markdown-content svg[aria-roledescription] .statediagram-cluster .inner {
+  fill: var(--helia-diagram-ink) !important;
+  stroke: var(--helia-diagram-ink) !important;
+}
+
+/* Sequence diagrams. */
+.sl-markdown-content svg[aria-roledescription] .actor,
+.sl-markdown-content svg[aria-roledescription] rect.actor {
+  fill: var(--helia-diagram-surface) !important;
+  stroke: var(--helia-diagram-border) !important;
+}
+
+.sl-markdown-content svg[aria-roledescription] .actor-line {
+  stroke: var(--helia-diagram-border) !important;
+}
+
+.sl-markdown-content svg[aria-roledescription] .messageLine0,
+.sl-markdown-content svg[aria-roledescription] .messageLine1 {
+  stroke: var(--helia-diagram-line) !important;
+  fill: none !important;
+}
+
+.sl-markdown-content svg[aria-roledescription] .messageText,
+.sl-markdown-content svg[aria-roledescription] .loopText,
+.sl-markdown-content svg[aria-roledescription] .noteText,
+.sl-markdown-content svg[aria-roledescription] .labelText {
+  fill: var(--helia-diagram-ink) !important;
+  stroke: none !important;
+}
+
+.sl-markdown-content svg[aria-roledescription] .labelBox,
+.sl-markdown-content svg[aria-roledescription] .loopLine {
+  fill: var(--helia-diagram-surface-muted) !important;
+  stroke: var(--helia-diagram-border) !important;
+}
+
+/* `note over` blocks: the accent earns its place by marking an aside. */
+.sl-markdown-content svg[aria-roledescription] .note {
+  fill: var(--helia-diagram-surface-muted) !important;
+  stroke: var(--helia-diagram-accent) !important;
+}
+
+.sl-markdown-content svg[aria-roledescription] .activation0,
+.sl-markdown-content svg[aria-roledescription] .activation1,
+.sl-markdown-content svg[aria-roledescription] .activation2 {
+  fill: var(--helia-diagram-surface-muted) !important;
+  stroke: var(--helia-diagram-border) !important;
+}
+
+/* Class and entity relationship boxes reuse the node treatment. */
+.sl-markdown-content svg[aria-roledescription] .classGroup rect,
+.sl-markdown-content svg[aria-roledescription] .entityBox,
+.sl-markdown-content svg[aria-roledescription] .attributeBoxOdd,
+.sl-markdown-content svg[aria-roledescription] .attributeBoxEven {
+  fill: var(--helia-diagram-surface) !important;
+  stroke: var(--helia-diagram-border) !important;
+}
+
+.sl-markdown-content svg[aria-roledescription] .divider,
+.sl-markdown-content svg[aria-roledescription] .relationshipLine {
+  stroke: var(--helia-diagram-border) !important;
+  fill: none !important;
+}
+
+/* Diagram titles take the caption step rather than a heading step: the heading
+   above the diagram already owns the outline. */
+.sl-markdown-content svg[aria-roledescription] .flowchartTitleText,
+.sl-markdown-content svg[aria-roledescription] .pieTitleText,
+.sl-markdown-content svg[aria-roledescription] .titleText {
+  fill: var(--helia-diagram-ink) !important;
+  font-weight: var(--helia-weight-semibold, 600) !important;
+}
+
+/* Mermaid's own error card, kept legible rather than restyled. */
+.sl-markdown-content svg[aria-roledescription] .error-icon,
+.sl-markdown-content svg[aria-roledescription] .error-text {
+  fill: var(--helia-tone-critical) !important;
+  stroke: none !important;
+}

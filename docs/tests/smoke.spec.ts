@@ -26,6 +26,7 @@ const routes = [
   { path: `${base}/callouts/`, heading: 'Callouts' },
   { path: `${base}/disclosure/`, heading: 'Disclosure' },
   { path: `${base}/timeline/`, heading: 'Timeline' },
+  { path: `${base}/diagrams/`, heading: 'Diagrams' },
   { path: `${base}/layout/`, heading: 'Layout' },
   { path: `${base}/templates/docs-sites/`, heading: 'Docs sites' },
   { path: `${base}/templates/web-apps/`, heading: 'Web apps' },
@@ -133,4 +134,72 @@ test('grid and flex children share their top margin', async ({ page }) => {
       `prose margin leaked into a grid or flex root on ${route}`,
     ).toEqual([]);
   }
+});
+
+/*
+ * MDX merges a slotted element and the text on the line after it into one
+ * paragraph, which drops the slot attribute and leaves the overline inside the
+ * heading. The card then reads as one run and the heading's accessible name
+ * carries both, so assert the two are separate elements and that the name is
+ * the title alone.
+ */
+test('a card overline stays out of the title', async ({ page }) => {
+  await page.goto(`${base}/layout/`);
+
+  const heading = page.getByRole('heading', {
+    name: 'Compile the model',
+    exact: true,
+  });
+  await expect(heading).toBeVisible();
+
+  const header = page.locator('.helia-card-header', { has: heading }).first();
+  const overline = header.locator('.helia-eyebrow');
+  await expect(overline).toHaveText('Step one');
+
+  // The overline is a sibling of the heading, not a descendant of it.
+  await expect(heading.locator('.helia-eyebrow')).toHaveCount(0);
+
+  // And it sits above the title rather than beside it.
+  const overlineBox = await overline.boundingBox();
+  const headingBox = await heading.boundingBox();
+  expect(overlineBox && headingBox).toBeTruthy();
+  expect(overlineBox!.y + overlineBox!.height).toBeLessThanOrEqual(
+    headingBox!.y + 1,
+  );
+});
+
+/* Diagrams are rendered at build time, so the SVG is in the HTML with no
+ * script involved, and it is painted by the package sheet rather than by
+ * mermaid's own baked palette. */
+test('mermaid fences render to themed inline SVG', async ({ page }) => {
+  await page.goto(`${base}/diagrams/`);
+
+  const diagrams = page.locator(
+    '.sl-markdown-content svg[aria-roledescription]',
+  );
+  await expect(diagrams).toHaveCount(3);
+
+  const kinds = await diagrams.evaluateAll((nodes) =>
+    nodes.map((n) => n.getAttribute('aria-roledescription')),
+  );
+  expect(kinds).toEqual(['flowchart-v2', 'sequence', 'stateDiagram']);
+
+  /* The node fill has to differ between themes, which is what proves the
+   * sheet is driving the palette: mermaid's baked style is a fixed hex and
+   * would paint both themes the same. */
+  const fillFor = async (theme: 'light' | 'dark') => {
+    await page.evaluate((t) => {
+      document.documentElement.dataset.theme = t;
+    }, theme);
+    return diagrams
+      .first()
+      .locator('.node rect, .node polygon, .basic.label-container')
+      .first()
+      .evaluate((el) => getComputedStyle(el).fill);
+  };
+
+  const light = await fillFor('light');
+  const dark = await fillFor('dark');
+  expect(light).not.toBe('');
+  expect(dark).not.toBe(light);
 });

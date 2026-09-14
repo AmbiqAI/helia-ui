@@ -38,15 +38,15 @@ git tag in the package's own repository, whose root is the package:
 ```jsonc
 {
   "dependencies": {
-    // Replace with "^0.1.0-alpha.2" once the package is on npm.
-    "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v0.1.0-alpha.2",
+    // Replace with "^0.1.0-alpha.3" once the package is on npm.
+    "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v0.1.0-alpha.3",
   },
 }
 ```
 
 While developing against an unreleased change, point the same entry at a packed
 tarball of a local checkout (`npm pack` in the package root, then
-`"file:../helia-ui-0.1.0-alpha.2.tgz"`) and switch back to the tag before
+`"file:../helia-ui-0.1.0-alpha.3.tgz"`) and switch back to the tag before
 committing. A `file:` path to the directory installs as a symlink, and the
 package ships `.tsx` source rather than a bundle, so TypeScript then resolves
 `react` from the checkout's own tree instead of this app's and reports the whole

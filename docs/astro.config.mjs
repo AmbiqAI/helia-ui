@@ -14,6 +14,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
+import rehypeMermaid from 'rehype-mermaid';
 import { heliaStarlight } from '@ambiqai/helia-ui/starlight';
 
 const base = '/helia-ui';
@@ -22,12 +23,27 @@ const basePath = `${base}/`;
 export default defineConfig({
   site: 'https://ambiqai.github.io',
   base,
+  /*
+   * Diagrams are rendered here, at build, so the page ships no diagram runtime.
+   * `inline-svg` needs a headless browser: CI gets one from Playwright, and a
+   * local build reads PLAYWRIGHT_BROWSERS_PATH. A missing browser fails the
+   * build rather than shipping an empty figure. See the Diagrams page.
+   */
+  markdown: {
+    rehypePlugins: [[rehypeMermaid, { strategy: 'inline-svg' }]],
+  },
   integrations: [
     starlight({
       title: 'helia-ui',
       description:
         'Design tokens, Astro parts, React components, and the Starlight theme for HELIA sites.',
-      customCss: ['./src/styles/tailwind.css', './src/styles/site.css'],
+      /* The diagram theme is opt-in rather than spliced in by the plugin: it is
+         only meaningful on a site that also runs the rehype plugin. */
+      customCss: [
+        './src/styles/tailwind.css',
+        '@ambiqai/helia-ui/mermaid.css',
+        './src/styles/site.css',
+      ],
       plugins: [
         heliaStarlight({
           footer: {
@@ -80,6 +96,7 @@ export default defineConfig({
             { label: 'Callouts', slug: 'callouts' },
             { label: 'Disclosure', slug: 'disclosure' },
             { label: 'Timeline', slug: 'timeline' },
+            { label: 'Diagrams', slug: 'diagrams' },
             { label: 'Layout', slug: 'layout' },
           ],
         },
