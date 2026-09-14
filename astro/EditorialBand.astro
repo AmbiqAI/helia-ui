@@ -37,7 +37,13 @@ const { tone = 'base', id } = Astro.props;
   .editorial-band {
     box-sizing: border-box;
     margin-inline: calc(50% - 50cqw - var(--sl-content-pad-x));
-    padding: clamp(2.25rem, 6vw, 4.5rem) 0;
+    /*
+     * The geometry belongs to the band, not to the tone or the treatment:
+     * every band reserves the same gutter and the same rhythm, so a plain one
+     * and a painted one put their first line on the same baseline. Only the
+     * ground below changes.
+     */
+    padding: clamp(2.25rem, 6vw, 4.5rem) clamp(1rem, 4vw, 2.5rem);
     width: calc(100cqw + 2 * var(--sl-content-pad-x));
   }
 
@@ -57,7 +63,6 @@ const { tone = 'base', id } = Astro.props;
      */
     box-shadow: 0 0 0 100vmax var(--band-bleed, var(--band-ground));
     clip-path: inset(0 -100vmax);
-    padding-inline: clamp(1rem, 4vw, 2.5rem);
   }
 
   /*

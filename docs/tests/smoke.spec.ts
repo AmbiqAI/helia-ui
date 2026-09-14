@@ -392,9 +392,14 @@ test('the two worked themes draw the same cards differently', async ({
     await expect(card).toBeVisible();
     const shape = await card.evaluate((node) => {
       const style = getComputedStyle(node);
+      const panelNode = node.closest('.site-theme-example') as HTMLElement;
       return {
         radius: style.borderTopLeftRadius,
         background: style.backgroundColor,
+        /* Where the cards start, which the hero treatment must not move. */
+        offset:
+          node.getBoundingClientRect().top -
+          panelNode.getBoundingClientRect().top,
       };
     });
 
@@ -413,6 +418,7 @@ test('the two worked themes draw the same cards differently', async ({
   expect(warm.radius).not.toBe(hub.radius);
   expect(warm.background).not.toBe(hub.background);
   expect(warm.ink).not.toBe(hub.ink);
+  expect(Math.abs(warm.offset - hub.offset)).toBeLessThanOrEqual(1);
 });
 
 /*

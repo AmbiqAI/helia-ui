@@ -139,6 +139,12 @@ const themes = [
 
   .site-theme-example__hero {
     border-radius: var(--helia-radius-md);
+    /*
+     * Reserved for every treatment, as `EditorialBand` reserves it: the two
+     * panels are read side by side, and padding that arrives with the paint
+     * would drop the warm panel's cards a row below the hub's.
+     */
+    padding: var(--helia-space-3);
   }
 
   /*
@@ -154,7 +160,6 @@ const themes = [
         color-mix(in srgb, var(--helia-product-accent) 18%, transparent),
         color-mix(in srgb, var(--helia-accent-secondary) 14%, transparent)
       );
-      padding: var(--helia-space-3);
     }
   }
 
