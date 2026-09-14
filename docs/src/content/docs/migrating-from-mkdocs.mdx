@@ -22,6 +22,84 @@ move content into it.
   mapping.
 </Aside>
 
+## Converter
+
+Most of this page is mechanical, so the package ships it as a command. It reads
+a MkDocs `docs_dir` and writes a Starlight content collection:
+
+```sh
+npx helia-ui-mkdocs-convert --docs docs --out src/content/docs \
+  --base /PRODUCT-REPO-NAME --public public \
+  --sidebar src/generated/docs-sidebar.json
+```
+
+<DataTable
+  caption="Options"
+  columns={['Option', 'What it does']}
+  rows={[
+    ['`--docs <dir>`', 'MkDocs `docs_dir` to read. Required.'],
+    ['`--out <dir>`', 'Content collection directory to write. Required.'],
+    [
+      '`--base <path>`',
+      "The site's base path, so a root-relative link keeps working under it.",
+    ],
+    ['`--config <file>`', '`mkdocs.yml`. Defaults to the one beside `--docs`.'],
+    [
+      '`--icons <file>`',
+      'JSON map of extra `:material-*:` names, merged over the built-in table.',
+    ],
+    [
+      '`--public <dir>`',
+      'Where linked images and `docs/assets/**` are copied.',
+    ],
+    [
+      '`--sidebar <file>`',
+      'Writes the MkDocs nav as a Starlight sidebar fragment.',
+    ],
+    [
+      '`--skip <path>`',
+      'A page to leave alone; repeatable. Defaults to `index.md`.',
+    ],
+    [
+      '`--keep <name>`',
+      'An entry in `--out` not to delete; repeatable. Defaults to `index.mdx` and `api`.',
+    ],
+    ['`--dry-run`', 'Convert and report, write nothing.'],
+    [
+      '`--report`',
+      'Print per-rewrite counts, unmapped icons and the hand-pass list.',
+    ],
+  ]}
+/>
+
+It rewrites what the rest of this page maps: admonitions and collapsible
+admonitions to asides, content tabs to `Tabs` and `TabItem`, `:material-*:`
+shortcodes to `Icon`, Termynal blocks to `AsciiTerminal`, relative links to
+route form, HTML comments to MDX expression comments, and the MDX escaping that
+Markdown did not need. Front matter comes from the page's H1 and lead
+paragraph. Attribute lists and `markdown="1"` attributes are dropped, void tags
+are closed, and fenced code is left alone.
+
+The MkDocs tree stays the source of truth until the deploy switch, so the
+command is idempotent: it rewrites `--out` from scratch on every run, keeping
+only what `--keep` names. Anything that has had a hand pass lives in files the
+converter owns, so re-run it against a clean tree and re-apply the hand pass
+from the diff.
+
+What it will not do by hand-waving, it prints:
+
+- **Raw HTML blocks and Chart.js canvases**, kept verbatim and listed per page.
+  See [Raw HTML](#raw-html) and [Charts](#charts).
+- **`{{ read_csv(...) }}` macros**, left as a marker for a `DataTable` island.
+- **Unmapped icon names**, emitted as a visible `[unmapped icon: name]` marker
+  rather than guessed at, and counted in the report.
+- **Pages with no H1**, whose title is derived from the filename.
+- **Nav entries with no page behind them**, which would be a 404 after the
+  switch.
+
+A `--8<--` snippet has no equivalent, so the run fails on one rather than
+dropping the content it pulled in.
+
 ## Admonitions
 
 `!!! note "Title"` becomes Starlight's `Aside`. Material has twelve admonition
@@ -381,3 +459,8 @@ group whose `items` hold an autogenerate object — `{ label: 'How-to', items:
 `sidebar.order` frontmatter key; an explicit list is an `items` array of
 entries. Routes that change need a
 redirect, since the product sites are already linked to from the hub.
+
+`--sidebar` writes that array for you, as a JSON fragment the Astro config
+spreads into `sidebar`. The template's route test reads the same fragment and
+asserts every entry serves 200, so a nav entry that gained no page fails as a
+test rather than as a reader's 404.
