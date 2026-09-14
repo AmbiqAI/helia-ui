@@ -13,7 +13,8 @@
  * for reduced motion, both amount to.
  *
  * Use it on a section, not on every card in one: a page where each element
- * arrives separately reads as a page that is still loading.
+ * arrives separately reads as a page that is still loading. `stagger` is the
+ * exception that proves it -- one wrapper, one arrival, told across the grid.
  *
  * @slot default -- The content to reveal. Visible without JavaScript.
  */
@@ -25,21 +26,46 @@ interface Props extends HTMLAttributes<'div'> {
    * Lower it for a tall section that would otherwise never cross the mark.
    */
   threshold?: number;
+  /**
+   * Cascade the direct children instead of revealing the wrapper as one
+   * block: each child waits one `--helia-motion-fast` step longer than the
+   * one before it, to a ceiling of six. Use it on a grid of cards.
+   */
+  stagger?: boolean;
 }
 
-const { threshold = 0.15, class: className, ...rest } = Astro.props;
+const {
+  threshold = 0.15,
+  stagger = false,
+  class: className,
+  ...rest
+} = Astro.props;
 ---
 
 <helia-reveal
-  class:list={['helia-motion-reveal', className]}
+  class:list={[
+    'helia-motion-reveal',
+    stagger && 'helia-motion-reveal--stagger',
+    className,
+  ]}
   data-threshold={threshold}
+  data-stagger={stagger ? '' : undefined}
   {...rest}
 >
   <slot />
 </helia-reveal>
 
 <script>
+  /*
+   * Where the cascade stops. Past the sixth child the wait is longer than the
+   * arrival itself, and a grid that is still filling in after the reader has
+   * started on it reads as a page that has not finished loading.
+   */
+  const MAX_STEP = 5;
+
   class HeliaReveal extends HTMLElement {
+    #observer: IntersectionObserver | null = null;
+
     connectedCallback() {
       const scale = Number.parseFloat(
         getComputedStyle(this).getPropertyValue('--helia-motion-scale'),
@@ -50,20 +76,52 @@ const { threshold = 0.15, class: className, ...rest } = Astro.props;
 
       const threshold = Number.parseFloat(this.dataset.threshold ?? '');
 
+      if (this.dataset.stagger !== undefined) {
+        // The index is the only per-child value: the delay itself stays a
+        // multiple of the token, in the sheet.
+        Array.from(this.children).forEach((child, index) => {
+          (child as HTMLElement).style.setProperty(
+            '--helia-motion-reveal-step',
+            String(Math.min(index, MAX_STEP)),
+          );
+        });
+      }
+
       this.classList.add('helia-motion-reveal--armed');
 
-      const observer = new IntersectionObserver(
+      this.#observer = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
             if (!entry.isIntersecting) continue;
             entry.target.classList.add('helia-motion-reveal--in');
-            observer.unobserve(entry.target);
+            this.#observer?.unobserve(entry.target);
           }
         },
         { threshold: Number.isFinite(threshold) ? threshold : 0.15 },
       );
 
-      observer.observe(this);
+      this.#observer.observe(this);
+    }
+
+    disconnectedCallback() {
+      this.#observer?.disconnect();
+    }
+
+    /**
+     * Hide the content again and wait for the next arrival. Does nothing on an
+     * element that never armed, so a visitor with motion off cannot be handed
+     * a reveal by a control that replays one.
+     */
+    replay() {
+      if (!this.#observer) return;
+      this.#observer.unobserve(this);
+      this.classList.remove('helia-motion-reveal--in');
+      // The hidden state has to be painted before the observer may put it
+      // back: re-observing in this frame resolves against the same style
+      // recalculation and the transition never starts.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => this.#observer?.observe(this));
+      });
     }
   }
 

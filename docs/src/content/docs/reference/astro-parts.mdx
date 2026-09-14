@@ -469,9 +469,10 @@ import MediaEmbed from '@ambiqai/helia-ui/astro/MediaEmbed';
 import Reveal from '@ambiqai/helia-ui/astro/Reveal';
 ```
 
-| Prop        | Type     | Default | Description                                                                                                                                 |
-| ----------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `threshold` | `number` | `0.15`  | How much of the element has to be in view before it reveals, 0 to 1. Lower it for a tall section that would otherwise never cross the mark. |
+| Prop        | Type      | Default | Description                                                                                                                                                                                               |
+| ----------- | --------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `threshold` | `number`  | `0.15`  | How much of the element has to be in view before it reveals, 0 to 1. Lower it for a tall section that would otherwise never cross the mark.                                                               |
+| `stagger`   | `boolean` | `false` | Cascade the direct children instead of revealing the wrapper as one block: each child waits one `--helia-motion-fast` step longer than the one before it, to a ceiling of six. Use it on a grid of cards. |
 
 Also accepts `HTMLAttributes<'div'>`.
 

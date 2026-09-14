@@ -121,13 +121,48 @@
  * transitions special-case visibility, so the return to `visible` takes effect
  * at the start of the fade rather than half way through it.
  */
-.helia-motion-reveal--armed {
+.helia-motion-reveal--armed:not(.helia-motion-reveal--stagger) {
   opacity: 0;
   transform: translateY(var(--helia-motion-reveal-distance));
   visibility: hidden;
 }
 
-.helia-motion-reveal--armed.helia-motion-reveal--in {
+.helia-motion-reveal--armed:not(
+    .helia-motion-reveal--stagger
+  ).helia-motion-reveal--in {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+}
+
+/*
+ * `--stagger` moves the hidden state down one level: the wrapper stays where
+ * it is and its direct children arrive one after another, which is what makes
+ * a grid read as a grid filling in rather than a block appearing. The step is
+ * a custom property the Reveal script sets per child, so the delay is still a
+ * multiple of a token and no child carries a duration of its own.
+ *
+ * Only direct children, and only one level: nesting the cascade would give an
+ * element two delays that compound into a wait nobody asked for.
+ */
+.helia-motion-reveal--stagger > * {
+  transition:
+    opacity var(--helia-motion-slow) var(--helia-ease-out),
+    transform var(--helia-motion-slow) var(--helia-ease-out),
+    visibility var(--helia-motion-slow);
+  transition-delay: calc(
+    var(--helia-motion-reveal-step, 0) * var(--helia-motion-fast)
+  );
+}
+
+.helia-motion-reveal--armed.helia-motion-reveal--stagger > * {
+  opacity: 0;
+  transform: translateY(var(--helia-motion-reveal-distance));
+  visibility: hidden;
+}
+
+.helia-motion-reveal--armed.helia-motion-reveal--stagger.helia-motion-reveal--in
+  > * {
   opacity: 1;
   transform: none;
   visibility: visible;

@@ -1,0 +1,34 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * Re-arms every `Reveal` on the page so the entry can be watched without
+ * scrolling away and back. Documentation furniture, not a part: a control that
+ * replays an animation belongs on the page that demonstrates the animation.
+ */
+import Button from '@ambiqai/helia-ui/astro/Button';
+---
+
+<div class="reveal-replay not-content">
+  <Button variant="secondary" size="sm" data-reveal-replay>Replay</Button>
+</div>
+
+<script>
+  type Replayable = Element & { replay?: () => void };
+
+  for (const control of document.querySelectorAll('[data-reveal-replay]')) {
+    control.addEventListener('click', () => {
+      for (const reveal of document.querySelectorAll<Replayable>(
+        'helia-reveal',
+      )) {
+        reveal.replay?.();
+      }
+    });
+  }
+</script>
+
+<style>
+  .reveal-replay {
+    margin-block: var(--helia-space-4);
+  }
+</style>

@@ -48,6 +48,9 @@
    *
    * Travel distances are separate tokens rather than part of the duration,
    * because reduced motion has to stop the movement and not merely shorten it.
+   * The reveal distance is the one that also multiplies by the dial: an entry
+   * has to be far enough to read as an entry, and a site slowing the tempo
+   * down is asking for a longer travel, not the same 20px taken slowly.
    */
   --helia-motion-scale: 1;
   --helia-motion-fast: calc(120ms * var(--helia-motion-scale));
@@ -55,7 +58,7 @@
   --helia-motion-slow: calc(320ms * var(--helia-motion-scale));
   --helia-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --helia-motion-lift-distance: -2px;
-  --helia-motion-reveal-distance: 8px;
+  --helia-motion-reveal-distance: calc(20px * var(--helia-motion-scale));
   --helia-motion-cue-distance: 2px;
 
   --helia-font-sans: var(--__sl-font, var(--helia-sl-font-system));

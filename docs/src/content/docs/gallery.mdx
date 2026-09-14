@@ -14,6 +14,7 @@ import Chip from '@ambiqai/helia-ui/astro/Chip';
 import LinkCard from '@ambiqai/helia-ui/astro/LinkCard';
 import Media from '@ambiqai/helia-ui/astro/Media';
 import Reveal from '@ambiqai/helia-ui/astro/Reveal';
+import RevealReplay from '../../components/RevealReplay.astro';
 import ShowcaseCarousel from '@ambiqai/helia-ui/astro/ShowcaseCarousel';
 import StatCard from '@ambiqai/helia-ui/astro/StatCard';
 
@@ -519,11 +520,18 @@ shows it in the media, the badges and the type.
 
 `Reveal` fades and rises what it wraps the first time it reaches the viewport.
 Use it on a section, not on every card in one: a page where each element
-arrives separately reads as a page that is still loading.
+arrives separately reads as a page that is still loading. `stagger` is the one
+exception, and it is still one wrapper.
 
 The hidden state is a class the script adds, so the content is visible without
 JavaScript, and the script returns before arming anything when the motion scale
 is 0.
+
+Replay re-arms every reveal on this page, so the entry can be watched without
+scrolling away and back. It does nothing for a visitor who asked for reduced
+motion, because nothing armed.
+
+<RevealReplay />
 
 <div className="gallery-spacer not-content">
   Scroll on. The cards below start hidden and arrive as they reach the viewport.
@@ -549,6 +557,44 @@ is 0.
       </Card>
       <code>{'<Reveal>'}</code>
     </div>
+  </div>
+</Reveal>
+
+<div className="gallery-spacer not-content">
+  A gap, so the staggered grid below is still out of view when the group above
+  arrives.
+</div>
+
+The cascade is on the direct children, so the grid is the `Reveal` rather than
+a `div` inside it: one wrapper with a grid class on it, and the cards are the
+children that arrive.
+
+<Reveal stagger class="gallery-grid not-content">
+  <div className="gallery-item">
+    <Card tone="elevated">
+      <CardContent>With stagger, the children arrive in order.</CardContent>
+    </Card>
+    <code>{'<Reveal stagger>'}</code>
+  </div>
+  <div className="gallery-item">
+    <Card tone="elevated">
+      <CardContent>
+        Each one waits a fast step longer than the last.
+      </CardContent>
+    </Card>
+    <code>{'<Reveal stagger>'}</code>
+  </div>
+  <div className="gallery-item">
+    <Card tone="elevated">
+      <CardContent>The wrapper itself does not move.</CardContent>
+    </Card>
+    <code>{'<Reveal stagger>'}</code>
+  </div>
+  <div className="gallery-item">
+    <Card tone="elevated">
+      <CardContent>The cascade stops at the sixth child.</CardContent>
+    </Card>
+    <code>{'<Reveal stagger>'}</code>
   </div>
 </Reveal>
 
