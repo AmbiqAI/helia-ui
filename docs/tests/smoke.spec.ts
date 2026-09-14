@@ -256,6 +256,15 @@ test('the token pages render every primitive and every type step', async ({
   /* A ratio with no sample beside it is a number nobody can judge. */
   await expect(page.locator('[data-contrast-row]').first()).toBeVisible();
 
+  /* The table is the package's own accessibility claim, so a pairing that the
+     palette drops below AA has to fail here rather than be published as a
+     number a reader is left to notice. */
+  const ratios = await page
+    .locator('[data-contrast-row] .contrast__ratio')
+    .evaluateAll((nodes) => nodes.map((node) => parseFloat(node.textContent!)));
+  expect(ratios.length).toBeGreaterThan(0);
+  expect(ratios.filter((ratio) => !(ratio >= 4.5))).toEqual([]);
+
   await page.goto(`${base}/foundations/`);
 
   const sizes = page.locator('[data-type-ramp] [data-type-size]');

@@ -214,7 +214,15 @@
   --helia-accent-cyan-ink: #008f9d;
   --helia-accent-green-ink: #008d5d;
   --helia-accent-orange-ink: #c6611c;
-  --helia-ink-caution: #b96526;
+
+  /*
+   * Caution amber as ink, and so a value per theme like the status inks below:
+   * an amber dark enough to clear 4.5:1 on light paper is too dark to clear it
+   * on the dark canvas, and the single value that split the difference cleared
+   * neither. Each of these clears 4.5:1 on both the canvas and the card of the
+   * theme it is declared in.
+   */
+  --helia-ink-caution: #cd7b33;
 
   /* Advisory tones, one per callout variant. */
   --helia-tone-tip: #008d68;
@@ -400,6 +408,8 @@
 
   /* The other five chart series follow the tones above on their own. */
   --helia-chart-6: #5d6b82;
+
+  --helia-ink-caution: #a85c1f;
 
   --helia-tone-success-ink: #0b7048;
   --helia-tone-warning-ink: #8f5300;
