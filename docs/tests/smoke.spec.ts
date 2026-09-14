@@ -10,6 +10,7 @@ const base = '/helia-ui';
 const routes = [
   { path: `${base}/`, heading: 'helia-ui' },
   { path: `${base}/foundations/`, heading: 'Foundations' },
+  { path: `${base}/foundations/site-theme/`, heading: 'Site theme' },
   { path: `${base}/gallery/`, heading: 'Gallery' },
   { path: `${base}/starlight-plugin/`, heading: 'Starlight plugin' },
   {

@@ -1,0 +1,80 @@
+/* SPDX-License-Identifier: BSD-3-Clause */
+/* Copyright (c) 2026, Ambiq */
+/*
+ * The two worked themes on the Site theme page.
+ *
+ * Each block is a `site-theme.css` with its selector changed from `:root` to a
+ * class, which is the only edit between these and the file a site would ship:
+ * the page shows both at once, and `:root` can only be one of them. The hub
+ * block restates the hub's values rather than leaning on this site's own
+ * defaults, so the comparison reads as two themes rather than one theme and
+ * an absence.
+ *
+ * The warm theme lives here rather than in the package. The package ships the
+ * contract and the defaults; a second set of values is a thing a site has.
+ */
+
+/*
+ * The dials are `:root` dials, and this is what it costs to move them anywhere
+ * else. `semantic.css` composes the radius steps and the tinted surfaces out of
+ * the dials once, on the element that declares them, and CSS substitutes a
+ * custom property at that element rather than at each descendant: a scale set
+ * further down the tree never reaches a token composed further up. So the scope
+ * restates the two compositions the examples move. A site has no equivalent
+ * block, because on a site the scope is `:root` and `semantic.css` has already
+ * done this.
+ */
+.site-theme-example {
+  --helia-radius-xs: calc(
+    (var(--helia-radius) - 0.35rem) * var(--helia-radius-scale)
+  );
+  --helia-radius-sm: calc(
+    (var(--helia-radius) - 0.2rem) * var(--helia-radius-scale)
+  );
+  --helia-radius-md: calc(var(--helia-radius) * var(--helia-radius-scale));
+  --helia-radius-lg: calc(
+    (var(--helia-radius) + 0.35rem) * var(--helia-radius-scale)
+  );
+  --helia-surface-card: color-mix(
+    in srgb,
+    var(--helia-surface-tint) var(--helia-surface-tint-amount),
+    var(--helia-surface-raised)
+  );
+  --helia-surface-card-muted: color-mix(
+    in srgb,
+    var(--helia-surface-tint) var(--helia-surface-tint-amount),
+    var(--helia-surface-muted)
+  );
+}
+
+.site-theme-example--hub {
+  --helia-product-accent: var(--helia-accent-slate);
+  --helia-accent-secondary: var(--helia-accent-slate);
+
+  --helia-radius-scale: 1;
+  --helia-motion-scale: 1;
+
+  --helia-font-sans: var(--__sl-font, var(--helia-sl-font-system));
+  --helia-font-mono: var(--__sl-font-mono, var(--helia-sl-font-system-mono));
+
+  --helia-surface-tint: transparent;
+  --helia-surface-tint-amount: 0%;
+
+  --helia-hero-treatment: plain;
+}
+
+.site-theme-example--warm {
+  --helia-product-accent: var(--helia-accent-orange);
+  --helia-accent-secondary: var(--helia-accent-pink);
+
+  --helia-radius-scale: 1.6;
+  --helia-motion-scale: 1;
+
+  --helia-font-sans: var(--__sl-font, var(--helia-sl-font-system));
+  --helia-font-mono: var(--__sl-font-mono, var(--helia-sl-font-system-mono));
+
+  --helia-surface-tint: var(--helia-accent-orange);
+  --helia-surface-tint-amount: 7%;
+
+  --helia-hero-treatment: band;
+}

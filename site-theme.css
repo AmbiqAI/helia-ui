@@ -12,54 +12,108 @@
  * Every value here is a default restated, so a copy with nothing changed
  * renders exactly what the package renders.
  *
+ * The `dial:` blocks are the source of the reference page at
+ * /helia-ui/foundations/site-theme/: `scripts/site-theme-doc.mjs` reads them,
+ * and `--check` runs in `validate`, so a dial whose comment and whose value
+ * disagree is a failed build rather than a stale page. Each block carries the
+ * name, what the dial changes, what it accepts, its default, and what reads
+ * it downstream.
+ *
  * See docs/design-system.md, "Site theme".
  */
 
 :root {
-  /*
-   * The site's accent. One value, not a vocabulary: a site carrying several
-   * product accents sets this per subtree rather than adding tokens. It is
-   * what the card accent rule draws and what `--accent` falls back to.
+  /**
+   * dial: --helia-product-accent
+   * changes: The site's accent. One value, not a vocabulary: a site carrying
+   *   several product accents sets this per subtree rather than adding tokens.
+   * values: Any colour, normally one of the `--helia-accent-*` hues rather
+   *   than a fresh one, so the palette stays the palette.
+   * default: var(--helia-accent-slate)
+   * reads: `AsciiTerminal`, for the prompt colour. No card recipe draws an
+   *   accent edge, so elsewhere a site passes this into `Media` as `--accent`.
    */
   --helia-product-accent: var(--helia-accent-slate);
 
-  /* The second accent, for a treatment that needs two: a gradient, a chart
-     series, a hero band. Leave it equal to the first and nothing pairs. */
+  /**
+   * dial: --helia-accent-secondary
+   * changes: The second accent, for a treatment that needs two: a gradient, a
+   *   chart series, a hero band. Leave it equal to the first and nothing pairs.
+   * values: Any colour, on the same terms as the first accent.
+   * default: var(--helia-accent-slate)
+   * reads: Nothing in the package. It is named here so that the sites which do
+   *   pair two colours all spell the second one the same way.
+   */
   --helia-accent-secondary: var(--helia-accent-slate);
 
-  /*
-   * Multiplies the whole radius scale at once. 0 is a square site, 1 is the
-   * package shape, above about 1.6 the pill and the card stop being distinct.
+  /**
+   * dial: --helia-radius-scale
+   * changes: Multiplies the whole radius scale at once.
+   * values: A unitless number. 0 is a square site, 1 is the package shape,
+   *   above about 1.6 the pill and the card stop being distinct.
+   * default: 1
+   * reads: `--helia-radius-xs`, `-sm`, `-md` and `-lg` in `semantic.css`, so
+   *   every `helia-surface` and every part that rounds its own chrome.
+   *   `--helia-radius-pill` is deliberately outside the scale.
    */
   --helia-radius-scale: 1;
 
-  /*
-   * Multiplies every motion duration. 0 removes motion for everyone on the
-   * site; 1.5 is the slowest worth asking for. Reduced motion zeroes it
-   * regardless, so this is the site's dial, not the visitor's.
+  /**
+   * dial: --helia-motion-scale
+   * changes: Multiplies every motion duration. Reduced motion zeroes it
+   *   regardless, so this is the site's dial, not the visitor's.
+   * values: A unitless number. 0 removes motion for everyone on the site;
+   *   1.5 is the slowest worth asking for.
+   * default: 1
+   * reads: `--helia-motion-fast`, `-base` and `-slow`, so `helia-motion-lift`,
+   *   `helia-motion-reveal`, `helia-motion-cue`, `helia-hover-surface` and
+   *   `helia-button`. `Reveal` and `ShowcaseCarousel` also read the number
+   *   itself and skip their scripts when it is 0.
    */
   --helia-motion-scale: 1;
 
-  /*
-   * Type. Both are the Starlight stack by default and both expect a full
-   * font stack, not a family name on its own.
+  /**
+   * dial: --helia-font-sans
+   * changes: Interface and editorial type.
+   * values: A full font stack, not a family name on its own.
+   * default: var(--__sl-font, var(--helia-sl-font-system))
+   * reads: The page frame through Starlight, and `CodeBlock` for its chrome.
    */
   --helia-font-sans: var(--__sl-font, var(--helia-sl-font-system));
+
+  /**
+   * dial: --helia-font-mono
+   * changes: Code, filenames, versions, transcripts.
+   * values: A full font stack, not a family name on its own.
+   * default: var(--__sl-font-mono, var(--helia-sl-font-system-mono))
+   * reads: `CodeBlock` and `AsciiTerminal`.
+   */
   --helia-font-mono: var(--__sl-font-mono, var(--helia-sl-font-system-mono));
 
-  /*
-   * A hue mixed into every surface, and how much of it. Keep the amount in
-   * single figures: this is a cast over the page, not a background colour.
-   * The default mixes nothing, which is why the amount rather than the hue is
-   * what is zeroed.
+  /**
+   * dial: --helia-surface-tint, --helia-surface-tint-amount
+   * changes: A hue mixed into every surface, and how much of it. The default
+   *   mixes nothing, which is why the amount rather than the hue is what is
+   *   zeroed.
+   * values: Any colour, and a percentage. Keep the amount in single figures:
+   *   this is a cast over the page, not a background colour.
+   * default: transparent
+   * default: 0%
+   * reads: `--helia-surface-paper`, `--helia-surface-card` and
+   *   `--helia-surface-card-muted`, so `helia-surface` and its variants,
+   *   `helia-chip--accent`, `helia-chip--static` and `helia-button--ghost`.
    */
   --helia-surface-tint: transparent;
   --helia-surface-tint-amount: 0%;
 
-  /*
-   * How the site's hero is drawn: `plain`, `band`, or `artwork`. Read by a
-   * site's own hero composition; the package defines the name so that every
-   * site spells the choice the same way.
+  /**
+   * dial: --helia-hero-treatment
+   * changes: How the site's hero is drawn.
+   * values: `plain`, `band`, or `artwork`.
+   * default: plain
+   * reads: Nothing in the package. A site's own hero composition reads it, and
+   *   the package defines the name so that every site spells the choice the
+   *   same way.
    */
   --helia-hero-treatment: plain;
 }
@@ -71,6 +125,14 @@
  *
  *   <html data-helia-density="compact">
  *
- * `compact`, `comfortable`, or the attribute left off for the default. It
- * moves the card padding step and nothing else.
+ * It is not anchored to `:root`, so the same attribute on any wrapper gives a
+ * section its own density.
+ */
+/**
+ * dial: data-helia-density
+ * changes: The card padding step, and nothing else. Prose rhythm and the page
+ *   frame belong to Starlight.
+ * values: `compact`, `comfortable`, or the attribute left off.
+ * default: unset
+ * reads: `--helia-card-pad`, so `helia-surface--pad-card`.
  */

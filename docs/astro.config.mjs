@@ -44,6 +44,9 @@ export default defineConfig({
         '@ambiqai/helia-ui/mermaid.css',
         './src/styles/site-theme.css',
         './src/styles/site.css',
+        /* Last, so the worked examples on the Site theme page are read as the
+           site theme they would be if either one were this site's `:root`. */
+        './src/styles/example-theme.css',
       ],
       plugins: [
         heliaStarlight({
@@ -76,7 +79,14 @@ export default defineConfig({
       ],
       sidebar: [
         { label: 'Overview', slug: '' },
-        { label: 'Foundations', slug: 'foundations' },
+        {
+          label: 'Foundations',
+          collapsed: false,
+          items: [
+            { label: 'Tokens and scales', slug: 'foundations' },
+            { label: 'Site theme', slug: 'foundations/site-theme' },
+          ],
+        },
         /* Near the top on purpose: it is the page an owner picking a card
            treatment is sent to, not a reference the parts pages lead into. */
         { label: 'Gallery', slug: 'gallery' },

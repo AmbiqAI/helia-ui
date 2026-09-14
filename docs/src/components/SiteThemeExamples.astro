@@ -1,0 +1,172 @@
+---
+/* SPDX-License-Identifier: BSD-3-Clause */
+/* Copyright (c) 2026, Ambiq */
+/**
+ * The two worked themes on the Site theme page, rendered side by side.
+ *
+ * One list of cards, rendered once per theme, so the only thing that can
+ * differ between the panels is a dial. The values are in
+ * `src/styles/example-theme.css`; the density dial is an attribute rather than
+ * a property, so it arrives on the wrapper the way it would arrive on `<html>`.
+ */
+import Badge from '@ambiqai/helia-ui/astro/Badge';
+import Button from '@ambiqai/helia-ui/astro/Button';
+import Card from '@ambiqai/helia-ui/astro/Card';
+import CardActions from '@ambiqai/helia-ui/astro/CardActions';
+import CardContent from '@ambiqai/helia-ui/astro/CardContent';
+import CardHeader from '@ambiqai/helia-ui/astro/CardHeader';
+import CardMedia from '@ambiqai/helia-ui/astro/CardMedia';
+import Media from '@ambiqai/helia-ui/astro/Media';
+import SectionHeader from '@ambiqai/helia-ui/astro/SectionHeader';
+
+const themes = [
+  {
+    label: 'The hub',
+    scope: 'site-theme-example--hub',
+    density: undefined,
+    dials: [
+      '--helia-product-accent: var(--helia-accent-slate)',
+      '--helia-radius-scale: 1',
+      '--helia-surface-tint-amount: 0%',
+      '--helia-hero-treatment: plain',
+      'density: unset',
+    ],
+  },
+  {
+    label: 'A warmer site',
+    scope: 'site-theme-example--warm',
+    density: 'comfortable',
+    dials: [
+      '--helia-product-accent: var(--helia-accent-orange)',
+      '--helia-accent-secondary: var(--helia-accent-pink)',
+      '--helia-radius-scale: 1.6',
+      '--helia-surface-tint: var(--helia-accent-orange)',
+      '--helia-surface-tint-amount: 7%',
+      '--helia-hero-treatment: band',
+      'data-helia-density="comfortable"',
+    ],
+  },
+] as const;
+---
+
+<div class="site-theme-examples not-content">
+  {
+    themes.map((theme) => (
+      <section
+        class:list={['site-theme-example', theme.scope]}
+        data-helia-density={theme.density}
+        aria-label={`${theme.label}: the same cards under its own theme`}
+      >
+        <div class="site-theme-example__hero">
+          <SectionHeader
+            eyebrow={theme.label}
+            title="Start building"
+            description="Three cards, one section header, and nothing else changed."
+          />
+        </div>
+
+        <div class="site-theme-example__cards">
+          <Card>
+            <CardMedia>
+              <Media
+                treatment="color-field"
+                style="--accent: var(--helia-product-accent)"
+              />
+            </CardMedia>
+            <CardHeader overline="Guide" titleAs="h4">
+              Install the toolchain
+            </CardHeader>
+          </Card>
+
+          <Card tone="filled">
+            <CardHeader overline="Tutorial" titleAs="h4">
+              Run the first example
+            </CardHeader>
+            <CardActions>
+              <Button href="/helia-ui/foundations/site-theme/" size="sm">
+                <span>Open</span>
+              </Button>
+              <Badge tone="info">15 min</Badge>
+            </CardActions>
+          </Card>
+
+          <Card tone="elevated" lift>
+            <CardHeader overline="Reference" titleAs="h4">
+              Read the API
+            </CardHeader>
+            <CardContent>
+              Every symbol, with the units and the error behaviour.
+            </CardContent>
+          </Card>
+        </div>
+
+        <ul class="site-theme-example__dials">
+          {theme.dials.map((dial) => (
+            <li>
+              <code>{dial}</code>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</div>
+
+<style>
+  .site-theme-examples {
+    display: grid;
+    gap: var(--helia-space-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+    margin-top: var(--helia-space-4);
+  }
+
+  .site-theme-example {
+    align-content: start;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: var(--helia-radius-md);
+    display: grid;
+    gap: var(--helia-space-4);
+    min-width: 0;
+    padding: var(--helia-space-4);
+  }
+
+  .site-theme-example__hero {
+    border-radius: var(--helia-radius-md);
+  }
+
+  /*
+   * The hero dial is the one thing no package rule reads: a site composes its
+   * own hero and switches on the value, which is what this does. A browser
+   * without style queries falls through to the plain treatment, which is the
+   * default the dial names anyway.
+   */
+  @container style(--helia-hero-treatment: band) {
+    .site-theme-example__hero {
+      background: linear-gradient(
+        100deg,
+        color-mix(in srgb, var(--helia-product-accent) 18%, transparent),
+        color-mix(in srgb, var(--helia-accent-secondary) 14%, transparent)
+      );
+      padding: var(--helia-space-3);
+    }
+  }
+
+  .site-theme-example__cards {
+    display: grid;
+    gap: var(--helia-space-3);
+    min-width: 0;
+  }
+
+  .site-theme-example__dials {
+    display: grid;
+    gap: var(--helia-space-1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .site-theme-example__dials code {
+    font-size: var(--helia-text-label);
+    overflow-wrap: anywhere;
+  }
+</style>
