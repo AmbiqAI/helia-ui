@@ -18,7 +18,7 @@ The package is private and is not published to the npm registry, so it is
 installed from a git tag in `AmbiqAI/helia-ui` rather than by version range:
 
 ```sh
-npm install github:AmbiqAI/helia-ui#v0.1.0-alpha.5
+npm install github:AmbiqAI/helia-ui#v0.1.0-alpha.6
 ```
 
 A tag rather than a branch: the tarball npm builds from a branch changes under
