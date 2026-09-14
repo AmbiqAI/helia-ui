@@ -114,10 +114,19 @@ const isTailwindEntry = (entry: string) =>
  * both modes, so the syntax ink was picked for the surface it lands on. One
  * light and one dark is also what makes Starlight emit `[data-theme]` selectors
  * instead of a media query, which is how the blocks follow the theme toggle.
+ *
+ * The high-contrast variants rather than the base pair: the base themes ship
+ * ink that fails WCAG AA on the card surface in both modes -- `variable` at
+ * 3.49:1 on light paper, `comment` at 3.95:1 on the dark card -- and the
+ * package draws them on its own surface rather than the theme's editor
+ * background, so the theme's own contrast budget does not carry over. The
+ * high-contrast pair keeps GitHub's hue assignments, so the change is one of
+ * depth rather than palette. The docs accessibility scan covers a code page in
+ * both themes; see AmbiqAI/helia-ui#33.
  */
 const CODE_THEMES: NonNullable<ExpressiveCodeOptions['themes']> = [
-  'github-dark',
-  'github-light',
+  'github-dark-high-contrast',
+  'github-light-high-contrast',
 ];
 
 /** The `url("data:image/svg+xml,...")` form Expressive Code expects for icons. */

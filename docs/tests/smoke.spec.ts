@@ -63,7 +63,7 @@ for (const route of routes) {
 /* The pages that carry the site's own demonstration markup: the landing with
  * the tables and callouts, and the ones that render the most package parts. A
  * violation on any of them is a violation in a part, not in prose. */
-const accessibilityRoutes: { path: string; exclude?: string }[] = [
+const accessibilityRoutes: { path: string; theme?: 'dark' }[] = [
   { path: `${base}/` },
   { path: `${base}/primitives/` },
   { path: `${base}/cards/` },
@@ -71,11 +71,14 @@ const accessibilityRoutes: { path: string; exclude?: string }[] = [
     /* The only page carrying a terminal in each of the three tones, so it is
        where a status ink that reads on one backdrop and not another shows. */
     path: `${base}/code/`,
-    /* Syntax colours come from the Shiki themes rather than from the package's
-       own tokens, and `github-light` puts a 3.48:1 orange on paper. Excluding
-       the highlighted blocks leaves the rest of the page -- the terminals
-       included -- under the full scan; the theme is its own decision. */
-    exclude: '.astro-code',
+  },
+  {
+    /* Syntax ink is the one page colour the package does not own -- it comes
+       from the Shiki theme pair, drawn on the package's card rather than on
+       the theme's own editor background -- so the code page is scanned in
+       both themes. See AmbiqAI/helia-ui#33. */
+    path: `${base}/code/`,
+    theme: 'dark',
   },
   {
     /* Every card variant and every transition on one page. A contrast failure
@@ -85,8 +88,9 @@ const accessibilityRoutes: { path: string; exclude?: string }[] = [
   },
 ];
 
-for (const { path, exclude } of accessibilityRoutes) {
-  test(`${path} has no accessibility violations`, async ({ page }) => {
+for (const { path, theme } of accessibilityRoutes) {
+  const label = theme ? `${path} (${theme})` : path;
+  test(`${label} has no accessibility violations`, async ({ page }) => {
     /*
      * Scanned as a reduced-motion visitor. The motion scale is 0 for them, so
      * `Reveal` never arms and nothing is part way through a fade while axe
@@ -109,9 +113,17 @@ for (const { path, exclude } of accessibilityRoutes) {
     await page.addStyleTag({
       content: '.helia-media__form { display: none; }',
     });
-    const builder = new AxeBuilder({ page });
-    if (exclude) builder.exclude(exclude);
-    const { violations } = await builder.analyze();
+    /*
+     * Set after load rather than through a colour-scheme emulation: Starlight
+     * resolves the stored preference in a blocking head script and writes the
+     * attribute itself, so anything set earlier is overwritten on navigation.
+     */
+    if (theme) {
+      await page.evaluate((value) => {
+        document.documentElement.dataset.theme = value;
+      }, theme);
+    }
+    const { violations } = await new AxeBuilder({ page }).analyze();
     expect(violations).toEqual([]);
   });
 }

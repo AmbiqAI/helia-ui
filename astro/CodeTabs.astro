@@ -117,7 +117,10 @@ const groupId = `code-tabs-${crypto.randomUUID()}`;
         <Code
           code={tab.code}
           lang={tab.language}
-          themes={{ light: 'github-light', dark: 'github-dark' }}
+          themes={{
+            light: 'github-light-high-contrast',
+            dark: 'github-dark-high-contrast',
+          }}
           defaultColor={false}
         />
       </div>
