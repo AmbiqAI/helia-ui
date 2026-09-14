@@ -11,15 +11,36 @@
  * The card is never an anchor. A whole-card link is `CardHeader href`, whose
  * link stretches over the card: an anchor here would nest the actions' own
  * links inside it.
+ *
+ * Everything past `as` is a modifier on the one recipe rather than a fork of
+ * it: tone changes what stands in for the edge, `media` changes where the
+ * frame sits, `density` moves the padding step, `accent` adds the rule. They
+ * compose, and each has a class a consumer can apply directly to an element
+ * this component cannot produce.
  */
 import type { HTMLAttributes, HTMLTag } from 'astro/types';
 import Surface from './Surface.astro';
 
+/**
+ * `outlined` is the default hairline card and `filled` the muted fill; both
+ * name what `card` and `muted` already did and stay as aliases of them.
+ */
+export type CardTone =
+  'card' | 'muted' | 'paper' | 'outlined' | 'filled' | 'elevated' | 'ghost';
+
 interface Props extends HTMLAttributes<'div'> {
   /** Element to render. Never an anchor: the whole-card link is `CardHeader href`. */
   as?: Exclude<HTMLTag, 'a'>;
-  /** Background: the raised card, the recessed muted fill, or paper. */
-  tone?: 'card' | 'muted' | 'paper';
+  /** What stands in for the card's edge and fill. */
+  tone?: CardTone;
+  /** Where a slotted `CardMedia` sits. `side` stacks again below 42rem. */
+  media?: 'top' | 'side' | 'background';
+  /** Moves the padding step the parts default to: 3, 4, or 5. */
+  density?: 'default' | 'compact' | 'comfortable';
+  /** Draws the accent rule on the leading edge, from `--helia-product-accent`. */
+  accent?: boolean;
+  /** Adds the hover lift. Pair it with `interactive` only when the card links. */
+  lift?: boolean;
   /** Adds the shared hover background shift and the focus-visible ring. */
   interactive?: boolean;
 }
@@ -27,18 +48,57 @@ interface Props extends HTMLAttributes<'div'> {
 const {
   as = 'div',
   tone = 'card',
+  media = 'top',
+  density = 'default',
+  accent = false,
+  lift = false,
   interactive = false,
   class: className,
   ...rest
 } = Astro.props;
+
+/* Tone splits in two: the background is the Surface's, the edge is the card's. */
+const SURFACE_TONE = {
+  card: 'card',
+  outlined: 'card',
+  elevated: 'card',
+  ghost: 'card',
+  muted: 'muted',
+  filled: 'muted',
+  paper: 'paper',
+} as const satisfies Record<CardTone, 'card' | 'muted' | 'paper'>;
+
+const EDGE = {
+  elevated: 'helia-card--elevated',
+  ghost: 'helia-card--ghost',
+} as const;
+
+const DENSITY = {
+  compact: 'helia-card--compact',
+  comfortable: 'helia-card--comfortable',
+} as const;
+
+const edge = tone === 'elevated' || tone === 'ghost' ? EDGE[tone] : undefined;
 ---
 
 <Surface
   as={as}
-  tone={tone}
+  tone={SURFACE_TONE[tone]}
   padding="none"
   interactive={interactive}
-  class:list={['helia-card', 'not-content', className]}
+  class:list={[
+    'helia-card',
+    'not-content',
+    edge,
+    /* A ghost card has nothing at rest, so the fill it gains on hover is part
+       of the tone rather than something the caller has to remember to ask for. */
+    tone === 'ghost' && 'helia-motion-surface',
+    media !== 'top' && `helia-card--media-${media}`,
+    density !== 'default' && DENSITY[density],
+    accent && 'helia-card--accent',
+    lift && 'helia-motion-lift',
+    className,
+  ]}
   {...rest}
 >
   <slot />

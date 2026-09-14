@@ -59,7 +59,7 @@
   --input: var(--helia-surface-border);
   --ring: var(--helia-focus-ring-color, var(--helia-ink-primary));
 
-  --radius: var(--helia-radius);
+  --radius: var(--helia-radius-md);
 
   /*
    * The chart ramp is the hub's accent set in the order the catalog reads
@@ -127,7 +127,7 @@
    * hub's base and large radius, which is what shadcn uses them for: controls
    * and cards respectively.
    */
-  --radius-md: var(--helia-radius);
+  --radius-md: var(--helia-radius-md);
   --radius-xl: var(--helia-radius-lg);
 
   /*

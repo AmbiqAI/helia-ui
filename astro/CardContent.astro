@@ -11,11 +11,11 @@ import type { HTMLAttributes } from 'astro/types';
 import type { PaddingStep } from './Surface.astro';
 
 interface Props extends HTMLAttributes<'div'> {
-  /** Inner padding, named by spacing step. `none` leaves the part to own its gaps. */
+  /** Inner padding, named by spacing step. `card` follows the density dial; `none` leaves the part to own its gaps. */
   padding?: PaddingStep;
 }
 
-const { padding = '4', class: className, ...rest } = Astro.props;
+const { padding = 'card', class: className, ...rest } = Astro.props;
 ---
 
 <div

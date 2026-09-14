@@ -30,8 +30,8 @@ git tag in the package's own repository, whose root is the package:
 ```jsonc
 {
   "dependencies": {
-    // Replace with "^0.1.0-alpha.4" once the package is on npm.
-    "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v0.1.0-alpha.4",
+    // Replace with "^0.1.0-alpha.5" once the package is on npm.
+    "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v0.1.0-alpha.5",
   },
 }
 ```

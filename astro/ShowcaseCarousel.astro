@@ -56,7 +56,20 @@ const { tabs, variant = 'feature' } = Astro.props;
     </div>
   </div>
 
-  <div class="track" data-carousel-track><slot /></div>
+  {
+    /*
+     * The track is a scroll container, so it is a tab stop: without one the only
+     * way to reach the cards past the first is a pointer, whenever the cards
+     * themselves carry nothing focusable. The focus ring is the shared recipe's.
+     */
+  }
+  <div
+    class="track helia-focus-ring helia-focus-ring--inset"
+    data-carousel-track
+    tabindex="0"
+  >
+    <slot />
+  </div>
 </showcase-carousel>
 
 <script>
@@ -71,11 +84,19 @@ const { tabs, variant = 'feature' } = Astro.props;
       if (!track || !previous || !next) return;
       // The cards are slotted, so they are known by position, not by a marker.
       const cards = Array.from(track.children) as HTMLElement[];
-      const scrollBehavior = window.matchMedia(
-        '(prefers-reduced-motion: reduce)',
-      ).matches
-        ? 'auto'
-        : 'smooth';
+      /*
+       * The glide reads the same dial the CSS transitions do. A site that has
+       * turned motion off, and a visitor who has, both get the jump rather
+       * than the slide; the rail is otherwise identical.
+       */
+      const motionScale = Number.parseFloat(
+        getComputedStyle(this).getPropertyValue('--helia-motion-scale'),
+      );
+      const scrollBehavior =
+        motionScale === 0 ||
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 'auto'
+          : 'smooth';
 
       // Tolerance for sub-pixel scroll offsets and fractional card widths.
       const epsilon = 2;
@@ -180,6 +201,10 @@ const { tabs, variant = 'feature' } = Astro.props;
     line-height: 1;
     margin: 0;
     padding: 0 var(--helia-space-3);
+    transition:
+      background-color var(--helia-motion-fast) var(--helia-ease-out),
+      border-color var(--helia-motion-fast) var(--helia-ease-out),
+      color var(--helia-motion-fast) var(--helia-ease-out);
     white-space: nowrap;
   }
 
@@ -220,6 +245,9 @@ const { tabs, variant = 'feature' } = Astro.props;
     line-height: 1;
     margin: 0;
     padding: 0 var(--helia-space-2);
+    transition:
+      background-color var(--helia-motion-fast) var(--helia-ease-out),
+      color var(--helia-motion-fast) var(--helia-ease-out);
     white-space: nowrap;
   }
 

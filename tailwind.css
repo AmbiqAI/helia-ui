@@ -106,7 +106,7 @@
   --radius-*: initial;
   --radius-xs: var(--helia-radius-xs);
   --radius-sm: var(--helia-radius-sm);
-  --radius-base: var(--helia-radius);
+  --radius-base: var(--helia-radius-md);
   --radius-lg: var(--helia-radius-lg);
   --radius-pill: var(--helia-radius-pill);
 

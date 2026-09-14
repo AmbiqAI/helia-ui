@@ -42,6 +42,7 @@ export default defineConfig({
       customCss: [
         './src/styles/tailwind.css',
         '@ambiqai/helia-ui/mermaid.css',
+        './src/styles/site-theme.css',
         './src/styles/site.css',
       ],
       plugins: [
@@ -76,6 +77,9 @@ export default defineConfig({
       sidebar: [
         { label: 'Overview', slug: '' },
         { label: 'Foundations', slug: 'foundations' },
+        /* Near the top on purpose: it is the page an owner picking a card
+           treatment is sent to, not a reference the parts pages lead into. */
+        { label: 'Gallery', slug: 'gallery' },
         { label: 'Starlight plugin', slug: 'starlight-plugin' },
         {
           label: 'Migrating from MkDocs',

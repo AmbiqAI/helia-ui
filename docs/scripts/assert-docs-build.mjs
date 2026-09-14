@@ -30,6 +30,9 @@ const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const ASTRO_LANE = [
   '',
   'foundations',
+  /* The gallery is the busiest Astro-lane page there is; if anything on it
+     needed an island the lane's whole premise would be in question. */
+  'gallery',
   'starlight-plugin',
   'migrating-from-mkdocs',
   'python-api-reference',

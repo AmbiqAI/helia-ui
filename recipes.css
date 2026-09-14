@@ -54,20 +54,100 @@
   outline-offset: -3px;
 }
 
-.helia-hover-surface {
-  transition:
-    background-color 140ms ease,
-    border-color 140ms ease;
-}
+/*
+ * Named transitions. Each one is built from the motion tokens and nothing
+ * else, so the per-site dial and the reduced-motion block reach all of them at
+ * once. See docs/design-system.md, "Motion".
+ */
 
 /*
  * Background and border only. A transform here would move the element out from
  * under the pointer in a grid, and reflow neighbours that share its row.
+ * `--helia-hover-border` lets a tone that carries no edge at rest keep none on
+ * hover, rather than growing one.
  */
+.helia-motion-surface,
+.helia-hover-surface {
+  transition:
+    background-color var(--helia-motion-fast) var(--helia-ease-out),
+    border-color var(--helia-motion-fast) var(--helia-ease-out);
+}
+
+.helia-motion-surface:hover,
+.helia-motion-surface:focus-visible,
 .helia-hover-surface:hover,
 .helia-hover-surface:focus-visible {
   background: var(--helia-surface-card-muted);
-  border-color: var(--sl-color-gray-4, var(--helia-sl-gray-4));
+  border-color: var(
+    --helia-hover-border,
+    var(--sl-color-gray-4, var(--helia-sl-gray-4))
+  );
+}
+
+/*
+ * The lift. Translation and one shadow step, never a scale: scaling a card
+ * resamples its media and its text, and a row of cards that each grow on hover
+ * reads as a row that cannot hold still.
+ */
+.helia-motion-lift {
+  transition:
+    transform var(--helia-motion-base) var(--helia-ease-out),
+    box-shadow var(--helia-motion-base) var(--helia-ease-out);
+}
+
+.helia-motion-lift:hover,
+.helia-motion-lift:focus-within {
+  box-shadow: var(--helia-lift-shadow, var(--helia-shadow-2));
+  transform: translateY(var(--helia-motion-lift-distance));
+}
+
+/*
+ * Entry. Hiding is `--armed`, which only the Reveal script adds, so a page
+ * with no JavaScript -- or a visitor whose motion scale is 0, where the script
+ * returns before it arms anything -- shows the content rather than hiding it
+ * forever. `--in` is the class the observer adds when the element arrives.
+ */
+.helia-motion-reveal {
+  transition:
+    opacity var(--helia-motion-slow) var(--helia-ease-out),
+    transform var(--helia-motion-slow) var(--helia-ease-out),
+    visibility var(--helia-motion-slow);
+}
+
+/*
+ * `visibility` as well as `opacity`: content that has not arrived yet is not
+ * content a screen reader should be reading either, and a contrast check run
+ * over a section at opacity 0 measures a colour nobody will ever see. CSS
+ * transitions special-case visibility, so the return to `visible` takes effect
+ * at the start of the fade rather than half way through it.
+ */
+.helia-motion-reveal--armed {
+  opacity: 0;
+  transform: translateY(var(--helia-motion-reveal-distance));
+  visibility: hidden;
+}
+
+.helia-motion-reveal--armed.helia-motion-reveal--in {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+}
+
+/*
+ * The directional cue on a link card: the arrow moves, the card does not.
+ * `:focus-within` rather than `:focus-visible` because the focus lands on the
+ * stretched header link, not on the element wearing this class.
+ */
+.helia-motion-cue {
+  display: inline-block;
+  transition: transform var(--helia-motion-fast) var(--helia-ease-out);
+}
+
+:where(a, button):hover .helia-motion-cue,
+:where(a, button):focus-visible .helia-motion-cue,
+.helia-card:hover .helia-motion-cue,
+.helia-card:focus-within .helia-motion-cue {
+  transform: translateX(var(--helia-motion-cue-distance));
 }
 
 .helia-surface {
@@ -75,7 +155,7 @@
   /* Tinted variants (Callout) set the border colour without forking the recipe. */
   border: 1px solid
     var(--helia-surface-border-color, var(--helia-surface-border));
-  border-radius: var(--helia-radius);
+  border-radius: var(--helia-radius-md);
 }
 
 /*
@@ -110,6 +190,15 @@
 
 .helia-surface--pad-6 {
   padding: var(--helia-space-6);
+}
+
+/*
+ * The density-aware step. It is what the card parts render when nobody names a
+ * step, so the site dial and a card's own `density` reach them through one
+ * inherited hook; a part that names a step opts out and keeps it.
+ */
+.helia-surface--pad-card {
+  padding: var(--helia-card-pad, var(--helia-space-4));
 }
 
 .helia-surface--muted {
@@ -183,9 +272,9 @@ a.helia-chip--neutral:focus-visible {
   line-height: 1;
   text-decoration: none;
   transition:
-    background-color 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease;
+    background-color var(--helia-motion-fast) var(--helia-ease-out),
+    border-color var(--helia-motion-fast) var(--helia-ease-out),
+    color var(--helia-motion-fast) var(--helia-ease-out);
 }
 
 .helia-button--md {
@@ -227,12 +316,11 @@ a.helia-chip--neutral:focus-visible {
   background: var(--helia-surface-card-muted);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .helia-button,
-  .helia-hover-surface {
-    transition: none;
-  }
-}
+/*
+ * There is no reduced-motion block here. Every duration above resolves through
+ * `--helia-motion-scale`, which semantic.css zeroes under the media query, so a
+ * second list of classes to switch off would be a list that goes stale.
+ */
 
 /*
  * Composable card family. The recipes live here for the same reason the
@@ -250,6 +338,138 @@ a.helia-chip--neutral:focus-visible {
   overflow: hidden;
   /* Anchors the stretched header link. */
   position: relative;
+}
+
+/*
+ * Card tone. `outlined` is what `.helia-card` already draws, so it has no
+ * modifier; `filled` is the muted surface and reaches the card through
+ * `.helia-surface--muted`. The two below replace the edge rather than adding to
+ * it, and none of them touches padding or radius, so a row can mix tones and
+ * still line up.
+ */
+.helia-card--elevated {
+  --helia-hover-border: transparent;
+  --helia-lift-shadow: var(--helia-shadow-3);
+
+  border-color: transparent;
+  box-shadow: var(--helia-shadow-2);
+}
+
+/* No fill and no edge at rest. The fill on hover is the surface transition,
+   which the component pairs with this tone rather than leaving to the caller. */
+.helia-card--ghost {
+  --helia-hover-border: transparent;
+
+  background: transparent;
+  border-color: transparent;
+}
+
+/* Density. The hook is inherited, so it reaches whichever parts the card
+   was handed without the card knowing which those are. */
+.helia-card--compact {
+  --helia-card-pad: var(--helia-space-3);
+}
+
+.helia-card--comfortable {
+  --helia-card-pad: var(--helia-space-5);
+}
+
+/*
+ * The accent rule: a pseudo-element rather than a border, because a border
+ * would move the card's own edge and break the row it sits in. The colour is
+ * the site accent unless a composition names one for this card.
+ */
+.helia-card--accent::before {
+  background: var(--helia-card-accent, var(--helia-product-accent));
+  block-size: var(--helia-rule-width);
+  content: '';
+  inset-block-start: 0;
+  inset-inline: 0;
+  position: absolute;
+  z-index: 2;
+}
+
+/*
+ * Background media: the frame fills the card and the parts ride over it. The
+ * ink is inverted to the fixed paper tone rather than the theme's, because the
+ * overlay below is dark in both themes.
+ */
+.helia-card--media-background {
+  --helia-hover-border: transparent;
+  /* The artwork's own surfaces are pinned dark in both themes. Inverted ink
+     over a field that lightens with the theme is a card that only reads half
+     the time, and it is the field rather than the overlay that decides. */
+  --helia-field-base: var(--helia-ink-black);
+  --helia-media-graphite: var(--helia-ink-black);
+  --helia-media-slate: var(--helia-ink-black);
+  --helia-media-wire: var(--helia-ink-black);
+  --helia-ink-primary: var(--helia-paper-white);
+  --helia-ink-secondary: color-mix(
+    in srgb,
+    var(--helia-paper-white) 82%,
+    transparent
+  );
+  --helia-ink-muted: color-mix(
+    in srgb,
+    var(--helia-paper-white) 66%,
+    transparent
+  );
+
+  border-color: transparent;
+  color: var(--helia-paper-white);
+  min-block-size: var(--helia-card-background-min);
+}
+
+.helia-card--media-background > .helia-card-media {
+  aspect-ratio: auto;
+  inset: 0;
+  position: absolute;
+}
+
+/* The overlay belongs to the placement, not to whatever artwork was slotted
+   in: it is what makes the ink legible over an image nobody here chose. */
+.helia-card--media-background > .helia-card-media::after {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--helia-ink-black) 70%, transparent),
+    color-mix(in srgb, var(--helia-ink-black) 25%, transparent)
+  );
+  content: '';
+  inset: 0;
+  position: absolute;
+}
+
+.helia-card--media-background > :not(.helia-card-media) {
+  position: relative;
+  z-index: 1;
+}
+
+/*
+ * Side media, wide viewports only. The frame is taken out of flow and the card
+ * reserves its width as padding, because the parts are siblings: a row
+ * direction would set the header, the body and the actions beside each other
+ * rather than stacked, and the card has no wrapper to give them. Below the
+ * breakpoint none of this applies and the card is the stacked one again.
+ */
+@media (width >= 42rem) {
+  .helia-card--media-side {
+    padding-inline-start: 40%;
+  }
+
+  .helia-card--media-side > .helia-card-media {
+    aspect-ratio: auto;
+    inset-block: 0;
+    inset-inline-start: 0;
+    position: absolute;
+    width: 40%;
+  }
+
+  .helia-card--accent.helia-card--media-side::before {
+    block-size: auto;
+    inline-size: var(--helia-rule-width);
+    inset-block: 0;
+    inset-inline-end: auto;
+  }
 }
 
 .helia-card-media {

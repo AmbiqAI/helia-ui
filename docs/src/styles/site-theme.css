@@ -1,0 +1,27 @@
+/* SPDX-License-Identifier: BSD-3-Clause */
+/* Copyright (c) 2026, Ambiq */
+/*
+ * The docs site's theme dials, from the template at
+ * `@ambiqai/helia-ui/site-theme.css`.
+ *
+ * This site deliberately sits on every default. It is the package's own
+ * documentation, so a value moved here would show the reader a system that is
+ * not the one the package ships. The Gallery demonstrates the dials inline on
+ * wrappers instead.
+ */
+
+:root {
+  --helia-product-accent: var(--helia-accent-slate);
+  --helia-accent-secondary: var(--helia-accent-slate);
+
+  --helia-radius-scale: 1;
+  --helia-motion-scale: 1;
+
+  --helia-font-sans: var(--__sl-font, var(--helia-sl-font-system));
+  --helia-font-mono: var(--__sl-font-mono, var(--helia-sl-font-system-mono));
+
+  --helia-surface-tint: transparent;
+  --helia-surface-tint-amount: 0%;
+
+  --helia-hero-treatment: plain;
+}

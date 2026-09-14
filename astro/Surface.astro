@@ -12,8 +12,12 @@
  */
 import type { HTMLAttributes, HTMLTag } from 'astro/types';
 
-/** Spacing scale step names, plus `none` for a surface that pads its own children. */
-export type PaddingStep = 'none' | 'px' | '1' | '2' | '3' | '4' | '5' | '6';
+/**
+ * Spacing scale step names, plus `none` for a surface that pads its own
+ * children and `card` for the density-aware step the card parts default to.
+ */
+export type PaddingStep =
+  'none' | 'card' | 'px' | '1' | '2' | '3' | '4' | '5' | '6';
 
 interface Props extends HTMLAttributes<'div'> {
   /** Element to render. Ignored when `href` is set. */
@@ -46,7 +50,7 @@ const Element = href ? 'a' : as;
     'helia-surface',
     tone !== 'card' && `helia-surface--${tone}`,
     padding !== 'none' && `helia-surface--pad-${padding}`,
-    interactive && ['helia-hover-surface', 'helia-focus-ring'],
+    interactive && ['helia-motion-surface', 'helia-focus-ring'],
     className,
   ]}
   href={href}

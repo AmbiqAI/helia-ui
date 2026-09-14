@@ -30,7 +30,7 @@
 
 .helia-media-surface-grid figure {
   border: 1px solid var(--sl-color-gray-5);
-  border-radius: var(--helia-radius);
+  border-radius: var(--helia-radius-md);
   margin: 0;
   min-width: 0;
   overflow: hidden;
@@ -72,6 +72,57 @@
 .helia-callout-stack {
   display: grid;
   gap: var(--helia-space-3);
+}
+
+/*
+ * Gallery scaffolding. Every example is labelled with the prop or class that
+ * produces it, so the grid cell is the pair rather than the card alone.
+ */
+.gallery-grid {
+  display: grid;
+  gap: var(--helia-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  margin-top: var(--helia-space-4);
+}
+
+.gallery-grid--wide {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
+}
+
+.gallery-grid--full {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.gallery-item {
+  align-content: start;
+  display: grid;
+  gap: var(--helia-space-2);
+  min-width: 0;
+}
+
+.gallery-item > code {
+  font-size: var(--helia-text-label);
+  overflow-wrap: anywhere;
+}
+
+.gallery-knob {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: var(--helia-radius-md);
+  display: grid;
+  gap: var(--helia-space-3);
+  padding: var(--helia-space-4);
+}
+
+.gallery-spacer {
+  align-items: center;
+  border: 1px dashed var(--sl-color-gray-5);
+  border-radius: var(--helia-radius-md);
+  color: var(--sl-color-gray-3);
+  display: flex;
+  font-size: var(--helia-text-caption);
+  justify-content: center;
+  margin-top: var(--helia-space-4);
+  min-height: 14rem;
 }
 
 /* A token rendered by being used: the bar's width is the step it names. */
@@ -126,7 +177,7 @@
 
 .token-swatch--bordered {
   border: 1px solid var(--sl-color-gray-5);
-  border-radius: var(--helia-radius);
+  border-radius: var(--helia-radius-md);
 }
 
 .token-ink-row {
@@ -146,7 +197,7 @@
 .logo-swatch {
   align-items: center;
   border: 1px solid var(--sl-color-gray-5);
-  border-radius: var(--helia-radius);
+  border-radius: var(--helia-radius-md);
   display: flex;
   flex-direction: column;
   gap: var(--helia-space-3);

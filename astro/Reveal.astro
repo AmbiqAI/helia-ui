@@ -1,0 +1,77 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * Entry animation for whatever it wraps: a short fade and rise the first time
+ * the element reaches the viewport.
+ *
+ * The hidden state is a class the script adds, never the resting state of the
+ * recipe, so the content is visible without JavaScript and visible again the
+ * moment the script decides not to run. The script reads the same
+ * `--helia-motion-scale` the transitions do and returns before arming anything
+ * when it is 0, which is what a site turning motion off, and a visitor asking
+ * for reduced motion, both amount to.
+ *
+ * Use it on a section, not on every card in one: a page where each element
+ * arrives separately reads as a page that is still loading.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  /**
+   * How much of the element has to be in view before it reveals, 0 to 1.
+   * Lower it for a tall section that would otherwise never cross the mark.
+   */
+  threshold?: number;
+}
+
+const { threshold = 0.15, class: className, ...rest } = Astro.props;
+---
+
+<helia-reveal
+  class:list={['helia-motion-reveal', className]}
+  data-threshold={threshold}
+  {...rest}
+>
+  <slot />
+</helia-reveal>
+
+<script>
+  class HeliaReveal extends HTMLElement {
+    connectedCallback() {
+      const scale = Number.parseFloat(
+        getComputedStyle(this).getPropertyValue('--helia-motion-scale'),
+      );
+      // NaN means the token never resolved, which is a site without the
+      // stylesheets. Nothing would animate anyway, so leave the content alone.
+      if (!(scale > 0)) return;
+
+      const threshold = Number.parseFloat(this.dataset.threshold ?? '');
+
+      this.classList.add('helia-motion-reveal--armed');
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            entry.target.classList.add('helia-motion-reveal--in');
+            observer.unobserve(entry.target);
+          }
+        },
+        { threshold: Number.isFinite(threshold) ? threshold : 0.15 },
+      );
+
+      observer.observe(this);
+    }
+  }
+
+  if (!customElements.get('helia-reveal')) {
+    customElements.define('helia-reveal', HeliaReveal);
+  }
+</script>
+
+<style>
+  helia-reveal {
+    display: block;
+  }
+</style>

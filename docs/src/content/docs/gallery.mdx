@@ -1,0 +1,602 @@
+---
+title: Gallery
+description: Every card variant, every named transition, and the site theme dials, side by side.
+---
+
+import Badge from '@ambiqai/helia-ui/astro/Badge';
+import Button from '@ambiqai/helia-ui/astro/Button';
+import Card from '@ambiqai/helia-ui/astro/Card';
+import CardActions from '@ambiqai/helia-ui/astro/CardActions';
+import CardContent from '@ambiqai/helia-ui/astro/CardContent';
+import CardHeader from '@ambiqai/helia-ui/astro/CardHeader';
+import CardMedia from '@ambiqai/helia-ui/astro/CardMedia';
+import Chip from '@ambiqai/helia-ui/astro/Chip';
+import LinkCard from '@ambiqai/helia-ui/astro/LinkCard';
+import Media from '@ambiqai/helia-ui/astro/Media';
+import Reveal from '@ambiqai/helia-ui/astro/Reveal';
+import ShowcaseCarousel from '@ambiqai/helia-ui/astro/ShowcaseCarousel';
+import StatCard from '@ambiqai/helia-ui/astro/StatCard';
+
+This page is for choosing. Every option the card parts and the motion system
+offer is on it, side by side, each labelled with the exact prop or class that
+produces it. Nothing here is a new component: the variants are modifiers on
+`Card` and the transitions are classes in `recipes.css`.
+
+The reference tables are on [Cards](/helia-ui/cards/) for the parts and in
+`docs/design-system.md` for the motion tokens and the site theme.
+
+## Tone
+
+Four tones, each of them a different answer to "what stands in for the edge".
+`outlined` is the default and `card` is its older name; `filled` and `muted`
+are likewise the same tone. Padding and radius do not move between them, so a
+row can mix tones and still line up.
+
+<div className="gallery-grid not-content">
+  <div className="gallery-item">
+    <Card tone="elevated">
+      <CardContent>A shadow instead of a border.</CardContent>
+    </Card>
+    <code>tone="elevated"</code>
+  </div>
+  <div className="gallery-item">
+    <Card tone="outlined">
+      <CardContent>The hairline card, unchanged.</CardContent>
+    </Card>
+    <code>tone="outlined"</code>
+  </div>
+  <div className="gallery-item">
+    <Card tone="filled">
+      <CardContent>The muted fill, for a card inside a surface.</CardContent>
+    </Card>
+    <code>tone="filled"</code>
+  </div>
+  <div className="gallery-item">
+    <Card tone="ghost">
+      <CardContent>Nothing at rest. Point at it for the fill.</CardContent>
+    </Card>
+    <code>tone="ghost"</code>
+  </div>
+</div>
+
+## Tone and density together
+
+`density` moves the step the card parts pad to: 3 for `compact`, 4 by default,
+5 for `comfortable`. A part that names its own step opts out and keeps it.
+
+### Compact
+
+<div className="gallery-grid not-content">
+  <div className="gallery-item">
+    <Card tone="elevated" density="compact">
+      <CardContent>Elevated, compact.</CardContent>
+    </Card>
+    <code>tone="elevated" density="compact"</code>
+  </div>
+  <div className="gallery-item">
+    <Card tone="outlined" density="compact">
+      <CardContent>Outlined, compact.</CardContent>
+    </Card>
+    <code>tone="outlined" density="compact"</code>
+  </div>
+  <div className="gallery-item">
+    <Card tone="filled" density="compact">
+      <CardContent>Filled, compact.</CardContent>
+    </Card>
+    <code>tone="filled" density="compact"</code>
+  </div>
+  <div className="gallery-item">
+    <Card tone="ghost" density="compact">
+      <CardContent>Ghost, compact.</CardContent>
+    </Card>
+    <code>tone="ghost" density="compact"</code>
+  </div>
+</div>
+
+### Default
+
+<div className="gallery-grid not-content">
+  <div className="gallery-item">
+    <Card tone="elevated">
+      <CardContent>Elevated, default.</CardContent>
+    </Card>
+    <code>tone="elevated"</code>
+  </div>
+  <div className="gallery-item">
+    <Card tone="outlined">
+      <CardContent>Outlined, default.</CardContent>
+    </Card>
+    <code>tone="outlined"</code>
+  </div>
+  <div className="gallery-item">
+    <Card tone="filled">
+      <CardContent>Filled, default.</CardContent>
+    </Card>
+    <code>tone="filled"</code>
+  </div>
+  <div className="gallery-item">
+    <Card tone="ghost">
+      <CardContent>Ghost, default.</CardContent>
+    </Card>
+    <code>tone="ghost"</code>
+  </div>
+</div>
+
+### Comfortable
+
+<div className="gallery-grid not-content">
+  <div className="gallery-item">
+    <Card tone="elevated" density="comfortable">
+      <CardContent>Elevated, comfortable.</CardContent>
+    </Card>
+    <code>tone="elevated" density="comfortable"</code>
+  </div>
+  <div className="gallery-item">
+    <Card tone="outlined" density="comfortable">
+      <CardContent>Outlined, comfortable.</CardContent>
+    </Card>
+    <code>tone="outlined" density="comfortable"</code>
+  </div>
+  <div className="gallery-item">
+    <Card tone="filled" density="comfortable">
+      <CardContent>Filled, comfortable.</CardContent>
+    </Card>
+    <code>tone="filled" density="comfortable"</code>
+  </div>
+  <div className="gallery-item">
+    <Card tone="ghost" density="comfortable">
+      <CardContent>Ghost, comfortable.</CardContent>
+    </Card>
+    <code>tone="ghost" density="comfortable"</code>
+  </div>
+</div>
+
+## Media placement
+
+`top` is the stacked card. `side` puts the frame down the leading edge at 40%
+of the card and stacks again below 42rem, so a narrow viewport gets the top
+placement whatever was asked for. `background` fills the card with the frame,
+draws an overlay over it, and inverts the ink onto the fixed paper tone.
+
+### The three placements
+
+<div className="gallery-grid gallery-grid--wide not-content">
+  <div className="gallery-item">
+    <Card>
+      <CardMedia ratio="16/9">
+        <Media
+          treatment="color-field"
+          style="--accent: var(--helia-accent-purple)"
+        />
+      </CardMedia>
+      <CardHeader titleAs="h4">
+        <span>Media on top</span>
+      </CardHeader>
+      <CardContent>The frame owns the ratio and the card stacks.</CardContent>
+    </Card>
+    <code>{'<Card>'}</code>
+  </div>
+  <div className="gallery-item">
+    <Card media="side">
+      <CardMedia ratio="16/9">
+        <Media
+          treatment="graphite"
+          style="--accent: var(--helia-accent-cyan)"
+        />
+      </CardMedia>
+      <CardHeader titleAs="h4">
+        <span>Media beside</span>
+      </CardHeader>
+      <CardContent>
+        The frame leaves the flow and the card reserves its width, so the
+        header, the body and the actions stay stacked.
+      </CardContent>
+    </Card>
+    <code>{'<Card media="side">'}</code>
+  </div>
+  <div className="gallery-item">
+    <Card media="background">
+      <CardMedia>
+        <Media
+          treatment="color-field"
+          style="--accent: var(--helia-accent-blue)"
+        />
+      </CardMedia>
+      <CardHeader titleAs="h4">
+        <span>Media behind</span>
+      </CardHeader>
+      <CardContent>
+        The ink inverts to the fixed paper tone, because the overlay is dark in
+        both themes.
+      </CardContent>
+    </Card>
+    <code>{'<Card media="background">'}</code>
+  </div>
+</div>
+
+## Accent
+
+`accent` draws a 3px rule from `--helia-product-accent` on the leading edge:
+the top of a stacked card, the left of a side one. It is a pseudo-element, not
+a border, so the card's own edge does not move and the row holds.
+
+A composition that needs a different colour for one card sets
+`--helia-card-accent` on it rather than reaching for a second prop.
+
+<div className="gallery-grid not-content">
+  <div className="gallery-item">
+    <Card>
+      <CardContent>No rule.</CardContent>
+    </Card>
+    <code>{'<Card>'}</code>
+  </div>
+  <div className="gallery-item">
+    <Card accent>
+      <CardContent>The site accent.</CardContent>
+    </Card>
+    <code>{'<Card accent>'}</code>
+  </div>
+  <div className="gallery-item">
+    <Card accent style="--helia-card-accent: var(--helia-accent-green)">
+      <CardContent>One card, one colour.</CardContent>
+    </Card>
+    <code>style="--helia-card-accent: var(--helia-accent-green)"</code>
+  </div>
+  <div className="gallery-item">
+    <Card accent tone="elevated">
+      <CardContent>The rule survives a tone with no border.</CardContent>
+    </Card>
+    <code>{'<Card accent tone="elevated">'}</code>
+  </div>
+</div>
+
+## StatCard
+
+A figure, its label, and an optional change. The number is the child, so it can
+carry a unit or markup; the delta is a `Badge` and its tone is the caller's,
+because the component has no idea whether up is good.
+
+<div className="gallery-grid not-content">
+  <div className="gallery-item">
+    <StatCard label="Routes emitted">206</StatCard>
+    <code>{'<StatCard label="Routes emitted">'}</code>
+  </div>
+  <div className="gallery-item">
+    <StatCard label="Build time" delta="-18%" deltaTone="success">
+      <span>41s</span>
+    </StatCard>
+    <code>delta="-18%" deltaTone="success"</code>
+  </div>
+  <div className="gallery-item">
+    <StatCard label="Open findings" delta="+3" deltaTone="warning" accent>
+      <span>12</span>
+    </StatCard>
+    <code>deltaTone="warning" accent</code>
+  </div>
+  <div className="gallery-item">
+    <StatCard label="Bundle" tone="elevated" density="compact">
+      <span>84 kB</span>
+    </StatCard>
+    <code>tone="elevated" density="compact"</code>
+  </div>
+</div>
+
+## LinkCard
+
+Title, one line, and a cue that moves when the card is under the pointer. The
+link lives on the title and the recipe stretches it over the card, so the whole
+card is the target and the cue is inside the same hit area.
+
+### Three link cards
+
+<div className="gallery-grid gallery-grid--wide not-content">
+  <div className="gallery-item">
+    <LinkCard titleAs="h4" href="/helia-ui/cards/" title="The card parts">
+      What each part owns, and how a subset of them composes.
+    </LinkCard>
+    <code>{'<LinkCard href title>'}</code>
+  </div>
+  <div className="gallery-item">
+    <LinkCard
+      titleAs="h4"
+      href="/helia-ui/foundations/"
+      title="Foundations"
+      overline="Tokens"
+      tone="ghost"
+    >
+      The scales every part compiles against.
+    </LinkCard>
+    <code>overline="Tokens" tone="ghost"</code>
+  </div>
+  <div className="gallery-item">
+    <LinkCard
+      titleAs="h4"
+      href="/helia-ui/primitives/"
+      title="Primitives"
+      tone="elevated"
+      lift
+      accent
+    >
+      The four shapes the rest of the system reuses.
+    </LinkCard>
+    <code>tone="elevated" lift accent</code>
+  </div>
+</div>
+
+## Named transitions
+
+Five transitions, each built from the motion tokens and nothing else, so the
+per-site dial and the reduced-motion rule reach all of them at once. Point at
+the cards below; none of them does anything at rest.
+
+### Hover targets
+
+<div className="gallery-grid gallery-grid--wide not-content">
+  <div className="gallery-item">
+    <Card interactive>
+      <CardHeader titleAs="h4">
+        <span>Hover me: the fill shifts</span>
+      </CardHeader>
+      <CardContent>
+        Background and border, 120ms. No transform: a card that moves under the
+        pointer inside a grid reflows the row it shares.
+      </CardContent>
+    </Card>
+    <code>.helia-motion-surface (via `interactive`)</code>
+  </div>
+  <div className="gallery-item">
+    <Card lift tone="elevated">
+      <CardHeader titleAs="h4">
+        <span>Hover me: the card lifts</span>
+      </CardHeader>
+      <CardContent>
+        2px up and one shadow step, 200ms. Never a scale, which would resample
+        the media and the text.
+      </CardContent>
+    </Card>
+    <code>{'<Card lift> / .helia-motion-lift'}</code>
+  </div>
+  <div className="gallery-item">
+    <LinkCard
+      titleAs="h4"
+      href="/helia-ui/gallery/#named-transitions"
+      title="Hover me: the arrow nudges"
+    >
+      2px along, 120ms. The cue moves and the card holds still.
+    </LinkCard>
+    <code>.helia-motion-cue</code>
+  </div>
+  <div className="gallery-item">
+    <Card>
+      <CardActions>
+        <Button href="/helia-ui/gallery/#named-transitions" size="sm">
+          <span>Hover me: the button fills</span>
+        </Button>
+        <Chip href="/helia-ui/gallery/#named-transitions">And the pill</Chip>
+      </CardActions>
+      <CardContent>
+        `Button` and `Chip` are on the same 120ms step as the surface, so a card
+        and the controls inside it settle together.
+      </CardContent>
+    </Card>
+    <code>.helia-button</code>
+  </div>
+</div>
+
+### The carousel glide
+
+The fifth transition. The rail reads the same dial the CSS does, so a site with
+motion switched off gets the jump rather than the slide.
+
+<div className="gallery-grid gallery-grid--full not-content">
+  <ShowcaseCarousel
+    variant="compact"
+    tabs={['Compile', 'Profile', 'Deploy', 'Measure']}
+  >
+    <Card>
+      <CardMedia ratio="16/9">
+        <Media
+          treatment="color-field"
+          style="--accent: var(--helia-accent-purple)"
+        />
+      </CardMedia>
+      <CardHeader titleAs="h4">
+        <span>Compile</span>
+      </CardHeader>
+    </Card>
+    <Card>
+      <CardMedia ratio="16/9">
+        <Media
+          treatment="color-field"
+          style="--accent: var(--helia-accent-cyan)"
+        />
+      </CardMedia>
+      <CardHeader titleAs="h4">
+        <span>Profile</span>
+      </CardHeader>
+    </Card>
+    <Card>
+      <CardMedia ratio="16/9">
+        <Media
+          treatment="color-field"
+          style="--accent: var(--helia-accent-green)"
+        />
+      </CardMedia>
+      <CardHeader titleAs="h4">
+        <span>Deploy</span>
+      </CardHeader>
+    </Card>
+    <Card>
+      <CardMedia ratio="16/9">
+        <Media
+          treatment="color-field"
+          style="--accent: var(--helia-accent-orange)"
+        />
+      </CardMedia>
+      <CardHeader titleAs="h4">
+        <span>Measure</span>
+      </CardHeader>
+    </Card>
+  </ShowcaseCarousel>
+</div>
+
+## Theme knobs
+
+The site theme is nine dials in one file. They are set here on a wrapper rather
+than on `:root`, which is the same mechanism a section of a page would use to
+carry its own treatment, and it is why the examples below can sit next to each
+other.
+
+<div className="gallery-grid gallery-grid--wide not-content">
+  <div className="gallery-item">
+    <div
+      className="gallery-knob"
+      style="--helia-radius-scale: 0"
+      data-helia-density="compact"
+    >
+      <Card tone="elevated">
+        <CardContent>Square, compact, untinted.</CardContent>
+      </Card>
+      <Card tone="filled">
+        <CardActions>
+          <Button href="/helia-ui/gallery/#theme-knobs" size="sm">
+            <span>Start</span>
+          </Button>
+          <Badge tone="info">Alpha</Badge>
+        </CardActions>
+      </Card>
+    </div>
+    <code>--helia-radius-scale: 0; data-helia-density="compact"</code>
+  </div>
+  <div className="gallery-item">
+    <div className="gallery-knob" style="--helia-radius-scale: 1">
+      <Card tone="elevated">
+        <CardContent>The package defaults, for comparison.</CardContent>
+      </Card>
+      <Card tone="filled">
+        <CardActions>
+          <Button href="/helia-ui/gallery/#theme-knobs" size="sm">
+            <span>Start</span>
+          </Button>
+          <Badge tone="info">Alpha</Badge>
+        </CardActions>
+      </Card>
+    </div>
+    <code>--helia-radius-scale: 1 (the default)</code>
+  </div>
+  <div className="gallery-item">
+    <div
+      className="gallery-knob"
+      style="--helia-radius-scale: 1.6; --helia-surface-tint: var(--helia-accent-cyan); --helia-surface-tint-amount: 9%"
+      data-helia-density="comfortable"
+    >
+      <Card tone="elevated">
+        <CardContent>Round, comfortable, tinted cyan.</CardContent>
+      </Card>
+      <Card tone="filled">
+        <CardActions>
+          <Button href="/helia-ui/gallery/#theme-knobs" size="sm">
+            <span>Start</span>
+          </Button>
+          <Badge tone="info">Alpha</Badge>
+        </CardActions>
+      </Card>
+    </div>
+    <code>
+      --helia-radius-scale: 1.6; --helia-surface-tint: var(--helia-accent-cyan);
+      --helia-surface-tint-amount: 9%
+    </code>
+  </div>
+</div>
+
+The accent dial is the one that does not need a wrapper of its own, because
+every card already reads it:
+
+<div className="gallery-grid not-content">
+  <div className="gallery-item">
+    <div style="--helia-product-accent: var(--helia-accent-orange)">
+      <Card accent>
+        <CardContent>An orange site.</CardContent>
+      </Card>
+    </div>
+    <code>--helia-product-accent: var(--helia-accent-orange)</code>
+  </div>
+  <div className="gallery-item">
+    <div style="--helia-product-accent: var(--helia-accent-purple)">
+      <Card accent>
+        <CardContent>A purple site.</CardContent>
+      </Card>
+    </div>
+    <code>--helia-product-accent: var(--helia-accent-purple)</code>
+  </div>
+  <div className="gallery-item">
+    <div style="--helia-motion-scale: 0">
+      <Card lift tone="elevated">
+        <CardContent>Motion off: the lift arrives instantly.</CardContent>
+      </Card>
+    </div>
+    <code>--helia-motion-scale: 0</code>
+  </div>
+</div>
+
+## Reveal on scroll
+
+`Reveal` fades and rises what it wraps the first time it reaches the viewport.
+Use it on a section, not on every card in one: a page where each element
+arrives separately reads as a page that is still loading.
+
+The hidden state is a class the script adds, so the content is visible without
+JavaScript, and the script returns before arming anything when the motion scale
+is 0.
+
+<div className="gallery-spacer not-content">
+  Scroll on. The cards below start hidden and arrive as they reach the viewport.
+</div>
+
+<Reveal>
+  <div className="gallery-grid not-content">
+    <div className="gallery-item">
+      <Card tone="elevated">
+        <CardContent>One section, one reveal.</CardContent>
+      </Card>
+      <code>{'<Reveal>'}</code>
+    </div>
+    <div className="gallery-item">
+      <Card tone="elevated">
+        <CardContent>The cards inside it arrive together.</CardContent>
+      </Card>
+      <code>{'<Reveal>'}</code>
+    </div>
+    <div className="gallery-item">
+      <Card tone="elevated">
+        <CardContent>Which is the point of wrapping the section.</CardContent>
+      </Card>
+      <code>{'<Reveal>'}</code>
+    </div>
+  </div>
+</Reveal>
+
+<div className="gallery-spacer not-content">
+  A second gap, so the group below is still out of view when the first arrives.
+</div>
+
+<Reveal threshold={0.4}>
+  <div className="gallery-grid not-content">
+    <div className="gallery-item">
+      <Card tone="filled">
+        <CardContent>
+          A higher threshold waits until more of the section is in view.
+        </CardContent>
+      </Card>
+      <code>{'<Reveal threshold={0.4}>'}</code>
+    </div>
+    <div className="gallery-item">
+      <Card tone="filled">
+        <CardContent>
+          Lower it for a section too tall to ever cross the mark.
+        </CardContent>
+      </Card>
+      <code>{'<Reveal threshold={0.4}>'}</code>
+    </div>
+  </div>
+</Reveal>

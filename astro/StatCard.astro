@@ -1,0 +1,74 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A single figure with its label, and an optional change beside it.
+ *
+ * It is a composition of the card parts rather than a card of its own: every
+ * tone, density, media and accent modifier reaches it, because they are passed
+ * straight through to `Card`.
+ *
+ * The number is the child, so it can carry a unit, a `<span>`, or markup the
+ * composition wants. The delta is a `Badge`, and the tone is the caller's:
+ * this component has no idea whether up is good.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import type { CardTone } from './Card.astro';
+import Badge from './Badge.astro';
+import Card from './Card.astro';
+import CardContent from './CardContent.astro';
+import Eyebrow from './Eyebrow.astro';
+
+interface Props extends HTMLAttributes<'div'> {
+  /** What the figure counts. Rendered as the eyebrow above it. */
+  label: string;
+  /** The change beside the figure. Omit it and no badge renders. */
+  delta?: string;
+  /** Which way the change reads. The component does not decide. */
+  deltaTone?: 'neutral' | 'info' | 'success' | 'warning' | 'danger' | 'accent';
+  /* The card modifiers, passed straight through. */
+  tone?: CardTone;
+  density?: 'default' | 'compact' | 'comfortable';
+  accent?: boolean;
+  lift?: boolean;
+  interactive?: boolean;
+}
+
+const {
+  label,
+  delta,
+  deltaTone = 'neutral',
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<Card class:list={['helia-stat-card', className]} {...rest}>
+  <CardContent>
+    <Eyebrow>{label}</Eyebrow>
+    <p class="value">
+      <slot />
+      {
+        delta !== undefined && (
+          <Badge tone={deltaTone} size="sm">
+            {delta}
+          </Badge>
+        )
+      }
+    </p>
+  </CardContent>
+</Card>
+
+<style>
+  .value {
+    align-items: baseline;
+    color: var(--helia-ink-primary);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: var(--helia-text-heading);
+    font-weight: var(--helia-weight-strong);
+    gap: var(--helia-space-2);
+    line-height: var(--helia-leading-tight);
+    margin: var(--helia-space-2) 0 0;
+  }
+</style>

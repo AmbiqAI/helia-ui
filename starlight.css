@@ -80,7 +80,7 @@
 @media (width >= 62rem) {
   site-search button[data-open-modal] {
     background: var(--sl-color-bg-nav) !important;
-    border-radius: var(--helia-radius) !important;
+    border-radius: var(--helia-radius-md) !important;
     max-width: 28rem !important;
   }
 }

@@ -25,7 +25,7 @@ import Eyebrow from './Eyebrow.astro';
 interface Props extends HTMLAttributes<'div'> {
   /** Heading level for the title. Pick the one the page outline needs. */
   titleAs?: 'h2' | 'h3' | 'h4';
-  /** Inner padding, named by spacing step. `none` leaves the part to own its gaps. */
+  /** Inner padding, named by spacing step. `card` follows the density dial; `none` leaves the part to own its gaps. */
   padding?: PaddingStep;
   /** Links the title, and stretches that link over the whole card. */
   href?: string;
@@ -40,7 +40,7 @@ interface Props extends HTMLAttributes<'div'> {
 
 const {
   titleAs: Title = 'h3',
-  padding = '4',
+  padding = 'card',
   href,
   overline,
   class: className,

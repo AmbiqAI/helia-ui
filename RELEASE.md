@@ -7,13 +7,43 @@ required facts in the package root next to LICENSE and NOTICE.
 | Field             | Value                                                                       |
 | ----------------- | --------------------------------------------------------------------------- |
 | Package           | `@ambiqai/helia-ui`                                                         |
-| Version           | 0.1.0-alpha.4                                                               |
-| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.4`.         |
+| Version           | 0.1.0-alpha.5                                                               |
+| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.5`.         |
 | License           | BSD-3-Clause (`LICENSE`)                                                    |
 | Licensing tier    | Tier 1, ADR-0005                                                            |
 | Source repository | https://github.com/AmbiqAI/helia-ui                                         |
 | Source path       | Repository root, mirrored from `packages/helia-ui` in `helia-developer-hub` |
 | Source commit     | Recorded at tag time.                                                       |
+
+## What changed in 0.1.0-alpha.5
+
+- A motion system. Three duration steps (`--helia-motion-fast`, `-base`,
+  `-slow`), two easings, one per-site dial `--helia-motion-scale` that
+  multiplies every duration, and three travel distances. Four named
+  transitions built from those tokens and nothing else:
+  `.helia-motion-surface` (the former `.helia-hover-surface`, which stays as an
+  alias), `.helia-motion-lift`, `.helia-motion-reveal` and `.helia-motion-cue`.
+  The carousel's glide reads the same dial. One
+  `prefers-reduced-motion: reduce` block zeroes the dial and the distances, so
+  there is no list of classes to keep in step.
+- Card variants as modifiers on the existing parts, not new components.
+  `Card` gains `tone` (`elevated`, `outlined`, `filled`, `ghost`, alongside the
+  older `card`, `muted` and `paper` names), `media` (`top`, `side`,
+  `background`), `density` (`compact`, `comfortable`), `accent` and `lift`.
+  Each has a class for an element the component cannot produce, and they
+  compose.
+- `Reveal`, `StatCard` and `LinkCard` in the Astro lane. `Reveal` is the one
+  part that ships script: a custom element and one `IntersectionObserver`, and
+  it returns before hiding anything when the motion scale is 0, so the content
+  is visible without JavaScript.
+- `@ambiqai/helia-ui/site-theme.css`, the site theme contract: the nine dials a
+  consuming site may set, and the statement that anything else is a package
+  change. `--helia-radius-scale` and `--helia-surface-tint` are new;
+  `--helia-radius-md` is `--helia-radius` after the multiplier and is what the
+  recipes now read.
+- A `Gallery` page in the package docs carrying every variant, every
+  transition and the theme dials side by side, each labelled with the prop or
+  class that produces it.
 
 ## What changed in 0.1.0-alpha.4
 

@@ -51,9 +51,14 @@ const SHELL_FILES = new Set([
 
 // Where a bare :root selector is the definition of a scale rather than a use of
 // one, so a literal in a custom property is the point.
+// A site theme file is nothing but a bare :root block of dials, so a hue or a
+// font stack written there is the point in the same way a scale is here.
 const TOKEN_DEFINITION_FILES = new Set([
   pkg('semantic.css'),
+  pkg('site-theme.css'),
+  pkg('docs/src/styles/site-theme.css'),
   'src/styles/site.css',
+  'src/styles/site-theme.css',
 ]);
 
 const COLOR = /#[0-9a-fA-F]{3,8}\b|\brgba?\([^)]*\)|\bhsla?\([^)]*\)/;

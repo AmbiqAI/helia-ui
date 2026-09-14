@@ -1,0 +1,76 @@
+/* SPDX-License-Identifier: BSD-3-Clause */
+/* Copyright (c) 2026, Ambiq */
+/*
+ * The site theme contract: a template, and the whole of it.
+ *
+ * Copy this file into a site as `src/styles/site-theme.css`, load it from
+ * `customCss` immediately after the package sheets, and set the values below.
+ * These nine variables are the flair a site is allowed to carry on its own.
+ * Anything a site wants that is not here is a package change, not a site one:
+ * open it against @ambiqai/helia-ui so every consumer gets the same answer.
+ *
+ * Every value here is a default restated, so a copy with nothing changed
+ * renders exactly what the package renders.
+ *
+ * See docs/design-system.md, "Site theme".
+ */
+
+:root {
+  /*
+   * The site's accent. One value, not a vocabulary: a site carrying several
+   * product accents sets this per subtree rather than adding tokens. It is
+   * what the card accent rule draws and what `--accent` falls back to.
+   */
+  --helia-product-accent: var(--helia-accent-slate);
+
+  /* The second accent, for a treatment that needs two: a gradient, a chart
+     series, a hero band. Leave it equal to the first and nothing pairs. */
+  --helia-accent-secondary: var(--helia-accent-slate);
+
+  /*
+   * Multiplies the whole radius scale at once. 0 is a square site, 1 is the
+   * package shape, above about 1.6 the pill and the card stop being distinct.
+   */
+  --helia-radius-scale: 1;
+
+  /*
+   * Multiplies every motion duration. 0 removes motion for everyone on the
+   * site; 1.5 is the slowest worth asking for. Reduced motion zeroes it
+   * regardless, so this is the site's dial, not the visitor's.
+   */
+  --helia-motion-scale: 1;
+
+  /*
+   * Type. Both are the Starlight stack by default and both expect a full
+   * font stack, not a family name on its own.
+   */
+  --helia-font-sans: var(--__sl-font, var(--helia-sl-font-system));
+  --helia-font-mono: var(--__sl-font-mono, var(--helia-sl-font-system-mono));
+
+  /*
+   * A hue mixed into every surface, and how much of it. Keep the amount in
+   * single figures: this is a cast over the page, not a background colour.
+   * The default mixes nothing, which is why the amount rather than the hue is
+   * what is zeroed.
+   */
+  --helia-surface-tint: transparent;
+  --helia-surface-tint-amount: 0%;
+
+  /*
+   * How the site's hero is drawn: `plain`, `band`, or `artwork`. Read by a
+   * site's own hero composition; the package defines the name so that every
+   * site spells the choice the same way.
+   */
+  --helia-hero-treatment: plain;
+}
+
+/*
+ * Density is the ninth dial and the one that is not a property here, because
+ * its values are keywords the package selects on rather than values it
+ * substitutes. Set it on the document element instead:
+ *
+ *   <html data-helia-density="compact">
+ *
+ * `compact`, `comfortable`, or the attribute left off for the default. It
+ * moves the card padding step and nothing else.
+ */

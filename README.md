@@ -18,7 +18,7 @@ The package is private and is not published to the npm registry, so it is
 installed from a git tag in `AmbiqAI/helia-ui` rather than by version range:
 
 ```sh
-npm install github:AmbiqAI/helia-ui#v0.1.0-alpha.4
+npm install github:AmbiqAI/helia-ui#v0.1.0-alpha.5
 ```
 
 A tag rather than a branch: the tarball npm builds from a branch changes under
@@ -51,20 +51,27 @@ add the package's parts to the site's `@source` list:
 @import '@ambiqai/helia-ui/recipes.css';
 ```
 
+Then copy `@ambiqai/helia-ui/site-theme.css` into the site as
+`src/styles/site-theme.css` and load it from `customCss` after those sheets.
+Those nine dials — accent, radius scale, motion scale, fonts, surface tint,
+hero treatment, density — are what a site may vary on its own. Anything else
+is a package change.
+
 ## Export map
 
-| Export                     | Contents                                                                                         |
-| -------------------------- | ------------------------------------------------------------------------------------------------ |
-| `./tokens.css`             | Primitive tokens for both themes, plus the mapping onto Starlight's `--sl-*` variables           |
-| `./semantic.css`           | The semantic layer: spacing, radius, type, weight, leading, ink, surfaces, tones                 |
-| `./recipes.css`            | `helia-surface`, `chip`, `eyebrow`, `button`, `card`, `badge`, `media`, focus and hover          |
-| `./starlight.css`          | Unlayered overrides for the Starlight shell: sidebar, header, search, TOC, steps, built-ins      |
-| `./tailwind.css`           | The Tailwind v4 entry: layer order and the `@theme` mapping, with no Starlight dependency        |
-| `./starlight-tailwind.css` | `./tailwind.css` with `@astrojs/starlight-tailwind` in front; the entry a Starlight site imports |
-| `./shadcn.css`             | The shadcn variable bridge, imported by `./tailwind.css`                                         |
-| `./astro/*`                | The publishable Astro parts, one file per part                                                   |
-| `./react/*`                | The React components, one file per component                                                     |
-| `./starlight`              | The Starlight plugin: component overrides and the theme's own configuration                      |
+| Export                     | Contents                                                                                                 |
+| -------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `./tokens.css`             | Primitive tokens for both themes, plus the mapping onto Starlight's `--sl-*` variables                   |
+| `./semantic.css`           | The semantic layer: spacing, radius, type, weight, leading, ink, surfaces, tones                         |
+| `./recipes.css`            | `helia-surface`, `chip`, `eyebrow`, `button`, `card`, `badge`, `media`, focus, and the named transitions |
+| `./site-theme.css`         | The site theme contract: a template of the nine dials a consuming site may set, and nothing else         |
+| `./starlight.css`          | Unlayered overrides for the Starlight shell: sidebar, header, search, TOC, steps, built-ins              |
+| `./tailwind.css`           | The Tailwind v4 entry: layer order and the `@theme` mapping, with no Starlight dependency                |
+| `./starlight-tailwind.css` | `./tailwind.css` with `@astrojs/starlight-tailwind` in front; the entry a Starlight site imports         |
+| `./shadcn.css`             | The shadcn variable bridge, imported by `./tailwind.css`                                                 |
+| `./astro/*`                | The publishable Astro parts, one file per part                                                           |
+| `./react/*`                | The React components, one file per component                                                             |
+| `./starlight`              | The Starlight plugin: component overrides and the theme's own configuration                              |
 
 Every stylesheet is unlayered apart from what `tailwind.css` declares, because
 Starlight's own rules sit in `@layer starlight.*` and unlayered rules outrank

@@ -1,0 +1,77 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A whole card that is one link: a title, a line about it, and a cue that
+ * moves when the card is under the pointer.
+ *
+ * The link lives on the title and the recipe stretches it over the card, which
+ * is why the card itself is not an anchor. The cue sits inside that link so it
+ * is part of the same hit area, and it is hidden from assistive technology:
+ * the title already says where the card goes.
+ *
+ * The title is a prop rather than the child because the child is the line of
+ * description, which is prose and wants the paragraph MDX gives it.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import type { CardTone } from './Card.astro';
+import Card from './Card.astro';
+import CardContent from './CardContent.astro';
+import CardHeader from './CardHeader.astro';
+
+interface Props extends Omit<HTMLAttributes<'div'>, 'title'> {
+  /** Where the card goes. */
+  href: string;
+  /** The link text, and the card's accessible name. */
+  title: string;
+  /** Heading level. Pick the one the page outline needs. */
+  titleAs?: 'h2' | 'h3' | 'h4';
+  /** The label above the title. */
+  overline?: string;
+  /* The card modifiers, passed straight through. */
+  tone?: CardTone;
+  density?: 'default' | 'compact' | 'comfortable';
+  accent?: boolean;
+  lift?: boolean;
+}
+
+const {
+  href,
+  title,
+  titleAs = 'h3',
+  overline,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const hasLine = Astro.slots.has('default');
+---
+
+<Card interactive class:list={['helia-link-card', className]} {...rest}>
+  <CardHeader titleAs={titleAs} href={href} overline={overline}>
+    <span class="title"
+      >{title}<span class="helia-motion-cue cue" aria-hidden="true">→</span
+      ></span
+    >
+  </CardHeader>
+  {
+    hasLine && (
+      <CardContent>
+        <slot />
+      </CardContent>
+    )
+  }
+</Card>
+
+<style>
+  .title {
+    align-items: baseline;
+    display: inline-flex;
+    gap: var(--helia-space-2);
+  }
+
+  /* The cue is the same size whatever heading level the title took. */
+  .cue {
+    font-size: var(--helia-text-body);
+  }
+</style>

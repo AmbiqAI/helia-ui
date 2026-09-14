@@ -10,6 +10,7 @@ const base = '/helia-ui';
 const routes = [
   { path: `${base}/`, heading: 'helia-ui' },
   { path: `${base}/foundations/`, heading: 'Foundations' },
+  { path: `${base}/gallery/`, heading: 'Gallery' },
   { path: `${base}/starlight-plugin/`, heading: 'Starlight plugin' },
   {
     path: `${base}/migrating-from-mkdocs/`,
@@ -56,10 +57,22 @@ const accessibilityRoutes = [
   `${base}/`,
   `${base}/primitives/`,
   `${base}/cards/`,
+  /* Every card variant and every transition on one page. A contrast failure
+     in an inverted or tinted variant shows up here before it reaches a site. */
+  `${base}/gallery/`,
 ];
 
 for (const path of accessibilityRoutes) {
   test(`${path} has no accessibility violations`, async ({ page }) => {
+    /*
+     * Scanned as a reduced-motion visitor. The motion scale is 0 for them, so
+     * `Reveal` never arms and nothing is part way through a fade while axe
+     * measures it — a contrast reading taken mid-transition is of a colour
+     * that exists for 320ms and belongs to no state the page settles in. It
+     * is also the configuration with the widest audience, so it is the one
+     * worth asserting.
+     */
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(path);
     /*
      * The generative forms are hidden for the scan. They are absolutely
