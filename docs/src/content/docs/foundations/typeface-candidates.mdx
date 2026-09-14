@@ -1,0 +1,24 @@
+---
+title: Typeface candidates
+description: Four sans candidates shown on the same specimens, at two display trackings, so the type choice can be made by eye.
+tableOfContents: false
+---
+
+import TypefaceCandidates from '../../../components/TypefaceCandidates.astro';
+
+The site ships the operating system's sans stack today. This page puts three
+self-hosted alternatives beside it on identical specimens so the difference is
+visible rather than argued: the display line at the display size and weight, a
+heading, a body paragraph at the reading measure, and a row of the UI roles.
+
+Nothing here is a decision. The package default is unchanged, the candidate
+faces load on this page only, and the monospace stack is the system one in
+every block — mono is not part of this comparison.
+
+The display line appears twice per candidate, at the tracking the system uses
+today (`-0.055em`) and at a looser `-0.02em`. The tight value was tuned against
+the system stack; a face with different sidebearings crowds or opens up at the
+same number, which is the thing to look at first. Heading weight stays 650
+throughout.
+
+<TypefaceCandidates />

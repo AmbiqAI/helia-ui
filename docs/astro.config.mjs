@@ -85,6 +85,10 @@ export default defineConfig({
           items: [
             { label: 'Tokens and scales', slug: 'foundations' },
             { label: 'Site theme', slug: 'foundations/site-theme' },
+            {
+              label: 'Typeface candidates',
+              slug: 'foundations/typeface-candidates',
+            },
           ],
         },
         /* Near the top on purpose: it is the page an owner picking a card

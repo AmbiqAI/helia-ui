@@ -11,6 +11,10 @@ const routes = [
   { path: `${base}/`, heading: 'helia-ui' },
   { path: `${base}/foundations/`, heading: 'Foundations' },
   { path: `${base}/foundations/site-theme/`, heading: 'Site theme' },
+  {
+    path: `${base}/foundations/typeface-candidates/`,
+    heading: 'Typeface candidates',
+  },
   { path: `${base}/gallery/`, heading: 'Gallery' },
   { path: `${base}/starlight-plugin/`, heading: 'Starlight plugin' },
   {
@@ -184,6 +188,21 @@ test('a card overline stays out of the title', async ({ page }) => {
   expect(overlineBox!.y + overlineBox!.height).toBeLessThanOrEqual(
     headingBox!.y + 1,
   );
+});
+
+/* The comparison is only a comparison if every candidate is on the page: a
+ * missing font import fails as a silently substituted stack, not as an error. */
+test('the typeface page renders four candidates', async ({ page }) => {
+  await page.goto(`${base}/foundations/typeface-candidates/`);
+
+  const names = page.locator('.candidate__name');
+  await expect(names).toHaveCount(4);
+  await expect(names).toHaveText([
+    'System stack (current)',
+    'Inter',
+    'Geist',
+    'Manrope',
+  ]);
 });
 
 /* Diagrams are rendered at build time, so the SVG is in the HTML with no
