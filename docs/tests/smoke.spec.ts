@@ -198,11 +198,44 @@ test('the typeface page renders four candidates', async ({ page }) => {
   const names = page.locator('.candidate__name');
   await expect(names).toHaveCount(4);
   await expect(names).toHaveText([
-    'System stack (current)',
+    'System stack (previous default)',
+    'Roboto (current default)',
     'Inter',
     'Geist',
-    'Manrope',
   ]);
+});
+
+/* The face ships with the package, so a page that never mentions it still has
+ * to resolve to it, and the preload has to name the same asset the stylesheet
+ * requests rather than a second copy of it. */
+test('the brand face is the default sans and is preloaded once', async ({
+  page,
+}) => {
+  await page.goto(`${base}/`);
+
+  const body = await page
+    .locator('body')
+    .evaluate((el) => getComputedStyle(el).fontFamily);
+  expect(body).toContain('Roboto Variable');
+
+  const preload = page.locator('link[rel="preload"][as="font"]');
+  await expect(preload).toHaveCount(1);
+
+  const href = await preload.getAttribute('href');
+  expect(href).toContain('roboto-latin-wght-normal');
+
+  const sheets = await page.evaluate(async () => {
+    const links = [...document.querySelectorAll('link[rel="stylesheet"]')];
+    const bodies = await Promise.all(
+      links.map((link) =>
+        fetch((link as HTMLLinkElement).href).then((response) =>
+          response.text(),
+        ),
+      ),
+    );
+    return bodies.join('\n');
+  });
+  expect(sheets).toContain(href!);
 });
 
 /* Diagrams are rendered at build time, so the SVG is in the HTML with no

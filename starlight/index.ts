@@ -43,6 +43,8 @@ export interface HeliaShellOptions {
   themeSelect?: boolean;
   mobileMenuToggle?: boolean;
   footer?: boolean;
+  /** `false` drops the brand font preload and leaves Starlight's head alone. */
+  head?: boolean;
 }
 
 export interface HeliaStarlightOptions {
@@ -91,6 +93,7 @@ const OVERRIDES = {
   themeSelect: ['ThemeSelect', 'ThemeMenu.astro'],
   mobileMenuToggle: ['MobileMenuToggle', 'MobileMenuToggle.astro'],
   footer: ['Footer', 'Footer.astro'],
+  head: ['Head', 'Head.astro'],
 } as const satisfies Record<keyof HeliaShellOptions, readonly [string, string]>;
 
 /*

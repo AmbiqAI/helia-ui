@@ -9,6 +9,14 @@
  * the property rather than resolving it.
  */
 
+/*
+ * The brand face travels with the package, so a consuming site gets it from
+ * the plugin's stylesheets rather than wiring a font host of its own. The
+ * fontsource sheet declares `font-display: swap` and one @font-face per
+ * subset, so a browser fetches only the subsets a page actually sets.
+ */
+@import '@fontsource-variable/roboto';
+
 :root {
   /* Spacing scale. Steps 1-6 are the rhythm; px is the hairline nudge. */
   --helia-space-px: 1px;
@@ -61,7 +69,14 @@
   --helia-motion-reveal-distance: calc(20px * var(--helia-motion-scale));
   --helia-motion-cue-distance: 2px;
 
-  --helia-font-sans: var(--__sl-font, var(--helia-sl-font-system));
+  /*
+   * On a Starlight page `--__sl-font` already carries the brand face, because
+   * starlight.css sets `--sl-font` and Starlight appends its own system stack
+   * behind whatever that names. The fallback here is for everywhere else: a
+   * template or an app that loads the package sheets without Starlight.
+   */
+  --helia-font-brand: 'Roboto Variable', var(--helia-sl-font-system);
+  --helia-font-sans: var(--__sl-font, var(--helia-font-brand));
   --helia-font-mono: var(--__sl-font-mono, var(--helia-sl-font-system-mono));
   --helia-text-meta: 0.64rem;
   --helia-text-label: 0.68rem;
@@ -81,6 +96,16 @@
   --helia-weight-semibold: 650;
   --helia-weight-strong: 700;
   --helia-weight-bold: 750;
+  /*
+   * Tracking is a property of the face, not of the size, so it belongs beside
+   * the ramp rather than in each component. The display value was tuned for a
+   * system stack and crowds a face with wider sidebearings; the steps below it
+   * hold the same proportion to it as before.
+   */
+  --helia-tracking-display: -0.02em;
+  --helia-tracking-page: -0.015em;
+  --helia-tracking-section: -0.011em;
+  --helia-tracking-heading: -0.009em;
   --helia-leading-tight: 1.08;
   --helia-leading-heading: 1.18;
   --helia-leading-body: 1.6;

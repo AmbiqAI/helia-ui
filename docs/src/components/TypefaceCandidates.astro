@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
 /*
- * A decision aid, not a part of the system: the candidate faces are imported
- * here rather than in the theme, so they load on this page alone and the
- * package default stays the system stack until the choice is made.
+ * The record behind the type choice. Roboto ships, so its @font-face rules
+ * arrive with the package sheets on every page; the two faces that were not
+ * chosen are imported here, which is what keeps them off every other route.
  * See AmbiqAI/helia-ui#16.
  */
 import '@fontsource-variable/inter';
 import '@fontsource-variable/geist';
-import '@fontsource-variable/manrope';
 
 type Candidate = {
   id: string;
@@ -22,9 +21,15 @@ type Candidate = {
 const candidates: Candidate[] = [
   {
     id: 'system',
-    name: 'System stack (current)',
+    name: 'System stack (previous default)',
     licence: 'Licence: none to carry. The stack is whatever the OS ships.',
     size: 'Download: nothing. No web font is requested.',
+  },
+  {
+    id: 'roboto',
+    name: 'Roboto (current default)',
+    licence: 'Licence: OFL-1.1, from @fontsource-variable/roboto 5.3.0.',
+    size: 'Download: 42.1 KB latin subset, roboto-latin-wght-normal.woff2.',
   },
   {
     id: 'inter',
@@ -37,12 +42,6 @@ const candidates: Candidate[] = [
     name: 'Geist',
     licence: 'Licence: OFL-1.1, from @fontsource-variable/geist 5.3.0.',
     size: 'Download: 28.7 KB latin subset, geist-latin-wght-normal.woff2.',
-  },
-  {
-    id: 'manrope',
-    name: 'Manrope',
-    licence: 'Licence: OFL-1.1, from @fontsource-variable/manrope 5.3.0.',
-    size: 'Download: 24.3 KB latin subset, manrope-latin-wght-normal.woff2.',
   },
 ];
 ---
@@ -68,12 +67,12 @@ const candidates: Candidate[] = [
           <p class="specimen__label">Display · 650 · two trackings</p>
           <div class="tracking">
             <div class="tracking__column">
-              <p class="tracking__value">-0.055em (current)</p>
-              <p class="display display--current">Intelligence at the edge</p>
+              <p class="tracking__value">-0.055em (previous)</p>
+              <p class="display display--tight">Intelligence at the edge</p>
             </div>
             <div class="tracking__column">
-              <p class="tracking__value">-0.02em</p>
-              <p class="display display--loose">Intelligence at the edge</p>
+              <p class="tracking__value">-0.02em (current)</p>
+              <p class="display display--current">Intelligence at the edge</p>
             </div>
           </div>
         </div>
@@ -130,16 +129,21 @@ const candidates: Candidate[] = [
     padding: var(--helia-space-5);
   }
 
+  /* The system block has to opt out of the page font, which is now Roboto. */
+  .candidate[data-typeface='system'] {
+    font-family: var(--helia-sl-font-system);
+  }
+
+  .candidate[data-typeface='roboto'] {
+    font-family: var(--helia-font-brand);
+  }
+
   .candidate[data-typeface='inter'] {
     font-family: 'Inter Variable', var(--helia-font-sans);
   }
 
   .candidate[data-typeface='geist'] {
     font-family: 'Geist Variable', var(--helia-font-sans);
-  }
-
-  .candidate[data-typeface='manrope'] {
-    font-family: 'Manrope Variable', var(--helia-font-sans);
   }
 
   .candidate__head {
@@ -153,7 +157,7 @@ const candidates: Candidate[] = [
     color: var(--helia-ink-primary);
     font-size: var(--helia-text-section);
     font-weight: var(--helia-weight-semibold);
-    letter-spacing: -0.03em;
+    letter-spacing: var(--helia-tracking-section);
     line-height: var(--helia-leading-heading);
     margin: 0;
   }
@@ -205,19 +209,21 @@ const candidates: Candidate[] = [
     margin: 0;
   }
 
-  .display--current {
+  /* The superseded value is written out: it is the thing being compared
+     against, so it cannot follow the token. */
+  .display--tight {
     letter-spacing: -0.055em;
   }
 
-  .display--loose {
-    letter-spacing: -0.02em;
+  .display--current {
+    letter-spacing: var(--helia-tracking-display);
   }
 
   .heading {
     color: var(--helia-ink-primary);
     font-size: var(--helia-text-heading);
     font-weight: var(--helia-weight-semibold);
-    letter-spacing: -0.02em;
+    letter-spacing: var(--helia-tracking-heading);
     line-height: var(--helia-leading-heading);
     margin: 0;
   }

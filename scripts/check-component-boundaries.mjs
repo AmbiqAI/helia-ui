@@ -91,11 +91,26 @@ const ALLOWED_PACKAGES = [
  * the integration type. The relaxation stops at this directory -- a part under
  * astro/ that reached for Starlight would still be tying itself to one site.
  */
-const PLUGIN_ALLOWED_PACKAGES = [...ALLOWED_PACKAGES, 'astro'];
+/*
+ * The brand face is a declared runtime dependency, and the preload in
+ * Head.astro has to import the file to learn the hashed URL the build gives
+ * it. Read from the manifest rather than named here, for the reason the React
+ * lane is: what the package declares is what npm installs.
+ */
+const FONT_PACKAGES = Object.keys(manifest.dependencies ?? {}).filter((name) =>
+  name.startsWith('@fontsource'),
+);
+
+const PLUGIN_ALLOWED_PACKAGES = [
+  ...ALLOWED_PACKAGES,
+  'astro',
+  ...FONT_PACKAGES,
+];
 const PLUGIN_ALLOWED_PREFIXES = [
   '@astrojs/starlight/',
   'virtual:starlight/',
   'virtual:helia-ui/',
+  ...FONT_PACKAGES.map((name) => `${name}/`),
 ];
 
 /*

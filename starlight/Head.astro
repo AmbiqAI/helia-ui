@@ -1,0 +1,26 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/*
+ * Starlight's own head, plus a preload for the face the token sheets ask for.
+ *
+ * The href has to be the exact asset the stylesheet requests, and that URL is
+ * content-hashed at build. Importing the file is the only way to learn it: a
+ * literal path written into the plugin's `head` config would be a second URL,
+ * and the browser would fetch the face twice rather than once early.
+ *
+ * Latin only. The other subsets are declared by the same sheet and stay
+ * demand-loaded, because a page that never sets Cyrillic must not pay for it.
+ */
+import Default from '@astrojs/starlight/components/Head.astro';
+import robotoLatin from '@fontsource-variable/roboto/files/roboto-latin-wght-normal.woff2?url';
+---
+
+<Default />
+<link
+  rel="preload"
+  href={robotoLatin}
+  as="font"
+  type="font/woff2"
+  crossorigin
+/>

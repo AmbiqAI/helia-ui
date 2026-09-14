@@ -62,10 +62,13 @@
    * `--sl-font*`, which the compat package sets from these. Pointing at the
    * system stacks Starlight falls back to breaks that cycle and leaves the
    * computed font unchanged. Off a Starlight page nobody defines those stacks,
-   * so the fallback is the package's own restatement of them.
+   * so the fallback is the package's own restatement of them. The brand face
+   * is named literally ahead of them for the same reason: reading it from
+   * `--helia-font-brand` would reopen the cycle through `--__sl-font`.
    */
   --font-*: initial;
-  --font-sans: var(--sl-font-system, var(--helia-sl-font-system));
+  --font-sans:
+    'Roboto Variable', var(--sl-font-system, var(--helia-sl-font-system));
   --font-mono: var(--sl-font-system-mono, var(--helia-sl-font-system-mono));
 }
 

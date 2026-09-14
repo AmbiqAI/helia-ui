@@ -1,5 +1,16 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 /* Copyright (c) 2026, Ambiq */
+/*
+ * One lever for the whole shell. Starlight resolves `--__sl-font` to
+ * `var(--sl-font, <system>), <system>`, and its reset applies that to body, so
+ * naming the face here reaches every built-in as well as the `--helia-font-*`
+ * tokens that read the same variable. The @font-face rules arrive with
+ * semantic.css; this only chooses.
+ */
+:root {
+  --sl-font: 'Roboto Variable';
+}
+
 .sl-markdown-content a:not([class]) {
   text-underline-offset: 0.18em;
 }
