@@ -7,7 +7,7 @@
   "type": "module",
   "engines": {
     "node": ">=22.12.0",
-    "npm": "^10"
+    "npm": ">=10"
   },
   "scripts": {
     "validate": "npm run format:check && npm run check:spdx && npm run check:notices && npm run check:styles && npm run check:boundaries && npm run check:islands",
