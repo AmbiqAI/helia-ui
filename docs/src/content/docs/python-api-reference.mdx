@@ -9,7 +9,7 @@ MkDocs product sites build their API reference with `mkdocstrings`, which has
 no Starlight equivalent. `helia-ui-pyref` is the replacement: it reads a
 [griffe](https://mkdocstrings.github.io/griffe/) JSON dump of a Python package
 and writes one Starlight Markdown page per module, plus the sidebar fragment
-that literate-nav used to produce.
+that literate-nav produces.
 
 The generator never imports the package it documents. griffe loads by AST, so
 a package with hardware or compiler dependencies dumps on any machine, and the
@@ -88,12 +88,12 @@ a flag that overrides it.
 `--docstring-style` exists for completeness only. The dump arrives already
 parsed, so a different style means re-dumping with
 `griffe dump <package> --docstyle numpy -f`; the generator refuses rather than
-pretend it can reinterpret sections it was handed.
+pretend it can reinterpret sections it is handed.
 
 ## The griffe pin
 
 griffe's `dump` output is a convenience format, not a versioned schema. The
-generator was developed against **griffe 1.7.3** and checks the top-level shape
+generator targets **griffe 1.7.3** and checks the top-level shape
 before it renders anything: a JSON object of packages, each a `module` with
 `name`, `path` and `members`. Anything else is refused with the command that
 produces a dump it understands, rather than emitting plausible-looking pages
@@ -204,7 +204,7 @@ Three, all of them reported rather than silent:
   per symbol.
 - **Attributes are one table.** The `Attributes:` docstring section and the
   public attribute members are merged, so a dataclass and a pydantic model
-  render the same way whichever way the fields were documented.
+  render the same way whichever way the fields are documented.
 - **Docstring headings are shifted.** A module docstring starting at `#` would
   emit a second top-level heading under the page title; headings are shifted so
   the shallowest sits at `--heading-level`. Slugs are unaffected, so anchors

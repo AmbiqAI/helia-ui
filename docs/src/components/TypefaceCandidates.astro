@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
 /*
- * The record behind the type choice. Roboto ships, so its @font-face rules
- * arrive with the package sheets on every page; the two faces that were not
- * chosen are imported here, which is what keeps them off every other route.
- * See AmbiqAI/helia-ui#16.
+ * Roboto's @font-face rules arrive with the package sheets on every page, so
+ * only Inter and Geist are imported here, which keeps them off every other
+ * route. See AmbiqAI/helia-ui#16.
  */
 import '@fontsource-variable/inter';
 import '@fontsource-variable/geist';
@@ -21,13 +20,13 @@ type Candidate = {
 const candidates: Candidate[] = [
   {
     id: 'system',
-    name: 'System stack (previous default)',
+    name: 'System stack',
     licence: 'Licence: none to carry. The stack is whatever the OS ships.',
     size: 'Download: nothing. No web font is requested.',
   },
   {
     id: 'roboto',
-    name: 'Roboto (current default)',
+    name: 'Roboto',
     licence: 'Licence: OFL-1.1, from @fontsource-variable/roboto 5.3.0.',
     size: 'Download: 42.1 KB latin subset, roboto-latin-wght-normal.woff2.',
   },
@@ -67,12 +66,12 @@ const candidates: Candidate[] = [
           <p class="specimen__label">Display · 650 · two trackings</p>
           <div class="tracking">
             <div class="tracking__column">
-              <p class="tracking__value">-0.055em (previous)</p>
+              <p class="tracking__value">-0.055em</p>
               <p class="display display--tight">Intelligence at the edge</p>
             </div>
             <div class="tracking__column">
-              <p class="tracking__value">-0.02em (current)</p>
-              <p class="display display--current">Intelligence at the edge</p>
+              <p class="tracking__value">-0.02em</p>
+              <p class="display display--token">Intelligence at the edge</p>
             </div>
           </div>
         </div>
@@ -129,7 +128,7 @@ const candidates: Candidate[] = [
     padding: var(--helia-space-5);
   }
 
-  /* The system block has to opt out of the page font, which is now Roboto. */
+  /* The system block opts out of the page font so it shows the OS stack. */
   .candidate[data-typeface='system'] {
     font-family: var(--helia-sl-font-system);
   }
@@ -209,13 +208,13 @@ const candidates: Candidate[] = [
     margin: 0;
   }
 
-  /* The superseded value is written out: it is the thing being compared
-     against, so it cannot follow the token. */
+  /* The tighter value is spelled out: it is the half of the comparison that
+     the token layer does not carry. */
   .display--tight {
     letter-spacing: -0.055em;
   }
 
-  .display--current {
+  .display--token {
     letter-spacing: var(--helia-tracking-display);
   }
 

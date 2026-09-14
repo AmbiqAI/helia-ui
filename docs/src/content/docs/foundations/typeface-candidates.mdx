@@ -6,20 +6,18 @@ tableOfContents: false
 
 import TypefaceCandidates from '../../../components/TypefaceCandidates.astro';
 
-The package ships Roboto. This page is the record of how that was decided: four
-candidates on identical specimens — the display line at the display size and
-weight, a heading, a body paragraph at the reading measure, and a row of the UI
-roles. The monospace stack is the system one in every block, because mono was
-not part of the choice.
+Four candidates on identical specimens: the display line at the display size
+and weight, a heading, a body paragraph at the reading measure, and a row of
+the UI roles. The monospace stack is the system one in every block, because
+mono is not part of the comparison.
 
-Roboto arrives with the package stylesheets, so every consuming site gets it
-without wiring a font host. Inter and Geist were not chosen and are loaded by
-this page alone. The system stack is the default this replaced.
+Roboto is the shipped default, and it arrives with the package stylesheets, so
+every consuming site gets it without wiring a font host. Inter and Geist are
+loaded by this page alone. The system stack carries no web font at all.
 
-The display line appears twice per candidate, at the tracking the system stack
-was tuned for (`-0.055em`) and at the `-0.02em` the type tokens now carry. The
-tight value crowds a face with wider sidebearings, which is what the second
-column is for; the rest of the heading scale moved with it in proportion.
-Heading weight stays 650 throughout.
+The display line appears twice per candidate, at `-0.055em` and at `-0.02em`,
+which is the value the type tokens carry. The tighter value crowds a face with
+wider sidebearings, which is what the two columns are for. Heading weight stays
+650 throughout.
 
 <TypefaceCandidates />

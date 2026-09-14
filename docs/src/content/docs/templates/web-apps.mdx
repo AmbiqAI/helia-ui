@@ -75,7 +75,7 @@ attribute.
 ## The responsiveness rules
 
 A streaming app that ignores these feels broken on the machine the demo runs on,
-which is not the machine it was written on.
+which is not the machine it is written on.
 
 1. **Generate and parse off the main thread.** The simulated signal runs in a
    Web Worker, and a real driver's packet decode belongs there too. A sample
@@ -129,7 +129,7 @@ export interface Source {
 }
 ```
 
-A chunk carries the samples and the rate they were produced at, and ownership
+A chunk carries the samples and the rate they are produced at, and ownership
 passes to the listener — a transferable arriving from a worker is already
 detached on the producer's side.
 

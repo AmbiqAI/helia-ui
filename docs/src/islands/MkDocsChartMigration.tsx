@@ -12,10 +12,10 @@ import {
 /*
  * The worked example behind the charts section of the migration guide.
  *
- * MkDocs carried this series as data attributes on an empty div, which
- * `chart-init.js` read at load and handed to Plotly. The numbers are the same
- * numbers; what changed is that they are now a typed module the build can see,
- * and the renderer is the package's Recharts wrapper.
+ * MkDocs carries this series as data attributes on an empty div, which
+ * `chart-init.js` reads at load and hands to Plotly. The numbers are the same
+ * numbers here; the difference is a typed module the build can see, rendered
+ * through the package's Recharts wrapper.
  *
  * The series is illustrative, not measured: it exists to show the shape of the
  * conversion, not to state anything about a part.
@@ -30,7 +30,7 @@ const windows = [
 ];
 
 /*
- * What was a Plotly `trace.name` and a hand-picked hex per trace is a config
+ * A Plotly `trace.name` and a hand-picked hex per trace become one config
  * entry per series. The colour is a token, so the chart follows the theme
  * instead of carrying a palette of its own.
  */

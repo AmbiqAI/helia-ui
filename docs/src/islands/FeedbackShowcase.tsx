@@ -25,7 +25,7 @@ export default function FeedbackShowcase() {
         <InfoIcon />
         <AlertTitle>Results written</AlertTitle>
         <AlertDescription>
-          Results were written to the selected output directory.
+          Results are written to the selected output directory.
         </AlertDescription>
       </Alert>
       <Alert>
