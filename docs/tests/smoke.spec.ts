@@ -158,6 +158,19 @@ test('grid and flex children share their top margin', async ({ page }) => {
   }
 });
 
+/* The content-first row is the answer to a card family that cannot count on
+ * artwork, so the count is the assertion: six options, none of them relying on
+ * an image, and each one a card in its own right rather than a nested figure. */
+test('the content-first row renders six cards', async ({ page }) => {
+  await page.goto(`${base}/gallery/`);
+
+  await expect(
+    page.locator(
+      '[data-content-first="comfortable"] > .gallery-item > .helia-card',
+    ),
+  ).toHaveCount(6);
+});
+
 /*
  * MDX merges a slotted element and the text on the line after it into one
  * paragraph, which drops the slot attribute and leaves the overline inside the

@@ -1,0 +1,77 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A quotation as a card part: the line, who said it, and an optional initials
+ * mark where a photograph would otherwise have to be found.
+ *
+ * The mark is initials rather than an avatar for the same reason this part
+ * exists at all: a card that needs a portrait is a card that waits on one. It
+ * is decorative, because the attribution beside it already carries the name.
+ *
+ * The quote is the child so it can carry emphasis or a link; the attribution
+ * is a prop because it is a name, and a name is not prose.
+ *
+ * @slot default -- The quotation. Keep it inline so MDX leaves it phrasing.
+ * @slot attribution -- Attribution markup an attribute cannot carry, such as a link.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import type { PaddingStep } from './Surface.astro';
+
+interface Props extends HTMLAttributes<'figure'> {
+  /** Who said it. Rendered beside the mark. */
+  attribution?: string;
+  /** The line under the attribution: a role, a team, a release. */
+  detail?: string;
+  /** One or two letters standing in for a portrait. Decorative. */
+  initials?: string;
+  /** Inner padding, named by spacing step. `card` follows the density dial; `none` leaves the part to own its gaps. */
+  padding?: PaddingStep;
+}
+
+const {
+  attribution,
+  detail,
+  initials,
+  padding = 'card',
+  class: className,
+  ...rest
+} = Astro.props;
+
+const hasAttribution =
+  attribution !== undefined ||
+  detail !== undefined ||
+  Astro.slots.has('attribution');
+---
+
+<figure
+  class:list={[
+    'helia-card-quote',
+    padding !== 'none' && `helia-surface--pad-${padding}`,
+    className,
+  ]}
+  {...rest}
+>
+  <blockquote class="helia-card-quote__text"><slot /></blockquote>
+  {
+    hasAttribution && (
+      <figcaption class="helia-card-quote__attribution">
+        {initials !== undefined && (
+          <span
+            class="helia-card-mark helia-card-mark--text"
+            aria-hidden="true"
+          >
+            {initials}
+          </span>
+        )}
+        <span class="helia-card-quote__who">
+          {attribution}
+          <slot name="attribution" />
+          {detail !== undefined && (
+            <span class="helia-card-quote__detail">{detail}</span>
+          )}
+        </span>
+      </figcaption>
+    )
+  }
+</figure>

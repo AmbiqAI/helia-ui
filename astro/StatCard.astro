@@ -69,7 +69,9 @@ const {
     color: var(--helia-ink-primary);
     display: flex;
     flex-wrap: wrap;
-    font-size: var(--helia-text-heading);
+    /* A hook rather than a fixed step: the figure stands alone at the heading
+       size, and drops to the subhead where a row of them is a card's body. */
+    font-size: var(--helia-stat-size, var(--helia-text-heading));
     font-weight: var(--helia-weight-strong);
     gap: var(--helia-space-2);
     line-height: var(--helia-leading-tight);

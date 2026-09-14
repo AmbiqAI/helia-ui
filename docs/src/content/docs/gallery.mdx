@@ -9,8 +9,11 @@ import Card from '@ambiqai/helia-ui/astro/Card';
 import CardActions from '@ambiqai/helia-ui/astro/CardActions';
 import CardContent from '@ambiqai/helia-ui/astro/CardContent';
 import CardHeader from '@ambiqai/helia-ui/astro/CardHeader';
+import CardList from '@ambiqai/helia-ui/astro/CardList';
 import CardMedia from '@ambiqai/helia-ui/astro/CardMedia';
+import CardQuote from '@ambiqai/helia-ui/astro/CardQuote';
 import Chip from '@ambiqai/helia-ui/astro/Chip';
+import Icon from '@ambiqai/helia-ui/astro/Icon';
 import LinkCard from '@ambiqai/helia-ui/astro/LinkCard';
 import Media from '@ambiqai/helia-ui/astro/Media';
 import Reveal from '@ambiqai/helia-ui/astro/Reveal';
@@ -284,6 +287,166 @@ card is the target and the cue is inside the same hit area.
       The four shapes the rest of the system reuses.
     </LinkCard>
     <code>tone="elevated" lift</code>
+  </div>
+</div>
+
+## Content-first
+
+Six cards that need no image. Good artwork is the scarcest thing a card family
+depends on, so each of these carries itself on type, a mark or a figure
+instead. None of them is a new component: they are the `CardHeader` marks and
+scale, two parts (`CardList`, `CardQuote`) and one `CardContent` variant, so
+tone, density and the lift reach all of them unchanged.
+
+### Comfortable
+
+<div className="gallery-grid not-content" data-content-first="comfortable">
+  <div className="gallery-item">
+    <Card density="comfortable">
+      <CardHeader titleAs="h4" overline="Profiling">
+        <Icon slot="icon" name="gauge-high" />
+        <span>Latency you can budget</span>
+      </CardHeader>
+      <CardContent>
+        Every kernel reports its own cycle count, so a regression has a name
+        before it has a bug report.
+      </CardContent>
+    </Card>
+    <code>
+      {'<CardHeader><Icon slot="icon" name="gauge-high" /></CardHeader>'}
+    </code>
+  </div>
+  <div className="gallery-item">
+    <Card density="comfortable">
+      <CardHeader titleAs="h4" overline="Included">
+        <span>What the SDK ships with</span>
+      </CardHeader>
+      <CardList
+        items={[
+          'Quantisation-aware training recipes',
+          'A profiler that reads the device counters',
+          'Reference builds for every supported board',
+        ]}
+      />
+    </Card>
+    <code>{'<CardList items={[...]} marker="check" />'}</code>
+  </div>
+  <div className="gallery-item">
+    <Card density="comfortable">
+      <CardHeader titleAs="h4" step={2} overline="Step two">
+        <span>Quantise the graph</span>
+      </CardHeader>
+      <CardContent>
+        The converter keeps the calibration set with the artefact, so the same
+        numbers come back on the next run.
+      </CardContent>
+    </Card>
+    <code>{'<CardHeader step={2} overline="Step two">'}</code>
+  </div>
+  <div className="gallery-item">
+    <Card density="comfortable">
+      <CardQuote attribution="Dana Mercer" detail="Firmware lead" initials="DM">
+        The profile told us where the cycles went on the first afternoon, which
+        is a week we did not spend guessing.
+      </CardQuote>
+    </Card>
+    <code>{'<CardQuote attribution detail initials="DM">'}</code>
+  </div>
+  <div className="gallery-item">
+    <Card density="comfortable">
+      <CardHeader titleAs="h4" overline="Measured on device">
+        <span>Keyword spotting</span>
+      </CardHeader>
+      <CardContent variant="stats">
+        <StatCard label="Latency">18 ms</StatCard>
+        <StatCard label="Energy">2.4 mJ</StatCard>
+        <StatCard label="Model">96 kB</StatCard>
+      </CardContent>
+    </Card>
+    <code>{'<CardContent variant="stats"><StatCard /></CardContent>'}</code>
+  </div>
+  <div className="gallery-item">
+    <Card density="comfortable" tone="filled">
+      <CardHeader titleAs="h4" scale="display" overline="Platform">
+        <span>Ship the model, not the toolchain</span>
+      </CardHeader>
+      <CardContent>
+        One card standing in for a hero, with nothing behind it but the type.
+      </CardContent>
+    </Card>
+    <code>{'<CardHeader scale="display" overline="Platform">'}</code>
+  </div>
+</div>
+
+### Compact
+
+The same six with `density="compact"`. The mark, the list gap and the figure
+row all come off the density hook, so nothing here is restyled per size.
+
+<div className="gallery-grid not-content" data-content-first="compact">
+  <div className="gallery-item">
+    <Card density="compact">
+      <CardHeader titleAs="h4" overline="Profiling">
+        <Icon slot="icon" name="gauge-high" />
+        <span>Latency you can budget</span>
+      </CardHeader>
+      <CardContent>Every kernel reports its own cycle count.</CardContent>
+    </Card>
+    <code>{'density="compact"'}</code>
+  </div>
+  <div className="gallery-item">
+    <Card density="compact">
+      <CardHeader titleAs="h4" overline="Included">
+        <span>What the SDK ships with</span>
+      </CardHeader>
+      <CardList
+        marker="bullet"
+        items={[
+          'Training recipes',
+          'A device profiler',
+          'Reference board builds',
+        ]}
+      />
+    </Card>
+    <code>{'<CardList marker="bullet" />'}</code>
+  </div>
+  <div className="gallery-item">
+    <Card density="compact">
+      <CardHeader titleAs="h4" step={2} overline="Step two">
+        <span>Quantise the graph</span>
+      </CardHeader>
+      <CardContent>Calibration travels with the artefact.</CardContent>
+    </Card>
+    <code>{'step={2} density="compact"'}</code>
+  </div>
+  <div className="gallery-item">
+    <Card density="compact">
+      <CardQuote attribution="Dana Mercer" initials="DM">
+        A week we did not spend guessing.
+      </CardQuote>
+    </Card>
+    <code>{'<CardQuote attribution initials>'}</code>
+  </div>
+  <div className="gallery-item">
+    <Card density="compact">
+      <CardHeader titleAs="h4" overline="Measured on device">
+        <span>Keyword spotting</span>
+      </CardHeader>
+      <CardContent variant="stats">
+        <StatCard label="Latency">18 ms</StatCard>
+        <StatCard label="Energy">2.4 mJ</StatCard>
+      </CardContent>
+    </Card>
+    <code>{'variant="stats" density="compact"'}</code>
+  </div>
+  <div className="gallery-item">
+    <Card density="compact" tone="filled">
+      <CardHeader titleAs="h4" scale="display" overline="Platform">
+        <span>Ship the model, not the toolchain</span>
+      </CardHeader>
+      <CardContent>The type carries it at any density.</CardContent>
+    </Card>
+    <code>{'scale="display" density="compact"'}</code>
   </div>
 </div>
 

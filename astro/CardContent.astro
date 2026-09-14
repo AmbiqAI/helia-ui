@@ -7,7 +7,12 @@
  * It takes the remaining height inside a card, so a trailing `CardActions`
  * sits on the baseline of every card in a row.
  *
- * @slot default -- The card's prose.
+ * `variant="stats"` is the same region laid out as a row of figures rather
+ * than as prose. The figures are `StatCard`s the consumer hands in, so the
+ * figure and its label keep one definition; the row strips their edge and
+ * their padding, because a card inside a card is not what the row means.
+ *
+ * @slot default -- The card's prose, or the figures when `variant` is `stats`.
  */
 import type { HTMLAttributes } from 'astro/types';
 import type { PaddingStep } from './Surface.astro';
@@ -15,14 +20,22 @@ import type { PaddingStep } from './Surface.astro';
 interface Props extends HTMLAttributes<'div'> {
   /** Inner padding, named by spacing step. `card` follows the density dial; `none` leaves the part to own its gaps. */
   padding?: PaddingStep;
+  /** `stats` lays the slotted figures out as a row that wraps rather than as prose. */
+  variant?: 'prose' | 'stats';
 }
 
-const { padding = 'card', class: className, ...rest } = Astro.props;
+const {
+  padding = 'card',
+  variant = 'prose',
+  class: className,
+  ...rest
+} = Astro.props;
 ---
 
 <div
   class:list={[
     'helia-card-content',
+    variant !== 'prose' && `helia-card-content--${variant}`,
     padding !== 'none' && `helia-surface--pad-${padding}`,
     className,
   ]}

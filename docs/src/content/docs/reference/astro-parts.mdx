@@ -186,15 +186,16 @@ Also accepts `HTMLAttributes<'div'>`.
 import CardContent from '@ambiqai/helia-ui/astro/CardContent';
 ```
 
-| Prop      | Type          | Default  | Description                                                                                                    |
-| --------- | ------------- | -------- | -------------------------------------------------------------------------------------------------------------- |
-| `padding` | `PaddingStep` | `'card'` | Inner padding, named by spacing step. `card` follows the density dial; `none` leaves the part to own its gaps. |
+| Prop      | Type                 | Default   | Description                                                                                                    |
+| --------- | -------------------- | --------- | -------------------------------------------------------------------------------------------------------------- |
+| `padding` | `PaddingStep`        | `'card'`  | Inner padding, named by spacing step. `card` follows the density dial; `none` leaves the part to own its gaps. |
+| `variant` | `'prose' \| 'stats'` | `'prose'` | `stats` lays the slotted figures out as a row that wraps rather than as prose.                                 |
 
 Also accepts `HTMLAttributes<'div'>`.
 
 **Slots**
 
-- `default` -- The card's prose.
+- `default` -- The card's prose, or the figures when `variant` is `stats`.
 
 [See it rendered on Cards](/helia-ui/cards/#a-card-with-every-part)
 
@@ -206,23 +207,47 @@ Also accepts `HTMLAttributes<'div'>`.
 import CardHeader from '@ambiqai/helia-ui/astro/CardHeader';
 ```
 
-| Prop       | Type                   | Default  | Description                                                                                                                                                                                                                                                                                        |
-| ---------- | ---------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `titleAs`  | `'h2' \| 'h3' \| 'h4'` | `'h3'`   | Heading level for the title. Pick the one the page outline needs.                                                                                                                                                                                                                                  |
-| `padding`  | `PaddingStep`          | `'card'` | Inner padding, named by spacing step. `card` follows the density dial; `none` leaves the part to own its gaps.                                                                                                                                                                                     |
-| `href`     | `string`               | --       | Links the title, and stretches that link over the whole card.                                                                                                                                                                                                                                      |
-| `overline` | `string`               | --       | The overline text. Prefer this to the `overline` slot in MDX: MDX merges a slotted element and the title text that follows it into one paragraph, which drops the `slot` attribute and folds the overline into the heading's accessible name. The slot stays for markup an attribute cannot carry. |
+| Prop       | Type                     | Default     | Description                                                                                                                                                                                                                                                                                        |
+| ---------- | ------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `titleAs`  | `'h2' \| 'h3' \| 'h4'`   | `'h3'`      | Heading level for the title. Pick the one the page outline needs.                                                                                                                                                                                                                                  |
+| `padding`  | `PaddingStep`            | `'card'`    | Inner padding, named by spacing step. `card` follows the density dial; `none` leaves the part to own its gaps.                                                                                                                                                                                     |
+| `href`     | `string`                 | --          | Links the title, and stretches that link over the whole card.                                                                                                                                                                                                                                      |
+| `overline` | `string`                 | --          | The overline text. Prefer this to the `overline` slot in MDX: MDX merges a slotted element and the title text that follows it into one paragraph, which drops the `slot` attribute and folds the overline into the heading's accessible name. The slot stays for markup an attribute cannot carry. |
+| `step`     | `number \| string`       | --          | The position in an ordered flow, rendered as a numeral in the leading disc.                                                                                                                                                                                                                        |
+| `scale`    | `'default' \| 'display'` | `'default'` | `display` takes the title and overline up a step, for a card standing in for a hero.                                                                                                                                                                                                               |
 
 Also accepts `HTMLAttributes<'div'>`.
 
 **Slots**
 
 - `default` -- The title text. Omit it and no heading is rendered.
+- `icon` -- A glyph for the tonal disc before the title, usually an `Icon`.
 - `overline` -- The label above the title, for markup `overline` cannot carry.
 - `meta` -- Metadata under the title, such as a date or an author.
 - `action` -- A trailing control, aligned to the top right of the header.
 
 [See it rendered on Cards](/helia-ui/cards/#a-card-with-every-part)
+
+## CardList
+
+**Use it for:** A short list inside a card: what a plan includes, what a guide covers, the order a flow runs in.
+
+```ts
+import CardList from '@ambiqai/helia-ui/astro/CardList';
+```
+
+| Prop           | Type                              | Default   | Description                                                                                                    |
+| -------------- | --------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------- |
+| `items` (req.) | `string[]`                        | --        | The lines, in reading order. Plain text: an item needing markup is a composition.                              |
+| `marker`       | `'check' \| 'bullet' \| 'number'` | `'check'` | What sits before each line. `number` renders an ordered list.                                                  |
+| `icon`         | `IconName`                        | --        | Replaces the glyph on a `check` or `bullet` list. Ignored when `marker` is `number`.                           |
+| `padding`      | `PaddingStep`                     | `'card'`  | Inner padding, named by spacing step. `card` follows the density dial; `none` leaves the part to own its gaps. |
+
+Also accepts `HTMLAttributes<'ul'>`.
+
+**Slots** -- none.
+
+[See it rendered on Gallery](/helia-ui/gallery/#content-first)
 
 ## CardMedia
 
@@ -244,6 +269,30 @@ Also accepts `HTMLAttributes<'div'>`.
 - `default` -- The media. An `<img>`, a `<Media>`, an inline SVG, a poster.
 
 [See it rendered on Cards](/helia-ui/cards/#a-card-with-every-part)
+
+## CardQuote
+
+**Use it for:** A quotation as a card part: the line, who said it, and an optional initials mark where a photograph would otherwise have to be found.
+
+```ts
+import CardQuote from '@ambiqai/helia-ui/astro/CardQuote';
+```
+
+| Prop          | Type          | Default  | Description                                                                                                    |
+| ------------- | ------------- | -------- | -------------------------------------------------------------------------------------------------------------- |
+| `attribution` | `string`      | --       | Who said it. Rendered beside the mark.                                                                         |
+| `detail`      | `string`      | --       | The line under the attribution: a role, a team, a release.                                                     |
+| `initials`    | `string`      | --       | One or two letters standing in for a portrait. Decorative.                                                     |
+| `padding`     | `PaddingStep` | `'card'` | Inner padding, named by spacing step. `card` follows the density dial; `none` leaves the part to own its gaps. |
+
+Also accepts `HTMLAttributes<'figure'>`.
+
+**Slots**
+
+- `default` -- The quotation. Keep it inline so MDX leaves it phrasing.
+- `attribution` -- Attribution markup an attribute cannot carry, such as a link.
+
+[See it rendered on Gallery](/helia-ui/gallery/#content-first)
 
 ## Chip
 

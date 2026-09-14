@@ -75,6 +75,8 @@ const EXAMPLES = {
     label: 'Cards',
     anchor: 'a-card-with-every-part',
   },
+  CardList: { page: 'gallery', label: 'Gallery', anchor: 'content-first' },
+  CardQuote: { page: 'gallery', label: 'Gallery', anchor: 'content-first' },
   CardMedia: {
     page: 'cards',
     label: 'Cards',

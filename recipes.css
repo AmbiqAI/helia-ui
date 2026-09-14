@@ -538,6 +538,9 @@ a.helia-chip--neutral:focus-visible {
 .helia-card-header__text {
   display: flex;
   flex-direction: column;
+  /* Takes the width between the leading mark and the trailing action, so the
+     action stays at the far edge whether or not a mark is there. */
+  flex: 1 1 auto;
   /* The step between overline, title and metadata is the card's: a dense row
      closes it up, an editorial tile opens it out. */
   gap: var(--helia-card-header-gap, var(--helia-space-2));
@@ -662,6 +665,185 @@ a.helia-chip--neutral:focus-visible {
   > [class*='helia-surface--pad-']:not(.helia-card-media)
   + [class*='helia-surface--pad-']:not(.helia-card-media) {
   padding-block-start: 0;
+}
+
+/*
+ * Content-first options. Good artwork is the scarcest thing a card family
+ * depends on, so each option below carries the card on type, a mark or a
+ * figure instead. They are modifiers and parts on the one recipe rather than a
+ * second family: tone, density and the lift reach all of them unchanged, and
+ * none of them draws an edge or a brim of its own.
+ */
+
+/*
+ * The leading mark. The header's `icon` slot, its `step` numeral and a quote's
+ * initials are one disc, so a row that mixes them lines up. The size comes off
+ * the density hook rather than a fixed value, because a compact row and an
+ * editorial tile want the same proportion, not the same pixels.
+ */
+.helia-card-mark {
+  --helia-card-mark-box: var(
+    --helia-card-mark-size,
+    calc(var(--helia-card-pad, var(--helia-space-4)) + var(--helia-space-4))
+  );
+
+  align-items: center;
+  /* Tonal rather than filled: the disc is a ground for the glyph, and at this
+     weight it reads on the paper card and the dark one alike. */
+  background: color-mix(
+    in oklab,
+    var(--accent, var(--helia-product-accent)) 14%,
+    var(--helia-surface-card-muted)
+  );
+  block-size: var(--helia-card-mark-box);
+  border-radius: var(--helia-radius-pill);
+  color: var(--helia-ink-primary);
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: var(--helia-text-body);
+  inline-size: var(--helia-card-mark-box);
+  justify-content: center;
+  line-height: 1;
+}
+
+/* The glyph carries the accent; a numeral or a set of initials does not,
+   because those are text and have to hold contrast wherever it has been set. */
+.helia-card-mark--icon {
+  color: var(--accent, var(--helia-product-accent));
+}
+
+.helia-card-mark--text {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--helia-weight-bold);
+  text-transform: uppercase;
+}
+
+/*
+ * The display step, for a card standing in where a hero would be. It moves the
+ * hooks the header already reads rather than restyling the title, so a
+ * composition that sets either one still wins.
+ */
+.helia-card-header--display {
+  --helia-card-header-gap: var(--helia-space-3);
+  --helia-card-title-size: var(--helia-text-subhead);
+  --helia-card-mark-size: calc(
+    var(--helia-card-pad, var(--helia-space-4)) + var(--helia-space-5)
+  );
+}
+
+.helia-card-header--display .helia-eyebrow {
+  font-size: var(--helia-text-caption);
+}
+
+/*
+ * A list the card carries instead of an image. The marker is a column of its
+ * own, so a wrapped line runs under the text rather than under the glyph, and
+ * the row gap comes off the same density hook the card pads to.
+ */
+.helia-card-list {
+  color: var(--helia-ink-secondary);
+  display: grid;
+  /* Takes the slack the way `CardContent` does, so a card whose body is a list
+     still puts its actions on the row's baseline. */
+  flex: 1 1 auto;
+  font-size: var(--helia-text-body);
+  gap: var(
+    --helia-card-list-gap,
+    calc(var(--helia-card-pad, var(--helia-space-4)) / 2)
+  );
+  line-height: 1.55;
+  list-style: none;
+}
+
+/* Zero specificity: this is the browser's list indent coming off, not a
+   padding choice, so the part's own padding step still wins. */
+:where(.helia-card-list) {
+  padding: 0;
+}
+
+.helia-card-list__item {
+  align-items: baseline;
+  display: grid;
+  gap: var(--helia-space-2);
+  grid-template-columns: auto 1fr;
+}
+
+.helia-card-list__marker {
+  color: var(--accent, var(--helia-product-accent));
+  font-size: var(--helia-text-small);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--helia-weight-semibold);
+  /* Numerals and glyphs differ in width; a fixed column keeps the text edge
+     straight down the list either way. */
+  min-inline-size: var(--helia-space-4);
+  text-align: center;
+}
+
+/*
+ * A row of figures as the card's body. The columns wrap on the card's own
+ * width rather than the viewport's, because the same card is two-up in a grid
+ * and full width on a phone.
+ */
+.helia-card-content--stats {
+  /* The figure drops a step: a row of them is the card's body, not the card. */
+  --helia-stat-size: var(--helia-text-subhead);
+
+  display: grid;
+  gap: var(
+    --helia-card-stats-gap,
+    calc(var(--helia-card-pad, var(--helia-space-4)) / 2)
+  );
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 5.5rem), 1fr));
+}
+
+/* A figure in the row is a number and its label, not a card inside a card. */
+.helia-card-content--stats .helia-stat-card {
+  background: transparent;
+  border-color: transparent;
+}
+
+.helia-card-content--stats .helia-stat-card .helia-card-content {
+  padding: 0;
+}
+
+.helia-card-quote {
+  display: grid;
+  gap: var(--helia-space-3);
+}
+
+/* No leading rule and no oversized quotation glyph: the family draws no brim,
+   so the line itself is what has to carry the card. The margin and border come
+   off for a quote card used outside `not-content` markup. */
+.helia-card-quote__text {
+  border: 0;
+  color: var(--helia-ink-primary);
+  font-size: var(--helia-text-lead);
+  line-height: var(--helia-leading-body);
+  margin: 0;
+  padding: 0;
+}
+
+/* MDX gives the quote a paragraph. Keep the text, drop the box's margins. */
+.helia-card-quote__text > * {
+  margin-block: 0;
+}
+
+.helia-card-quote__attribution {
+  align-items: center;
+  color: var(--helia-ink-primary);
+  display: flex;
+  font-size: var(--helia-text-caption);
+  font-weight: var(--helia-weight-semibold);
+  gap: var(--helia-space-3);
+}
+
+.helia-card-quote__who {
+  display: grid;
+}
+
+.helia-card-quote__detail {
+  color: var(--helia-ink-muted);
+  font-weight: var(--helia-weight-regular);
 }
 
 .helia-badge {

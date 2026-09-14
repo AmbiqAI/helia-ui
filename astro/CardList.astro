@@ -1,0 +1,67 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A short list inside a card: what a plan includes, what a guide covers, the
+ * order a flow runs in.
+ *
+ * It exists because a card that carries its points as a list is the answer to
+ * a card with no image to carry, and a bare `<ul>` in a card is Starlight's
+ * prose list with the card's rhythm stripped out of it.
+ *
+ * The items are a prop rather than slotted `<li>`s because the marker is an
+ * element per item: a slot hands over children this part cannot reach inside.
+ * A list whose items need markup of their own is a composition the consumer
+ * writes, not this part.
+ *
+ * The row gap follows the card's density, so a compact card closes the list up
+ * along with everything else in it. `--helia-card-list-gap` moves it alone.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import type { IconName } from '@fortawesome/fontawesome-svg-core';
+import type { PaddingStep } from './Surface.astro';
+import Icon from './Icon.astro';
+
+interface Props extends HTMLAttributes<'ul'> {
+  /** The lines, in reading order. Plain text: an item needing markup is a composition. */
+  items: string[];
+  /** What sits before each line. `number` renders an ordered list. */
+  marker?: 'check' | 'bullet' | 'number';
+  /** Replaces the glyph on a `check` or `bullet` list. Ignored when `marker` is `number`. */
+  icon?: IconName;
+  /** Inner padding, named by spacing step. `card` follows the density dial; `none` leaves the part to own its gaps. */
+  padding?: PaddingStep;
+}
+
+const {
+  items,
+  marker = 'check',
+  icon,
+  padding = 'card',
+  class: className,
+  ...rest
+} = Astro.props;
+
+const List = marker === 'number' ? 'ol' : 'ul';
+const glyph = icon ?? (marker === 'check' ? 'check' : 'circle');
+---
+
+<List
+  class:list={[
+    'helia-card-list',
+    padding !== 'none' && `helia-surface--pad-${padding}`,
+    className,
+  ]}
+  {...rest}
+>
+  {
+    items.map((item, index) => (
+      <li class="helia-card-list__item">
+        <span class="helia-card-list__marker" aria-hidden="true">
+          {marker === 'number' ? index + 1 : <Icon name={glyph} />}
+        </span>
+        <span>{item}</span>
+      </li>
+    ))
+  }
+</List>

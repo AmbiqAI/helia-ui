@@ -18,7 +18,13 @@
  * `--helia-card-title-leading` or `--helia-card-header-gap` on the header or above
  * it.
  *
+ * The leading mark is how a card stands up without artwork: an `icon` slot for
+ * a tonal disc, or `step` for the numeral one an ordered flow needs. They are
+ * the same disc, so a row mixing the two lines up; a header handed both keeps
+ * the icon, because two marks in one corner is neither.
+ *
  * @slot default -- The title text. Omit it and no heading is rendered.
+ * @slot icon -- A glyph for the tonal disc before the title, usually an `Icon`.
  * @slot overline -- The label above the title, for markup `overline` cannot carry.
  * @slot meta -- Metadata under the title, such as a date or an author.
  * @slot action -- A trailing control, aligned to the top right of the header.
@@ -41,6 +47,10 @@ interface Props extends HTMLAttributes<'div'> {
    * accessible name. The slot stays for markup an attribute cannot carry.
    */
   overline?: string;
+  /** The position in an ordered flow, rendered as a numeral in the leading disc. */
+  step?: number | string;
+  /** `display` takes the title and overline up a step, for a card standing in for a hero. */
+  scale?: 'default' | 'display';
 }
 
 const {
@@ -48,6 +58,8 @@ const {
   padding = 'card',
   href,
   overline,
+  step,
+  scale = 'default',
   class: className,
   ...rest
 } = Astro.props;
@@ -56,16 +68,27 @@ const hasTitle = Astro.slots.has('default');
 const hasOverline = overline !== undefined || Astro.slots.has('overline');
 const hasMeta = Astro.slots.has('meta');
 const hasAction = Astro.slots.has('action');
+const hasIcon = Astro.slots.has('icon');
+const hasStep = !hasIcon && step !== undefined;
 ---
 
 <div
   class:list={[
     'helia-card-header',
+    scale === 'display' && 'helia-card-header--display',
     padding !== 'none' && `helia-surface--pad-${padding}`,
     className,
   ]}
   {...rest}
 >
+  {
+    hasIcon && (
+      <span class="helia-card-mark helia-card-mark--icon">
+        <slot name="icon" />
+      </span>
+    )
+  }
+  {hasStep && <span class="helia-card-mark helia-card-mark--text">{step}</span>}
   <div class="helia-card-header__text">
     {
       hasOverline && (
