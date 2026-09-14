@@ -13,7 +13,7 @@
  * or `replay` opts the page into the inline script.
  */
 export type AsciiTerminalLineKind =
-  'command' | 'muted' | 'output' | 'success' | 'warning';
+  'command' | 'muted' | 'output' | 'success' | 'warning' | 'error';
 
 export interface AsciiTerminalLine {
   /** The line as it is read and as it is copied, without the prompt. */
@@ -328,6 +328,9 @@ const transcript = normalizedLines
     --ascii-ink: var(--helia-ink-primary);
     --ascii-muted: var(--helia-ink-muted);
     --ascii-prompt: var(--helia-product-accent, var(--helia-accent-cyan));
+    --ascii-success: var(--helia-tone-success-ink);
+    --ascii-warning: var(--helia-tone-warning-ink);
+    --ascii-error: var(--helia-tone-critical-ink);
     --helia-surface-border-color: var(--ascii-border);
     /* A fixed tone keeps its backdrop in both themes, so the ring follows the
        terminal ink rather than the page's. */
@@ -339,12 +342,19 @@ const transcript = normalizedLines
     overflow: hidden;
   }
 
+  /* The status inks restate the theme tokens rather than reading them: a
+     pinned backdrop keeps its palette when the reader switches themes, and a
+     theme-following ink on it would slide to the pair meant for the other
+     surface and lose its contrast. */
   .tone-dark {
     --ascii-bg: #0d1017;
     --ascii-border: #2b303b;
     --ascii-toolbar-bg: #11151d;
     --ascii-ink: #f5f6f7;
     --ascii-muted: #9ca3af;
+    --ascii-success: #2fb878;
+    --ascii-warning: #e9a445;
+    --ascii-error: #ff7b86;
   }
 
   .tone-light {
@@ -353,6 +363,9 @@ const transcript = normalizedLines
     --ascii-toolbar-bg: #f5f5f7;
     --ascii-ink: var(--helia-ink-black);
     --ascii-muted: #626870;
+    --ascii-success: #0b7048;
+    --ascii-warning: #8f5300;
+    --ascii-error: #c0273a;
   }
 
   /* A title bar is the muted step of the surface under it, the way an
@@ -470,11 +483,15 @@ const transcript = normalizedLines
   }
 
   .ascii-terminal__line.is-success {
-    color: #20a464;
+    color: var(--ascii-success);
   }
 
   .ascii-terminal__line.is-warning {
-    color: #d68b28;
+    color: var(--ascii-warning);
+  }
+
+  .ascii-terminal__line.is-error {
+    color: var(--ascii-error);
   }
 
   .ascii-terminal__prompt {

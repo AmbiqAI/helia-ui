@@ -59,11 +59,11 @@ import AsciiTerminal from '@ambiqai/helia-ui/astro/AsciiTerminal';
 
 **AsciiTerminalLine**
 
-| Prop          | Type                                                         | Default | Description                                                       |
-| ------------- | ------------------------------------------------------------ | ------- | ----------------------------------------------------------------- |
-| `text` (req.) | `string`                                                     | --      | The line as it is read and as it is copied, without the prompt.   |
-| `kind`        | `'command' \| 'muted' \| 'output' \| 'success' \| 'warning'` | --      | What the line is. Only `command` is typed out and given a prompt. |
-| `prompt`      | `string`                                                     | --      | Prompt in front of a `command` line. Ignored on every other kind. |
+| Prop          | Type                                                                    | Default | Description                                                       |
+| ------------- | ----------------------------------------------------------------------- | ------- | ----------------------------------------------------------------- |
+| `text` (req.) | `string`                                                                | --      | The line as it is read and as it is copied, without the prompt.   |
+| `kind`        | `'command' \| 'muted' \| 'output' \| 'success' \| 'warning' \| 'error'` | --      | What the line is. Only `command` is typed out and given a prompt. |
+| `prompt`      | `string`                                                                | --      | Prompt in front of a `command` line. Ignored on every other kind. |
 
 **Slots** -- none.
 

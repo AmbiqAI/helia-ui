@@ -60,19 +60,32 @@ for (const route of routes) {
   });
 }
 
-/* The three pages that carry the site's own demonstration markup: the landing
- * with the tables and callouts, and the two that render the most package
- * parts. A violation on any of them is a violation in a part, not in prose. */
-const accessibilityRoutes = [
-  `${base}/`,
-  `${base}/primitives/`,
-  `${base}/cards/`,
-  /* Every card variant and every transition on one page. A contrast failure
-     in an inverted or tinted variant shows up here before it reaches a site. */
-  `${base}/gallery/`,
+/* The pages that carry the site's own demonstration markup: the landing with
+ * the tables and callouts, and the ones that render the most package parts. A
+ * violation on any of them is a violation in a part, not in prose. */
+const accessibilityRoutes: { path: string; exclude?: string }[] = [
+  { path: `${base}/` },
+  { path: `${base}/primitives/` },
+  { path: `${base}/cards/` },
+  {
+    /* The only page carrying a terminal in each of the three tones, so it is
+       where a status ink that reads on one backdrop and not another shows. */
+    path: `${base}/code/`,
+    /* Syntax colours come from the Shiki themes rather than from the package's
+       own tokens, and `github-light` puts a 3.48:1 orange on paper. Excluding
+       the highlighted blocks leaves the rest of the page -- the terminals
+       included -- under the full scan; the theme is its own decision. */
+    exclude: '.astro-code',
+  },
+  {
+    /* Every card variant and every transition on one page. A contrast failure
+       in an inverted or tinted variant shows up here before it reaches a
+       site. */
+    path: `${base}/gallery/`,
+  },
 ];
 
-for (const path of accessibilityRoutes) {
+for (const { path, exclude } of accessibilityRoutes) {
   test(`${path} has no accessibility violations`, async ({ page }) => {
     /*
      * Scanned as a reduced-motion visitor. The motion scale is 0 for them, so
@@ -96,7 +109,9 @@ for (const path of accessibilityRoutes) {
     await page.addStyleTag({
       content: '.helia-media__form { display: none; }',
     });
-    const { violations } = await new AxeBuilder({ page }).analyze();
+    const builder = new AxeBuilder({ page });
+    if (exclude) builder.exclude(exclude);
+    const { violations } = await builder.analyze();
     expect(violations).toEqual([]);
   });
 }

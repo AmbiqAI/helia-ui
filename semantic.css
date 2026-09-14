@@ -242,6 +242,20 @@
   --helia-tone-experimental: #7460c8;
   --helia-tone-deprecated: #ad612b;
 
+  /*
+   * Text counterparts of the advisory tones. The tones above are fills and
+   * strokes -- a callout's icon and border, a badge's rim -- and are one value
+   * for both themes, so a tone dark enough to read on paper is too dark to
+   * read on the canvas and the other way round. These are the same meanings
+   * chosen as ink: each one clears 4.5:1 against the raised surface of the
+   * theme it is declared in. Anything that sets a status colour on text takes
+   * one of these, never the fill.
+   */
+  --helia-tone-success-ink: #2fb878;
+  --helia-tone-warning-ink: #e9a445;
+  --helia-tone-critical-ink: #ff7b86;
+  --helia-tone-important-ink: #6ea8ff;
+
   /* Abstract media art: surfaces, strokes and fills for the field treatments. */
   --helia-field-base: #171a20;
   --helia-field-mix-cool: #545ee8;
@@ -317,6 +331,11 @@
   --helia-tone-green: #087a51;
   --helia-tone-orange: #ba5c16;
   --helia-tone-purple: #6651d9;
+
+  --helia-tone-success-ink: #0b7048;
+  --helia-tone-warning-ink: #8f5300;
+  --helia-tone-critical-ink: #c0273a;
+  --helia-tone-important-ink: #1f62c4;
 }
 
 /*
