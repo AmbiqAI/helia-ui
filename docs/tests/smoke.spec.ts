@@ -29,6 +29,10 @@ const routes = [
   { path: `${base}/timeline/`, heading: 'Timeline' },
   { path: `${base}/diagrams/`, heading: 'Diagrams' },
   { path: `${base}/layout/`, heading: 'Layout' },
+  {
+    path: `${base}/reference/astro-parts/`,
+    heading: 'Astro part contracts',
+  },
   { path: `${base}/templates/docs-sites/`, heading: 'Docs sites' },
   { path: `${base}/templates/web-apps/`, heading: 'Web apps' },
   { path: `${base}/react/inputs/`, heading: 'Inputs' },

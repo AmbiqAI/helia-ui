@@ -1,13 +1,31 @@
 ---
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
+/**
+ * A hosted video, held behind its poster until someone asks for it.
+ *
+ * Nothing is requested from YouTube on load: the page ships a poster and a
+ * play control, and the first click swaps in a nocookie iframe. That keeps the
+ * third party out of the page for every visitor who never plays the video, and
+ * it is why the component takes an ID rather than an embed URL.
+ *
+ * Without scripting the figure falls back to a link out to the video.
+ */
 interface Props {
+  /** What the video is. Names the frame, the play control, and the fallback link. */
   title: string;
+  /** The YouTube video ID, not a URL. Validated at build. */
   videoId: string;
+  /** Poster image. A bare path is resolved against the site's base; an absolute
+   * path, a URL, or a data URI is used as given. Omit it for the abstract placeholder. */
   posterSrc?: string;
+  /** Alternative text for the poster. Leave it empty where the title already says the same thing. */
   posterAlt?: string;
+  /** Caption under the figure. Omit it and no figcaption renders. */
   caption?: string;
+  /** Running time, shown over the poster. Free text, for example `4:12`. */
   duration?: string;
+  /** Where the fallback and caption links go. Defaults to the watch URL for `videoId`. */
   externalUrl?: string;
   /** Forwarded to the figure, so a layout can size it without reaching inside. */
   class?: string;

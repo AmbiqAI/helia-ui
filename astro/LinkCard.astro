@@ -12,6 +12,8 @@
  *
  * The title is a prop rather than the child because the child is the line of
  * description, which is prose and wants the paragraph MDX gives it.
+ *
+ * @slot default -- The line of description under the title.
  */
 import type { HTMLAttributes } from 'astro/types';
 import type { CardTone } from './Card.astro';
@@ -28,9 +30,11 @@ interface Props extends Omit<HTMLAttributes<'div'>, 'title'> {
   titleAs?: 'h2' | 'h3' | 'h4';
   /** The label above the title. */
   overline?: string;
-  /* The card modifiers, passed straight through. */
+  /** What stands in for the card's edge and fill. Passed straight to `Card`. */
   tone?: CardTone;
+  /** Moves the padding step the parts default to. Passed straight to `Card`. */
   density?: 'default' | 'compact' | 'comfortable';
+  /** Adds the hover lift. Passed straight to `Card`. */
   lift?: boolean;
 }
 

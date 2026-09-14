@@ -1,11 +1,27 @@
 ---
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
+/**
+ * The heading of a page section: an optional label, the title, an optional
+ * line under it, and an optional link to the fuller view.
+ *
+ * Everything is a prop rather than a slot because the header is a fixed
+ * arrangement, not a container: the trailing link sits on the baseline of the
+ * title block, which only works if the header knows both.
+ *
+ * The title is an `<h2>`, so the part belongs to a page section rather than to
+ * a card.
+ */
 interface Props {
+  /** The uppercase label above the title. */
   eyebrow?: string;
+  /** The section's heading. Required. */
   title: string;
+  /** One line about the section, under the title. */
   description?: string;
+  /** Where the trailing link goes. Without it, no link renders. */
   href?: string;
+  /** The trailing link's text. Ignored without `href`. */
   linkLabel?: string;
 }
 

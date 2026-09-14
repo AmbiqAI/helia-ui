@@ -10,7 +10,7 @@
     "npm": ">=10"
   },
   "scripts": {
-    "validate": "npm run format:check && npm run check:spdx && npm run check:notices && npm run check:styles && npm run check:boundaries && npm run check:islands",
+    "validate": "npm run format:check && npm run check:spdx && npm run check:notices && npm run check:styles && npm run check:boundaries && npm run check:islands && npm run check:astro-props",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check:spdx": "node scripts/check-spdx.mjs",
@@ -19,6 +19,7 @@
     "check:styles": "node scripts/check-style-literals.mjs",
     "check:boundaries": "node scripts/check-component-boundaries.mjs",
     "check:islands": "node scripts/check-islands.mjs",
+    "check:astro-props": "node scripts/astro-props.mjs --check",
     "docs:dev": "npm --prefix docs run dev",
     "docs:build": "npm --prefix docs run build",
     "docs:test": "npm --prefix docs run test",

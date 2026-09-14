@@ -1,18 +1,22 @@
 ---
 title: Layout
-description: The showcase carousel, the one layout part the package ships.
+description: The carousel, the section header, the editorial band, and the data table.
 ---
 
 import Card from '@ambiqai/helia-ui/astro/Card';
 import CardContent from '@ambiqai/helia-ui/astro/CardContent';
 import CardHeader from '@ambiqai/helia-ui/astro/CardHeader';
 import CardMedia from '@ambiqai/helia-ui/astro/CardMedia';
+import DataTable from '@ambiqai/helia-ui/astro/DataTable';
+import EditorialBand from '@ambiqai/helia-ui/astro/EditorialBand';
 import Media from '@ambiqai/helia-ui/astro/Media';
+import SectionHeader from '@ambiqai/helia-ui/astro/SectionHeader';
 import ShowcaseCarousel from '@ambiqai/helia-ui/astro/ShowcaseCarousel';
 
-Page layout is the consuming site's job. The package ships one layout part,
-the carousel, because the scroll, snap, and tab behaviour is worth writing once
-and the rail never needs to know what it is carrying.
+Page layout is the consuming site's job. The package ships only the parts whose
+behaviour is worth writing once: the scroll and snap of a rail, the full-bleed
+arithmetic of a band, the pager on a table. None of them needs to know what it
+is carrying.
 
 ## Showcase carousel
 
@@ -124,3 +128,49 @@ The track sets `--carousel-card-basis` and applies the flex basis and the
 scroll-snap alignment to its own children, so a slotted card needs no carousel
 knowledge at all. A card that wants a different width can still set its own
 `flex` and win on specificity.
+
+## Section header
+
+Use it for the heading of a page section: the label, the title, the line under
+it, and the link to the fuller view, all on one baseline. Everything is a prop
+because the trailing link is aligned against the title block, which only works
+if the header knows both.
+
+<SectionHeader
+  eyebrow="Ecosystem"
+  title="Reference designs"
+  description="Boards, sensors, and the models that have been measured on them."
+  href="#section-header"
+  linkLabel="View all"
+/>
+
+## Editorial band
+
+Use it for a change of ground partway down a long page. The band escapes the
+content column so the paint reaches the viewport edges, while the text inside it
+stays on the readable measure. Consecutive bands butt together rather than
+stacking a gap.
+
+<EditorialBand tone="paper">
+  The band is the one part that deliberately breaks out of its container. Give
+  it an `id` where a nav or a deep link has to reach the section.
+</EditorialBand>
+
+## Data table
+
+Use it for a set of values that has to be read across rows. Cells are strings:
+the pager hides rows by index and the frame sizes columns from their text, and
+neither survives arbitrary markup. `pageSize` is the only behaviour, and it is
+progressive, so every row is in the document without scripting.
+
+<DataTable
+  caption="A few Astro parts"
+  columns={['Part', 'Documented on', 'Takes slots']}
+  rows={[
+    ['Surface', 'Primitives', 'Yes'],
+    ['Card', 'Cards', 'Yes'],
+    ['CodeBlock', 'Code', 'No'],
+    ['Timeline', 'Timeline', 'No'],
+  ]}
+  pageSize={2}
+/>

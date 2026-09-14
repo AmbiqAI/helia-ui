@@ -5,6 +5,8 @@
  * The call to action: a pill-shaped link or button.
  *
  * The recipe itself is `.helia-button` in `src/styles/global.css`.
+ *
+ * @slot default -- The label, and the accessible name of the control.
  */
 import type { HTMLAttributes } from 'astro/types';
 
@@ -20,7 +22,11 @@ interface ButtonBase {
  * `rel`; without it a `<button>` that accepts `disabled` and `type`.
  */
 type Props =
-  | (ButtonBase & Omit<HTMLAttributes<'a'>, 'href'> & { href: string })
+  | (ButtonBase &
+      Omit<HTMLAttributes<'a'>, 'href'> & {
+        /** Where it goes. Its presence is what makes this an anchor. */
+        href: string;
+      })
   | (ButtonBase & HTMLAttributes<'button'> & { href?: undefined });
 
 const {

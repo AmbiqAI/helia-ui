@@ -47,6 +47,7 @@ const ASTRO_LANE = [
      only worth the browser it costs if the page ships no island. */
   'diagrams',
   'layout',
+  'reference/astro-parts',
 ];
 
 /* Prose about the starters. They document an app lane that does hydrate, but

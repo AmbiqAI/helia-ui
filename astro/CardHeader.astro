@@ -17,6 +17,11 @@
  * A composition that needs other values sets `--helia-card-title-size`,
  * `--helia-card-title-leading` or `--helia-card-header-gap` on the header or above
  * it.
+ *
+ * @slot default -- The title text. Omit it and no heading is rendered.
+ * @slot overline -- The label above the title, for markup `overline` cannot carry.
+ * @slot meta -- Metadata under the title, such as a date or an author.
+ * @slot action -- A trailing control, aligned to the top right of the header.
  */
 import type { HTMLAttributes } from 'astro/types';
 import type { PaddingStep } from './Surface.astro';

@@ -1,6 +1,14 @@
 ---
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
+/**
+ * A framed code sample: the highlighted source, an optional context strip, and
+ * a copy control.
+ *
+ * Highlighting runs at build through Shiki, so the page ships no highlighter.
+ * The source is a prop rather than a slot because the copy control and the
+ * line highlighting both need the text, not the rendered markup.
+ */
 import { Code } from 'astro:components';
 import type { ShikiTransformer } from 'shiki';
 
@@ -17,12 +25,21 @@ type CodeLanguage =
   | 'typescript';
 
 interface Props {
+  /** The source, verbatim. It is also what the copy control puts on the clipboard. */
   code: string;
+  /** Grammar to highlight with. */
   language?: CodeLanguage;
+  /** Path shown in the context strip. Takes precedence over `label`. */
   filename?: string;
+  /** Context-strip text when there is no `filename`. Defaults to the language,
+   * or to `Terminal` on the terminal variant. */
   label?: string;
+  /** 1-based line numbers to mark as changed or worth reading first. */
   highlightLines?: readonly number[];
+  /** Renders the line-number gutter. */
   lineNumbers?: boolean;
+  /** `code` is the framed default, `terminal` the shell form, `bare` drops the
+   * context strip and leaves the copy control floating. */
   variant?: 'bare' | 'code' | 'terminal';
   /** Forwarded to the frame, so a layout can size it without reaching inside. */
   class?: string;

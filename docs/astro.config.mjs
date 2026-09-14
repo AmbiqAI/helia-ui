@@ -105,6 +105,13 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Reference',
+          collapsed: false,
+          items: [
+            { label: 'Astro part contracts', slug: 'reference/astro-parts' },
+          ],
+        },
+        {
           label: 'Templates',
           collapsed: false,
           items: [

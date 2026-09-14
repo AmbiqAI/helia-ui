@@ -11,6 +11,8 @@
  * The number is the child, so it can carry a unit, a `<span>`, or markup the
  * composition wants. The delta is a `Badge`, and the tone is the caller's:
  * this component has no idea whether up is good.
+ *
+ * @slot default -- The figure itself, with whatever unit or markup it needs.
  */
 import type { HTMLAttributes } from 'astro/types';
 import type { CardTone } from './Card.astro';
@@ -26,10 +28,13 @@ interface Props extends HTMLAttributes<'div'> {
   delta?: string;
   /** Which way the change reads. The component does not decide. */
   deltaTone?: 'neutral' | 'info' | 'success' | 'warning' | 'danger' | 'accent';
-  /* The card modifiers, passed straight through. */
+  /** What stands in for the card's edge and fill. Passed straight to `Card`. */
   tone?: CardTone;
+  /** Moves the padding step the parts default to. Passed straight to `Card`. */
   density?: 'default' | 'compact' | 'comfortable';
+  /** Adds the hover lift. Passed straight to `Card`. */
   lift?: boolean;
+  /** Adds the hover shift and the focus-visible ring. Passed straight to `Card`. */
   interactive?: boolean;
 }
 

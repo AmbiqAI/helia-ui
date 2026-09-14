@@ -1,8 +1,21 @@
 ---
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
+/**
+ * A full-bleed band across the content column: the paint reaches the viewport
+ * edges while the text stays on the readable measure.
+ *
+ * It is the one part that deliberately escapes its container, which is how a
+ * long page gets a change of ground without the site owning a second layout.
+ * Consecutive bands butt against each other rather than stacking a gap, so a
+ * run of them reads as one alternating rhythm.
+ *
+ * @slot default -- The band's content, held to the readable width.
+ */
 interface Props {
+  /** The ground. `base` is the page background; `paper` and `subtle` both paint the paper fill. */
   tone?: 'base' | 'paper' | 'subtle';
+  /** Anchor for the section, so a nav or a deep link can reach it. */
   id?: string;
 }
 

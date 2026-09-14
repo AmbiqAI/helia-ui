@@ -6,6 +6,8 @@
  *
  * The recipe itself is `.helia-chip` in `src/styles/global.css`, so a list item
  * or other element that has to stay in place can carry the same class.
+ *
+ * @slot default -- The label, and the link text when `href` is set.
  */
 import type { HTMLAttributes } from 'astro/types';
 
@@ -24,7 +26,11 @@ interface ChipBase {
  * `rel`; without it an inert `<span>`.
  */
 type Props =
-  | (ChipBase & Omit<HTMLAttributes<'a'>, 'href'> & { href: string })
+  | (ChipBase &
+      Omit<HTMLAttributes<'a'>, 'href'> & {
+        /** Where it goes. Its presence is what makes this an anchor. */
+        href: string;
+      })
   | (ChipBase & HTMLAttributes<'span'> & { href?: undefined });
 
 const {

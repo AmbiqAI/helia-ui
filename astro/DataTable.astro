@@ -1,10 +1,24 @@
 ---
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
+/**
+ * A scrollable data table with an optional client-side pager.
+ *
+ * Cells are strings, not markup: the pager hides rows by index and the scroll
+ * frame sizes columns from their text, and neither survives arbitrary content.
+ * Anything richer than a value belongs in the React data-display lane.
+ *
+ * The pager is progressive. Without it, or without scripting, every row is in
+ * the document and the table simply scrolls.
+ */
 interface Props {
+  /** Header cells, left to right. Sets the column count. */
   columns: readonly string[];
+  /** Body rows, each one cell per column, in column order. */
   rows: readonly (readonly string[])[];
+  /** The table's caption, and the accessible name of its pager. Required. */
   caption: string;
+  /** Rows per page. 0 renders every row and no pager. */
   pageSize?: number;
 }
 

@@ -1,6 +1,16 @@
 ---
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
+/**
+ * An aside on a `Surface`: a titled block with a tone and the icon that tone
+ * implies.
+ *
+ * The tone picks the icon and the tint together, so a consumer never chooses
+ * an icon that contradicts the colour. Only `critical` is announced: it is the
+ * one tone that means the reader loses something by reading past it.
+ *
+ * @slot default -- The body of the aside. Prose, not a bare sentence fragment.
+ */
 import { icon } from '@fortawesome/fontawesome-svg-core';
 import {
   faCircleInfo,
@@ -26,7 +36,9 @@ type CalloutTone =
   | 'deprecated';
 
 interface Props {
+  /** The heading of the aside. Required: an untitled aside is a paragraph. */
   title: string;
+  /** What the aside means. Picks the tint and the icon together. */
   tone?: CalloutTone;
 }
 

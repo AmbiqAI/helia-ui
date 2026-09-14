@@ -1,26 +1,49 @@
 ---
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
+/**
+ * A terminal transcript: a fixed set of lines, optionally typed out on entry,
+ * with optional copy and replay controls.
+ *
+ * The transcript is data, not a slot, because the component reconstructs the
+ * plain-text form for the clipboard and for the typing animation, and it can
+ * only do that if it knows where each line starts and what kind it is.
+ *
+ * The default form is inert and ships no behaviour. Setting `animated`, `copy`
+ * or `replay` opts the page into the inline script.
+ */
 export type AsciiTerminalLineKind =
   'command' | 'muted' | 'output' | 'success' | 'warning';
 
 export interface AsciiTerminalLine {
+  /** The line as it is read and as it is copied, without the prompt. */
   text: string;
+  /** What the line is. Only `command` is typed out and given a prompt. */
   kind?: AsciiTerminalLineKind;
+  /** Prompt in front of a `command` line. Ignored on every other kind. */
   prompt?: string;
 }
 
 interface Props {
+  /** The transcript, in order. */
   lines: readonly AsciiTerminalLine[];
+  /** The frame's caption. */
   title?: string;
+  /** Accessible name for the frame. Defaults to the title plus `transcript`. */
   ariaLabel?: string;
+  /** Types the command lines out on entry. Reduced motion shows them at once. */
   animated?: boolean;
+  /** Starts the animation when the frame scrolls into view. Needs `animated`. */
   autoplay?: boolean;
+  /** Adds the copy control, which copies the whole transcript as plain text. */
   copy?: boolean;
+  /** Adds the replay control. Defaults to whatever `animated` is. */
   replay?: boolean;
   /** `adaptive` follows the site theme; `light` and `dark` are fixed. */
   tone?: 'adaptive' | 'light' | 'dark';
+  /** Milliseconds per typed character. 0 types a command line instantly. */
   typingSpeed?: number;
+  /** Milliseconds of pause after each line. 0 runs the lines together. */
   lineDelay?: number;
 }
 

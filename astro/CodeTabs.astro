@@ -1,6 +1,14 @@
 ---
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
+/**
+ * One code sample shown several ways: a tab per language or per toolchain,
+ * with only the selected panel visible.
+ *
+ * Each tab carries its own grammar, so the set is not limited to one language.
+ * The select variant exists for a narrow column, where a row of tabs would
+ * wrap or scroll.
+ */
 import { Code } from 'astro:components';
 
 type CodeLanguage =
@@ -15,14 +23,20 @@ type CodeLanguage =
   | 'typescript';
 
 interface CodeTab {
+  /** The tab's text, and how the panel is named to assistive technology. */
   label: string;
+  /** Grammar to highlight this tab's source with. */
   language: CodeLanguage;
+  /** The source for this tab, verbatim. */
   code: string;
 }
 
 interface Props {
+  /** The samples, in tab order. The first one renders selected. */
   tabs: readonly CodeTab[];
+  /** Accessible name for the tab list or the select. */
   ariaLabel?: string;
+  /** `tabs` is the row of tabs; `select` is the dropdown for a narrow column. */
   variant?: 'tabs' | 'select';
 }
 

@@ -1,15 +1,26 @@
 ---
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
+/**
+ * A stack of disclosure rows: one `<details>` per item, the first one open.
+ *
+ * The rows are data rather than slots because the group owns the divider and
+ * the row chrome, which a slotted `<details>` would have to redeclare. Content
+ * is a single line of text for the same reason: anything that needs markup is
+ * a card, not a row in a group.
+ */
 import { icon } from '@fortawesome/fontawesome-svg-core';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
 interface AccordionItem {
+  /** The summary line, and the control that opens the row. */
   title: string;
+  /** The row body. Plain text: it is rendered as one paragraph. */
   content: string;
 }
 
 interface Props {
+  /** The rows, in display order. The first one renders open. */
   items: readonly AccordionItem[];
 }
 

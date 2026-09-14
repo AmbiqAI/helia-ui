@@ -5,10 +5,13 @@
  * The uppercase label that sits above a heading.
  *
  * The recipe itself is `.helia-eyebrow` in `src/styles/global.css`.
+ *
+ * @slot default -- The label text.
  */
 import type { HTMLAttributes, HTMLTag } from 'astro/types';
 
 interface Props extends HTMLAttributes<'p'> {
+  /** Element to render. Use a `<span>` where a paragraph would break the outline. */
   as?: HTMLTag;
 }
 

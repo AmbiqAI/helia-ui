@@ -1,28 +1,52 @@
 ---
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
+/**
+ * A dated list of grouped entries: releases, changes, or planned work.
+ *
+ * Groups are the unit the rail marks, so the shape is a list of lists rather
+ * than a flat list with repeated dates. The tone is per group and advisory:
+ * the component never derives it from a date or a status word.
+ *
+ * The two variants are the same data read two ways, which is why they are one
+ * component: `updates` looks back and `roadmap` looks forward.
+ */
 type TimelineTone = 'neutral' | 'blue' | 'cyan' | 'green' | 'orange' | 'purple';
 
 interface TimelineItem {
+  /** What happened. The link text when `href` is set. */
   title: string;
+  /** One line of detail under the title. */
   description?: string;
+  /** Where the entry goes. Without it the title is plain text. */
   href?: string;
+  /** Trailing metadata, such as a version or an owner. */
   meta?: string;
 }
 
 interface TimelineGroup {
+  /** The group's marker text, usually a date or a milestone. */
   label: string;
+  /** Machine-readable date for the label, as an HTML `datetime` value. */
   datetime?: string;
+  /** Advisory tint for the group's marker. The caller decides what it means. */
   tone?: TimelineTone;
+  /** The group's entries, in display order. */
   items: TimelineItem[];
 }
 
 interface Props {
+  /** The groups, in display order. */
   groups: TimelineGroup[];
+  /** Heading above the rail. Omit it where the page already has one. */
   heading?: string;
+  /** Text of the trailing link in the header. Needs `actionHref` to render. */
   actionLabel?: string;
+  /** Where the trailing link goes. Needs `actionLabel` to render. */
   actionHref?: string;
+  /** Accessible name for the rail. Defaults to `heading`, then to `Timeline`. */
   ariaLabel?: string;
+  /** `updates` reads as history, `roadmap` as planned work. */
   variant?: 'updates' | 'roadmap';
 }
 
