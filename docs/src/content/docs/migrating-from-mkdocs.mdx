@@ -26,18 +26,22 @@ move content into it.
 
 `!!! note "Title"` becomes Starlight's `Aside`. Material has twelve admonition
 types and `Aside` has four, so several Material types land on the same tone.
-Where the distinction matters, the package's `Callout` has eight and takes a
+Where the distinction matters, the package's `Callout` has nine and takes a
 free-text title.
+
+This table is the whole Material set, so a converter has one mapping to read
+and never has to decide.
 
 <DataTable
   caption="Material admonition types and what they become"
   columns={['Material', 'Aside type', 'Package Callout tone']}
   rows={[
-    ['note, abstract, summary, tldr', 'note', 'note'],
+    ['note', 'note', 'note'],
+    ['abstract, summary, tldr', 'note', 'note'],
     ['info', 'note', 'note'],
     ['tip, hint', 'tip', 'tip'],
     ['important', 'tip', 'important'],
-    ['success, check, done', 'tip', 'tip'],
+    ['success, check, done', 'tip', 'success'],
     ['question, help, faq', 'note', 'note'],
     ['warning, caution, attention', 'caution', 'warning'],
     ['failure, fail, missing', 'caution', 'warning'],
@@ -50,8 +54,29 @@ free-text title.
 
 `Aside` is the default because it is the built-in: it is styled by the theme,
 it is translated, and it needs no import in Markdown. Reach for `Callout` when
-the page needs `compatibility`, `experimental` or `deprecated`, which have no
-`Aside` equivalent, or when the title is not one of the four fixed words.
+the page needs `success`, `compatibility`, `experimental` or `deprecated`,
+which have no `Aside` equivalent, or when the title is not one of the four
+fixed words.
+
+### Why `success` maps to `tip`
+
+Starlight 0.41 does not take a custom `Aside` type. `Aside.astro` validates the
+prop against a fixed `['note', 'tip', 'caution', 'danger']` and throws an
+`AstroError` on anything else, and the remark directive that turns `:::note`
+into an `Aside` drops a name it does not recognise, so `:::success` renders as
+nothing at all. A `success` skin in `starlight.css` would therefore have no
+element to attach to.
+
+So `success`, `check` and `done` convert to `Aside type="tip"`, which is the
+closest built-in and already reads as a positive tone. Where a page genuinely
+needs to distinguish a completed step from a suggestion, use the package's
+`Callout` instead, which gained a `success` tone in 0.1.0-alpha.3:
+
+```mdx
+<Callout title="Calibration complete" tone="success">
+  The sensor is ready to record.
+</Callout>
+```
 
 ```md
 <!-- MkDocs -->
@@ -226,14 +251,112 @@ Plotly and Chart.js become Recharts islands. The package ships the shadcn chart
 wrapper over Recharts as `@ambiqai/helia-ui/react/chart`, and the existing data
 moves over unchanged: what changes is the renderer, not the numbers.
 
-```tsx
-// src/islands/LatencyChart.tsx
-import { ChartContainer, ChartTooltip } from '@ambiqai/helia-ui/react/chart';
+There is no chart component to import beyond that wrapper, because a chart is
+too specific to a page to be a part. The conversion is a recipe instead.
+
+### What the MkDocs side looks like
+
+Material sites drive charts from data attributes on an empty element, read at
+load by a `chart-init.js` that hands them to Plotly or Chart.js:
+
+```html
+<!-- MkDocs -->
+<div
+  class="chart"
+  data-chart-type="line"
+  data-chart-x="0,1,2,3,4,5"
+  data-chart-series='[{"name":"heliaRT","y":"5.4,5.2,5.6,5.1,5.3,5.2"},
+                      {"name":"heliaAOT","y":"4.9,4.8,4.7,4.9,4.6,4.8"}]'
+  data-chart-colors="#1769e0,#00a7b5"
+></div>
 ```
 
-Hydrate with `client:visible` so a chart below the fold costs nothing until it
-is scrolled to. Chart colours come from the token set, so a chart follows the
-theme without a palette of its own.
+Everything there is a string the build cannot check: a typo in a series name or
+a missing value only shows up as an empty chart in a browser.
+
+### The conversion, attribute by attribute
+
+<DataTable
+  caption="Where each chart-init.js attribute goes"
+  columns={['MkDocs attribute', 'Becomes']}
+  rows={[
+    ['data-chart-type', 'The Recharts element: LineChart, BarChart, AreaChart'],
+    ['data-chart-x', 'The shared key on each row, named by dataKey on XAxis'],
+    ['data-chart-series', 'One key per series on each row of the data array'],
+    ['series name', 'The label on that series’ ChartConfig entry'],
+    ['data-chart-colors', 'A --chart-N token on that entry’s color'],
+    ['chart-init.js', 'Nothing. The island is the initialiser.'],
+  ]}
+/>
+
+Three things are worth keeping straight. The parallel arrays become one array
+of rows, because Recharts takes a row per x value rather than a series per
+line. The per-trace hex colours become `--chart-1` through `--chart-5` from the
+token set, so a chart follows the theme instead of carrying a palette of its
+own. And `chart-init.js` itself is deleted rather than ported.
+
+### The island
+
+```tsx
+// src/islands/LatencyOverWindows.tsx
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from '@ambiqai/helia-ui/react/chart';
+
+const windows = [
+  { window: 0, rt: 5.4, aot: 4.9 },
+  { window: 1, rt: 5.2, aot: 4.8 },
+  // one row per x value, one key per series
+];
+
+const config = {
+  rt: { label: 'heliaRT', color: 'var(--chart-1)' },
+  aot: { label: 'heliaAOT', color: 'var(--chart-2)' },
+} satisfies ChartConfig;
+
+export default function LatencyOverWindows() {
+  return (
+    <ChartContainer config={config}>
+      <LineChart data={windows}>
+        <CartesianGrid vertical={false} />
+        <XAxis dataKey="window" tickLine={false} axisLine={false} />
+        <YAxis tickLine={false} axisLine={false} unit="ms" />
+        <ChartTooltip content={<ChartTooltipContent />} />
+        <Line dataKey="rt" stroke="var(--color-rt)" dot={false} />
+        <Line dataKey="aot" stroke="var(--color-aot)" dot={false} />
+      </LineChart>
+    </ChartContainer>
+  );
+}
+```
+
+`ChartContainer` turns each `config` key into a `--color-<key>` custom property,
+which is why the series reads `stroke="var(--color-rt)"` rather than repeating
+the token.
+
+Drop it on the page with `client:visible`, so a chart below the fold costs
+nothing until it is scrolled to:
+
+```mdx
+import LatencyOverWindows from '../../islands/LatencyOverWindows';
+
+<LatencyOverWindows client:visible />
+```
+
+This exact example is rendered on
+[Data display](/helia-ui/react/data-display/#a-converted-mkdocs-chart), where
+the site's own React islands live. This page stays static: only the
+React-components section hydrates, which is what the docs build asserts.
+
+<Aside type="caution" title="Numbers are claims">
+  A chart states something about a part. Move the data across unchanged and keep
+  whatever source of record the MkDocs page cited; do not round, re-scale or
+  re-label a series during the conversion.
+</Aside>
 
 ## Terminals
 

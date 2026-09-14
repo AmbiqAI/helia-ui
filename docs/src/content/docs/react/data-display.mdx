@@ -5,6 +5,7 @@ description: The static data table and the shadcn chart wrapper over Recharts.
 
 import DataTable from '@ambiqai/helia-ui/astro/DataTable';
 import ChartShowcase from '../../../islands/ChartShowcase';
+import MkDocsChartMigration from '../../../islands/MkDocsChartMigration';
 
 ## Dense data table
 
@@ -34,3 +35,17 @@ direct comparison and scatter plots for tradeoffs between two measures; keep the
 framing compact and the number of series restrained.
 
 <ChartShowcase animate client:only="react" />
+
+## A converted MkDocs chart
+
+The worked example behind the
+[charts section of the migration guide](/helia-ui/migrating-from-mkdocs/#charts).
+On the MkDocs side this was two Plotly traces carried as data attributes on an
+empty div and drawn by `chart-init.js` at load. Here the series are a typed
+module the build can see, the renderer is the package wrapper, and the two
+colours are `--chart-1` and `--chart-2` rather than hexes, so the lines follow
+the theme.
+
+The series is illustrative and not a measurement of any part.
+
+<MkDocsChartMigration client:visible />
