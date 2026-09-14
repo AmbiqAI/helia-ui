@@ -188,6 +188,13 @@ async function walk(dir, prefix = '') {
 const outDir = resolve(values.out);
 const sidebar = buildSidebar(root, options);
 
+/* A path outside the working directory reads better absolute than as a stack
+ * of `..` segments, and CI logs are the main reader here. */
+const show = (path) => {
+  const rel = relative(process.cwd(), path);
+  return rel.startsWith('..') ? path : rel;
+};
+
 if (values.check) {
   const temp = await mkdtemp(join(tmpdir(), 'helia-ui-pyref-'));
   try {
@@ -202,9 +209,7 @@ if (values.check) {
       if (!fresh.has(path)) drift.push(`orphaned: ${path}`);
     }
     if (drift.length > 0) {
-      console.error(
-        `${relative(process.cwd(), outDir)} has drifted from ${relative(process.cwd(), inputPath)}:\n`,
-      );
+      console.error(`${show(outDir)} has drifted from ${show(inputPath)}:\n`);
       for (const line of drift.slice(0, 50)) console.error(`  ${line}`);
       if (drift.length > 50)
         console.error(`  ... and ${drift.length - 50} more`);
@@ -222,9 +227,7 @@ if (values.check) {
     await mkdir(dirname(target), { recursive: true });
     await writeFile(target, `${JSON.stringify(sidebar, null, 2)}\n`, 'utf8');
   }
-  console.log(
-    `pyref: ${pages.length} pages written to ${relative(process.cwd(), outDir)}.`,
-  );
+  console.log(`pyref: ${pages.length} pages written to ${show(outDir)}.`);
 }
 
 if (warnings.length > 0) {

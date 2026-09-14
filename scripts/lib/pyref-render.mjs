@@ -627,13 +627,15 @@ function renderSection(section, context) {
       const type = ASIDE_TYPES[kind] ?? 'note';
       const redundant = title.toLowerCase() === type;
       const head = title && !redundant ? `:::${type}[${title}]` : `:::${type}`;
-      return `${head}\n${text(section.value?.description)}\n:::`;
+      /* The blank line before the closer keeps it out of a trailing list item
+       * when a formatter reflows the page. */
+      return `${head}\n${text(section.value?.description)}\n\n:::`;
     }
 
     case 'deprecated':
       return `:::caution[Deprecated]\n${
         section.value?.version ? `Since ${section.value.version}. ` : ''
-      }${text(section.value?.description)}\n:::`;
+      }${text(section.value?.description)}\n\n:::`;
 
     case 'modules':
     case 'classes':
