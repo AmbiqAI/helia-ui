@@ -64,7 +64,7 @@ const chevronMarkup = icon(faChevronDown).html.join('');
     margin: 0;
     min-height: 3.25rem;
     padding: var(--helia-space-3) var(--helia-space-4);
-    transition: background-color 140ms ease;
+    transition: background-color var(--helia-motion-fast) var(--helia-ease-out);
   }
 
   summary::-webkit-details-marker {
@@ -91,7 +91,7 @@ const chevronMarkup = icon(faChevronDown).html.join('');
     height: 1.5rem;
     justify-content: center;
     line-height: 1;
-    transition: transform 140ms ease;
+    transition: transform var(--helia-motion-fast) var(--helia-ease-out);
   }
 
   /* style-lint: allow global -- the chevron is set:html from Font Awesome, so the svg carries no scope */
@@ -112,13 +112,6 @@ const chevronMarkup = icon(faChevronDown).html.join('');
     max-width: 46rem;
     padding: 0 calc(var(--helia-space-6) + var(--helia-space-5))
       var(--helia-space-4) var(--helia-space-4);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    summary,
-    summary span {
-      transition: none;
-    }
   }
 
   @media (width < 42rem) {

@@ -49,7 +49,7 @@ const {
             <span>{actionLabel}</span>
             <svg
               aria-hidden="true"
-              class="timeline-arrow"
+              class="timeline-arrow helia-motion-cue"
               fill="none"
               viewBox="0 0 20 20"
             >
@@ -91,7 +91,7 @@ const {
                     </span>
                     <svg
                       aria-hidden="true"
-                      class="timeline-arrow"
+                      class="timeline-arrow helia-motion-cue"
                       fill="none"
                       viewBox="0 0 20 20"
                     >
@@ -271,19 +271,11 @@ const {
     stroke-linecap: round;
     stroke-linejoin: round;
     stroke-width: 1.6;
-    transition: transform 160ms ease;
     width: 1.25rem;
   }
 
   .timeline-item-link .timeline-arrow {
     color: var(--sl-color-gray-2);
-  }
-
-  .timeline-action:hover .timeline-arrow,
-  .timeline-action:focus-visible .timeline-arrow,
-  .timeline-item-link:hover .timeline-arrow,
-  .timeline-item-link:focus-visible .timeline-arrow {
-    transform: translateX(0.2rem);
   }
 
   .timeline-item-link:focus-visible,
@@ -350,12 +342,6 @@ const {
     .timeline-item-link,
     .timeline-item-static {
       gap: var(--helia-space-3);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .timeline-arrow {
-      transition: none;
     }
   }
 </style>

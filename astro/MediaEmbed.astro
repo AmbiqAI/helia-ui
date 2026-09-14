@@ -199,7 +199,7 @@ const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&r
     justify-content: center;
     position: absolute;
     transform: translate(-50%, -50%);
-    transition: transform 180ms ease;
+    transition: transform var(--helia-motion-base) var(--helia-ease-out);
     width: 3.5rem;
     z-index: 2;
   }
@@ -255,10 +255,8 @@ const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&r
   }
 
   @media (prefers-reduced-motion: reduce) {
-    button {
-      transition: none;
-    }
-
+    /* Zeroing the dial collapses the duration, but a scale factor is not one
+       of the distance tokens, so the growth itself has to go. */
     button:hover {
       transform: translate(-50%, -50%);
     }

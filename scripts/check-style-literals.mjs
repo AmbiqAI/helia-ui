@@ -23,6 +23,7 @@ import {
   PACKAGE_DIR,
   ROOT,
   WORKSPACE,
+  isUnder,
   joinRel,
   pkg,
 } from './lib/scope.mjs';
@@ -64,6 +65,20 @@ const TOKEN_DEFINITION_FILES = new Set([
 const COLOR = /#[0-9a-fA-F]{3,8}\b|\brgba?\([^)]*\)|\bhsla?\([^)]*\)/;
 const SPACING_PROPERTY =
   /^(padding|margin|gap|row-gap|column-gap|inset)(-(block|inline|top|right|bottom|left|start|end))*$/;
+
+/*
+ * Motion. A duration written as a literal is a step nobody can reach: it is
+ * off the three-step scale, and it survives `--helia-motion-scale: 0`, which
+ * is what the reduced-motion block in semantic.css gives a visitor who asks
+ * for no movement. Easings are a scale of one for the same reason.
+ *
+ * Scope is the package sheets, where the scale is defined and where every
+ * consumer inherits it; a site's own components are swept on their own.
+ */
+const MOTION_PROPERTY = /^(transition|animation)(-[a-z-]+)?$/;
+const DURATION_LITERAL = /(?<![\w.-])\d*\.?\d+m?s(?![\w-])/;
+const EASING_LITERAL =
+  /cubic-bezier\([^)]*\)|(?<![\w-])(?:ease(?:-in)?(?:-out)?|linear)(?![\w-])/;
 const RULES = [
   'arbitrary',
   'color',
@@ -71,6 +86,7 @@ const RULES = [
   'font-weight',
   'font',
   'border-radius',
+  'motion',
   'media',
   'spacing',
   'important',
@@ -190,6 +206,7 @@ for (const rel of [
   const source = fs.readFileSync(path.join(ROOT, rel), 'utf8');
   const isShell = SHELL_FILES.has(rel);
   const definesTokens = TOKEN_DEFINITION_FILES.has(rel);
+  const inPackage = isUnder(rel, PACKAGE_DIR);
 
   const fileAllows = new Map();
   let pending = null;
@@ -296,6 +313,15 @@ for (const rel of [
                   `${part} in '${property}: ${bare}' is not a token`,
                 );
             }
+          }
+        }
+
+        if (inPackage && !tokenBlock) {
+          const duration = DURATION_LITERAL.exec(bare);
+          if (duration) report('motion', `${duration[0]} is not a token`);
+          if (!custom && MOTION_PROPERTY.test(property)) {
+            const easing = EASING_LITERAL.exec(bare);
+            if (easing) report('motion', `${easing[0]} is not a token`);
           }
         }
       }

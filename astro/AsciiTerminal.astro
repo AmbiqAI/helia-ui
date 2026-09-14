@@ -368,8 +368,8 @@ const transcript = normalizedLines
     margin: 0;
     padding: 0;
     transition:
-      background-color 140ms ease,
-      color 140ms ease;
+      background-color var(--helia-motion-fast) var(--helia-ease-out),
+      color var(--helia-motion-fast) var(--helia-ease-out);
     width: 1.9rem;
   }
 
@@ -455,7 +455,10 @@ const transcript = normalizedLines
   }
 
   .ascii-terminal__line[data-active='true'] [data-line-text]::after {
-    animation: ascii-caret 850ms steps(1, end) infinite;
+    /* A blink is a cadence rather than a transition, so it multiplies the slow
+       step: a site that turns the dial to 0 gets a caret that holds still. */
+    animation: ascii-caret calc(var(--helia-motion-slow) * 2.5) steps(1, end)
+      infinite;
     background: currentColor;
     content: '';
     display: inline-block;
@@ -489,12 +492,7 @@ const transcript = normalizedLines
   }
 
   @media (prefers-reduced-motion: reduce) {
-    button {
-      transition: none;
-    }
-
     .ascii-terminal__line[data-active='true'] [data-line-text]::after {
-      animation: none;
       display: none;
     }
   }

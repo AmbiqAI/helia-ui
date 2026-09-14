@@ -41,7 +41,7 @@
   --helia-radius-pill: 999px;
 
   /*
-   * Motion. Three duration steps and two easings, each duration multiplied by
+   * Motion. Three duration steps and one easing, each duration multiplied by
    * one per-site dial so a site can slow the whole system down or switch it
    * off without touching a transition. The dial is a number, not a duration:
    * 0 removes motion, 1.5 is the slowest a site may reasonably ask for.
@@ -54,7 +54,6 @@
   --helia-motion-base: calc(200ms * var(--helia-motion-scale));
   --helia-motion-slow: calc(320ms * var(--helia-motion-scale));
   --helia-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --helia-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --helia-motion-lift-distance: -2px;
   --helia-motion-reveal-distance: 8px;
   --helia-motion-cue-distance: 2px;

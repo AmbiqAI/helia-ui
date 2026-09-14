@@ -162,7 +162,7 @@
     padding: var(--helia-space-2) var(--helia-space-1) var(--helia-space-2)
       var(--helia-space-4);
     position: relative;
-    transition: color 140ms ease;
+    transition: color var(--helia-motion-fast) var(--helia-ease-out);
   }
 
   .right-sidebar-panel starlight-toc nav > ul ul a {
@@ -185,11 +185,5 @@
 
   .right-sidebar-panel starlight-toc nav > ul a[aria-current='true']::before {
     background: currentColor;
-  }
-}
-
-@media (width >= 72rem) and (prefers-reduced-motion: reduce) {
-  .right-sidebar-panel starlight-toc nav > ul a {
-    transition: none;
   }
 }
