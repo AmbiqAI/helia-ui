@@ -88,6 +88,7 @@
 
   /* Advisory tones, one per callout variant. */
   --helia-tone-tip: #008d68;
+  --helia-tone-success: #2f8f3e;
   --helia-tone-important: #3970c3;
   --helia-tone-warning: #c66a22;
   --helia-tone-critical: #b92f3b;

@@ -4,6 +4,7 @@
 import { icon } from '@fortawesome/fontawesome-svg-core';
 import {
   faCircleInfo,
+  faCircleCheck,
   faCircleExclamation,
   faArrowRight,
   faClockRotateLeft,
@@ -16,6 +17,7 @@ import Surface from './Surface.astro';
 type CalloutTone =
   | 'note'
   | 'tip'
+  | 'success'
   | 'important'
   | 'warning'
   | 'critical'
@@ -33,17 +35,19 @@ const role = tone === 'critical' ? 'alert' : 'note';
 const iconDefinition =
   tone === 'tip'
     ? faArrowRight
-    : tone === 'experimental'
-      ? faCodeBranch
-      : tone === 'compatibility'
-        ? faLink
-        : tone === 'warning' || tone === 'critical'
-          ? faTriangleExclamation
-          : tone === 'deprecated'
-            ? faClockRotateLeft
-            : tone === 'important'
-              ? faCircleExclamation
-              : faCircleInfo;
+    : tone === 'success'
+      ? faCircleCheck
+      : tone === 'experimental'
+        ? faCodeBranch
+        : tone === 'compatibility'
+          ? faLink
+          : tone === 'warning' || tone === 'critical'
+            ? faTriangleExclamation
+            : tone === 'deprecated'
+              ? faClockRotateLeft
+              : tone === 'important'
+                ? faCircleExclamation
+                : faCircleInfo;
 const iconMarkup = icon(iconDefinition).html.join('');
 ---
 
@@ -77,6 +81,12 @@ const iconMarkup = icon(iconDefinition).html.join('');
 
   .helia-callout--tip {
     --callout-accent: var(--helia-tone-tip);
+  }
+
+  /* Distinct from tip: tip leans teal, success leans grass, so a page that
+     uses both still reads as two different things. */
+  .helia-callout--success {
+    --callout-accent: var(--helia-tone-success);
   }
 
   .helia-callout--important {
