@@ -18,7 +18,7 @@ The package is private and is not published to the npm registry, so it is
 installed from a git tag in `AmbiqAI/helia-ui` rather than by version range:
 
 ```sh
-npm install github:AmbiqAI/helia-ui#v0.1.0-alpha.1
+npm install github:AmbiqAI/helia-ui#v0.1.0-alpha.2
 ```
 
 A tag rather than a branch: the tarball npm builds from a branch changes under
@@ -33,6 +33,14 @@ React lane needs — `react`, `react-dom`, `radix-ui`, `cmdk`, `lucide-react`,
 optional peer, so a site that only imports stylesheets installs none of it. A
 site that imports from `./react/*` or `./tailwind.css` declares those itself,
 at the majors listed under `peerDependencies`.
+`@astrojs/starlight-tailwind` is needed only by a site that imports
+`./starlight-tailwind.css`.
+
+Only the paths in `files` travel to a consumer, and that is what applies to a
+git install too: npm clones the ref and packs it with the same rules the
+registry tarball uses. So `docs/`, `templates/`, the tests beside the scripts
+and the lockfile stay out of a consumer's tree, and there is no `.npmignore` —
+`files` is the allowlist and it takes precedence over one.
 
 Then import the stylesheets in the site's Tailwind entry, in this order, and
 add the package's parts to the site's `@source` list:
@@ -45,17 +53,18 @@ add the package's parts to the site's `@source` list:
 
 ## Export map
 
-| Export            | Contents                                                                                      |
-| ----------------- | --------------------------------------------------------------------------------------------- |
-| `./tokens.css`    | Primitive tokens for both themes, plus the mapping onto Starlight's `--sl-*` variables        |
-| `./semantic.css`  | The semantic layer: spacing, radius, type, weight, leading, ink, surfaces, tones              |
-| `./recipes.css`   | `helia-surface`, `chip`, `eyebrow`, `button`, `card`, `badge`, `media`, focus and hover       |
-| `./starlight.css` | Unlayered overrides for the Starlight shell: sidebar, header, search, TOC, steps, built-ins   |
-| `./tailwind.css`  | The Tailwind v4 entry: layer order, the Starlight compat round trip, and the `@theme` mapping |
-| `./shadcn.css`    | The shadcn variable bridge, imported by `./tailwind.css`                                      |
-| `./astro/*`       | The publishable Astro parts, one file per part                                                |
-| `./react/*`       | The React components, one file per component                                                  |
-| `./starlight`     | The Starlight plugin: component overrides and the theme's own configuration                   |
+| Export                     | Contents                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------ |
+| `./tokens.css`             | Primitive tokens for both themes, plus the mapping onto Starlight's `--sl-*` variables           |
+| `./semantic.css`           | The semantic layer: spacing, radius, type, weight, leading, ink, surfaces, tones                 |
+| `./recipes.css`            | `helia-surface`, `chip`, `eyebrow`, `button`, `card`, `badge`, `media`, focus and hover          |
+| `./starlight.css`          | Unlayered overrides for the Starlight shell: sidebar, header, search, TOC, steps, built-ins      |
+| `./tailwind.css`           | The Tailwind v4 entry: layer order and the `@theme` mapping, with no Starlight dependency        |
+| `./starlight-tailwind.css` | `./tailwind.css` with `@astrojs/starlight-tailwind` in front; the entry a Starlight site imports |
+| `./shadcn.css`             | The shadcn variable bridge, imported by `./tailwind.css`                                         |
+| `./astro/*`                | The publishable Astro parts, one file per part                                                   |
+| `./react/*`                | The React components, one file per component                                                     |
+| `./starlight`              | The Starlight plugin: component overrides and the theme's own configuration                      |
 
 Every stylesheet is unlayered apart from what `tailwind.css` declares, because
 Starlight's own rules sit in `@layer starlight.*` and unlayered rules outrank
@@ -95,21 +104,49 @@ import { heliaStarlight } from '@ambiqai/helia-ui/starlight';
 here would point inside `node_modules`. The consuming site declares its own
 scan list in its Tailwind entry and imports this file from it. That list has to
 name `astro/**/*.astro` in this package as well as the site's own tree, or a
-utility class written in a part will not reach the stylesheet.
+utility class written in a part will not reach the stylesheet:
+
+```css
+@import '@ambiqai/helia-ui/starlight-tailwind.css'; /* or tailwind.css */
+
+@source '../content/**/*.{md,mdx}';
+@source '../../node_modules/@ambiqai/helia-ui/astro/**/*.astro';
+@source '../../node_modules/@ambiqai/helia-ui/starlight/**/*.astro';
+```
+
+Pointing a `@source` back into `node_modules` is the supported form and it
+works: Tailwind skips `node_modules` when it detects sources automatically, not
+when a path is named explicitly, so a directory, a glob and a single file all
+scan. Prefer naming individual components from `react/**` rather than the whole
+directory — shadcn writes long variant strings into every generated file, and
+scanning the layer for components a site never renders roughly doubles the
+emitted stylesheet.
 
 ## Working on the package
 
 ```sh
-npm ci            # Node from .nvmrc, npm 10 or later
-npm run validate  # formatting, SPDX headers, notices, style, boundary and island checks
-npm run docs:dev  # the documentation site, which consumes the package through its exports
+npm ci                 # Node from .nvmrc; npm 10, and only npm 10
+npm run validate       # formatting, SPDX headers, notices, style, boundary and island checks
+npm test               # the script unit tests
+
+npm ci --prefix docs   # the docs site installs separately, once
+npm run docs:dev       # the documentation site, which consumes the package through its exports
 npm run docs:build
-npm run docs:test # Playwright smoke suite over the built docs site
+npm run docs:test      # Playwright smoke suite over the built docs site
 ```
 
-`docs/` is a workspace of this package and a consumer of it: it reaches the
+`docs/` is a consumer of this package, not a workspace of it: it reaches the
 package only through the export map, so anything it cannot render is a gap in
-the package rather than in the site.
+the package rather than in the site. It has its own `package.json`, its own
+lockfile and its own `npm ci`, and it depends on the package as `file:..`. The
+reason it is not a workspace is that a `workspaces` field in a package manifest
+travels with the package: it lands in the lockfile entry of everyone who
+installs it, and it describes a directory that is not in the tarball.
+
+`engines.npm` is `^10` and `.npmrc` sets `engine-strict=true`, in the package
+root and in `docs/` alike, so a newer npm refuses to install rather than
+silently rewriting the lockfile in a dialect CI does not install from. Use
+`npx -y npm@10 ...` if the npm on your path is newer.
 
 ## Starting a product docs site
 

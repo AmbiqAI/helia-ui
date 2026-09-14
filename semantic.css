@@ -30,8 +30,8 @@
   --helia-radius-lg: calc(var(--helia-radius) + 0.35rem);
   --helia-radius-pill: 999px;
 
-  --helia-font-sans: var(--__sl-font);
-  --helia-font-mono: var(--__sl-font-mono);
+  --helia-font-sans: var(--__sl-font, var(--helia-sl-font-system));
+  --helia-font-mono: var(--__sl-font-mono, var(--helia-sl-font-system-mono));
   --helia-text-meta: 0.64rem;
   --helia-text-label: 0.68rem;
   --helia-text-caption: 0.74rem;
@@ -53,9 +53,9 @@
   --helia-leading-tight: 1.08;
   --helia-leading-heading: 1.18;
   --helia-leading-body: 1.6;
-  --helia-ink-primary: var(--sl-color-white);
-  --helia-ink-secondary: var(--sl-color-gray-2);
-  --helia-ink-muted: var(--sl-color-gray-3);
+  --helia-ink-primary: var(--sl-color-white, var(--helia-sl-white));
+  --helia-ink-secondary: var(--sl-color-gray-2, var(--helia-sl-gray-2));
+  --helia-ink-muted: var(--sl-color-gray-3, var(--helia-sl-gray-3));
   --helia-surface-paper: var(--helia-surface-raised);
   --helia-surface-card: var(--helia-surface-raised);
   --helia-surface-card-muted: var(--helia-surface-muted);
@@ -121,7 +121,7 @@
 
   /* Theme-aware counterpart to the flat --helia-accent-* set: these tones have to
      darken on paper to stay legible. */
-  --helia-tone-neutral: var(--sl-color-white);
+  --helia-tone-neutral: var(--sl-color-white, var(--helia-sl-white));
   --helia-tone-blue: #4d9bff;
   --helia-tone-cyan: #28b8c2;
   --helia-tone-green: #2fb878;

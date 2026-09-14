@@ -67,7 +67,7 @@
 .helia-hover-surface:hover,
 .helia-hover-surface:focus-visible {
   background: var(--helia-surface-card-muted);
-  border-color: var(--sl-color-gray-4);
+  border-color: var(--sl-color-gray-4, var(--helia-sl-gray-4));
 }
 
 .helia-surface {
@@ -203,7 +203,7 @@ a.helia-chip--neutral:focus-visible {
 /* Inverted ink: a black pill in the light theme, a white pill in the dark. */
 .helia-button--primary {
   background: var(--helia-ink-primary);
-  color: var(--sl-color-text-invert);
+  color: var(--sl-color-text-invert, var(--helia-sl-text-invert));
 }
 
 .helia-button--primary:hover,

@@ -56,6 +56,32 @@
   --sl-color-bg-nav: var(--helia-surface-raised);
   --sl-color-bg-sidebar: var(--helia-surface-canvas);
   --sl-color-hairline: var(--helia-hairline);
+
+  /*
+   * Starlight fallbacks. The package sheets read a handful of variables that
+   * Starlight's own props.css owns and this file does not map: the greyscale
+   * ramp, the inverted ink and the two font stacks. A Starlight page supplies
+   * them; a plain app does not, and an unresolved var() drops the declaration
+   * rather than falling back, so every read of one goes through
+   * `var(--sl-x, var(--helia-sl-x))` and lands here when Starlight is absent.
+   *
+   * The values are Starlight's own, restated, so the two paths compute the
+   * same thing. They are fallbacks only: a Starlight site's own values win,
+   * including a site that customises the ramp.
+   */
+  --helia-sl-white: hsl(0, 0%, 100%);
+  --helia-sl-gray-2: hsl(224, 6%, 77%);
+  --helia-sl-gray-3: hsl(224, 6%, 56%);
+  --helia-sl-gray-4: hsl(224, 7%, 36%);
+  /* Starlight derives this from the accent low step, which is mapped above. */
+  --helia-sl-text-invert: var(--helia-accent-low);
+  --helia-sl-font-system:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    'Noto Sans', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+  --helia-sl-font-system-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
 }
 
 :root[data-theme='light'] {
@@ -68,4 +94,11 @@
   --helia-surface-raised: #ffffff;
   --helia-surface-muted: #f5f5f7;
   --helia-hairline: #dfe3e8;
+
+  /* The light half of the Starlight fallbacks; the ramp inverts, the fonts do not. */
+  --helia-sl-white: hsl(224, 10%, 10%);
+  --helia-sl-gray-2: hsl(224, 10%, 23%);
+  --helia-sl-gray-3: hsl(224, 7%, 36%);
+  --helia-sl-gray-4: hsl(224, 6%, 56%);
+  --helia-sl-text-invert: var(--helia-sl-white);
 }

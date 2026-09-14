@@ -47,7 +47,8 @@ The four sheets the plugin injects are `tokens.css`, `semantic.css`,
 Tailwind roots in your `customCss` and before everything else:
 
 ```
-./src/styles/tailwind.css       your Tailwind entry
+./src/styles/tailwind.css       your Tailwind entry, which imports
+                                @ambiqai/helia-ui/starlight-tailwind.css
 @ambiqai/helia-ui/tokens.css    injected
 @ambiqai/helia-ui/semantic.css  injected
 @ambiqai/helia-ui/recipes.css   injected

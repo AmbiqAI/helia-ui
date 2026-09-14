@@ -1,0 +1,24 @@
+/* SPDX-License-Identifier: BSD-3-Clause */
+/* Copyright (c) 2026, Ambiq */
+/*
+ * Tailwind v4 entry for a Starlight site.
+ *
+ * The same entry as ./tailwind.css with @astrojs/starlight-tailwind in front
+ * of it. A Starlight site imports this file; anything else imports
+ * ./tailwind.css directly and installs no compat package.
+ *
+ * The compat package has to be imported before ./tailwind.css, not after: it
+ * sets the Starlight `--sl-*` variables from Tailwind's theme, and the
+ * `@theme` blocks in ./tailwind.css restate the gray ramp and the font stacks
+ * so that round trip lands where it started. Reversing the order would let the
+ * compat package's own gray ramp win instead.
+ *
+ * The layer order is declared here as well as in ./tailwind.css. Repeating an
+ * order already established is a no-op, and it has to be stated before the
+ * compat package's rules arrive or they would establish their own.
+ */
+
+@layer base, starlight, theme, components, utilities;
+
+@import '@astrojs/starlight-tailwind';
+@import './tailwind.css';

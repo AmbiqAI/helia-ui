@@ -8,9 +8,14 @@
  * a `@source` glob relative to the file that declares it: a glob written inside
  * the package would point into node_modules, so only this file can name both
  * this tree and the package's.
+ *
+ * The `starlight-` entry rather than `tailwind.css`: it is the same entry with
+ * @astrojs/starlight-tailwind in front, which only a Starlight site needs. An
+ * app without the Starlight shell imports `tailwind.css` and installs no
+ * compat package.
  */
 
-@import '@ambiqai/helia-ui/tailwind.css';
+@import '@ambiqai/helia-ui/starlight-tailwind.css';
 
 /* Automatic detection is off, so the emitted stylesheet is a function of this
  * list and nothing else. Add a directory here the moment you author in it. */

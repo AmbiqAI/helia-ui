@@ -30,8 +30,8 @@ git tag in the package's own repository, whose root is the package:
 ```jsonc
 {
   "dependencies": {
-    // Replace with "^0.1.0-alpha.1" once the package is on npm.
-    "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v0.1.0-alpha.1",
+    // Replace with "^0.1.0-alpha.2" once the package is on npm.
+    "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v0.1.0-alpha.2",
   },
 }
 ```
@@ -42,8 +42,12 @@ committing.
 
 This template's `dependencies` also carry `react`, `react-dom` and the Tailwind
 packages because the package declares them as optional peers: a site that
-renders React islands or imports `@ambiqai/helia-ui/tailwind.css` installs them
-itself. Drop the ones the site does not use.
+renders React islands or imports one of the package's Tailwind entries installs
+them itself. `@astrojs/starlight-tailwind` is there because this is a Starlight
+site and `src/styles/tailwind.css` imports
+`@ambiqai/helia-ui/starlight-tailwind.css`; an app without the Starlight shell
+imports `@ambiqai/helia-ui/tailwind.css` and drops it. Drop the ones the site
+does not use.
 
 Then generate the lockfile the workflow expects:
 
@@ -70,7 +74,11 @@ root-relative link (`/install/`) will 404 in production; a relative one
 
 - The `heliaStarlight()` plugin: the package stylesheets in the right order,
   and the shared footer, theme menu and mobile menu.
-- Tailwind v4 through `src/styles/tailwind.css`, which owns the scan list.
+- Tailwind v4 through `src/styles/tailwind.css`, which owns the scan list. A
+  `@source` may point back into `node_modules` — an explicit path is not subject
+  to the ignore rules automatic detection applies — so the package's own parts
+  are scanned from there. Name individual `react/**` components rather than the
+  directory: shadcn writes long variant strings into every generated file.
 - KaTeX: `remark-math` and `rehype-katex` on Astro's `markdown` config, with
   `katex/dist/katex.min.css` in `customCss`. Starlight's own `markdown` option
   does not take plugins.

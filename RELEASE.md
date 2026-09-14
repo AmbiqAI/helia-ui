@@ -7,8 +7,8 @@ required facts in the package root next to LICENSE and NOTICE.
 | Field             | Value                                                                       |
 | ----------------- | --------------------------------------------------------------------------- |
 | Package           | `@ambiqai/helia-ui`                                                         |
-| Version           | 0.1.0-alpha.1                                                               |
-| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.1`.         |
+| Version           | 0.1.0-alpha.2                                                               |
+| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.2`.         |
 | License           | BSD-3-Clause (`LICENSE`)                                                    |
 | Licensing tier    | Tier 1, ADR-0005                                                            |
 | Source repository | https://github.com/AmbiqAI/helia-ui                                         |

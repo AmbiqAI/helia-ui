@@ -12,6 +12,11 @@
  * glob relative to the file that declares it, so one written here would point
  * inside node_modules. The importing entry holds those rules.
  *
+ * This file does NOT import @astrojs/starlight-tailwind: that lives in
+ * ./starlight-tailwind.css, which a Starlight site imports in place of this
+ * one. Splitting it is what lets a plain app — a Vite SPA, say — use the theme
+ * mapping without pulling a Starlight compat package in to satisfy it.
+ *
  * The arrow in @astrojs/starlight-tailwind points the other way from ours: it
  * sets the Starlight `--sl-*` variables FROM Tailwind's theme. The variables
  * tokens.css already owns (accent, bg, bg-nav, bg-sidebar, hairline) win on
@@ -27,7 +32,6 @@
 
 /* style-lint: allow-file color -- the gray ramp below is the one value the compat package reads that cannot be a var() without closing a cycle; allow-file rather than SHELL_FILES so only the colour rule is relaxed and the suppression is counted */
 
-@import '@astrojs/starlight-tailwind';
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities) source(none);
 
@@ -57,11 +61,12 @@
    * `--helia-font-*` alias `--__sl-font*`, which Starlight derives from
    * `--sl-font*`, which the compat package sets from these. Pointing at the
    * system stacks Starlight falls back to breaks that cycle and leaves the
-   * computed font unchanged.
+   * computed font unchanged. Off a Starlight page nobody defines those stacks,
+   * so the fallback is the package's own restatement of them.
    */
   --font-*: initial;
-  --font-sans: var(--sl-font-system);
-  --font-mono: var(--sl-font-system-mono);
+  --font-sans: var(--sl-font-system, var(--helia-sl-font-system));
+  --font-mono: var(--sl-font-system-mono, var(--helia-sl-font-system-mono));
 }
 
 /*

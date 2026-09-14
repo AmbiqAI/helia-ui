@@ -38,15 +38,15 @@ git tag in the package's own repository, whose root is the package:
 ```jsonc
 {
   "dependencies": {
-    // Replace with "^0.1.0-alpha.1" once the package is on npm.
-    "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v0.1.0-alpha.1",
+    // Replace with "^0.1.0-alpha.2" once the package is on npm.
+    "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v0.1.0-alpha.2",
   },
 }
 ```
 
 While developing against an unreleased change, point the same entry at a packed
 tarball of a local checkout (`npm pack` in the package root, then
-`"file:../helia-ui-0.1.0-alpha.1.tgz"`) and switch back to the tag before
+`"file:../helia-ui-0.1.0-alpha.2.tgz"`) and switch back to the tag before
 committing. A `file:` path to the directory installs as a symlink, and the
 package ships `.tsx` source rather than a bundle, so TypeScript then resolves
 `react` from the checkout's own tree instead of this app's and reports the whole
@@ -160,17 +160,18 @@ never after an earlier `await`.
 
 ## What the app supplies
 
-The package's stylesheets are written for a Starlight page. Outside Starlight a
-few of the variables they read have no owner, so `src/styles/app.css` supplies
-them: the two system font stacks Starlight's `props.css` defines, and
-`--sl-color-text-invert`. The values there are Starlight's own, restated.
+`src/styles/app.css` imports `@ambiqai/helia-ui/tailwind.css`, not
+`starlight-tailwind.css`: the `starlight-` entry is the same entry with
+`@astrojs/starlight-tailwind` in front of it, and this app has no Starlight
+shell. So it installs no compat package, and it supplies none of the
+Starlight-owned variables the package sheets read — those carry their own
+fallbacks inside the package.
 
-The same file also carries one `@source` line per React component the app uses.
-That shape is forced, not chosen: Tailwind 4.3 applies its ignore rules to
-`@source` paths inside `node_modules`, so a directory or a glob silently matches
-nothing and the components render with the inherited text colour. Naming a file
-is the only form that gets through. Add a line when you first import a
-component.
+The same file carries one `@source` line per React component the app uses. A
+`@source` path into `node_modules` works in every form, so that list is a size
+choice rather than a workaround: `react/*.tsx` would scan the whole layer, and
+shadcn writes long variant strings into every generated file. Add a line when
+you first import a component, and delete it when the last import goes.
 
 ## Claims
 

@@ -106,14 +106,22 @@ function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
 }
 
-/** Node resolution: nearest node_modules wins, then walk up to the root. */
+/**
+ * Node resolution: nearest node_modules wins, then walk up. The walk does not
+ * stop at the generated root, because the package is installed two ways. Run
+ * from its own repository it has a node_modules of its own; run from the hub
+ * the same dependencies are hoisted to the workspace root, one level above the
+ * package, and a walk bounded by the package would report every one of them
+ * missing. Both trees resolve to the same versions or the notices differ
+ * between them, which `--check` would catch.
+ */
 function resolvePackageDir(name, fromDir) {
   let dir = fromDir;
   for (;;) {
     const candidate = join(dir, 'node_modules', name);
     if (existsSync(join(candidate, 'package.json'))) return candidate;
     const parent = dirname(dir);
-    if (parent === dir || !dir.startsWith(repoRoot)) return null;
+    if (parent === dir) return null;
     dir = parent;
   }
 }

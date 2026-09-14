@@ -39,7 +39,9 @@ published tarball. Copy them out of `AmbiqAI/helia-ui`.
 - **Tailwind v4 through `@tailwindcss/vite`**, with an entry that imports
   `tokens.css`, `semantic.css` and `tailwind.css` in the order the Starlight
   plugin uses, then Tailwind's Preflight, because an app has no docs shell to
-  inherit a baseline from.
+  inherit a baseline from. `tailwind.css` and not `starlight-tailwind.css`: an
+  app has no Starlight shell, so it installs no compat package and supplies none
+  of Starlight's variables.
 - **A theme toggle that owns `data-theme` on `<html>`.** Light, dark and system,
   persisted, applied before first paint by a small script in `index.html`.
 - **A Pages deploy.** `vite.config.ts` reads `base` from `BASE_PATH`, and

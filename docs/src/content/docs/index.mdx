@@ -54,7 +54,7 @@ export default defineConfig({
 
 ```css
 /* src/styles/tailwind.css */
-@import '@ambiqai/helia-ui/tailwind.css';
+@import '@ambiqai/helia-ui/starlight-tailwind.css';
 
 @source '../content/**/*.{md,mdx}';
 @source '../components/**/*.{astro,tsx}';
@@ -63,26 +63,29 @@ export default defineConfig({
 
 <Callout tone="note" title="The scan list is yours">
   Tailwind resolves a `@source` glob relative to the file that declares it, so
-  the package cannot express a path into your tree, and it cannot express a path
-  out of `node_modules` either. Every site therefore keeps a Tailwind entry that
-  imports `@ambiqai/helia-ui/tailwind.css` and names its own sources, including
-  the package directories whose parts it renders.
+  the package cannot express a path into your tree. Every site therefore keeps a
+  Tailwind entry that imports the package's and names its own sources, including
+  the package directories whose parts it renders. A `@source` that reaches back
+  into `node_modules` is fine — an explicit `@source` is not subject to the
+  ignore rules automatic detection applies — so `@source
+  '../../node_modules/@ambiqai/helia-ui/astro/**/*.astro'` is the working form.
 </Callout>
 
 ## The export map
 
-| Export            | What it is                                                                                              |
-| ----------------- | ------------------------------------------------------------------------------------------------------- |
-| `./tokens.css`    | Primitives for both themes, and the mapping onto Starlight's `--sl-*` variables                         |
-| `./semantic.css`  | Spacing, radius, type, weight, leading, ink, surfaces, tones                                            |
-| `./recipes.css`   | `helia-surface`, `chip`, `eyebrow`, `button`, `card`, `badge`, `media`, and the focus and hover recipes |
-| `./starlight.css` | Unlayered chrome overrides: sidebar, header, search, table of contents, steps, skinned built-ins        |
-| `./tailwind.css`  | Layer order, the Starlight compat round trip, and the `@theme` mapping                                  |
-| `./shadcn.css`    | The shadcn variable bridge, imported by `./tailwind.css`                                                |
-| `./astro/*`       | The Astro parts, one file per part                                                                      |
-| `./react/*`       | The generated shadcn components, one file per component                                                 |
-| `./starlight`     | The `heliaStarlight()` plugin                                                                           |
-| `./starlight/*`   | The shell components the plugin installs                                                                |
+| Export                     | What it is                                                                                              |
+| -------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `./tokens.css`             | Primitives for both themes, and the mapping onto Starlight's `--sl-*` variables                         |
+| `./semantic.css`           | Spacing, radius, type, weight, leading, ink, surfaces, tones                                            |
+| `./recipes.css`            | `helia-surface`, `chip`, `eyebrow`, `button`, `card`, `badge`, `media`, and the focus and hover recipes |
+| `./starlight.css`          | Unlayered chrome overrides: sidebar, header, search, table of contents, steps, skinned built-ins        |
+| `./tailwind.css`           | Layer order and the `@theme` mapping, with no Starlight dependency                                      |
+| `./starlight-tailwind.css` | `./tailwind.css` with `@astrojs/starlight-tailwind` in front; what a Starlight site imports             |
+| `./shadcn.css`             | The shadcn variable bridge, imported by `./tailwind.css`                                                |
+| `./astro/*`                | The Astro parts, one file per part                                                                      |
+| `./react/*`                | The generated shadcn components, one file per component                                                 |
+| `./starlight`              | The `heliaStarlight()` plugin                                                                           |
+| `./starlight/*`            | The shell components the plugin installs                                                                |
 
 The four stylesheets the plugin injects are unlayered on purpose. Unlayered
 rules beat every cascade layer, so the token sheets stay the source of truth no
