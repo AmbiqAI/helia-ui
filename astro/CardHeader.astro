@@ -29,18 +29,26 @@ interface Props extends HTMLAttributes<'div'> {
   padding?: PaddingStep;
   /** Links the title, and stretches that link over the whole card. */
   href?: string;
+  /**
+   * The overline text. Prefer this to the `overline` slot in MDX: MDX merges a
+   * slotted element and the title text that follows it into one paragraph,
+   * which drops the `slot` attribute and folds the overline into the heading's
+   * accessible name. The slot stays for markup an attribute cannot carry.
+   */
+  overline?: string;
 }
 
 const {
   titleAs: Title = 'h3',
   padding = '4',
   href,
+  overline,
   class: className,
   ...rest
 } = Astro.props;
 
 const hasTitle = Astro.slots.has('default');
-const hasOverline = Astro.slots.has('overline');
+const hasOverline = overline !== undefined || Astro.slots.has('overline');
 const hasMeta = Astro.slots.has('meta');
 const hasAction = Astro.slots.has('action');
 ---
@@ -57,6 +65,7 @@ const hasAction = Astro.slots.has('action');
     {
       hasOverline && (
         <Eyebrow>
+          {overline}
           <slot name="overline" />
         </Eyebrow>
       )
