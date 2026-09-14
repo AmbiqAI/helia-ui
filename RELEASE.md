@@ -4,16 +4,16 @@ ADR-0005 requires "a release manifest carrying license and provenance, per demo
 policy" but does not prescribe a filename or format, so this file records the
 required facts in the package root next to LICENSE and NOTICE.
 
-| Field             | Value                                                                                |
-| ----------------- | ------------------------------------------------------------------------------------ |
-| Package           | `@ambiqai/helia-ui`                                                                  |
-| Version           | 0.1.0-alpha.0                                                                        |
-| Status            | Not published. Private, consumed from the workspace; alpha for the repository split. |
-| License           | BSD-3-Clause (`LICENSE`)                                                             |
-| Licensing tier    | Tier 1, ADR-0005                                                                     |
-| Source repository | https://github.com/AmbiqAI/helia-developer-hub                                       |
-| Source path       | `packages/helia-ui`, which is also the root of the split repository                  |
-| Source commit     | Recorded at publish time; see `git log -1` for the tree this manifest travels with.  |
+| Field             | Value                                                                       |
+| ----------------- | --------------------------------------------------------------------------- |
+| Package           | `@ambiqai/helia-ui`                                                         |
+| Version           | 0.1.0-alpha.1                                                               |
+| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.1`.         |
+| License           | BSD-3-Clause (`LICENSE`)                                                    |
+| Licensing tier    | Tier 1, ADR-0005                                                            |
+| Source repository | https://github.com/AmbiqAI/helia-ui                                         |
+| Source path       | Repository root, mirrored from `packages/helia-ui` in `helia-developer-hub` |
+| Source commit     | Recorded at tag time.                                                       |
 
 ## Provenance
 

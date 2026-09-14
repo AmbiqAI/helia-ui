@@ -4,14 +4,17 @@ A minimal Starlight site wired to `@ambiqai/helia-ui`. Copy it into a product
 repository as `docs/`, change the placeholders, and delete this README.
 
 This directory is **repo-only**: it is not listed in the package's `files`, so
-it is not in the published tarball. Copy it from
-`AmbiqAI/helia-developer-hub` at `packages/helia-ui/templates/product-docs/`.
+it is not in the published tarball. Copy it from `AmbiqAI/helia-ui` at
+`templates/product-docs/`.
+
+The package's own documentation, with every part rendered, is at
+https://ambiqai.github.io/helia-ui/.
 
 ## Copy it out
 
 ```sh
-git clone --depth 1 https://github.com/AmbiqAI/helia-developer-hub.git /tmp/hub
-cp -R /tmp/hub/packages/helia-ui/templates/product-docs ./docs
+git clone --depth 1 https://github.com/AmbiqAI/helia-ui.git /tmp/helia-ui
+cp -R /tmp/helia-ui/templates/product-docs ./docs
 cd docs
 rm README.md
 ```
@@ -21,22 +24,26 @@ directory; it expects the site at `docs/` and reads `docs/.nvmrc`.
 
 ## Point it at the package
 
-`@ambiqai/helia-ui` is not published to npm yet. Until it is, depend on the git
-tag rather than the version range this template ships with:
+`@ambiqai/helia-ui` is not published to npm yet, so this template depends on a
+git tag in the package's own repository, whose root is the package:
 
 ```jsonc
 {
   "dependencies": {
-    // Replace with "^0.1.0-alpha.0" once the package is on npm.
-    "@ambiqai/helia-ui": "github:AmbiqAI/helia-developer-hub#helia-ui-v0.1.0-alpha.0",
+    // Replace with "^0.1.0-alpha.1" once the package is on npm.
+    "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v0.1.0-alpha.1",
   },
 }
 ```
 
-A git dependency installs the whole repository, so the package's `files` list
-does not apply and the path stays `node_modules/@ambiqai/helia-ui` only if the
-tag points at a tree whose root is the package. If it does not, use a local
-`file:` path while developing and switch to the registry when it exists.
+While developing against an unreleased change, point the same entry at a local
+checkout with `"file:../../helia-ui"` and switch back to the tag before
+committing.
+
+This template's `dependencies` also carry `react`, `react-dom` and the Tailwind
+packages because the package declares them as optional peers: a site that
+renders React islands or imports `@ambiqai/helia-ui/tailwind.css` installs them
+itself. Drop the ones the site does not use.
 
 Then generate the lockfile the workflow expects:
 

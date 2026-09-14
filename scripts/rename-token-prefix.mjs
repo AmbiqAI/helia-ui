@@ -9,8 +9,8 @@
  * now `--helia-`; the two layers stay in separate files but share the prefix.
  * The site-named class prefix `hub-` moves to `helia-` with them.
  *
- * This is committed rather than thrown away because tokens.css is vendored
- * into aitg-handbook, which has to run the identical rename over its own tree:
+ * This is committed rather than thrown away because aitg-handbook consumes
+ * these tokens and has to run the identical rename over its own tree:
  *
  *   node scripts/rename-token-prefix.mjs --root <dir> --tokens-only
  *

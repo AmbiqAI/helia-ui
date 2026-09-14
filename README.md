@@ -9,22 +9,30 @@ consuming site's bundler reads these files directly, so a consumer needs the
 same Tailwind and Starlight majors listed under `peerDependencies`.
 
 Documentation, with every part rendered, builds from `docs/` in this package
-and publishes to https://ambiqai.github.io/helia-ui/ once the repository is in
-place. Until then, build it locally with `npm run docs:dev`.
+and publishes to https://ambiqai.github.io/helia-ui/. Build it locally with
+`npm run docs:dev`.
 
 ## Install
 
 The package is private and is not published to the npm registry, so it is
-installed from a git tag rather than by version range, once the repository it
-is tagged in exists:
+installed from a git tag in `AmbiqAI/helia-ui` rather than by version range:
 
 ```sh
-npm install github:AmbiqAI/helia-ui#v0.1.0-alpha.0
+npm install github:AmbiqAI/helia-ui#v0.1.0-alpha.1
 ```
 
 A tag rather than a branch: the tarball npm builds from a branch changes under
 the consuming lockfile whenever the branch moves. The tag is the release, and
 `RELEASE.md` is its manifest.
+
+`astro` and `@astrojs/starlight` are the only required peers. Everything the
+React lane needs — `react`, `react-dom`, `radix-ui`, `cmdk`, `lucide-react`,
+`class-variance-authority`, `cn`, `recharts`, `sonner`,
+`@tanstack/react-table` — and everything the Tailwind entry needs —
+`tailwindcss`, `@tailwindcss/vite`, `@astrojs/starlight-tailwind` — is an
+optional peer, so a site that only imports stylesheets installs none of it. A
+site that imports from `./react/*` or `./tailwind.css` declares those itself,
+at the majors listed under `peerDependencies`.
 
 Then import the stylesheets in the site's Tailwind entry, in this order, and
 add the package's parts to the site's `@source` list:

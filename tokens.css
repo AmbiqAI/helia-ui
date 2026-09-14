@@ -10,12 +10,10 @@
  * defined here must not be redefined there; nothing site-specific belongs in
  * this file.
  *
- * CANONICAL COPY: helia-developer-hub/packages/helia-ui/tokens.css
- * This file is VENDORED byte-for-byte into aitg-handbook/src/styles/tokens.css.
- * Edit it in the hub only, then run `npm run sync:tokens` there to push the
- * copy. `npm run check:tokens` diffs the two and fails on drift (it skips
- * cleanly when the sibling repo is not checked out). Do not edit the vendored
- * copy in place; it will be overwritten.
+ * CANONICAL COPY: AmbiqAI/helia-ui, at the root of the package as tokens.css.
+ * Consumers take it by version through `@ambiqai/helia-ui/tokens.css`; nobody
+ * vendors a copy, so a change here reaches a site only when that site moves to
+ * the tag carrying it.
  *
  * NOTE: deliberately left UNLAYERED. Starlight's own variables live in the
  * `starlight.base` cascade layer, and unlayered rules always win over layered
