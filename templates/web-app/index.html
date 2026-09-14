@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HELIA signal monitor</title>
+    <meta
+      name="description"
+      content="Streaming signal demo built on @ambiqai/helia-ui."
+    />
+    <!--
+      Applied before first paint. React would set the same attribute a moment
+      later, and that moment is a full-page flash of the wrong palette. The
+      duplicated logic is the price; keep it in step with src/theme.ts.
+    -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('helia-theme');
+          var choice =
+            stored === 'light' || stored === 'dark' ? stored : 'system';
+          var resolved =
+            choice === 'system'
+              ? window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light'
+              : choice;
+          document.documentElement.dataset.theme = resolved;
+        } catch (error) {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

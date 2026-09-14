@@ -1,0 +1,79 @@
+/* SPDX-License-Identifier: BSD-3-Clause */
+/* Copyright (c) 2026, Ambiq */
+/*
+ * This app's Tailwind v4 entry.
+ *
+ * Order matches what the Starlight plugin does for a docs site: tokens, then
+ * the semantic layer, then the Tailwind root. The first two are unlayered and
+ * unlayered rules beat every cascade layer, so they stay the source of truth
+ * whatever the compat package wires up underneath.
+ *
+ * `@ambiqai/helia-ui/tailwind.css` pulls in shadcn.css, which is where the
+ * React layer's `bg-card` and `text-muted-foreground` are aliased onto the
+ * tokens and where `@custom-variant dark` is defined. Importing shadcn.css
+ * separately would give Tailwind two roots and emit the utility layer twice.
+ */
+
+@import '@ambiqai/helia-ui/tokens.css';
+@import '@ambiqai/helia-ui/semantic.css';
+@import '@ambiqai/helia-ui/tailwind.css';
+
+/*
+ * A docs site gets its baseline from Starlight. An app has no shell, so it
+ * takes Tailwind's: without Preflight the body keeps its 8px margin and every
+ * heading its browser size, which fights the type scale.
+ */
+@import 'tailwindcss/preflight.css' layer(base);
+
+/* Automatic detection is off in the package's entry, so the emitted stylesheet
+ * is a function of this list and nothing else. */
+@source '../**/*.tsx';
+
+/*
+ * The React layer renders into this app's markup, so it is this app's
+ * templates. One line per component, and that shape is forced rather than
+ * chosen: Tailwind 4.3 applies its ignore rules to `@source` paths inside
+ * node_modules, so both `.../react` and `.../react/*.tsx` silently match
+ * nothing and the components render unstyled — `text-foreground` never gets
+ * emitted and the text stays at the inherited colour, which looks like a
+ * broken dark mode rather than a missing utility. Naming a file is the only
+ * form that gets through.
+ *
+ * Add a line when a component is first imported; delete it when the last
+ * import goes.
+ */
+@source '../../node_modules/@ambiqai/helia-ui/react/badge.tsx';
+@source '../../node_modules/@ambiqai/helia-ui/react/button.tsx';
+@source '../../node_modules/@ambiqai/helia-ui/react/card.tsx';
+@source '../../node_modules/@ambiqai/helia-ui/react/chart.tsx';
+@source '../../node_modules/@ambiqai/helia-ui/react/select.tsx';
+@source '../../node_modules/@ambiqai/helia-ui/react/slider.tsx';
+@source '../../node_modules/@ambiqai/helia-ui/react/sonner.tsx';
+
+/*
+ * The package's sheets are written for a Starlight page, and a handful of the
+ * variables they read are owned by Starlight's own props.css rather than by
+ * the package. Outside Starlight nobody supplies them, so the app does. The
+ * values are Starlight's own, restated; see AmbiqAI/helia-ui templates/web-app
+ * README "What the app supplies" before changing one.
+ */
+:root {
+  --sl-font-system:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    'Noto Sans', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+  --sl-font-system-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+  --__sl-font: var(--sl-font, var(--sl-font-system)), var(--sl-font-system);
+  --__sl-font-mono:
+    var(--sl-font-mono, var(--sl-font-system-mono)), var(--sl-font-system-mono);
+  --sl-color-text-invert: var(--sl-color-accent-low);
+
+  /* style-lint: allow color -- the one brand value an app owns; it has no token because it differs per product */
+  --helia-product-accent: #009ca0;
+}
+
+:root[data-theme='light'] {
+  --sl-color-text-invert: var(--sl-color-white);
+}

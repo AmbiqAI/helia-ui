@@ -1,0 +1,53 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Pages deploys are not interchangeable, so a queued run waits rather than
+# cancelling the one that is mid-upload.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run lint
+      - name: Install the browser the smoke test uses
+        run: npx playwright install --with-deps chromium-headless-shell
+      - run: npm test
+      - name: Build
+        # A project site is served from /<repo>/, so the bundle's asset URLs
+        # have to carry the prefix. A custom domain serves from / and wants
+        # BASE_PATH unset.
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}/
+        run: npm run build
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

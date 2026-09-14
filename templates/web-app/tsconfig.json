@@ -1,0 +1,26 @@
+{
+  // `strict` is the floor. The extra-strict switches (noUncheckedIndexedAccess,
+  // exactOptionalPropertyTypes, verbatimModuleSyntax) are deliberately off:
+  // @ambiqai/helia-ui ships .tsx source rather than a bundle, so its files are
+  // compiled as part of this project and would be judged by them too. Turn one
+  // on only if the package's own sources pass it.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    // w3c-web-usb and web-bluetooth are global augmentations, so they have to
+    // be named here: neither has an import the source could reference.
+    "types": ["vite/client", "node", "w3c-web-usb", "web-bluetooth"],
+    "jsx": "react-jsx",
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src", "tests", "vite.config.ts", "playwright.config.ts"]
+}
