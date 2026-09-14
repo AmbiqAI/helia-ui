@@ -47,6 +47,9 @@ jobs:
       - name: Install docs dependencies
         run: npm ci --prefix docs
 
+      - name: Install the headless browser rehype-mermaid renders with
+        run: npx playwright install --with-deps chromium-headless-shell
+
       - name: Build docs site
         run: npm run docs:build
 

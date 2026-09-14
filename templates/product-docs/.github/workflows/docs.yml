@@ -44,6 +44,9 @@ jobs:
         working-directory: docs
         run: npm run check
 
+      - name: Install the headless browser rehype-mermaid renders with
+        run: npx playwright install --with-deps chromium-headless-shell
+
       - name: Build site
         working-directory: docs
         run: npm run build
