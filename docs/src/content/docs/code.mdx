@@ -184,6 +184,9 @@ never announced.
 - Diff presentation
 - Static and animated terminal transcripts
 
-`CodeBlock` and `CodeTabs` render through Shiki at build time, so a page pays no
-JavaScript for highlighting; their copy button is the only script either one
-ships. `AsciiTerminal` is not highlighted at all and ships nothing unless asked.
+`CodeBlock` renders through Expressive Code, which is what the Starlight plugin
+themes, so it and a fenced block on the same page are the same object.
+`CodeTabs` renders through Shiki directly. Both highlight at build time, so a
+page pays no JavaScript for highlighting and the copy button is the only script
+either one ships. `AsciiTerminal` is not highlighted at all and ships nothing
+unless asked.

@@ -269,22 +269,22 @@ Also accepts `Omit<HTMLAttributes<'a'>, 'href'>`, `HTMLAttributes<'span'>`.
 
 ## CodeBlock
 
-**Use it for:** A framed code sample: the highlighted source, an optional context strip, and a copy control.
+**Use it for:** A code sample rendered through Expressive Code: the highlighted source in a frame, with the frame's own copy control.
 
 ```ts
 import CodeBlock from '@ambiqai/helia-ui/astro/CodeBlock';
 ```
 
-| Prop             | Type                                                                                                        | Default       | Description                                                                                                                   |
-| ---------------- | ----------------------------------------------------------------------------------------------------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `code` (req.)    | `string`                                                                                                    | --            | The source, verbatim. It is also what the copy control puts on the clipboard.                                                 |
-| `language`       | `\| 'bash' \| 'c' \| 'cpp' \| 'diff' \| 'json' \| 'plaintext' \| 'python' \| 'sh' \| 'tsx' \| 'typescript'` | `'plaintext'` | Grammar to highlight with.                                                                                                    |
-| `filename`       | `string`                                                                                                    | --            | Path shown in the context strip. Takes precedence over `label`.                                                               |
-| `label`          | `string`                                                                                                    | --            | Context-strip text when there is no `filename`. Defaults to the language, or to `Terminal` on the terminal variant.           |
-| `highlightLines` | `readonly number[]`                                                                                         | `[]`          | 1-based line numbers to mark as changed or worth reading first.                                                               |
-| `lineNumbers`    | `boolean`                                                                                                   | `false`       | Renders the line-number gutter.                                                                                               |
-| `variant`        | `'bare' \| 'code' \| 'terminal'`                                                                            | `'code'`      | `code` is the framed default, `terminal` the shell form, `bare` drops the context strip and leaves the copy control floating. |
-| `class`          | `string`                                                                                                    | --            | Forwarded to the frame, so a layout can size it without reaching inside.                                                      |
+| Prop             | Type                                                                                                        | Default       | Description                                                                                                                                         |
+| ---------------- | ----------------------------------------------------------------------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `code` (req.)    | `string`                                                                                                    | --            | The source, verbatim. It is also what the copy control puts on the clipboard.                                                                       |
+| `language`       | `\| 'bash' \| 'c' \| 'cpp' \| 'diff' \| 'json' \| 'plaintext' \| 'python' \| 'sh' \| 'tsx' \| 'typescript'` | `'plaintext'` | Grammar to highlight with.                                                                                                                          |
+| `filename`       | `string`                                                                                                    | --            | Path shown in the frame's title. Takes precedence over `label`.                                                                                     |
+| `label`          | `string`                                                                                                    | --            | Frame title when there is no `filename`. With neither, the frame carries no visible title; a terminal frame is still named to assistive technology. |
+| `highlightLines` | `readonly number[]`                                                                                         | `[]`          | 1-based line numbers to mark as changed or worth reading first.                                                                                     |
+| `lineNumbers`    | `boolean`                                                                                                   | `false`       | Renders the line-number gutter.                                                                                                                     |
+| `variant`        | `'bare' \| 'code' \| 'terminal'`                                                                            | `'code'`      | `code` is the framed default, `terminal` the shell form, `bare` drops the frame, leaving the highlighted source on its own.                         |
+| `class`          | `string`                                                                                                    | --            | Forwarded to the frame, so a layout can size it without reaching inside.                                                                            |
 
 **Slots** -- none.
 

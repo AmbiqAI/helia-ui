@@ -23,6 +23,56 @@
   background: var(--helia-surface-border);
 }
 
+/*
+ * Expressive Code. The colours, the frame and the copy button are configured in
+ * the Starlight plugin; only the two things its settings cannot express are
+ * here. Its own rules sit in `@layer starlight.components`, so these unlayered
+ * declarations win without raising specificity.
+ */
+
+/*
+ * A terminal frame always draws a title bar, which with no title is an empty
+ * strip the package's terminal part does not have. Hiding it puts back the top
+ * edge and the button offset the frame stylesheet gives away to the bar.
+ */
+.expressive-code .frame.is-terminal:not(.has-title) > .header {
+  display: none;
+}
+
+.expressive-code .frame.is-terminal:not(.has-title) {
+  --button-spacing: 0.4rem;
+}
+
+/*
+ * `--header-border-radius` is the frame's own `--helia-radius-md` plus its
+ * border width, which is what the untitled corners have to match.
+ */
+.expressive-code .frame.is-terminal:not(.has-title) pre {
+  border-start-end-radius: var(--header-border-radius);
+  border-start-start-radius: var(--header-border-radius);
+  border-top: 1px solid var(--helia-surface-border);
+}
+
+/*
+ * Line numbers without `@expressive-code/plugin-line-numbers`: the core
+ * stylesheet already lays a gutter column out on every line, so a counter is
+ * enough to fill it. `CodeBlock` adds the class for its `lineNumbers` prop.
+ */
+.helia-code-lines pre > code {
+  counter-reset: helia-code-line;
+}
+
+.helia-code-lines .ec-line::before {
+  color: var(--helia-ink-muted);
+  content: counter(helia-code-line);
+  counter-increment: helia-code-line;
+  grid-area: gutter;
+  padding-inline: var(--helia-space-4) 0;
+  pointer-events: none;
+  text-align: right;
+  user-select: none;
+}
+
 .content-panel {
   container-type: inline-size;
 }

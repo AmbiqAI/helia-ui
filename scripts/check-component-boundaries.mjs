@@ -66,13 +66,20 @@ const CSS_IMPORT = /@import\s+(?:url\(\s*)?['"]([^'"]+)['"]/g;
  * The packages a publishable component may reach for. `astro/types` and `shiki`
  * are types alone, so they leave nothing in the built output; `astro:components`
  * is Astro's own. FontAwesome is a real runtime dependency, and one the package
- * declares -- unlike `astro:content` or Starlight's components, which would
- * tie a component to a particular site and stay denied.
+ * declares -- unlike `astro:content`, which would tie a component to a
+ * particular site's collections and stays denied.
+ *
+ * `@astrojs/starlight/components` is the one Starlight entry a part may use. It
+ * is a required peer dependency, so it ties a part to Starlight rather than to
+ * a site, and `Code` is how a part renders through the same Expressive Code
+ * instance the plugin themes instead of drawing a second code frame. Nothing
+ * else under `@astrojs/starlight/` is open to this lane.
  */
 const ALLOWED_PACKAGES = [
   'astro/types',
   'astro:components',
   'shiki',
+  '@astrojs/starlight/components',
   '@fortawesome/fontawesome-svg-core',
   '@fortawesome/free-solid-svg-icons',
 ];
