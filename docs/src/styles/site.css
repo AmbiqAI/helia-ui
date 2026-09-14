@@ -93,24 +93,12 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-.gallery-item {
-  align-content: start;
-  display: grid;
-  gap: var(--helia-space-2);
-  min-width: 0;
-}
-
-.gallery-item > code {
-  font-size: var(--helia-text-label);
-  overflow-wrap: anywhere;
-}
-
-.gallery-knob {
-  border: 1px solid var(--sl-color-gray-5);
-  border-radius: var(--helia-radius-md);
+/* Two or more parts on one example stage. The stage is the frame, so the
+   stack owns the rhythm between them and nothing else. */
+.gallery-stack {
   display: grid;
   gap: var(--helia-space-3);
-  padding: var(--helia-space-4);
+  min-width: 0;
 }
 
 .gallery-spacer {

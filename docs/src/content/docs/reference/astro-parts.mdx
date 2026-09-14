@@ -77,11 +77,11 @@ import AsciiTerminal from '@ambiqai/helia-ui/astro/AsciiTerminal';
 import Badge from '@ambiqai/helia-ui/astro/Badge';
 ```
 
-| Prop   | Type                                                                    | Default     | Description                                                                            |
-| ------ | ----------------------------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------- |
-| `tone` | `'neutral' \| 'info' \| 'success' \| 'warning' \| 'danger' \| 'accent'` | `'neutral'` | The advisory tint. `neutral` and `accent` reuse the chip tones; the rest are tinted.   |
-| `dot`  | `boolean`                                                               | `false`     | Leading status dot, drawn in the badge ink. Decorative: the label carries the meaning. |
-| `size` | `'sm' \| 'md'`                                                          | `'sm'`      | `sm` is the in-content metadata size, `md` the standalone one.                         |
+| Prop   | Type                                                                                      | Default     | Description                                                                                                                        |
+| ------ | ----------------------------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `tone` | `\| 'neutral' \| 'info' \| 'success' \| 'warning' \| 'danger' \| 'accent' \| 'secondary'` | `'neutral'` | The advisory tint. `neutral` and `accent` reuse the chip tones; the rest are tinted. `secondary` takes `--helia-accent-secondary`. |
+| `dot`  | `boolean`                                                                                 | `false`     | Leading status dot, drawn in the badge ink. Decorative: the label carries the meaning.                                             |
+| `size` | `'sm' \| 'md'`                                                                            | `'sm'`      | `sm` is the in-content metadata size, `md` the standalone one.                                                                     |
 
 Also accepts `HTMLAttributes<'span'>`.
 

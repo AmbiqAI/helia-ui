@@ -10,6 +10,10 @@
  * Consecutive bands butt against each other rather than stacking a gap, so a
  * run of them reads as one alternating rhythm.
  *
+ * `tone` picks which ground the band paints; `--helia-hero-treatment` decides
+ * what that ground is made of, which is the site theme's say rather than the
+ * caller's. The two are independent: a `base` band has nothing to treat.
+ *
  * @slot default -- The band's content, held to the readable width.
  */
 interface Props {
@@ -43,15 +47,68 @@ const { tone = 'base', id } = Astro.props;
 
   .editorial-band--paper,
   .editorial-band--subtle {
-    background: var(--helia-surface-paper);
+    --band-ground: var(--helia-surface-paper);
+
+    background: var(--band-ground);
     /*
      * Starlight may reserve a desktop column outside `.content-panel`. Extend
      * the surface paint through that space without moving the readable inner
      * content or introducing horizontal overflow.
      */
-    box-shadow: 0 0 0 100vmax var(--helia-surface-paper);
+    box-shadow: 0 0 0 100vmax var(--band-bleed, var(--band-ground));
     clip-path: inset(0 -100vmax);
     padding-inline: clamp(1rem, 4vw, 2.5rem);
+  }
+
+  /*
+   * The hero treatment. A style query rather than a prop because the value is
+   * the site's, set once on `:root` or on a theme scope, and a caller passing
+   * it per band is how twelve sites end up with twelve heroes.
+   *
+   * `tinted` pulls the site accent into the ground. `gradient` runs the two
+   * accents across the band, and needs a separate bleed colour: a box-shadow
+   * takes a colour and not a gradient, so the reserved column gets the two
+   * accents mixed rather than either end of the run.
+   */
+  @container style(--helia-hero-treatment: tinted) {
+    .editorial-band--paper,
+    .editorial-band--subtle {
+      --band-ground: color-mix(
+        in srgb,
+        var(--helia-product-accent) 8%,
+        var(--helia-surface-paper)
+      );
+    }
+  }
+
+  @container style(--helia-hero-treatment: gradient) {
+    .editorial-band--paper,
+    .editorial-band--subtle {
+      --band-bleed: color-mix(
+        in srgb,
+        color-mix(
+            in srgb,
+            var(--helia-product-accent),
+            var(--helia-accent-secondary)
+          )
+          10%,
+        var(--helia-surface-paper)
+      );
+
+      background: linear-gradient(
+        100deg,
+        color-mix(
+          in srgb,
+          var(--helia-product-accent) 12%,
+          var(--helia-surface-paper)
+        ),
+        color-mix(
+          in srgb,
+          var(--helia-accent-secondary) 12%,
+          var(--helia-surface-paper)
+        )
+      );
+    }
   }
 
   .editorial-band__inner {

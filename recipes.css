@@ -885,7 +885,8 @@ a.helia-chip--neutral:focus-visible {
 .helia-badge--info,
 .helia-badge--success,
 .helia-badge--warning,
-.helia-badge--danger {
+.helia-badge--danger,
+.helia-badge--secondary {
   --helia-chip-border: color-mix(
     in oklab,
     var(--helia-badge-tone) 42%,
@@ -914,6 +915,12 @@ a.helia-chip--neutral:focus-visible {
 
 .helia-badge--danger {
   --helia-badge-tone: var(--helia-tone-critical);
+}
+
+/* The one tone that is not advisory: it carries the site's second accent, so a
+   badge is where a pairing shows up on a card that draws no accent edge. */
+.helia-badge--secondary {
+  --helia-badge-tone: var(--helia-accent-secondary);
 }
 
 .helia-badge__dot {

@@ -77,24 +77,13 @@
   --helia-control-lg: 3.25rem;
 
   /*
-   * Radius scale, derived so one primitive still sets the shape language. The
-   * base step is `--helia-radius` from tokens.css: now that both layers share
-   * the prefix an alias of it here would be a self-reference, which CSS treats
-   * as a cycle and drops. `--helia-radius-md` is that primitive after the
-   * per-site multiplier, and it is what the recipes read; `--helia-radius`
-   * stays the unscaled seed so the dial has one place to apply.
+   * Radius scale. The base step is `--helia-radius` from tokens.css: now that
+   * both layers share the prefix an alias of it here would be a self-reference,
+   * which CSS treats as a cycle and drops. The four steps are derived from this
+   * dial in the theme-scope block below; `--helia-radius-pill` is deliberately
+   * outside the scale, so it stays here with nothing to re-derive.
    */
   --helia-radius-scale: 1;
-  --helia-radius-xs: calc(
-    (var(--helia-radius) - 0.35rem) * var(--helia-radius-scale)
-  );
-  --helia-radius-sm: calc(
-    (var(--helia-radius) - 0.2rem) * var(--helia-radius-scale)
-  );
-  --helia-radius-md: calc(var(--helia-radius) * var(--helia-radius-scale));
-  --helia-radius-lg: calc(
-    (var(--helia-radius) + 0.35rem) * var(--helia-radius-scale)
-  );
   --helia-radius-pill: 999px;
 
   /*
@@ -110,12 +99,15 @@
    * down is asking for a longer travel, not the same 20px taken slowly.
    */
   --helia-motion-scale: 1;
-  --helia-motion-fast: calc(120ms * var(--helia-motion-scale));
-  --helia-motion-base: calc(200ms * var(--helia-motion-scale));
-  --helia-motion-slow: calc(320ms * var(--helia-motion-scale));
+  /*
+   * The visitor's half of the motion decision, kept apart from the site's so
+   * that neither can be mistaken for the other. Reduced motion zeroes this on
+   * `:root` and nothing redefines it lower down, so it inherits into every
+   * scope and a subtree that sets a scale of its own still cannot animate.
+   */
+  --helia-motion-enabled: 1;
   --helia-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --helia-motion-lift-distance: -2px;
-  --helia-motion-reveal-distance: calc(20px * var(--helia-motion-scale));
   --helia-motion-cue-distance: 2px;
 
   /*
@@ -169,21 +161,13 @@
    */
   --helia-surface-tint: transparent;
   --helia-surface-tint-amount: 0%;
-  --helia-surface-paper: color-mix(
-    in srgb,
-    var(--helia-surface-tint) var(--helia-surface-tint-amount),
-    var(--helia-surface-raised)
-  );
-  --helia-surface-card: color-mix(
-    in srgb,
-    var(--helia-surface-tint) var(--helia-surface-tint-amount),
-    var(--helia-surface-raised)
-  );
-  --helia-surface-card-muted: color-mix(
-    in srgb,
-    var(--helia-surface-tint) var(--helia-surface-tint-amount),
-    var(--helia-surface-muted)
-  );
+  /*
+   * Which of the two grounds paper sits on. The theme flip moves this rather
+   * than moving `--helia-surface-paper` itself, so the tint mix below it has
+   * one form for both themes and a scope has nothing theme-conditional to
+   * restate.
+   */
+  --helia-surface-paper-base: var(--helia-surface-raised);
   --helia-surface-border: var(--helia-hairline);
 
   /*
@@ -193,7 +177,7 @@
   --helia-product-accent: var(--helia-accent-slate);
   --helia-accent-secondary: var(--helia-accent-slate);
 
-  /* Consumed by a site hero; defined here so the contract is one file. */
+  /* Read by `EditorialBand`; defined here so the contract is one file. */
   --helia-hero-treatment: plain;
 
   /* The card padding step, so the density dial has one place to apply. */
@@ -295,13 +279,68 @@
   --sl-color-hairline-light: #242936;
 }
 
-:root[data-theme='light'] {
-  /* Light paper is the muted surface, not the raised one. */
+/*
+ * Everything the dials compose. CSS substitutes a custom property at the
+ * element that declares it, so a token composed once on `:root` is a finished
+ * value by the time it inherits: a dial set on a wrapper would move nothing.
+ * Repeating the compositions on the scope hooks is what makes a dial mean the
+ * same thing wherever it is set.
+ *
+ * The hooks are an attribute and a class rather than a universal selector.
+ * `*` would re-derive eleven properties on every element in the document,
+ * which is the whole cost of the feature paid by every page that never uses
+ * it; two flat matches alongside `:root` cost one extra rule. The contract a
+ * site follows is therefore: set dials on an element that also carries
+ * `data-helia-theme`, or `.helia-theme-scope` where markup cannot take an
+ * attribute. `:root` is the ordinary case and needs neither.
+ */
+:root,
+[data-helia-theme],
+.helia-theme-scope {
+  --helia-radius-xs: calc(
+    (var(--helia-radius) - 0.35rem) * var(--helia-radius-scale)
+  );
+  --helia-radius-sm: calc(
+    (var(--helia-radius) - 0.2rem) * var(--helia-radius-scale)
+  );
+  --helia-radius-md: calc(var(--helia-radius) * var(--helia-radius-scale));
+  --helia-radius-lg: calc(
+    (var(--helia-radius) + 0.35rem) * var(--helia-radius-scale)
+  );
+
+  --helia-motion-fast: calc(
+    120ms * var(--helia-motion-scale) * var(--helia-motion-enabled)
+  );
+  --helia-motion-base: calc(
+    200ms * var(--helia-motion-scale) * var(--helia-motion-enabled)
+  );
+  --helia-motion-slow: calc(
+    320ms * var(--helia-motion-scale) * var(--helia-motion-enabled)
+  );
+  --helia-motion-reveal-distance: calc(
+    20px * var(--helia-motion-scale) * var(--helia-motion-enabled)
+  );
+
   --helia-surface-paper: color-mix(
+    in srgb,
+    var(--helia-surface-tint) var(--helia-surface-tint-amount),
+    var(--helia-surface-paper-base)
+  );
+  --helia-surface-card: color-mix(
+    in srgb,
+    var(--helia-surface-tint) var(--helia-surface-tint-amount),
+    var(--helia-surface-raised)
+  );
+  --helia-surface-card-muted: color-mix(
     in srgb,
     var(--helia-surface-tint) var(--helia-surface-tint-amount),
     var(--helia-surface-muted)
   );
+}
+
+:root[data-theme='light'] {
+  /* Light paper is the muted surface, not the raised one. */
+  --helia-surface-paper-base: var(--helia-surface-muted);
   /* Hub-only light border, one step lighter than the shared hairline. */
   --helia-surface-border: #d2d2d7;
   --sl-color-hairline-light: #dfe3e8;
@@ -367,11 +406,16 @@
      theme sets `--helia-motion-scale` on `:root` from a sheet that loads after
      this one, and at equal specificity the later rule would win, so the dial
      would quietly defeat the preference. Doubling the selector settles it by
-     specificity instead of by load order. */
+     specificity instead of by load order.
+
+     Zeroing the scale is what `Reveal` and `ShowcaseCarousel` read to skip
+     their scripts. Zeroing `--helia-motion-enabled` is what the durations and
+     the reveal travel multiply by, and it is the half a theme scope cannot
+     override, so the preference survives a subtree that asks for motion. */
   :root:root {
+    --helia-motion-enabled: 0;
     --helia-motion-scale: 0;
     --helia-motion-lift-distance: 0px;
-    --helia-motion-reveal-distance: 0px;
     --helia-motion-cue-distance: 0px;
   }
 }

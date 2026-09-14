@@ -76,5 +76,16 @@ const hasLine = Astro.slots.has('default');
   /* The cue is the same size whatever heading level the title took. */
   .cue {
     font-size: var(--helia-text-body);
+    transition: color var(--helia-motion-fast) var(--helia-ease-out);
+  }
+
+  /*
+   * Under the pointer the cue takes the site's second accent. No card part
+   * draws an accent edge, so the direction is the one piece of a link card
+   * that can carry a colour without becoming a brim.
+   */
+  .helia-link-card:hover .cue,
+  .helia-link-card:focus-within .cue {
+    color: var(--helia-accent-secondary);
   }
 </style>

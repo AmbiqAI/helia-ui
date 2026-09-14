@@ -62,6 +62,14 @@ const TOKEN_DEFINITION_FILES = new Set([
   'src/styles/site-theme.css',
 ]);
 
+/*
+ * Where a scale may be defined. `:root` is the document's own; the attribute
+ * and the class are the theme-scope hooks, where semantic.css repeats the
+ * compositions so a dial set on a wrapper reaches the subtree under it.
+ */
+const TOKEN_SELECTOR =
+  /^(:root(\[[^\]]*\])?|\[data-helia-theme\]|\.helia-theme-scope)$/;
+
 const COLOR = /#[0-9a-fA-F]{3,8}\b|\brgba?\([^)]*\)|\bhsla?\([^)]*\)/;
 const SPACING_PROPERTY =
   /^(padding|margin|gap|row-gap|column-gap|inset)(-(block|inline|top|right|bottom|left|start|end))*$/;
@@ -270,9 +278,15 @@ for (const rel of [
       }
     }
 
-    // Literals are the point only where the scales are defined: a bare :root
-    // selector in a token-definition file, with no descendant part.
-    const tokenBlock = definesTokens && /^:root(\[[^\]]*\])?$/.test(selector);
+    // Literals are the point only where the scales are defined: a
+    // token-definition file, in a block whose every selector is either :root or
+    // one of the theme-scope hooks semantic.css re-derives the dials on. No
+    // descendant part, so a use of a scale can never pass as a definition.
+    const tokenBlock =
+      definesTokens &&
+      selector
+        .split(',')
+        .every((part) => TOKEN_SELECTOR.test(part.trim().replace(/\{$/, '')));
 
     if (kind === 'declaration') {
       const color = COLOR.exec(text);

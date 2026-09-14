@@ -1028,37 +1028,84 @@ motion switched off gets the jump rather than the slide.
 
 ## Theme knobs
 
-The site theme is nine dials in one file. They are set here on a wrapper rather
-than on `:root`, which is the same mechanism a section of a page would use to
-carry its own treatment, and it is why the examples below can sit next to each
-other.
-
-Scoped dials, meaning a dial a section owns rather than the document, are
-tracked in AmbiqAI/helia-ui#23.
+The site theme is nine dials in one file. `:root` is where a site sets them;
+a section that wants its own treatment sets them on a wrapper that carries
+`data-helia-theme`, which is the hook `semantic.css` re-derives the composed
+tokens on. That is the mechanism every example below uses, and it is why they
+can sit next to each other on one page. A wrapper without the attribute moves
+only the dials themselves, not the radius steps and tinted surfaces built out
+of them.
 
 <div className="gallery-grid gallery-grid--wide not-content">
-  <div className="gallery-item">
+  <Example
+    title="--helia-radius-scale: 0"
+    code={`
+      <div
+        className="gallery-stack"
+        data-helia-theme="knob-square"
+        data-helia-density="compact"
+        style="--helia-radius-scale: 0; --helia-surface-tint: var(--helia-accent-orange); --helia-surface-tint-amount: 6%"
+      >
+        <Card tone="elevated">
+          <CardContent>Square, compact, tinted orange.</CardContent>
+        </Card>
+        <Card tone="filled">
+          <CardActions>
+            <Button href="/helia-ui/gallery/#theme-knobs" size="sm">
+              <span>Start</span>
+            </Button>
+            <Badge tone="secondary">Paired</Badge>
+          </CardActions>
+        </Card>
+      </div>
+    `}
+  >
     <div
-      className="gallery-knob"
-      style="--helia-radius-scale: 0"
+      className="gallery-stack"
+      data-helia-theme="knob-square"
       data-helia-density="compact"
+      style="--helia-radius-scale: 0; --helia-surface-tint: var(--helia-accent-orange); --helia-surface-tint-amount: 6%"
     >
       <Card tone="elevated">
-        <CardContent>Square, compact, untinted.</CardContent>
+        <CardContent>Square, compact, tinted orange.</CardContent>
       </Card>
       <Card tone="filled">
         <CardActions>
           <Button href="/helia-ui/gallery/#theme-knobs" size="sm">
             <span>Start</span>
           </Button>
-          <Badge tone="info">Alpha</Badge>
+          <Badge tone="secondary">Paired</Badge>
         </CardActions>
       </Card>
     </div>
-    <code>--helia-radius-scale: 0; data-helia-density="compact"</code>
-  </div>
-  <div className="gallery-item">
-    <div className="gallery-knob" style="--helia-radius-scale: 1">
+  </Example>
+  <Example
+    title="--helia-radius-scale: 1 (the default)"
+    code={`
+      <div
+        className="gallery-stack"
+        data-helia-theme="knob-default"
+        style="--helia-radius-scale: 1"
+      >
+        <Card tone="elevated">
+          <CardContent>The package defaults, for comparison.</CardContent>
+        </Card>
+        <Card tone="filled">
+          <CardActions>
+            <Button href="/helia-ui/gallery/#theme-knobs" size="sm">
+              <span>Start</span>
+            </Button>
+            <Badge tone="secondary">Paired</Badge>
+          </CardActions>
+        </Card>
+      </div>
+    `}
+  >
+    <div
+      className="gallery-stack"
+      data-helia-theme="knob-default"
+      style="--helia-radius-scale: 1"
+    >
       <Card tone="elevated">
         <CardContent>The package defaults, for comparison.</CardContent>
       </Card>
@@ -1067,17 +1114,39 @@ tracked in AmbiqAI/helia-ui#23.
           <Button href="/helia-ui/gallery/#theme-knobs" size="sm">
             <span>Start</span>
           </Button>
-          <Badge tone="info">Alpha</Badge>
+          <Badge tone="secondary">Paired</Badge>
         </CardActions>
       </Card>
     </div>
-    <code>--helia-radius-scale: 1 (the default)</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title="--helia-radius-scale: 1.6"
+    code={`
+      <div
+        className="gallery-stack"
+        data-helia-theme="knob-round"
+        data-helia-density="comfortable"
+        style="--helia-radius-scale: 1.6; --helia-surface-tint: var(--helia-accent-cyan); --helia-surface-tint-amount: 9%"
+      >
+        <Card tone="elevated">
+          <CardContent>Round, comfortable, tinted cyan.</CardContent>
+        </Card>
+        <Card tone="filled">
+          <CardActions>
+            <Button href="/helia-ui/gallery/#theme-knobs" size="sm">
+              <span>Start</span>
+            </Button>
+            <Badge tone="secondary">Paired</Badge>
+          </CardActions>
+        </Card>
+      </div>
+    `}
+  >
     <div
-      className="gallery-knob"
-      style="--helia-radius-scale: 1.6; --helia-surface-tint: var(--helia-accent-cyan); --helia-surface-tint-amount: 9%"
+      className="gallery-stack"
+      data-helia-theme="knob-round"
       data-helia-density="comfortable"
+      style="--helia-radius-scale: 1.6; --helia-surface-tint: var(--helia-accent-cyan); --helia-surface-tint-amount: 9%"
     >
       <Card tone="elevated">
         <CardContent>Round, comfortable, tinted cyan.</CardContent>
@@ -1087,24 +1156,36 @@ tracked in AmbiqAI/helia-ui#23.
           <Button href="/helia-ui/gallery/#theme-knobs" size="sm">
             <span>Start</span>
           </Button>
-          <Badge tone="info">Alpha</Badge>
+          <Badge tone="secondary">Paired</Badge>
         </CardActions>
       </Card>
     </div>
-    <code>
-      --helia-radius-scale: 1.6; --helia-surface-tint: var(--helia-accent-cyan);
-      --helia-surface-tint-amount: 9%
-    </code>
-  </div>
+  </Example>
 </div>
 
 The accent dial reaches a card through its artwork rather than its edge: no
 card part carries an accent rule or brim, so a subtree that names an accent
-shows it in the media, the badges and the type.
+shows it in the media, the badges and the type. The second accent is the one
+that pairs with it, and a link card spends it on the cue under the pointer.
 
 <div className="gallery-grid not-content">
-  <div className="gallery-item">
-    <div style="--helia-product-accent: var(--helia-accent-orange)">
+  <Example
+    title="--helia-product-accent: var(--helia-accent-orange)"
+    code={`
+      <div data-helia-theme="knob-orange" style="--helia-product-accent: var(--helia-accent-orange)">
+        <Card>
+          <CardMedia>
+            <Media treatment="color-field" style="--accent: var(--helia-product-accent)" />
+          </CardMedia>
+          <CardContent>An orange site.</CardContent>
+        </Card>
+      </div>
+    `}
+  >
+    <div
+      data-helia-theme="knob-orange"
+      style="--helia-product-accent: var(--helia-accent-orange)"
+    >
       <Card>
         <CardMedia>
           <Media
@@ -1115,10 +1196,24 @@ shows it in the media, the badges and the type.
         <CardContent>An orange site.</CardContent>
       </Card>
     </div>
-    <code>--helia-product-accent: var(--helia-accent-orange)</code>
-  </div>
-  <div className="gallery-item">
-    <div style="--helia-product-accent: var(--helia-accent-purple)">
+  </Example>
+  <Example
+    title="--helia-product-accent: var(--helia-accent-purple)"
+    code={`
+      <div data-helia-theme="knob-purple" style="--helia-product-accent: var(--helia-accent-purple)">
+        <Card>
+          <CardMedia>
+            <Media treatment="color-field" style="--accent: var(--helia-product-accent)" />
+          </CardMedia>
+          <CardContent>A purple site.</CardContent>
+        </Card>
+      </div>
+    `}
+  >
+    <div
+      data-helia-theme="knob-purple"
+      style="--helia-product-accent: var(--helia-accent-purple)"
+    >
       <Card>
         <CardMedia>
           <Media
@@ -1129,16 +1224,23 @@ shows it in the media, the badges and the type.
         <CardContent>A purple site.</CardContent>
       </Card>
     </div>
-    <code>--helia-product-accent: var(--helia-accent-purple)</code>
-  </div>
-  <div className="gallery-item">
-    <div style="--helia-motion-scale: 0">
+  </Example>
+  <Example
+    title="--helia-motion-scale: 0"
+    code={`
+      <div data-helia-theme="knob-still" style="--helia-motion-scale: 0">
+        <Card lift tone="elevated">
+          <CardContent>Motion off: the lift arrives instantly.</CardContent>
+        </Card>
+      </div>
+    `}
+  >
+    <div data-helia-theme="knob-still" style="--helia-motion-scale: 0">
       <Card lift tone="elevated">
         <CardContent>Motion off: the lift arrives instantly.</CardContent>
       </Card>
     </div>
-    <code>--helia-motion-scale: 0</code>
-  </div>
+  </Example>
 </div>
 
 ## Reveal on scroll

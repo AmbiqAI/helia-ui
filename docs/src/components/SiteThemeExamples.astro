@@ -8,6 +8,10 @@
  * differ between the panels is a dial. The values are in
  * `src/styles/example-theme.css`; the density dial is an attribute rather than
  * a property, so it arrives on the wrapper the way it would arrive on `<html>`.
+ *
+ * `data-helia-theme` is the hook that makes the dials re-derive inside a panel
+ * instead of stopping at `:root`. On a site it is not needed, because there
+ * the scope is `:root`.
  */
 import Badge from '@ambiqai/helia-ui/astro/Badge';
 import Button from '@ambiqai/helia-ui/astro/Button';
@@ -26,6 +30,7 @@ const themes = [
     density: undefined,
     dials: [
       '--helia-product-accent: var(--helia-accent-slate)',
+      '--helia-accent-secondary: var(--helia-accent-slate)',
       '--helia-radius-scale: 1',
       '--helia-surface-tint-amount: 0%',
       '--helia-hero-treatment: plain',
@@ -42,7 +47,7 @@ const themes = [
       '--helia-radius-scale: 1.6',
       '--helia-surface-tint: var(--helia-accent-orange)',
       '--helia-surface-tint-amount: 7%',
-      '--helia-hero-treatment: band',
+      '--helia-hero-treatment: gradient',
       'data-helia-density="comfortable"',
     ],
   },
@@ -54,6 +59,7 @@ const themes = [
     themes.map((theme) => (
       <section
         class:list={['site-theme-example', theme.scope]}
+        data-helia-theme={theme.scope}
         data-helia-density={theme.density}
         aria-label={`${theme.label}: the same cards under its own theme`}
       >
@@ -87,6 +93,7 @@ const themes = [
                 <span>Open</span>
               </Button>
               <Badge tone="info">15 min</Badge>
+              <Badge tone="secondary">Paired</Badge>
             </CardActions>
           </Card>
 
@@ -135,12 +142,12 @@ const themes = [
   }
 
   /*
-   * The hero dial is the one thing no package rule reads: a site composes its
-   * own hero and switches on the value, which is what this does. A browser
-   * without style queries falls through to the plain treatment, which is the
-   * default the dial names anyway.
+   * `EditorialBand` reads this dial for a full-bleed band, which is not a shape
+   * that fits in a side-by-side panel, so the example composes its own hero on
+   * the same value the way a site would. A browser without style queries falls
+   * through to the plain treatment, which is the default the dial names anyway.
    */
-  @container style(--helia-hero-treatment: band) {
+  @container style(--helia-hero-treatment: gradient) {
     .site-theme-example__hero {
       background: linear-gradient(
         100deg,

@@ -6,7 +6,7 @@ const gallery = '/helia-ui/gallery/';
 
 /* What the page ends with. The gallery is where an owner goes to choose, so an
  * example that quietly stops rendering is the page failing at its one job. */
-const EXAMPLES = 60;
+const EXAMPLES = 66;
 
 /*
  * The root element each part renders. An example's source is a prop rather than

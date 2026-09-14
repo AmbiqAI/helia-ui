@@ -331,3 +331,79 @@ test(`${base}/react/cohesion/ draws the button pair the same`, async ({
     1,
   );
 });
+
+/*
+ * A dial composes tokens rather than being one, and CSS substitutes a custom
+ * property at the element that declares it: before the compositions were
+ * repeated on the theme-scope hooks these three wrappers rendered three
+ * identical cards under three different captions. Shape and ground are the two
+ * the knobs move, so three distinct values of each is the assertion.
+ */
+test('a theme scope re-derives what its dials compose', async ({ page }) => {
+  await page.goto(`${base}/gallery/`);
+
+  const scopes = ['knob-square', 'knob-default', 'knob-round'];
+  const drawn = [];
+
+  for (const scope of scopes) {
+    const card = page
+      .locator(`[data-helia-theme="${scope}"] .helia-card`)
+      .first();
+    await expect(card).toBeVisible();
+    drawn.push(
+      await card.evaluate((node) => {
+        const style = getComputedStyle(node);
+        return {
+          radius: style.borderTopLeftRadius,
+          background: style.backgroundColor,
+        };
+      }),
+    );
+  }
+
+  expect(new Set(drawn.map((card) => card.radius)).size).toBe(scopes.length);
+  expect(new Set(drawn.map((card) => card.background)).size).toBe(
+    scopes.length,
+  );
+});
+
+/*
+ * The same assertion on the worked pair, which is the page that claims a site
+ * owns its flair as a diff against one file. The badge is the second accent:
+ * it is the one dial with no other way to show itself on a card, since no card
+ * part draws an accent edge.
+ */
+test('the two worked themes draw the same cards differently', async ({
+  page,
+}) => {
+  await page.goto(`${base}/foundations/site-theme/`);
+
+  const panel = async (scope: string) => {
+    const card = page
+      .locator(`.site-theme-example--${scope} .helia-card`)
+      .first();
+    await expect(card).toBeVisible();
+    const shape = await card.evaluate((node) => {
+      const style = getComputedStyle(node);
+      return {
+        radius: style.borderTopLeftRadius,
+        background: style.backgroundColor,
+      };
+    });
+
+    const badge = page
+      .locator(`.site-theme-example--${scope} .helia-badge--secondary`)
+      .first();
+    await expect(badge).toBeVisible();
+    const ink = await badge.evaluate((node) => getComputedStyle(node).color);
+
+    return { ...shape, ink };
+  };
+
+  const hub = await panel('hub');
+  const warm = await panel('warm');
+
+  expect(warm.radius).not.toBe(hub.radius);
+  expect(warm.background).not.toBe(hub.background);
+  expect(warm.ink).not.toBe(hub.ink);
+});

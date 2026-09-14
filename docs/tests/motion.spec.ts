@@ -55,19 +55,25 @@ test('the lift runs at the base step without the preference', async ({
 
 /*
  * The reveal distance is the one travel the dial multiplies, so the preference
- * has two ways to stop it. This asserts the token itself rather than a
- * transform, because a reveal under the preference never arms and so never
- * carries one.
+ * has two ways to stop it. It is measured on a probe rather than on a reveal in
+ * the page, because a reveal under the preference never arms and so carries no
+ * transform, and through a property that takes a length rather than off the
+ * token: an unregistered custom property computes to its own text, which is a
+ * calc now that the travel is derived on each theme scope.
  */
 test('reduced motion zeroes the reveal distance', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(gallery);
 
-  const distance = await page.evaluate(() =>
-    getComputedStyle(document.documentElement)
-      .getPropertyValue('--helia-motion-reveal-distance')
-      .trim(),
-  );
+  const distance = await page.evaluate(() => {
+    const probe = document.createElement('div');
+    probe.style.position = 'absolute';
+    probe.style.height = 'var(--helia-motion-reveal-distance)';
+    document.body.append(probe);
+    const { height } = getComputedStyle(probe);
+    probe.remove();
+    return height;
+  });
 
   expect(distance).toBe('0px');
 });
