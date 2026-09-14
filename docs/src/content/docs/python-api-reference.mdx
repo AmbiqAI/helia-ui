@@ -1,0 +1,217 @@
+---
+title: Python API reference
+description: Generating Starlight reference pages from a Python package with helia-ui-pyref, the replacement for mkdocstrings.
+---
+
+import DataTable from '@ambiqai/helia-ui/astro/DataTable';
+
+MkDocs product sites build their API reference with `mkdocstrings`, which has
+no Starlight equivalent. `helia-ui-pyref` is the replacement: it reads a
+[griffe](https://mkdocstrings.github.io/griffe/) JSON dump of a Python package
+and writes one Starlight Markdown page per module, plus the sidebar fragment
+that literate-nav used to produce.
+
+The generator never imports the package it documents. griffe loads by AST, so
+a package with hardware or compiler dependencies dumps on any machine, and the
+site build needs no Python at all.
+
+## Running it
+
+```sh
+# In the Python repository, with griffe installed:
+griffe dump helia_aot --docstyle google -f > griffe.json
+
+# In the docs site:
+npx helia-ui-pyref \
+  --input ../griffe.json \
+  --out src/content/docs/reference/api \
+  --base /helia-aot/ \
+  --sidebar src/generated/api-sidebar.json
+```
+
+Pages land at `<out>/<module path>/index.md`, so `helia_aot.air.model` becomes
+`reference/api/helia_aot/air/model/index.md` and serves at
+`/helia-aot/reference/api/helia_aot/air/model/`. That is the same shape the
+MkDocs `api/` tree had, so inbound links survive the move.
+
+<DataTable
+  caption="Command-line options"
+  columns={['Option', 'Default', 'What it does']}
+  rows={[
+    ['--input <file>', 'required', 'The griffe dump to read.'],
+    ['--out <dir>', 'required', 'Directory the module pages are written into.'],
+    [
+      '--base <path>',
+      '/',
+      'Site base path, prefixed onto cross-reference URLs.',
+    ],
+    [
+      '--package <name>',
+      'the only one',
+      'Which package to render when the dump holds several.',
+    ],
+    [
+      '--sidebar <file>',
+      'not written',
+      'Write the Starlight sidebar fragment as JSON.',
+    ],
+    [
+      '--check',
+      'off',
+      'Regenerate into a temporary directory and exit 1 on drift.',
+    ],
+    ['--quiet', 'off', 'Report only the warning count, not each warning.'],
+    ['--route-prefix <path>', 'reference/api', 'Route the pages serve under.'],
+  ]}
+/>
+
+The nine `mkdocstrings` options the HELIA product sites set are the defaults,
+so a run with no flags reproduces the pages those sites publish today. Each has
+a flag that overrides it.
+
+<DataTable
+  caption="mkdocstrings options and their flags"
+  columns={['mkdocstrings option', 'Default here', 'Flag']}
+  rows={[
+    ['docstring_style', 'google', '--docstring-style'],
+    ['show_root_heading', 'false', '--show-root-heading'],
+    ['heading_level', '2', '--heading-level'],
+    ['merge_init_into_class', 'true', '--no-merge-init-into-class'],
+    ['members_order', 'source', '--members-order'],
+    ['filters', '!^_ and ^__init__$', '--filter (repeatable)'],
+    ['separate_signature', 'true', '--no-separate-signature'],
+    ['show_signature', 'true', '--no-show-signature'],
+    ['show_signature_annotations', 'true', '--no-signature-annotations'],
+  ]}
+/>
+
+`--docstring-style` exists for completeness only. The dump arrives already
+parsed, so a different style means re-dumping with
+`griffe dump <package> --docstyle numpy -f`; the generator refuses rather than
+pretend it can reinterpret sections it was handed.
+
+## The griffe pin
+
+griffe's `dump` output is a convenience format, not a versioned schema. The
+generator was developed against **griffe 1.7.3** and checks the top-level shape
+before it renders anything: a JSON object of packages, each a `module` with
+`name`, `path` and `members`. Anything else is refused with the command that
+produces a dump it understands, rather than emitting plausible-looking pages
+from a tree it misread.
+
+Pin griffe in the Python repository. When you lift the pin, run `--check` (see
+below) and read the diff before committing it.
+
+## Keeping the pages honest in CI
+
+Generated pages are committed, so the site builds without Python. `--check`
+regenerates into a temporary directory and diffs against what is committed,
+exiting 1 on drift and naming every file that is stale, missing or orphaned.
+
+```yaml
+- run: uv run griffe dump helia_aot --docstyle google -f > griffe.json
+- run: npx helia-ui-pyref --input griffe.json --out docs/src/content/docs/reference/api --base /helia-aot/ --check
+```
+
+Put it in the same workflow that builds the docs. A docstring edited without
+regenerating the reference then fails the pull request rather than shipping a
+page that disagrees with the code.
+
+## The sidebar fragment
+
+`--sidebar` writes a Starlight sidebar entry nested by package path, replacing
+the literate-nav summary. Spread it into `astro.config.mjs`:
+
+```js
+import apiSidebar from './src/generated/api-sidebar.json';
+
+sidebar: [
+  { label: 'Guides', autogenerate: { directory: 'guides' } },
+  { label: 'API reference', items: apiSidebar.items },
+];
+```
+
+Each package becomes a collapsed group whose first item is its own page,
+labelled `Overview`.
+
+## What the output looks like
+
+Google-style sections become tables, consistently: `Args` and `Other Args`,
+`Attributes`, `Returns`, `Yields`, `Receives`, `Raises` and `Warns`. `Examples`
+becomes prose and fenced Python, and a Google admonition becomes a Starlight
+aside.
+
+````md
+---
+title: 'handler'
+sidebar:
+  order: 2
+---
+
+## <span id="helia_aot.aot.handlers.handler.AotHandler"></span>AotHandler
+
+```python
+AotHandler(context: CodeGenContext)
+```
+
+Base class for all AOT code-generation handlers.
+
+:::note[Lifecycle]
+The lifecycle of an AOT handler consists of three main stages:
+
+1. resolve() — inspect AIR, add any scratch tensors, choose kernels
+2. plan() — (optional) adjust memory plan or other per-handler scheduling
+3. emit() — write out headers, C sources, assets, etc.
+
+:::
+
+**Parameters**
+
+| Name      | Type             | Description             | Default    |
+| --------- | ---------------- | ----------------------- | ---------- |
+| `context` | `CodeGenContext` | Code generation context | _required_ |
+
+### <span id="helia_aot.aot.handlers.handler.AotHandler.resolve"></span>AotHandler.resolve
+
+`abstractmethod`
+
+```python
+resolve() -> None
+```
+````
+
+Every symbol heading carries two anchors. Starlight slugs the heading text, and
+the `<span>` reproduces the `mkdocstrings` anchor — the full dotted path — so a
+link written against the MkDocs site still lands on the right symbol. Those
+dotted anchors are what cross-references resolve to.
+
+## Cross-references
+
+`[Name][module.path]` in a docstring becomes a link to the page and anchor that
+carries the symbol, prefixed with `--base`. A reference that resolves to
+nothing keeps its text and is reported as a warning rather than shipped as a
+dead link. Cross-reference syntax inside backticks or a fenced block is left
+alone, so `[w][z][y][x]` describing an array layout stays what it is.
+
+## Where it differs from mkdocstrings
+
+:::note[Deliberate differences]
+Three, all of them reported rather than silent:
+
+- **Imported names are not re-documented.** `mkdocstrings` renders an imported
+  symbol wherever it is imported. A module that declares `__all__` instead gets
+  a **Re-exports** table linking to the canonical page, which keeps one page
+  per symbol.
+- **Attributes are one table.** The `Attributes:` docstring section and the
+  public attribute members are merged, so a dataclass and a pydantic model
+  render the same way whichever way the fields were documented.
+- **Docstring headings are shifted.** A module docstring starting at `#` would
+  emit a second top-level heading under the page title; headings are shifted so
+  the shallowest sits at `--heading-level`. Slugs are unaffected, so anchors
+  into docstring headings still work.
+
+:::
+
+Material-specific content in docstrings — `:material-icon:` shortcodes,
+`pymdownx` fences — is passed through untouched. Converting it is part of
+moving the authored pages, not of generating the reference.

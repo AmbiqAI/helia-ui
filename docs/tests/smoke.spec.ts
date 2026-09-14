@@ -15,6 +15,10 @@ const routes = [
     path: `${base}/migrating-from-mkdocs/`,
     heading: 'Migrating from MkDocs',
   },
+  {
+    path: `${base}/python-api-reference/`,
+    heading: 'Python API reference',
+  },
   { path: `${base}/primitives/`, heading: 'Primitives' },
   { path: `${base}/cards/`, heading: 'Cards' },
   { path: `${base}/media/`, heading: 'Media' },

@@ -63,7 +63,11 @@ export default defineConfig({
         { label: 'Starlight plugin', slug: 'starlight-plugin' },
         {
           label: 'Migrating from MkDocs',
-          slug: 'migrating-from-mkdocs',
+          collapsed: false,
+          items: [
+            { label: 'Feature mapping', slug: 'migrating-from-mkdocs' },
+            { label: 'Python API reference', slug: 'python-api-reference' },
+          ],
         },
         {
           label: 'Astro parts',
