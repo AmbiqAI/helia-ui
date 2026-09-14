@@ -26,7 +26,8 @@
   },
   "bin": {
     "helia-ui-pyref": "./scripts/pyref.mjs",
-    "helia-ui-mkdocs-convert": "./scripts/mkdocs-convert.mjs"
+    "helia-ui-mkdocs-convert": "./scripts/mkdocs-convert.mjs",
+    "helia-ui-serve-dist": "./scripts/serve-dist.mjs"
   },
   "exports": {
     "./astro/*": "./astro/*.astro",
@@ -50,6 +51,7 @@
     "scripts/mkdocs-convert.mjs",
     "scripts/lib/mkdocs-convert-render.mjs",
     "scripts/lib/material-icons.json",
+    "scripts/serve-dist.mjs",
     "react",
     "starlight",
     "*.css",

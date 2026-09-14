@@ -145,6 +145,18 @@ npm run docs:build
 npm run docs:test      # Playwright smoke suite over the built docs site
 ```
 
+`npm run docs:test` serves an existing build rather than making one, so build
+first. The server behind it is `scripts/serve-dist.mjs`, shipped as the
+`helia-ui-serve-dist` bin: a dependency-free static server over `dist/` under a
+base path, used as the Playwright `webServer` here and in the hub. It stands in
+for `astro preview`, which treats `--port` as a hint: when the port is busy it
+starts on another one and reports that only on stdout, so the suite times out
+waiting for `webServer.url` or, under `reuseExistingServer`, tests whatever
+unrelated server holds the port. Preview instances also outlive the runner, and
+newer Astro detaches outright under agent environment variables. The static
+server fails loudly on a busy port instead. `astro preview` is still the right
+thing for a human reading the site.
+
 `docs/` is a consumer of this package, not a workspace of it: it reaches the
 package only through the export map, so anything it cannot render is a gap in
 the package rather than in the site. It has its own `package.json`, its own
