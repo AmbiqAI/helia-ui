@@ -25,13 +25,14 @@ A tag rather than a branch: the tarball npm builds from a branch changes under
 the consuming lockfile whenever the branch moves. The tag is the release, and
 `RELEASE.md` is its manifest.
 
-`engines.npm` is a floor, `>=10`, not the `^10` this repository develops
-against, because a git install makes this manifest a dependency manifest in
-your tree: a pin here warns on npm 11 and fails outright in a project of your
-own that sets `engine-strict`. Nothing about consuming this package needs npm
-10 — no lockfile ships with it — so the major stays pinned only in the app
-roots that commit one, and working on the package itself is held to npm 10 by
-the workflow in "Working on the package" rather than by this field.
+`engines` is a floor — node `>=22`, npm `>=10` — below the node 24 and npm 11
+this repository develops against, because a git install makes this manifest a
+dependency manifest in your tree: the newer range would fail outright in a
+project of your own that sets `engine-strict`. Nothing about consuming this
+package needs the newer pair — no lockfile ships with it — so the floor stays
+here, the app roots that commit a lockfile carry the requirement, and working
+on the package itself is held to it by the workflow in "Working on the
+package" rather than by this field.
 
 `astro` and `@astrojs/starlight` are the only required peers. Everything the
 React lane needs — `react`, `react-dom`, `radix-ui`, `cmdk`, `lucide-react`,
@@ -143,7 +144,7 @@ emitted stylesheet.
 ## Working on the package
 
 ```sh
-npm ci                 # Node from .nvmrc; npm 10, and only npm 10
+npm ci                 # Node from .nvmrc, which brings the npm CI installs with
 npm run validate       # formatting, SPDX headers, notices, style, boundary and island checks
 npm test               # the script unit tests
 
@@ -174,12 +175,12 @@ travels with the package: it lands in the lockfile entry of everyone who
 installs it, and it describes a directory that is not in the tarball.
 
 `.npmrc` sets `engine-strict=true` in the package root and in `docs/` alike, so
-the node range refuses to install rather than warning. `docs/` also pins
-`engines.npm` to `^10`, which stops a newer npm silently rewriting its lockfile
-in a dialect CI does not install from; the package root cannot carry that pin,
-because its manifest is also what a consumer installs (see "Install"). Use
-`npx -y npm@10 ...` here regardless if the npm on your path is newer — this
-root commits a lockfile too, and nothing but the workflow protects it.
+the node range refuses to install rather than warning. `docs/` also floors
+`engines.npm` at `>=11`, which stops an older npm silently rewriting its
+lockfile in a dialect CI does not install from; the package root cannot carry
+that floor, because its manifest is also what a consumer installs (see
+"Install"). Use the node from `.nvmrc` here regardless of what is on your path
+— this root commits a lockfile too, and nothing but the workflow protects it.
 
 ## Starting a product docs site
 
