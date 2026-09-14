@@ -24,7 +24,11 @@
     "check:islands": "node scripts/check-islands.mjs",
     "docs:dev": "npm run dev --workspace @ambiqai/helia-ui-docs",
     "docs:build": "npm run build --workspace @ambiqai/helia-ui-docs",
-    "docs:test": "npm run test --workspace @ambiqai/helia-ui-docs"
+    "docs:test": "npm run test --workspace @ambiqai/helia-ui-docs",
+    "test": "node --test \"scripts/**/*.test.mjs\""
+  },
+  "bin": {
+    "helia-ui-pyref": "./scripts/pyref.mjs"
   },
   "exports": {
     "./astro/*": "./astro/*.astro",
@@ -40,6 +44,8 @@
   },
   "files": [
     "astro",
+    "scripts/pyref.mjs",
+    "scripts/lib/pyref-render.mjs",
     "react",
     "starlight",
     "*.css",
