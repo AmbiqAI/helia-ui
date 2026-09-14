@@ -6,7 +6,7 @@ const gallery = '/helia-ui/gallery/';
 
 /* What the page ends with. The gallery is where an owner goes to choose, so an
  * example that quietly stops rendering is the page failing at its one job. */
-const EXAMPLES = 66;
+const EXAMPLES = 70;
 
 /*
  * The root element each part renders. An example's source is a prop rather than
@@ -19,11 +19,13 @@ const PART_ROOTS: Record<string, string> = {
   AccordionGroup: '.accordion-group',
   AsciiTerminal: 'helia-ascii-terminal',
   Badge: '.helia-badge',
+  Band: '.helia-band',
   Button: '.helia-button',
   Callout: '.helia-callout',
   Card: '.helia-card',
   CardActions: '.helia-card-actions',
   CardContent: '.helia-card-content',
+  CardGrid: '.helia-card-grid',
   CardHeader: '.helia-card-header',
   CardList: '.helia-card-list',
   CardMedia: '.helia-card-media',
@@ -35,8 +37,10 @@ const PART_ROOTS: Record<string, string> = {
   Eyebrow: '.helia-eyebrow',
   Icon: '.helia-icon',
   LinkCard: '.helia-link-card',
+  Masonry: '.helia-masonry',
   Media: '.helia-media',
   MediaEmbed: '.media-embed',
+  Mosaic: '.helia-mosaic',
   Reveal: 'helia-reveal',
   SectionHeader: '.section-header',
   ShowcaseCarousel: 'showcase-carousel',

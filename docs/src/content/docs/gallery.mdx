@@ -6,11 +6,13 @@ description: Every card variant, every named transition, and the site theme dial
 import AccordionGroup from '@ambiqai/helia-ui/astro/AccordionGroup';
 import AsciiTerminal from '@ambiqai/helia-ui/astro/AsciiTerminal';
 import Badge from '@ambiqai/helia-ui/astro/Badge';
+import Band from '@ambiqai/helia-ui/astro/Band';
 import Button from '@ambiqai/helia-ui/astro/Button';
 import Callout from '@ambiqai/helia-ui/astro/Callout';
 import Card from '@ambiqai/helia-ui/astro/Card';
 import CardActions from '@ambiqai/helia-ui/astro/CardActions';
 import CardContent from '@ambiqai/helia-ui/astro/CardContent';
+import CardGrid from '@ambiqai/helia-ui/astro/CardGrid';
 import CardHeader from '@ambiqai/helia-ui/astro/CardHeader';
 import CardList from '@ambiqai/helia-ui/astro/CardList';
 import CardMedia from '@ambiqai/helia-ui/astro/CardMedia';
@@ -23,8 +25,10 @@ import Example from '../../components/Example.astro';
 import Eyebrow from '@ambiqai/helia-ui/astro/Eyebrow';
 import Icon from '@ambiqai/helia-ui/astro/Icon';
 import LinkCard from '@ambiqai/helia-ui/astro/LinkCard';
+import Masonry from '@ambiqai/helia-ui/astro/Masonry';
 import Media from '@ambiqai/helia-ui/astro/Media';
 import MediaEmbed from '@ambiqai/helia-ui/astro/MediaEmbed';
+import Mosaic from '@ambiqai/helia-ui/astro/Mosaic';
 import Reveal from '@ambiqai/helia-ui/astro/Reveal';
 import RevealReplay from '../../components/RevealReplay.astro';
 import SectionHeader from '@ambiqai/helia-ui/astro/SectionHeader';
@@ -1381,6 +1385,365 @@ children that arrive.
     </div>
   </Reveal>
 </Example>
+
+## Page layout
+
+Four parts that arrange a page rather than fill one. None of them knows what it
+is carrying: the ground, the cards and the artwork are all handed in, so the
+same four cover a product page, a release note and a landing.
+
+### Band
+
+`Band` takes a section to the edges of the reading frame and keeps its content
+on the readable measure. `tone` picks the ground and `density` the rhythm above
+and below it. None of the four grounds draws an edge or an elevation: a section
+that carried either would be a very wide card.
+
+<Example
+  title='<Band tone="muted">'
+  code={`
+    <Band tone="muted">
+      <div slot="header">
+        <Eyebrow>Ground</Eyebrow>
+        <h4>A section with a ground of its own</h4>
+      </div>
+      <p>
+        The paint runs to the edges of the frame and the words stay on the
+        measure. Nothing is drawn around it.
+      </p>
+    </Band>
+  `}
+>
+  <div className="gallery-bleed">
+    <Band tone="muted">
+      <div slot="header">
+        <Eyebrow>Ground</Eyebrow>
+        <h4>A section with a ground of its own</h4>
+      </div>
+      <p>
+        The paint runs to the edges of the frame and the words stay on the
+        measure. Nothing is drawn around it.
+      </p>
+    </Band>
+  </div>
+</Example>
+
+### Card grid
+
+`CardGrid` is the row of peers. A named count steps down at the two
+breakpoints; `auto` fits whatever `min` allows, which is the answer for a set
+whose length the page does not know. `stagger` makes the grid the reveal
+itself, so the cards cascade in rather than the block arriving as one.
+
+<Example
+  title="<CardGrid columns={3} equalize stagger>"
+  code={`
+    <CardGrid columns={3} equalize stagger class="not-content">
+      <Card tone="filled">
+        <CardHeader titleAs="h4">
+          <span>Columns</span>
+        </CardHeader>
+        <CardContent>Two, three, four, or as many as the minimum allows.</CardContent>
+      </Card>
+      <Card tone="filled">
+        <CardHeader titleAs="h4">
+          <span>Equalise</span>
+        </CardHeader>
+        <CardContent>Every row takes the height of the tallest card on the grid.</CardContent>
+      </Card>
+      <Card tone="filled">
+        <CardHeader titleAs="h4">
+          <span>Stagger</span>
+        </CardHeader>
+        <CardContent>One wrapper, one arrival, told across the row.</CardContent>
+      </Card>
+    </CardGrid>
+  `}
+>
+  <CardGrid columns={3} equalize stagger class="not-content">
+    <Card tone="filled">
+      <CardHeader titleAs="h4">
+        <span>Columns</span>
+      </CardHeader>
+      <CardContent>
+        Two, three, four, or as many as the minimum allows.
+      </CardContent>
+    </Card>
+    <Card tone="filled">
+      <CardHeader titleAs="h4">
+        <span>Equalise</span>
+      </CardHeader>
+      <CardContent>
+        Every row takes the height of the tallest card on the grid.
+      </CardContent>
+    </Card>
+    <Card tone="filled">
+      <CardHeader titleAs="h4">
+        <span>Stagger</span>
+      </CardHeader>
+      <CardContent>One wrapper, one arrival, told across the row.</CardContent>
+    </Card>
+  </CardGrid>
+</Example>
+
+### Masonry
+
+`Masonry` packs cards of unequal height into columns with no dead space under
+the short ones. It is CSS columns and no script, so the packing is right in the
+first paint; the cost is a reading order that runs down each column before it
+moves across.
+
+<Example
+  title="<Masonry columns={3}>"
+  code={`
+    <Masonry columns={3} class="not-content">
+      <Card tone="filled">
+        <CardQuote attribution="Dana Mercer" detail="Firmware lead" initials="DM">
+          The profile told us where the cycles went on the first afternoon.
+        </CardQuote>
+      </Card>
+      <Card tone="filled">
+        <CardHeader titleAs="h4">
+          <span>Uneven by design</span>
+        </CardHeader>
+        <CardContent>
+          A short card next to a long one is what the layout is for. Forcing the
+          two to one height is what makes a set of notes look padded.
+        </CardContent>
+      </Card>
+      <Card tone="filled">
+        <CardHeader titleAs="h4" overline="Included">
+          <span>What the column keeps</span>
+        </CardHeader>
+        <CardList
+          items={[
+            'Each card whole across a break',
+            'The gap on the spacing scale',
+            'One column below 42rem',
+          ]}
+        />
+      </Card>
+    </Masonry>
+  `}
+>
+  <Masonry columns={3} class="not-content">
+    <Card tone="filled">
+      <CardQuote attribution="Dana Mercer" detail="Firmware lead" initials="DM">
+        The profile told us where the cycles went on the first afternoon.
+      </CardQuote>
+    </Card>
+    <Card tone="filled">
+      <CardHeader titleAs="h4">
+        <span>Uneven by design</span>
+      </CardHeader>
+      <CardContent>
+        A short card next to a long one is what the layout is for. Forcing the
+        two to one height is what makes a set of notes look padded.
+      </CardContent>
+    </Card>
+    <Card tone="filled">
+      <CardHeader titleAs="h4" overline="Included">
+        <span>What the column keeps</span>
+      </CardHeader>
+      <CardList
+        items={[
+          'Each card whole across a break',
+          'The gap on the spacing scale',
+          'One column below 42rem',
+        ]}
+      />
+    </Card>
+  </Masonry>
+</Example>
+
+### Mosaic
+
+`Mosaic` gives one card the room to carry artwork and fills the rest of the set
+around it. The feature is the first child rather than a prop, so the
+arrangement follows reading order. `pattern` moves it to the end of the set or
+across the top.
+
+<Example
+  title="<Mosaic>"
+  code={`
+    <Mosaic class="not-content">
+      <Card tone="elevated" media="background">
+        <CardMedia>
+          <Media treatment="color-field" style="--accent: var(--helia-accent-cyan)" />
+        </CardMedia>
+        <CardHeader titleAs="h4">
+          <span>The feature</span>
+        </CardHeader>
+        <CardContent>Two columns by two rows, with somewhere to put the artwork.</CardContent>
+      </Card>
+      <Card tone="filled">
+        <CardContent>The rest fill the remaining cells.</CardContent>
+      </Card>
+      <Card tone="filled">
+        <CardContent>In the order they were written.</CardContent>
+      </Card>
+      <Card tone="filled">
+        <CardContent>Nothing here is placed by hand.</CardContent>
+      </Card>
+    </Mosaic>
+  `}
+>
+  <Mosaic class="not-content">
+    <Card tone="elevated" media="background">
+      <CardMedia>
+        <Media
+          treatment="color-field"
+          style="--accent: var(--helia-accent-cyan)"
+        />
+      </CardMedia>
+      <CardHeader titleAs="h4">
+        <span>The feature</span>
+      </CardHeader>
+      <CardContent>
+        Two columns by two rows, with somewhere to put the artwork.
+      </CardContent>
+    </Card>
+    <Card tone="filled">
+      <CardContent>The rest fill the remaining cells.</CardContent>
+    </Card>
+    <Card tone="filled">
+      <CardContent>In the order they were written.</CardContent>
+    </Card>
+    <Card tone="filled">
+      <CardContent>Nothing here is placed by hand.</CardContent>
+    </Card>
+  </Mosaic>
+</Example>
+
+### The four together
+
+The rest of this section is not an example on a stage: the bands are on the
+page itself, which is the only way to see a ground actually run to the edges
+and a run of sections read as one rhythm. Scroll it as a page rather than as a
+set of parts.
+
+<Band tone="plain" density="compact" data-page-layout-composition>
+  <div slot="header">
+    <Eyebrow>Overview</Eyebrow>
+    <h4>One feature and the set around it</h4>
+  </div>
+  <Mosaic class="not-content">
+    <Card tone="elevated" media="background">
+      <CardMedia>
+        <Media
+          treatment="color-field"
+          style="--accent: var(--helia-accent-purple)"
+        />
+      </CardMedia>
+      <CardHeader titleAs="h4" overline="Featured">
+        <span>The one the section is about</span>
+      </CardHeader>
+      <CardContent>
+        Artwork needs room, and a grid of equals says nothing about which card
+        is the point.
+      </CardContent>
+    </Card>
+    <Card tone="filled">
+      <CardHeader titleAs="h4">
+        <span>Beside it</span>
+      </CardHeader>
+      <CardContent>Peers, at the size a peer deserves.</CardContent>
+    </Card>
+    <Card tone="filled">
+      <CardHeader titleAs="h4">
+        <span>Under it</span>
+      </CardHeader>
+      <CardContent>Filled in document order.</CardContent>
+    </Card>
+    <Card tone="filled">
+      <CardHeader titleAs="h4">
+        <span>And on</span>
+      </CardHeader>
+      <CardContent>The set is as long as the page needs.</CardContent>
+    </Card>
+  </Mosaic>
+</Band>
+
+<Band tone="muted">
+  <div slot="header">
+    <Eyebrow>Capabilities</Eyebrow>
+    <h4>Three peers on a ground</h4>
+  </div>
+  <CardGrid columns={3} equalize class="not-content">
+    <Card>
+      <CardHeader titleAs="h4">
+        <span>The ground changes</span>
+      </CardHeader>
+      <CardContent>
+        The section above it has none, so this one reads as a step rather than
+        as a box.
+      </CardContent>
+    </Card>
+    <Card>
+      <CardHeader titleAs="h4">
+        <span>The measure does not</span>
+      </CardHeader>
+      <CardContent>
+        Paint to the edges, text on the same width as the prose above it.
+      </CardContent>
+    </Card>
+    <Card>
+      <CardHeader titleAs="h4">
+        <span>Nothing is drawn</span>
+      </CardHeader>
+      <CardContent>
+        No edge, no brim, no shadow. The ground is the whole of the signal.
+      </CardContent>
+    </Card>
+  </CardGrid>
+</Band>
+
+<Band tone="plain">
+  <div slot="header">
+    <Eyebrow>Notes</Eyebrow>
+    <h4>What came back from the field</h4>
+  </div>
+  <Masonry columns={3} class="not-content">
+    <Card tone="filled">
+      <CardQuote attribution="Priya Raman" detail="Platform" initials="PR">
+        We stopped arguing about section spacing the week the bands landed.
+      </CardQuote>
+    </Card>
+    <Card tone="filled">
+      <CardHeader titleAs="h4">
+        <span>Content first</span>
+      </CardHeader>
+      <CardContent>
+        Good artwork is the scarcest thing a card family depends on, so the
+        options that carry a card without an image are the ones a long page
+        leans on.
+      </CardContent>
+    </Card>
+    <Card tone="filled">
+      <CardHeader titleAs="h4" overline="Covered">
+        <span>What a note can hold</span>
+      </CardHeader>
+      <CardList
+        items={['A quote and who said it', 'A short list', 'A line of prose']}
+      />
+    </Card>
+    <Card tone="filled">
+      <CardQuote attribution="Sam Okafor" initials="SO">
+        Three columns, no measuring, no layout shift when the font lands.
+      </CardQuote>
+    </Card>
+  </Masonry>
+</Band>
+
+<Band tone="contrast" density="compact">
+  <div slot="header">
+    <h4>The close</h4>
+  </div>
+  <p>
+    The inked ground is pinned dark in both themes, because ink that follows the
+    theme over a ground that does not is a section that reads half the time.
+  </p>
+</Band>
 
 ## Other parts
 

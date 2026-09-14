@@ -1,0 +1,47 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * One card given the room to carry artwork, with the rest of the set beside
+ * it. For the head of a section, where a grid of equals says nothing about
+ * which of them is the point.
+ *
+ * The feature is the first child rather than a prop or a named slot, so the
+ * arrangement follows reading order and the markup is the same set of cards a
+ * `CardGrid` would take. Everything after it fills the remaining cells in the
+ * order it was written.
+ *
+ * Below 62rem the feature spans the full width and the rest pair off under it;
+ * below 42rem the whole thing is one column. A feature that stayed a feature
+ * on a phone would be a card three screens tall.
+ *
+ * @slot default -- The cards. The first is the feature; the rest fill around it.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  /** Where the feature sits on the wide layout: two columns by two rows at the start or the end of the set, or one row across the top. */
+  pattern?: 'feature-start' | 'feature-end' | 'feature-top';
+  /** The gap between cards. */
+  density?: 'compact' | 'default' | 'comfortable';
+}
+
+const {
+  pattern = 'feature-start',
+  density = 'default',
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<div
+  class:list={[
+    'helia-mosaic',
+    `helia-mosaic--${pattern}`,
+    density !== 'default' && `helia-layout--${density}`,
+    className,
+  ]}
+  {...rest}
+>
+  <slot />
+</div>

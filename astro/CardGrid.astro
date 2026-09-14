@@ -1,0 +1,57 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A grid of peer cards. The cards are the consumer's; this owns the columns,
+ * the gap and, when asked, the arrival.
+ *
+ * `stagger` makes the grid the `Reveal` itself rather than wrapping one around
+ * it: the cascade runs on a reveal's direct children, and a grid nested inside
+ * one is a single child that does not cascade. Without it the part renders a
+ * plain element and ships no script.
+ *
+ * @slot default -- The cards, in reading order.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import Reveal from './Reveal.astro';
+
+interface Props extends HTMLAttributes<'div'> {
+  /** Columns at the wide end. A named count halves at 62rem and stacks below 42rem; `auto` fits as many as `min` allows. */
+  columns?: 2 | 3 | 4 | 'auto';
+  /** The narrowest a card may get before `auto` drops a column. Any CSS length; ignored by the named counts. */
+  min?: string;
+  /** The gap between cards. */
+  density?: 'compact' | 'default' | 'comfortable';
+  /** Cascade the cards in as the grid arrives, one `--helia-motion-fast` step apart. */
+  stagger?: boolean;
+  /** Give every row the height of the tallest card on the grid, so a row of uneven cards still lines up. */
+  equalize?: boolean;
+}
+
+const {
+  columns = 'auto',
+  min,
+  density = 'default',
+  stagger = false,
+  equalize = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const Root = stagger ? Reveal : 'div';
+---
+
+<Root
+  class:list={[
+    'helia-card-grid',
+    `helia-card-grid--${columns}`,
+    density !== 'default' && `helia-layout--${density}`,
+    equalize && 'helia-card-grid--equalize',
+    className,
+  ]}
+  stagger={stagger || undefined}
+  style={min ? `--helia-card-grid-min: ${min}` : undefined}
+  {...rest}
+>
+  <slot />
+</Root>

@@ -91,6 +91,28 @@ Also accepts `HTMLAttributes<'span'>`.
 
 [See it rendered on Cards](/helia-ui/cards/#badge)
 
+## Band
+
+**Use it for:** A full-bleed page section: the ground reaches the edges of the reading frame while the content stays on the readable measure.
+
+```ts
+import Band from '@ambiqai/helia-ui/astro/Band';
+```
+
+| Prop      | Type                                           | Default     | Description                                                          |
+| --------- | ---------------------------------------------- | ----------- | -------------------------------------------------------------------- |
+| `tone`    | `'plain' \| 'muted' \| 'contrast' \| 'tinted'` | `'plain'`   | The ground. `plain` paints none and leaves the page showing through. |
+| `density` | `'compact' \| 'default' \| 'comfortable'`      | `'default'` | Vertical rhythm above and below the content.                         |
+
+Also accepts `HTMLAttributes<'section'>`.
+
+**Slots**
+
+- `header` -- The section heading, above the content and on the same measure.
+- `default` -- The section's content, held to the readable width.
+
+[See it rendered on Gallery](/helia-ui/gallery/#band)
+
 ## Button
 
 **Use it for:** The call to action: a pill-shaped link or button.
@@ -198,6 +220,30 @@ Also accepts `HTMLAttributes<'div'>`.
 - `default` -- The card's prose, or the figures when `variant` is `stats`.
 
 [See it rendered on Cards](/helia-ui/cards/#a-card-with-every-part)
+
+## CardGrid
+
+**Use it for:** A grid of peer cards. The cards are the consumer's; this owns the columns, the gap and, when asked, the arrival.
+
+```ts
+import CardGrid from '@ambiqai/helia-ui/astro/CardGrid';
+```
+
+| Prop       | Type                                      | Default     | Description                                                                                                         |
+| ---------- | ----------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------- |
+| `columns`  | `2 \| 3 \| 4 \| 'auto'`                   | `'auto'`    | Columns at the wide end. A named count halves at 62rem and stacks below 42rem; `auto` fits as many as `min` allows. |
+| `min`      | `string`                                  | --          | The narrowest a card may get before `auto` drops a column. Any CSS length; ignored by the named counts.             |
+| `density`  | `'compact' \| 'default' \| 'comfortable'` | `'default'` | The gap between cards.                                                                                              |
+| `stagger`  | `boolean`                                 | `false`     | Cascade the cards in as the grid arrives, one `--helia-motion-fast` step apart.                                     |
+| `equalize` | `boolean`                                 | `false`     | Give every row the height of the tallest card on the grid, so a row of uneven cards still lines up.                 |
+
+Also accepts `HTMLAttributes<'div'>`.
+
+**Slots**
+
+- `default` -- The cards, in reading order.
+
+[See it rendered on Gallery](/helia-ui/gallery/#card-grid)
 
 ## CardHeader
 
@@ -468,6 +514,27 @@ Also accepts `Omit<HTMLAttributes<'div'>, 'title'>`.
 
 [See it rendered on Gallery](/helia-ui/gallery/#linkcard)
 
+## Masonry
+
+**Use it for:** Cards of unequal height packed into columns, with no dead space under the short ones. For a content-first set -- quotes, notes, lists -- where forcing every card to one height is what makes the set look padded.
+
+```ts
+import Masonry from '@ambiqai/helia-ui/astro/Masonry';
+```
+
+| Prop      | Type                                      | Default     | Description                                                                                       |
+| --------- | ----------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------- |
+| `columns` | `2 \| 3 \| 4`                             | `3`         | Columns at the wide end. Three and four halve at 62rem, and everything is one column below 42rem. |
+| `density` | `'compact' \| 'default' \| 'comfortable'` | `'default'` | The gap between cards.                                                                            |
+
+Also accepts `HTMLAttributes<'div'>`.
+
+**Slots**
+
+- `default` -- The cards. Each one is kept whole across a column break.
+
+[See it rendered on Gallery](/helia-ui/gallery/#masonry)
+
 ## Media
 
 **Use it for:** Generative artwork for a card that has no real image: oversized blurred forms, or a sparse field of planes, orbits and wires.
@@ -509,6 +576,27 @@ import MediaEmbed from '@ambiqai/helia-ui/astro/MediaEmbed';
 **Slots** -- none.
 
 [See it rendered on Media](/helia-ui/media/#hosted-video)
+
+## Mosaic
+
+**Use it for:** One card given the room to carry artwork, with the rest of the set beside it. For the head of a section, where a grid of equals says nothing about which of them is the point.
+
+```ts
+import Mosaic from '@ambiqai/helia-ui/astro/Mosaic';
+```
+
+| Prop      | Type                                                | Default           | Description                                                                                                                       |
+| --------- | --------------------------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `pattern` | `'feature-start' \| 'feature-end' \| 'feature-top'` | `'feature-start'` | Where the feature sits on the wide layout: two columns by two rows at the start or the end of the set, or one row across the top. |
+| `density` | `'compact' \| 'default' \| 'comfortable'`           | `'default'`       | The gap between cards.                                                                                                            |
+
+Also accepts `HTMLAttributes<'div'>`.
+
+**Slots**
+
+- `default` -- The cards. The first is the feature; the rest fill around it.
+
+[See it rendered on Gallery](/helia-ui/gallery/#mosaic)
 
 ## Reveal
 

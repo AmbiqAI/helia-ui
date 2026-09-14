@@ -1,0 +1,59 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A full-bleed page section: the ground reaches the edges of the reading frame
+ * while the content stays on the readable measure.
+ *
+ * It is how a long page gets a change of ground between sections without the
+ * site owning a second layout. Consecutive bands butt against each other
+ * rather than stacking a gap, so a run of alternating tones reads as one
+ * rhythm instead of a list of boxes.
+ *
+ * The ground is flat: no edge and no elevation. A band that carried either
+ * would be a very wide card, and the card family already draws those.
+ *
+ * `EditorialBand` is the same technique tied to the site hero treatment, which
+ * is the site's say rather than the caller's. This one takes its ground from
+ * the caller, which is what an alternating run of sections needs.
+ *
+ * @slot header -- The section heading, above the content and on the same measure.
+ * @slot default -- The section's content, held to the readable width.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'section'> {
+  /** The ground. `plain` paints none and leaves the page showing through. */
+  tone?: 'plain' | 'muted' | 'contrast' | 'tinted';
+  /** Vertical rhythm above and below the content. */
+  density?: 'compact' | 'default' | 'comfortable';
+}
+
+const {
+  tone = 'plain',
+  density = 'default',
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<section
+  class:list={[
+    'helia-band',
+    `helia-band--${tone}`,
+    density !== 'default' && `helia-band--${density}`,
+    className,
+  ]}
+  {...rest}
+>
+  <div class="helia-band__inner">
+    {
+      Astro.slots.has('header') && (
+        <div class="helia-band__header">
+          <slot name="header" />
+        </div>
+      )
+    }
+    <slot />
+  </div>
+</section>

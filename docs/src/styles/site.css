@@ -101,6 +101,13 @@
   min-width: 0;
 }
 
+/* A full-bleed part shown on an example stage. The stage is the frame the
+   example promises, so the band's arithmetic has to resolve against it rather
+   than against the page it would otherwise escape into. */
+.gallery-bleed {
+  container-type: inline-size;
+}
+
 .gallery-spacer {
   align-items: center;
   border: 1px dashed var(--sl-color-gray-5);

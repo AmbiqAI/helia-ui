@@ -1182,3 +1182,283 @@ a.helia-chip--neutral:focus-visible {
   left: 76%;
   top: 30%;
 }
+
+/*
+ * Page layout parts. Band, CardGrid, Masonry and Mosaic each own an
+ * arrangement and nothing about what is arranged. The recipes live here rather
+ * than in the components because every one of them styles children it only
+ * ever receives through a slot, which a scoped block cannot reach.
+ * See docs/design-system.md, "Composable components".
+ */
+
+/*
+ * The gap the three card layouts share, so a page that sets a density on one
+ * of them is setting the same step on all three. It is the spacing scale
+ * rather than `--helia-card-pad`: this is the distance between cards, and a
+ * card closing its own padding up has not moved its neighbours.
+ */
+.helia-layout--compact {
+  --helia-layout-gap: var(--helia-space-3);
+}
+
+.helia-layout--comfortable {
+  --helia-layout-gap: var(--helia-space-5);
+}
+
+/*
+ * The band escapes its container so the ground reaches the edges of the
+ * reading frame while the text stays on the measure. The arithmetic is the
+ * container's width and not the viewport's, because `100vw` counts the
+ * scrollbar and buys a horizontal scroll on every page that has one.
+ */
+.helia-band {
+  box-sizing: border-box;
+  margin-inline: calc(50% - 50cqw - var(--sl-content-pad-x));
+  padding-block: var(--helia-band-rhythm, clamp(2.5rem, 6vw, 5rem));
+  width: calc(100cqw + 2 * var(--sl-content-pad-x));
+}
+
+/* A run of bands is one alternating rhythm, not a stack of sections. */
+.helia-band + .helia-band {
+  margin-top: 0;
+}
+
+.helia-band--compact {
+  --helia-band-rhythm: clamp(1.5rem, 4vw, 3rem);
+}
+
+.helia-band--comfortable {
+  --helia-band-rhythm: clamp(3.5rem, 8vw, 7rem);
+}
+
+/*
+ * The ground. The shadow is paint rather than elevation: Starlight may reserve
+ * a desktop column outside `.content-panel`, and a spread this wide carries the
+ * fill through it without moving the readable inner content or introducing
+ * horizontal overflow. `clip-path` keeps that spread off the sections above and
+ * below, so the band still has no visible edge.
+ */
+.helia-band--muted,
+.helia-band--contrast,
+.helia-band--tinted {
+  background: var(--helia-band-ground);
+  box-shadow: 0 0 0 100vmax var(--helia-band-ground);
+  clip-path: inset(0 -100vmax);
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+
+.helia-band--muted {
+  --helia-band-ground: var(--helia-surface-card-muted);
+}
+
+/* The site accent pulled into the ground at the strength a hero uses it. */
+.helia-band--tinted {
+  --helia-band-ground: color-mix(
+    in srgb,
+    var(--helia-product-accent) 8%,
+    var(--helia-surface-paper)
+  );
+}
+
+/*
+ * The inked section. Pinned dark in both themes, like the background-media
+ * card: a ground that lightens with the theme under ink that does not is a
+ * section that only reads half the time. The Starlight prose inks move with
+ * the band's own, because the markdown slotted into it is what has to stay
+ * legible.
+ */
+.helia-band--contrast {
+  --helia-band-ground: var(--helia-ink-black);
+  --helia-ink-primary: var(--helia-paper-white);
+  --helia-ink-secondary: color-mix(
+    in srgb,
+    var(--helia-paper-white) 82%,
+    transparent
+  );
+  --helia-ink-muted: color-mix(
+    in srgb,
+    var(--helia-paper-white) 66%,
+    transparent
+  );
+  --sl-color-white: var(--helia-paper-white);
+  --sl-color-gray-1: var(--helia-paper-white);
+  --sl-color-gray-2: color-mix(
+    in srgb,
+    var(--helia-paper-white) 82%,
+    transparent
+  );
+  --sl-color-gray-3: color-mix(
+    in srgb,
+    var(--helia-paper-white) 70%,
+    transparent
+  );
+
+  color: var(--helia-paper-white);
+}
+
+.helia-band__inner {
+  margin-inline: auto;
+  max-width: var(--sl-content-width);
+}
+
+.helia-band__header {
+  margin-block-end: var(--helia-space-5);
+}
+
+.helia-band__header > :first-child,
+.helia-band__inner > :first-child {
+  margin-top: 0;
+}
+
+.helia-band__header > :last-child,
+.helia-band__inner > :last-child {
+  margin-bottom: 0;
+}
+
+/*
+ * The card grid. `auto` fits whatever the minimum allows, which is the right
+ * answer for a set whose length the page does not know; the named counts are
+ * for a set the page has composed, and they step down at the two breakpoints
+ * rather than reflowing on content.
+ */
+.helia-card-grid {
+  display: grid;
+  gap: var(--helia-layout-gap, var(--helia-space-4));
+  min-width: 0;
+}
+
+.helia-card-grid--auto {
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, var(--helia-card-grid-min, 16rem)), 1fr)
+  );
+}
+
+.helia-card-grid--2,
+.helia-card-grid--3,
+.helia-card-grid--4 {
+  grid-template-columns: repeat(var(--helia-card-grid-columns), minmax(0, 1fr));
+}
+
+.helia-card-grid--2 {
+  --helia-card-grid-columns: 2;
+}
+
+.helia-card-grid--3 {
+  --helia-card-grid-columns: 3;
+}
+
+.helia-card-grid--4 {
+  --helia-card-grid-columns: 4;
+}
+
+/*
+ * Rows to the tallest card rather than each row to its own tallest, so a grid
+ * whose cards run long in one row still reads as a grid.
+ */
+.helia-card-grid--equalize {
+  grid-auto-rows: 1fr;
+}
+
+@media (width < 62rem) {
+  .helia-card-grid--3,
+  .helia-card-grid--4 {
+    --helia-card-grid-columns: 2;
+  }
+}
+
+@media (width < 42rem) {
+  .helia-card-grid--2,
+  .helia-card-grid--3,
+  .helia-card-grid--4 {
+    --helia-card-grid-columns: 1;
+  }
+}
+
+/*
+ * Masonry. CSS columns and no script: nothing measures anything, so the
+ * packing is right in the first paint and survives a web font landing late.
+ */
+.helia-masonry {
+  column-gap: var(--helia-layout-gap, var(--helia-space-4));
+  columns: var(--helia-masonry-columns, 3);
+}
+
+.helia-masonry > * {
+  break-inside: avoid;
+  margin-block-end: var(--helia-layout-gap, var(--helia-space-4));
+}
+
+.helia-masonry--2 {
+  --helia-masonry-columns: 2;
+}
+
+.helia-masonry--3 {
+  --helia-masonry-columns: 3;
+}
+
+.helia-masonry--4 {
+  --helia-masonry-columns: 4;
+}
+
+@media (width < 62rem) {
+  .helia-masonry--3,
+  .helia-masonry--4 {
+    --helia-masonry-columns: 2;
+  }
+}
+
+@media (width < 42rem) {
+  .helia-masonry {
+    --helia-masonry-columns: 1;
+  }
+}
+
+/*
+ * Mosaic. Three columns with the feature taking four of the cells, so the rest
+ * of the set fills the remainder in document order without being placed. The
+ * row floor is what gives a feature carrying artwork somewhere to put it; past
+ * that the tallest card in a row still decides.
+ */
+.helia-mosaic {
+  display: grid;
+  gap: var(--helia-layout-gap, var(--helia-space-4));
+  grid-auto-rows: minmax(var(--helia-mosaic-row, 9rem), auto);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-width: 0;
+}
+
+.helia-mosaic--feature-start > :first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.helia-mosaic--feature-end > :first-child {
+  grid-column: 2 / span 2;
+  grid-row: 1 / span 2;
+}
+
+.helia-mosaic--feature-top > :first-child {
+  grid-column: 1 / -1;
+}
+
+/* One feature three screens tall is not a feature. Below the breakpoint it
+   spans the width and the rest pair off under it. */
+@media (width < 62rem) {
+  .helia-mosaic {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .helia-mosaic--feature-start > :first-child,
+  .helia-mosaic--feature-end > :first-child {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+}
+
+@media (width < 42rem) {
+  .helia-mosaic {
+    grid-auto-rows: auto;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

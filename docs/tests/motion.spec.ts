@@ -133,7 +133,9 @@ test('replay re-arms a reveal that has already arrived', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto(gallery);
 
-  const stagger = page.locator('helia-reveal.helia-motion-reveal--stagger');
+  const stagger = page
+    .locator('helia-reveal.helia-motion-reveal--stagger')
+    .first();
   await stagger.scrollIntoViewIfNeeded();
   await expect(stagger).toHaveClass(/helia-motion-reveal--in/);
 

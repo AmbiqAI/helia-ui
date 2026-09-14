@@ -57,6 +57,7 @@ const EXAMPLES = {
   AccordionGroup: { page: 'disclosure', label: 'Disclosure' },
   AsciiTerminal: { page: 'code', label: 'Code', anchor: 'ascii-terminal' },
   Badge: { page: 'cards', label: 'Cards', anchor: 'badge' },
+  Band: { page: 'gallery', label: 'Gallery', anchor: 'band' },
   Button: { page: 'primitives', label: 'Primitives', anchor: 'button' },
   Callout: { page: 'callouts', label: 'Callouts', anchor: 'core-guidance' },
   Card: { page: 'cards', label: 'Cards', anchor: 'the-card-parts' },
@@ -70,6 +71,7 @@ const EXAMPLES = {
     label: 'Cards',
     anchor: 'a-card-with-every-part',
   },
+  CardGrid: { page: 'gallery', label: 'Gallery', anchor: 'card-grid' },
   CardHeader: {
     page: 'cards',
     label: 'Cards',
@@ -90,8 +92,10 @@ const EXAMPLES = {
   Eyebrow: { page: 'primitives', label: 'Primitives', anchor: 'eyebrow' },
   Icon: { page: 'primitives', label: 'Primitives', anchor: 'icon' },
   LinkCard: { page: 'gallery', label: 'Gallery', anchor: 'linkcard' },
+  Masonry: { page: 'gallery', label: 'Gallery', anchor: 'masonry' },
   Media: { page: 'media', label: 'Media', anchor: 'generative-artwork' },
   MediaEmbed: { page: 'media', label: 'Media', anchor: 'hosted-video' },
+  Mosaic: { page: 'gallery', label: 'Gallery', anchor: 'mosaic' },
   Reveal: { page: 'gallery', label: 'Gallery', anchor: 'reveal-on-scroll' },
   SectionHeader: { page: 'layout', label: 'Layout', anchor: 'section-header' },
   ShowcaseCarousel: {

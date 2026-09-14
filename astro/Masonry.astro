@@ -1,0 +1,44 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * Cards of unequal height packed into columns, with no dead space under the
+ * short ones. For a content-first set -- quotes, notes, lists -- where forcing
+ * every card to one height is what makes the set look padded.
+ *
+ * CSS columns rather than script: nothing here measures anything, so the
+ * layout is right in the first paint and stays right when a web font lands.
+ * The cost is the reading order, which runs down each column and then across.
+ * Use it where the items are peers; a set that has to be read in order belongs
+ * on `CardGrid`.
+ *
+ * @slot default -- The cards. Each one is kept whole across a column break.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  /** Columns at the wide end. Three and four halve at 62rem, and everything is one column below 42rem. */
+  columns?: 2 | 3 | 4;
+  /** The gap between cards. */
+  density?: 'compact' | 'default' | 'comfortable';
+}
+
+const {
+  columns = 3,
+  density = 'default',
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<div
+  class:list={[
+    'helia-masonry',
+    `helia-masonry--${columns}`,
+    density !== 'default' && `helia-layout--${density}`,
+    className,
+  ]}
+  {...rest}
+>
+  <slot />
+</div>
