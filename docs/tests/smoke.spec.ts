@@ -166,7 +166,7 @@ test('the content-first row renders six cards', async ({ page }) => {
 
   await expect(
     page.locator(
-      '[data-content-first="comfortable"] > .gallery-item > .helia-card',
+      '[data-content-first="comfortable"] [data-example-stage] > .helia-card',
     ),
   ).toHaveCount(6);
 });

@@ -3,8 +3,11 @@ title: Gallery
 description: Every card variant, every named transition, and the site theme dials, side by side.
 ---
 
+import AccordionGroup from '@ambiqai/helia-ui/astro/AccordionGroup';
+import AsciiTerminal from '@ambiqai/helia-ui/astro/AsciiTerminal';
 import Badge from '@ambiqai/helia-ui/astro/Badge';
 import Button from '@ambiqai/helia-ui/astro/Button';
+import Callout from '@ambiqai/helia-ui/astro/Callout';
 import Card from '@ambiqai/helia-ui/astro/Card';
 import CardActions from '@ambiqai/helia-ui/astro/CardActions';
 import CardContent from '@ambiqai/helia-ui/astro/CardContent';
@@ -13,18 +16,26 @@ import CardList from '@ambiqai/helia-ui/astro/CardList';
 import CardMedia from '@ambiqai/helia-ui/astro/CardMedia';
 import CardQuote from '@ambiqai/helia-ui/astro/CardQuote';
 import Chip from '@ambiqai/helia-ui/astro/Chip';
+import CodeTabs from '@ambiqai/helia-ui/astro/CodeTabs';
+import DataTable from '@ambiqai/helia-ui/astro/DataTable';
+import EditorialBand from '@ambiqai/helia-ui/astro/EditorialBand';
+import Example from '../../components/Example.astro';
+import Eyebrow from '@ambiqai/helia-ui/astro/Eyebrow';
 import Icon from '@ambiqai/helia-ui/astro/Icon';
 import LinkCard from '@ambiqai/helia-ui/astro/LinkCard';
 import Media from '@ambiqai/helia-ui/astro/Media';
+import MediaEmbed from '@ambiqai/helia-ui/astro/MediaEmbed';
 import Reveal from '@ambiqai/helia-ui/astro/Reveal';
 import RevealReplay from '../../components/RevealReplay.astro';
+import SectionHeader from '@ambiqai/helia-ui/astro/SectionHeader';
 import ShowcaseCarousel from '@ambiqai/helia-ui/astro/ShowcaseCarousel';
 import StatCard from '@ambiqai/helia-ui/astro/StatCard';
+import Timeline from '@ambiqai/helia-ui/astro/Timeline';
 
 This page is for choosing. Every option the card parts and the motion system
-offer is on it, side by side, each labelled with the exact prop or class that
-produces it. Nothing here is a new component: the variants are modifiers on
-`Card` and the transitions are classes in `recipes.css`.
+offer is on it, side by side, each one showing the exact source that produces
+it behind "Show code". Nothing here is a new component: the variants are
+modifiers on `Card` and the transitions are classes in `recipes.css`.
 
 The reference tables are on [Cards](/helia-ui/cards/) for the parts and in
 `docs/design-system.md` for the motion tokens and the site theme.
@@ -36,31 +47,55 @@ Four tones, each of them a different answer to "what stands in for the edge".
 are likewise the same tone. Padding and radius do not move between them, so a
 row can mix tones and still line up.
 
-<div className="gallery-grid not-content">
-  <div className="gallery-item">
+<div className="gallery-grid gallery-grid--wide not-content">
+  <Example
+    title='tone="elevated"'
+    code={`
+      <Card tone="elevated">
+        <CardContent>A shadow instead of a border.</CardContent>
+      </Card>
+    `}
+  >
     <Card tone="elevated">
       <CardContent>A shadow instead of a border.</CardContent>
     </Card>
-    <code>tone="elevated"</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='tone="outlined"'
+    code={`
+      <Card tone="outlined">
+        <CardContent>The hairline card, unchanged.</CardContent>
+      </Card>
+    `}
+  >
     <Card tone="outlined">
       <CardContent>The hairline card, unchanged.</CardContent>
     </Card>
-    <code>tone="outlined"</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='tone="filled"'
+    code={`
+      <Card tone="filled">
+        <CardContent>The muted fill, for a card inside a surface.</CardContent>
+      </Card>
+    `}
+  >
     <Card tone="filled">
       <CardContent>The muted fill, for a card inside a surface.</CardContent>
     </Card>
-    <code>tone="filled"</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='tone="ghost"'
+    code={`
+      <Card tone="ghost">
+        <CardContent>Nothing at rest. Point at it for the fill.</CardContent>
+      </Card>
+    `}
+  >
     <Card tone="ghost">
       <CardContent>Nothing at rest. Point at it for the fill.</CardContent>
     </Card>
-    <code>tone="ghost"</code>
-  </div>
+  </Example>
 </div>
 
 ## Tone and density together
@@ -70,89 +105,161 @@ row can mix tones and still line up.
 
 ### Compact
 
-<div className="gallery-grid not-content">
-  <div className="gallery-item">
+<div className="gallery-grid gallery-grid--wide not-content">
+  <Example
+    title='tone="elevated" density="compact"'
+    code={`
+      <Card tone="elevated" density="compact">
+        <CardContent>Elevated, compact.</CardContent>
+      </Card>
+    `}
+  >
     <Card tone="elevated" density="compact">
       <CardContent>Elevated, compact.</CardContent>
     </Card>
-    <code>tone="elevated" density="compact"</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='tone="outlined" density="compact"'
+    code={`
+      <Card tone="outlined" density="compact">
+        <CardContent>Outlined, compact.</CardContent>
+      </Card>
+    `}
+  >
     <Card tone="outlined" density="compact">
       <CardContent>Outlined, compact.</CardContent>
     </Card>
-    <code>tone="outlined" density="compact"</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='tone="filled" density="compact"'
+    code={`
+      <Card tone="filled" density="compact">
+        <CardContent>Filled, compact.</CardContent>
+      </Card>
+    `}
+  >
     <Card tone="filled" density="compact">
       <CardContent>Filled, compact.</CardContent>
     </Card>
-    <code>tone="filled" density="compact"</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='tone="ghost" density="compact"'
+    code={`
+      <Card tone="ghost" density="compact">
+        <CardContent>Ghost, compact.</CardContent>
+      </Card>
+    `}
+  >
     <Card tone="ghost" density="compact">
       <CardContent>Ghost, compact.</CardContent>
     </Card>
-    <code>tone="ghost" density="compact"</code>
-  </div>
+  </Example>
 </div>
 
 ### Default
 
-<div className="gallery-grid not-content">
-  <div className="gallery-item">
+<div className="gallery-grid gallery-grid--wide not-content">
+  <Example
+    title='tone="elevated"'
+    code={`
+      <Card tone="elevated">
+        <CardContent>Elevated, default.</CardContent>
+      </Card>
+    `}
+  >
     <Card tone="elevated">
       <CardContent>Elevated, default.</CardContent>
     </Card>
-    <code>tone="elevated"</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='tone="outlined"'
+    code={`
+      <Card tone="outlined">
+        <CardContent>Outlined, default.</CardContent>
+      </Card>
+    `}
+  >
     <Card tone="outlined">
       <CardContent>Outlined, default.</CardContent>
     </Card>
-    <code>tone="outlined"</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='tone="filled"'
+    code={`
+      <Card tone="filled">
+        <CardContent>Filled, default.</CardContent>
+      </Card>
+    `}
+  >
     <Card tone="filled">
       <CardContent>Filled, default.</CardContent>
     </Card>
-    <code>tone="filled"</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='tone="ghost"'
+    code={`
+      <Card tone="ghost">
+        <CardContent>Ghost, default.</CardContent>
+      </Card>
+    `}
+  >
     <Card tone="ghost">
       <CardContent>Ghost, default.</CardContent>
     </Card>
-    <code>tone="ghost"</code>
-  </div>
+  </Example>
 </div>
 
 ### Comfortable
 
-<div className="gallery-grid not-content">
-  <div className="gallery-item">
+<div className="gallery-grid gallery-grid--wide not-content">
+  <Example
+    title='tone="elevated" density="comfortable"'
+    code={`
+      <Card tone="elevated" density="comfortable">
+        <CardContent>Elevated, comfortable.</CardContent>
+      </Card>
+    `}
+  >
     <Card tone="elevated" density="comfortable">
       <CardContent>Elevated, comfortable.</CardContent>
     </Card>
-    <code>tone="elevated" density="comfortable"</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='tone="outlined" density="comfortable"'
+    code={`
+      <Card tone="outlined" density="comfortable">
+        <CardContent>Outlined, comfortable.</CardContent>
+      </Card>
+    `}
+  >
     <Card tone="outlined" density="comfortable">
       <CardContent>Outlined, comfortable.</CardContent>
     </Card>
-    <code>tone="outlined" density="comfortable"</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='tone="filled" density="comfortable"'
+    code={`
+      <Card tone="filled" density="comfortable">
+        <CardContent>Filled, comfortable.</CardContent>
+      </Card>
+    `}
+  >
     <Card tone="filled" density="comfortable">
       <CardContent>Filled, comfortable.</CardContent>
     </Card>
-    <code>tone="filled" density="comfortable"</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='tone="ghost" density="comfortable"'
+    code={`
+      <Card tone="ghost" density="comfortable">
+        <CardContent>Ghost, comfortable.</CardContent>
+      </Card>
+    `}
+  >
     <Card tone="ghost" density="comfortable">
       <CardContent>Ghost, comfortable.</CardContent>
     </Card>
-    <code>tone="ghost" density="comfortable"</code>
-  </div>
+  </Example>
 </div>
 
 ## Media placement
@@ -165,7 +272,23 @@ draws an overlay over it, and inverts the ink onto the fixed paper tone.
 ### The three placements
 
 <div className="gallery-grid gallery-grid--wide not-content">
-  <div className="gallery-item">
+  <Example
+    title="<Card> (media on top)"
+    code={`
+      <Card>
+        <CardMedia ratio="16/9">
+          <Media
+            treatment="color-field"
+            style="--accent: var(--helia-accent-purple)"
+          />
+        </CardMedia>
+        <CardHeader titleAs="h4">
+          <span>Media on top</span>
+        </CardHeader>
+        <CardContent>The frame owns the ratio and the card stacks.</CardContent>
+      </Card>
+    `}
+  >
     <Card>
       <CardMedia ratio="16/9">
         <Media
@@ -178,9 +301,27 @@ draws an overlay over it, and inverts the ink onto the fixed paper tone.
       </CardHeader>
       <CardContent>The frame owns the ratio and the card stacks.</CardContent>
     </Card>
-    <code>{'<Card>'}</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='<Card media="side">'
+    code={`
+      <Card media="side">
+        <CardMedia ratio="16/9">
+          <Media
+            treatment="graphite"
+            style="--accent: var(--helia-accent-cyan)"
+          />
+        </CardMedia>
+        <CardHeader titleAs="h4">
+          <span>Media beside</span>
+        </CardHeader>
+        <CardContent>
+          The frame leaves the flow and the card reserves its width, so the
+          header, the body and the actions stay stacked.
+        </CardContent>
+      </Card>
+    `}
+  >
     <Card media="side">
       <CardMedia ratio="16/9">
         <Media
@@ -196,9 +337,27 @@ draws an overlay over it, and inverts the ink onto the fixed paper tone.
         header, the body and the actions stay stacked.
       </CardContent>
     </Card>
-    <code>{'<Card media="side">'}</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='<Card media="background">'
+    code={`
+      <Card media="background">
+        <CardMedia>
+          <Media
+            treatment="color-field"
+            style="--accent: var(--helia-accent-blue)"
+          />
+        </CardMedia>
+        <CardHeader titleAs="h4">
+          <span>Media behind</span>
+        </CardHeader>
+        <CardContent>
+          The ink inverts to the fixed paper tone, because the overlay is dark
+          in both themes.
+        </CardContent>
+      </Card>
+    `}
+  >
     <Card media="background">
       <CardMedia>
         <Media
@@ -214,8 +373,7 @@ draws an overlay over it, and inverts the ink onto the fixed paper tone.
         both themes.
       </CardContent>
     </Card>
-    <code>{'<Card media="background">'}</code>
-  </div>
+  </Example>
 </div>
 
 ## StatCard
@@ -224,29 +382,51 @@ A figure, its label, and an optional change. The number is the child, so it can
 carry a unit or markup; the delta is a `Badge` and its tone is the caller's,
 because the component has no idea whether up is good.
 
-<div className="gallery-grid not-content">
-  <div className="gallery-item">
+<div className="gallery-grid gallery-grid--wide not-content">
+  <Example
+    title='<StatCard label="Routes emitted">'
+    code={`
+      <StatCard label="Routes emitted">206</StatCard>
+    `}
+  >
     <StatCard label="Routes emitted">206</StatCard>
-    <code>{'<StatCard label="Routes emitted">'}</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='delta="-18%" deltaTone="success"'
+    code={`
+      <StatCard label="Build time" delta="-18%" deltaTone="success">
+        <span>41s</span>
+      </StatCard>
+    `}
+  >
     <StatCard label="Build time" delta="-18%" deltaTone="success">
       <span>41s</span>
     </StatCard>
-    <code>delta="-18%" deltaTone="success"</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='deltaTone="warning"'
+    code={`
+      <StatCard label="Open findings" delta="+3" deltaTone="warning">
+        <span>12</span>
+      </StatCard>
+    `}
+  >
     <StatCard label="Open findings" delta="+3" deltaTone="warning">
       <span>12</span>
     </StatCard>
-    <code>deltaTone="warning"</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='tone="elevated" density="compact"'
+    code={`
+      <StatCard label="Bundle" tone="elevated" density="compact">
+        <span>84 kB</span>
+      </StatCard>
+    `}
+  >
     <StatCard label="Bundle" tone="elevated" density="compact">
       <span>84 kB</span>
     </StatCard>
-    <code>tone="elevated" density="compact"</code>
-  </div>
+  </Example>
 </div>
 
 ## LinkCard
@@ -258,13 +438,32 @@ card is the target and the cue is inside the same hit area.
 ### Three link cards
 
 <div className="gallery-grid gallery-grid--wide not-content">
-  <div className="gallery-item">
+  <Example
+    title="<LinkCard href title>"
+    code={`
+      <LinkCard titleAs="h4" href="/helia-ui/cards/" title="The card parts">
+        What each part owns, and how a subset of them composes.
+      </LinkCard>
+    `}
+  >
     <LinkCard titleAs="h4" href="/helia-ui/cards/" title="The card parts">
       What each part owns, and how a subset of them composes.
     </LinkCard>
-    <code>{'<LinkCard href title>'}</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='overline="Tokens" tone="ghost"'
+    code={`
+      <LinkCard
+        titleAs="h4"
+        href="/helia-ui/foundations/"
+        title="Foundations"
+        overline="Tokens"
+        tone="ghost"
+      >
+        The scales every part compiles against.
+      </LinkCard>
+    `}
+  >
     <LinkCard
       titleAs="h4"
       href="/helia-ui/foundations/"
@@ -274,9 +473,21 @@ card is the target and the cue is inside the same hit area.
     >
       The scales every part compiles against.
     </LinkCard>
-    <code>overline="Tokens" tone="ghost"</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='tone="elevated" lift'
+    code={`
+      <LinkCard
+        titleAs="h4"
+        href="/helia-ui/primitives/"
+        title="Primitives"
+        tone="elevated"
+        lift
+      >
+        The four shapes the rest of the system reuses.
+      </LinkCard>
+    `}
+  >
     <LinkCard
       titleAs="h4"
       href="/helia-ui/primitives/"
@@ -286,8 +497,7 @@ card is the target and the cue is inside the same hit area.
     >
       The four shapes the rest of the system reuses.
     </LinkCard>
-    <code>tone="elevated" lift</code>
-  </div>
+  </Example>
 </div>
 
 ## Content-first
@@ -300,8 +510,25 @@ tone, density and the lift reach all of them unchanged.
 
 ### Comfortable
 
-<div className="gallery-grid not-content" data-content-first="comfortable">
-  <div className="gallery-item">
+<div
+  className="gallery-grid gallery-grid--wide not-content"
+  data-content-first="comfortable"
+>
+  <Example
+    title='<CardHeader> with <Icon slot="icon">'
+    code={`
+      <Card density="comfortable">
+        <CardHeader titleAs="h4" overline="Profiling">
+          <Icon slot="icon" name="gauge-high" />
+          <span>Latency you can budget</span>
+        </CardHeader>
+        <CardContent>
+          Every kernel reports its own cycle count, so a regression has a name
+          before it has a bug report.
+        </CardContent>
+      </Card>
+    `}
+  >
     <Card density="comfortable">
       <CardHeader titleAs="h4" overline="Profiling">
         <Icon slot="icon" name="gauge-high" />
@@ -312,11 +539,24 @@ tone, density and the lift reach all of them unchanged.
         before it has a bug report.
       </CardContent>
     </Card>
-    <code>
-      {'<CardHeader><Icon slot="icon" name="gauge-high" /></CardHeader>'}
-    </code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title="<CardList items={[...]} />"
+    code={`
+      <Card density="comfortable">
+        <CardHeader titleAs="h4" overline="Included">
+          <span>What the SDK ships with</span>
+        </CardHeader>
+        <CardList
+          items={[
+            'Quantisation-aware training recipes',
+            'A profiler that reads the device counters',
+            'Reference builds for every supported board',
+          ]}
+        />
+      </Card>
+    `}
+  >
     <Card density="comfortable">
       <CardHeader titleAs="h4" overline="Included">
         <span>What the SDK ships with</span>
@@ -329,9 +569,21 @@ tone, density and the lift reach all of them unchanged.
         ]}
       />
     </Card>
-    <code>{'<CardList items={[...]} marker="check" />'}</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='<CardHeader step={2} overline="Step two">'
+    code={`
+      <Card density="comfortable">
+        <CardHeader titleAs="h4" step={2} overline="Step two">
+          <span>Quantise the graph</span>
+        </CardHeader>
+        <CardContent>
+          The converter keeps the calibration set with the artefact, so the
+          same numbers come back on the next run.
+        </CardContent>
+      </Card>
+    `}
+  >
     <Card density="comfortable">
       <CardHeader titleAs="h4" step={2} overline="Step two">
         <span>Quantise the graph</span>
@@ -341,18 +593,44 @@ tone, density and the lift reach all of them unchanged.
         numbers come back on the next run.
       </CardContent>
     </Card>
-    <code>{'<CardHeader step={2} overline="Step two">'}</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title="<CardQuote attribution detail initials>"
+    code={`
+      <Card density="comfortable">
+        <CardQuote
+          attribution="Dana Mercer"
+          detail="Firmware lead"
+          initials="DM"
+        >
+          The profile told us where the cycles went on the first afternoon,
+          which is a week we did not spend guessing.
+        </CardQuote>
+      </Card>
+    `}
+  >
     <Card density="comfortable">
       <CardQuote attribution="Dana Mercer" detail="Firmware lead" initials="DM">
         The profile told us where the cycles went on the first afternoon, which
         is a week we did not spend guessing.
       </CardQuote>
     </Card>
-    <code>{'<CardQuote attribution detail initials="DM">'}</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='<CardContent variant="stats">'
+    code={`
+      <Card density="comfortable">
+        <CardHeader titleAs="h4" overline="Measured on device">
+          <span>Keyword spotting</span>
+        </CardHeader>
+        <CardContent variant="stats">
+          <StatCard label="Latency">18 ms</StatCard>
+          <StatCard label="Energy">2.4 mJ</StatCard>
+          <StatCard label="Model">96 kB</StatCard>
+        </CardContent>
+      </Card>
+    `}
+  >
     <Card density="comfortable">
       <CardHeader titleAs="h4" overline="Measured on device">
         <span>Keyword spotting</span>
@@ -363,9 +641,20 @@ tone, density and the lift reach all of them unchanged.
         <StatCard label="Model">96 kB</StatCard>
       </CardContent>
     </Card>
-    <code>{'<CardContent variant="stats"><StatCard /></CardContent>'}</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='<CardHeader scale="display">'
+    code={`
+      <Card density="comfortable" tone="filled">
+        <CardHeader titleAs="h4" scale="display" overline="Platform">
+          <span>Ship the model, not the toolchain</span>
+        </CardHeader>
+        <CardContent>
+          One card standing in for a hero, with nothing behind it but the type.
+        </CardContent>
+      </Card>
+    `}
+  >
     <Card density="comfortable" tone="filled">
       <CardHeader titleAs="h4" scale="display" overline="Platform">
         <span>Ship the model, not the toolchain</span>
@@ -374,8 +663,7 @@ tone, density and the lift reach all of them unchanged.
         One card standing in for a hero, with nothing behind it but the type.
       </CardContent>
     </Card>
-    <code>{'<CardHeader scale="display" overline="Platform">'}</code>
-  </div>
+  </Example>
 </div>
 
 ### Compact
@@ -383,8 +671,22 @@ tone, density and the lift reach all of them unchanged.
 The same six with `density="compact"`. The mark, the list gap and the figure
 row all come off the density hook, so nothing here is restyled per size.
 
-<div className="gallery-grid not-content" data-content-first="compact">
-  <div className="gallery-item">
+<div
+  className="gallery-grid gallery-grid--wide not-content"
+  data-content-first="compact"
+>
+  <Example
+    title='density="compact"'
+    code={`
+      <Card density="compact">
+        <CardHeader titleAs="h4" overline="Profiling">
+          <Icon slot="icon" name="gauge-high" />
+          <span>Latency you can budget</span>
+        </CardHeader>
+        <CardContent>Every kernel reports its own cycle count.</CardContent>
+      </Card>
+    `}
+  >
     <Card density="compact">
       <CardHeader titleAs="h4" overline="Profiling">
         <Icon slot="icon" name="gauge-high" />
@@ -392,9 +694,25 @@ row all come off the density hook, so nothing here is restyled per size.
       </CardHeader>
       <CardContent>Every kernel reports its own cycle count.</CardContent>
     </Card>
-    <code>{'density="compact"'}</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='<CardList marker="bullet" />'
+    code={`
+      <Card density="compact">
+        <CardHeader titleAs="h4" overline="Included">
+          <span>What the SDK ships with</span>
+        </CardHeader>
+        <CardList
+          marker="bullet"
+          items={[
+            'Training recipes',
+            'A device profiler',
+            'Reference board builds',
+          ]}
+        />
+      </Card>
+    `}
+  >
     <Card density="compact">
       <CardHeader titleAs="h4" overline="Included">
         <span>What the SDK ships with</span>
@@ -408,26 +726,55 @@ row all come off the density hook, so nothing here is restyled per size.
         ]}
       />
     </Card>
-    <code>{'<CardList marker="bullet" />'}</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='step={2} density="compact"'
+    code={`
+      <Card density="compact">
+        <CardHeader titleAs="h4" step={2} overline="Step two">
+          <span>Quantise the graph</span>
+        </CardHeader>
+        <CardContent>Calibration travels with the artefact.</CardContent>
+      </Card>
+    `}
+  >
     <Card density="compact">
       <CardHeader titleAs="h4" step={2} overline="Step two">
         <span>Quantise the graph</span>
       </CardHeader>
       <CardContent>Calibration travels with the artefact.</CardContent>
     </Card>
-    <code>{'step={2} density="compact"'}</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title="<CardQuote attribution initials>"
+    code={`
+      <Card density="compact">
+        <CardQuote attribution="Dana Mercer" initials="DM">
+          A week we did not spend guessing.
+        </CardQuote>
+      </Card>
+    `}
+  >
     <Card density="compact">
       <CardQuote attribution="Dana Mercer" initials="DM">
         A week we did not spend guessing.
       </CardQuote>
     </Card>
-    <code>{'<CardQuote attribution initials>'}</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='variant="stats" density="compact"'
+    code={`
+      <Card density="compact">
+        <CardHeader titleAs="h4" overline="Measured on device">
+          <span>Keyword spotting</span>
+        </CardHeader>
+        <CardContent variant="stats">
+          <StatCard label="Latency">18 ms</StatCard>
+          <StatCard label="Energy">2.4 mJ</StatCard>
+        </CardContent>
+      </Card>
+    `}
+  >
     <Card density="compact">
       <CardHeader titleAs="h4" overline="Measured on device">
         <span>Keyword spotting</span>
@@ -437,17 +784,25 @@ row all come off the density hook, so nothing here is restyled per size.
         <StatCard label="Energy">2.4 mJ</StatCard>
       </CardContent>
     </Card>
-    <code>{'variant="stats" density="compact"'}</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title='scale="display" density="compact"'
+    code={`
+      <Card density="compact" tone="filled">
+        <CardHeader titleAs="h4" scale="display" overline="Platform">
+          <span>Ship the model, not the toolchain</span>
+        </CardHeader>
+        <CardContent>The type carries it at any density.</CardContent>
+      </Card>
+    `}
+  >
     <Card density="compact" tone="filled">
       <CardHeader titleAs="h4" scale="display" overline="Platform">
         <span>Ship the model, not the toolchain</span>
       </CardHeader>
       <CardContent>The type carries it at any density.</CardContent>
     </Card>
-    <code>{'scale="display" density="compact"'}</code>
-  </div>
+  </Example>
 </div>
 
 ## Named transitions
@@ -459,7 +814,20 @@ the cards below; none of them does anything at rest.
 ### Hover targets
 
 <div className="gallery-grid gallery-grid--wide not-content">
-  <div className="gallery-item">
+  <Example
+    title=".helia-motion-surface (via interactive)"
+    code={`
+      <Card interactive>
+        <CardHeader titleAs="h4">
+          <span>Hover me: the fill shifts</span>
+        </CardHeader>
+        <CardContent>
+          Background and border, 120ms. No transform: a card that moves under
+          the pointer inside a grid reflows the row it shares.
+        </CardContent>
+      </Card>
+    `}
+  >
     <Card interactive>
       <CardHeader titleAs="h4">
         <span>Hover me: the fill shifts</span>
@@ -469,9 +837,21 @@ the cards below; none of them does anything at rest.
         pointer inside a grid reflows the row it shares.
       </CardContent>
     </Card>
-    <code>.helia-motion-surface (via `interactive`)</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title="<Card lift> / .helia-motion-lift"
+    code={`
+      <Card lift tone="elevated">
+        <CardHeader titleAs="h4">
+          <span>Hover me: the card lifts</span>
+        </CardHeader>
+        <CardContent>
+          2px up and one shadow step, 200ms. Never a scale, which would
+          resample the media and the text.
+        </CardContent>
+      </Card>
+    `}
+  >
     <Card lift tone="elevated">
       <CardHeader titleAs="h4">
         <span>Hover me: the card lifts</span>
@@ -481,9 +861,19 @@ the cards below; none of them does anything at rest.
         the media and the text.
       </CardContent>
     </Card>
-    <code>{'<Card lift> / .helia-motion-lift'}</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title=".helia-motion-cue"
+    code={`
+      <LinkCard
+        titleAs="h4"
+        href="/helia-ui/gallery/#named-transitions"
+        title="Hover me: the arrow nudges"
+      >
+        2px along, 120ms. The cue moves and the card holds still.
+      </LinkCard>
+    `}
+  >
     <LinkCard
       titleAs="h4"
       href="/helia-ui/gallery/#named-transitions"
@@ -491,9 +881,24 @@ the cards below; none of them does anything at rest.
     >
       2px along, 120ms. The cue moves and the card holds still.
     </LinkCard>
-    <code>.helia-motion-cue</code>
-  </div>
-  <div className="gallery-item">
+  </Example>
+  <Example
+    title=".helia-button"
+    code={`
+      <Card>
+        <CardActions>
+          <Button href="/helia-ui/gallery/#named-transitions" size="sm">
+            <span>Hover me: the button fills</span>
+          </Button>
+          <Chip href="/helia-ui/gallery/#named-transitions">And the pill</Chip>
+        </CardActions>
+        <CardContent>
+          Button and Chip are on the same 120ms step as the surface, so a card
+          and the controls inside it settle together.
+        </CardContent>
+      </Card>
+    `}
+  >
     <Card>
       <CardActions>
         <Button href="/helia-ui/gallery/#named-transitions" size="sm">
@@ -502,12 +907,11 @@ the cards below; none of them does anything at rest.
         <Chip href="/helia-ui/gallery/#named-transitions">And the pill</Chip>
       </CardActions>
       <CardContent>
-        `Button` and `Chip` are on the same 120ms step as the surface, so a card
-        and the controls inside it settle together.
+        Button and Chip are on the same 120ms step as the surface, so a card and
+        the controls inside it settle together.
       </CardContent>
     </Card>
-    <code>.helia-button</code>
-  </div>
+  </Example>
 </div>
 
 ### The carousel glide
@@ -516,55 +920,110 @@ The fifth transition. The rail reads the same dial the CSS does, so a site with
 motion switched off gets the jump rather than the slide.
 
 <div className="gallery-grid gallery-grid--full not-content">
-  <ShowcaseCarousel
-    variant="compact"
-    tabs={['Compile', 'Profile', 'Deploy', 'Measure']}
+  <Example
+    title='<ShowcaseCarousel variant="compact" tabs={[...]}>'
+    code={`
+      <ShowcaseCarousel
+        variant="compact"
+        tabs={['Compile', 'Profile', 'Deploy', 'Measure']}
+      >
+        <Card>
+          <CardMedia ratio="16/9">
+            <Media
+              treatment="color-field"
+              style="--accent: var(--helia-accent-purple)"
+            />
+          </CardMedia>
+          <CardHeader titleAs="h4">
+            <span>Compile</span>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardMedia ratio="16/9">
+            <Media
+              treatment="color-field"
+              style="--accent: var(--helia-accent-cyan)"
+            />
+          </CardMedia>
+          <CardHeader titleAs="h4">
+            <span>Profile</span>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardMedia ratio="16/9">
+            <Media
+              treatment="color-field"
+              style="--accent: var(--helia-accent-green)"
+            />
+          </CardMedia>
+          <CardHeader titleAs="h4">
+            <span>Deploy</span>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardMedia ratio="16/9">
+            <Media
+              treatment="color-field"
+              style="--accent: var(--helia-accent-orange)"
+            />
+          </CardMedia>
+          <CardHeader titleAs="h4">
+            <span>Measure</span>
+          </CardHeader>
+        </Card>
+      </ShowcaseCarousel>
+    `}
   >
-    <Card>
-      <CardMedia ratio="16/9">
-        <Media
-          treatment="color-field"
-          style="--accent: var(--helia-accent-purple)"
-        />
-      </CardMedia>
-      <CardHeader titleAs="h4">
-        <span>Compile</span>
-      </CardHeader>
-    </Card>
-    <Card>
-      <CardMedia ratio="16/9">
-        <Media
-          treatment="color-field"
-          style="--accent: var(--helia-accent-cyan)"
-        />
-      </CardMedia>
-      <CardHeader titleAs="h4">
-        <span>Profile</span>
-      </CardHeader>
-    </Card>
-    <Card>
-      <CardMedia ratio="16/9">
-        <Media
-          treatment="color-field"
-          style="--accent: var(--helia-accent-green)"
-        />
-      </CardMedia>
-      <CardHeader titleAs="h4">
-        <span>Deploy</span>
-      </CardHeader>
-    </Card>
-    <Card>
-      <CardMedia ratio="16/9">
-        <Media
-          treatment="color-field"
-          style="--accent: var(--helia-accent-orange)"
-        />
-      </CardMedia>
-      <CardHeader titleAs="h4">
-        <span>Measure</span>
-      </CardHeader>
-    </Card>
-  </ShowcaseCarousel>
+    <ShowcaseCarousel
+      variant="compact"
+      tabs={['Compile', 'Profile', 'Deploy', 'Measure']}
+    >
+      <Card>
+        <CardMedia ratio="16/9">
+          <Media
+            treatment="color-field"
+            style="--accent: var(--helia-accent-purple)"
+          />
+        </CardMedia>
+        <CardHeader titleAs="h4">
+          <span>Compile</span>
+        </CardHeader>
+      </Card>
+      <Card>
+        <CardMedia ratio="16/9">
+          <Media
+            treatment="color-field"
+            style="--accent: var(--helia-accent-cyan)"
+          />
+        </CardMedia>
+        <CardHeader titleAs="h4">
+          <span>Profile</span>
+        </CardHeader>
+      </Card>
+      <Card>
+        <CardMedia ratio="16/9">
+          <Media
+            treatment="color-field"
+            style="--accent: var(--helia-accent-green)"
+          />
+        </CardMedia>
+        <CardHeader titleAs="h4">
+          <span>Deploy</span>
+        </CardHeader>
+      </Card>
+      <Card>
+        <CardMedia ratio="16/9">
+          <Media
+            treatment="color-field"
+            style="--accent: var(--helia-accent-orange)"
+          />
+        </CardMedia>
+        <CardHeader titleAs="h4">
+          <span>Measure</span>
+        </CardHeader>
+      </Card>
+    </ShowcaseCarousel>
+  </Example>
 </div>
 
 ## Theme knobs
@@ -573,6 +1032,9 @@ The site theme is nine dials in one file. They are set here on a wrapper rather
 than on `:root`, which is the same mechanism a section of a page would use to
 carry its own treatment, and it is why the examples below can sit next to each
 other.
+
+Scoped dials, meaning a dial a section owns rather than the document, are
+tracked in AmbiqAI/helia-ui#23.
 
 <div className="gallery-grid gallery-grid--wide not-content">
   <div className="gallery-item">
@@ -700,28 +1162,38 @@ motion, because nothing armed.
   Scroll on. The cards below start hidden and arrive as they reach the viewport.
 </div>
 
-<Reveal>
-  <div className="gallery-grid not-content">
-    <div className="gallery-item">
+<Example
+  title="<Reveal>"
+  code={`
+    <Reveal>
+      <div className="gallery-grid not-content">
+        <Card tone="elevated">
+          <CardContent>One section, one reveal.</CardContent>
+        </Card>
+        <Card tone="elevated">
+          <CardContent>The cards inside it arrive together.</CardContent>
+        </Card>
+        <Card tone="elevated">
+          <CardContent>Which is the point of wrapping the section.</CardContent>
+        </Card>
+      </div>
+    </Reveal>
+  `}
+>
+  <Reveal>
+    <div className="gallery-grid not-content">
       <Card tone="elevated">
         <CardContent>One section, one reveal.</CardContent>
       </Card>
-      <code>{'<Reveal>'}</code>
-    </div>
-    <div className="gallery-item">
       <Card tone="elevated">
         <CardContent>The cards inside it arrive together.</CardContent>
       </Card>
-      <code>{'<Reveal>'}</code>
-    </div>
-    <div className="gallery-item">
       <Card tone="elevated">
         <CardContent>Which is the point of wrapping the section.</CardContent>
       </Card>
-      <code>{'<Reveal>'}</code>
     </div>
-  </div>
-</Reveal>
+  </Reveal>
+</Example>
 
 <div className="gallery-spacer not-content">
   A gap, so the staggered grid below is still out of view when the group above
@@ -732,56 +1204,505 @@ The cascade is on the direct children, so the grid is the `Reveal` rather than
 a `div` inside it: one wrapper with a grid class on it, and the cards are the
 children that arrive.
 
-<Reveal stagger class="gallery-grid not-content">
-  <div className="gallery-item">
+<Example
+  title="<Reveal stagger>"
+  code={`
+    <Reveal stagger class="gallery-grid not-content">
+      <Card tone="elevated">
+        <CardContent>With stagger, the children arrive in order.</CardContent>
+      </Card>
+      <Card tone="elevated">
+        <CardContent>Each one waits a fast step longer than the last.</CardContent>
+      </Card>
+      <Card tone="elevated">
+        <CardContent>The wrapper itself does not move.</CardContent>
+      </Card>
+      <Card tone="elevated">
+        <CardContent>The cascade stops at the sixth child.</CardContent>
+      </Card>
+    </Reveal>
+  `}
+>
+  <Reveal stagger class="gallery-grid not-content">
     <Card tone="elevated">
       <CardContent>With stagger, the children arrive in order.</CardContent>
     </Card>
-    <code>{'<Reveal stagger>'}</code>
-  </div>
-  <div className="gallery-item">
     <Card tone="elevated">
       <CardContent>
         Each one waits a fast step longer than the last.
       </CardContent>
     </Card>
-    <code>{'<Reveal stagger>'}</code>
-  </div>
-  <div className="gallery-item">
     <Card tone="elevated">
       <CardContent>The wrapper itself does not move.</CardContent>
     </Card>
-    <code>{'<Reveal stagger>'}</code>
-  </div>
-  <div className="gallery-item">
     <Card tone="elevated">
       <CardContent>The cascade stops at the sixth child.</CardContent>
     </Card>
-    <code>{'<Reveal stagger>'}</code>
-  </div>
-</Reveal>
+  </Reveal>
+</Example>
 
 <div className="gallery-spacer not-content">
   A second gap, so the group below is still out of view when the first arrives.
 </div>
 
-<Reveal threshold={0.4}>
-  <div className="gallery-grid not-content">
-    <div className="gallery-item">
+<Example
+  title="<Reveal threshold={0.4}>"
+  code={`
+    <Reveal threshold={0.4}>
+      <div className="gallery-grid not-content">
+        <Card tone="filled">
+          <CardContent>
+            A higher threshold waits until more of the section is in view.
+          </CardContent>
+        </Card>
+        <Card tone="filled">
+          <CardContent>
+            Lower it for a section too tall to ever cross the mark.
+          </CardContent>
+        </Card>
+      </div>
+    </Reveal>
+  `}
+>
+  <Reveal threshold={0.4}>
+    <div className="gallery-grid not-content">
       <Card tone="filled">
         <CardContent>
           A higher threshold waits until more of the section is in view.
         </CardContent>
       </Card>
-      <code>{'<Reveal threshold={0.4}>'}</code>
-    </div>
-    <div className="gallery-item">
       <Card tone="filled">
         <CardContent>
           Lower it for a section too tall to ever cross the mark.
         </CardContent>
       </Card>
-      <code>{'<Reveal threshold={0.4}>'}</code>
     </div>
+  </Reveal>
+</Example>
+
+## Other parts
+
+The rest of the Astro parts, one example each. They are documented in depth on
+their own pages; they are here so that one page answers what the package can
+draw.
+
+<Example
+  title="<CodeTabs tabs={[...]} />"
+  code={`
+    <CodeTabs
+      ariaLabel="Average latency implementation"
+      tabs={[
+        {
+          label: 'TypeScript',
+          language: 'typescript',
+          code: 'const average = total / samples.length;',
+        },
+        {
+          label: 'Python',
+          language: 'python',
+          code: 'average = total / len(samples)',
+        },
+      ]}
+    />
+  `}
+>
+  <CodeTabs
+    ariaLabel="Average latency implementation"
+    tabs={[
+      {
+        label: 'TypeScript',
+        language: 'typescript',
+        code: 'const average = total / samples.length;',
+      },
+      {
+        label: 'Python',
+        language: 'python',
+        code: 'average = total / len(samples)',
+      },
+    ]}
+  />
+</Example>
+
+<Example
+  title="<AsciiTerminal lines={[...]} />"
+  code={`
+    <AsciiTerminal
+      title="Expected output"
+      lines={[
+        { kind: 'command', text: 'npm run build' },
+        { kind: 'muted', text: 'Resolving configuration…' },
+        { kind: 'output', text: '  ENTRY     src/index.ts' },
+        { kind: 'output', text: '  TARGET    es2022' },
+      ]}
+    />
+  `}
+>
+  <AsciiTerminal
+    title="Expected output"
+    lines={[
+      { kind: 'command', text: 'npm run build' },
+      { kind: 'muted', text: 'Resolving configuration…' },
+      { kind: 'output', text: '  ENTRY     src/index.ts' },
+      { kind: 'output', text: '  TARGET    es2022' },
+    ]}
+  />
+</Example>
+
+<Example
+  title="<Callout title tone>"
+  code={`
+    <div className="helia-callout-stack">
+      <Callout title="Keep the calibration set">
+        The converter writes it beside the artefact, so the next run starts from
+        the same numbers.
+      </Callout>
+      <Callout tone="warning" title="Density is inherited">
+        A part that names its own step opts out of the hook and keeps it.
+      </Callout>
+    </div>
+  `}
+>
+  <div className="helia-callout-stack">
+    <Callout title="Keep the calibration set">
+      The converter writes it beside the artefact, so the next run starts from
+      the same numbers.
+    </Callout>
+    <Callout tone="warning" title="Density is inherited">
+      A part that names its own step opts out of the hook and keeps it.
+    </Callout>
   </div>
-</Reveal>
+</Example>
+
+<Example
+  title="<Timeline groups={[...]} />"
+  code={`
+    <Timeline
+      heading="What's new"
+      groups={[
+        {
+          label: 'Week two',
+          items: [
+            {
+              title: 'The gallery shows its own source',
+              description:
+                'Every example carries the MDX that renders it.',
+            },
+          ],
+        },
+        {
+          label: 'Week one',
+          items: [{ title: 'Content-first cards landed' }],
+        },
+      ]}
+    />
+  `}
+>
+  <Timeline
+    heading="What's new"
+    groups={[
+      {
+        label: 'Week two',
+        items: [
+          {
+            title: 'The gallery shows its own source',
+            description: 'Every example carries the MDX that renders it.',
+          },
+        ],
+      },
+      {
+        label: 'Week one',
+        items: [{ title: 'Content-first cards landed' }],
+      },
+    ]}
+  />
+</Example>
+
+<Example
+  title="<AccordionGroup items={[...]} />"
+  code={`
+    <AccordionGroup
+      items={[
+        {
+          title: 'When does a variant earn a place here?',
+          content:
+            'When it is a modifier on a part rather than a part of its own.',
+        },
+        {
+          title: 'Where are the reference tables?',
+          content: 'On the page for the part, not on this one.',
+        },
+      ]}
+    />
+  `}
+>
+  <AccordionGroup
+    items={[
+      {
+        title: 'When does a variant earn a place here?',
+        content:
+          'When it is a modifier on a part rather than a part of its own.',
+      },
+      {
+        title: 'Where are the reference tables?',
+        content: 'On the page for the part, not on this one.',
+      },
+    ]}
+  />
+</Example>
+
+<Example
+  title='<EditorialBand tone="paper">'
+  code={`
+    <EditorialBand tone="paper">
+      <SectionHeader
+        eyebrow="Chapter"
+        title="A band, not a card"
+        description="No border, no radius, no shadow: a chapter-level section."
+      />
+    </EditorialBand>
+  `}
+>
+  <EditorialBand tone="paper">
+    <SectionHeader
+      eyebrow="Chapter"
+      title="A band, not a card"
+      description="No border, no radius, no shadow: a chapter-level section."
+    />
+  </EditorialBand>
+</Example>
+
+<Example
+  title="<SectionHeader eyebrow title description href>"
+  code={`
+    <SectionHeader
+      eyebrow="Parts"
+      title="Everything the package draws"
+      description="One row above a section, with the link that leaves it."
+      href="/helia-ui/reference/astro-parts/"
+      linkLabel="All contracts"
+    />
+  `}
+>
+  <SectionHeader
+    eyebrow="Parts"
+    title="Everything the package draws"
+    description="One row above a section, with the link that leaves it."
+    href="/helia-ui/reference/astro-parts/"
+    linkLabel="All contracts"
+  />
+</Example>
+
+<Example
+  title="<DataTable caption columns rows />"
+  code={`
+    <DataTable
+      caption="Card tones"
+      columns={['Tone', 'What stands in for the edge']}
+      rows={[
+        ['elevated', 'A shadow'],
+        ['outlined', 'A hairline border'],
+        ['filled', 'A muted fill'],
+        ['ghost', 'Nothing, until the pointer arrives'],
+      ]}
+    />
+  `}
+>
+  <DataTable
+    caption="Card tones"
+    columns={['Tone', 'What stands in for the edge']}
+    rows={[
+      ['elevated', 'A shadow'],
+      ['outlined', 'A hairline border'],
+      ['filled', 'A muted fill'],
+      ['ghost', 'Nothing, until the pointer arrives'],
+    ]}
+  />
+</Example>
+
+<Example
+  title="<MediaEmbed title videoId />"
+  code={`
+    <MediaEmbed
+      title="YouTube embed sample"
+      videoId="M7lc1UVf-VE"
+      caption="The player is not requested until the visitor presses play."
+      duration="1:24"
+    />
+  `}
+>
+  <MediaEmbed
+    title="YouTube embed sample"
+    videoId="M7lc1UVf-VE"
+    caption="The player is not requested until the visitor presses play."
+    duration="1:24"
+  />
+</Example>
+
+<Example
+  title="<Eyebrow>"
+  code={`
+    <Eyebrow>Section label</Eyebrow>
+    <Eyebrow as="span">Inline label</Eyebrow>
+  `}
+>
+  <Eyebrow>Section label</Eyebrow>
+  <Eyebrow as="span">Inline label</Eyebrow>
+</Example>
+
+<Example
+  title="<Chip tone size href>"
+  code={`
+    <div className="helia-badge-row">
+      <Chip>Neutral</Chip>
+      <Chip tone="accent">Accent</Chip>
+      <Chip tone="static">Static</Chip>
+      <Chip href="/helia-ui/gallery/#other-parts">Linked</Chip>
+      <Chip size="md">Medium</Chip>
+      <Chip size="md" tone="static">
+        Medium static
+      </Chip>
+    </div>
+  `}
+>
+  <div className="helia-badge-row">
+    <Chip>Neutral</Chip>
+    <Chip tone="accent">Accent</Chip>
+    <Chip tone="static">Static</Chip>
+    <Chip href="/helia-ui/gallery/#other-parts">Linked</Chip>
+    <Chip size="md">Medium</Chip>
+    <Chip size="md" tone="static">
+      Medium static
+    </Chip>
+  </div>
+</Example>
+
+<Example
+  title="<Button variant size>"
+  code={`
+    <div className="helia-display-row">
+      <Button href="/helia-ui/gallery/#other-parts">Primary</Button>
+      <Button href="/helia-ui/gallery/#other-parts" variant="secondary">
+        Secondary
+      </Button>
+      <Button href="/helia-ui/gallery/#other-parts" variant="ghost">
+        Ghost
+      </Button>
+      <Button href="/helia-ui/gallery/#other-parts" size="sm">
+        Primary, small
+      </Button>
+      <Button
+        href="/helia-ui/gallery/#other-parts"
+        variant="secondary"
+        size="sm"
+      >
+        Secondary, small
+      </Button>
+      <Button href="/helia-ui/gallery/#other-parts" variant="ghost" size="sm">
+        Ghost, small
+      </Button>
+    </div>
+  `}
+>
+  <div className="helia-display-row">
+    <Button href="/helia-ui/gallery/#other-parts">Primary</Button>
+    <Button href="/helia-ui/gallery/#other-parts" variant="secondary">
+      Secondary
+    </Button>
+    <Button href="/helia-ui/gallery/#other-parts" variant="ghost">
+      Ghost
+    </Button>
+    <Button href="/helia-ui/gallery/#other-parts" size="sm">
+      Primary, small
+    </Button>
+    <Button href="/helia-ui/gallery/#other-parts" variant="secondary" size="sm">
+      Secondary, small
+    </Button>
+    <Button href="/helia-ui/gallery/#other-parts" variant="ghost" size="sm">
+      Ghost, small
+    </Button>
+  </div>
+</Example>
+
+<Example
+  title="<Badge tone size dot>"
+  code={`
+    <div className="helia-badge-row">
+      <Badge>Neutral</Badge>
+      <Badge tone="info">Info</Badge>
+      <Badge tone="success">Success</Badge>
+      <Badge tone="warning">Warning</Badge>
+      <Badge tone="danger">Danger</Badge>
+      <Badge tone="accent">Accent</Badge>
+      <Badge size="md">Neutral, medium</Badge>
+      <Badge size="md" tone="info">
+        Info, medium
+      </Badge>
+      <Badge size="md" tone="success" dot>
+        With a dot
+      </Badge>
+    </div>
+  `}
+>
+  <div className="helia-badge-row">
+    <Badge>Neutral</Badge>
+    <Badge tone="info">Info</Badge>
+    <Badge tone="success">Success</Badge>
+    <Badge tone="warning">Warning</Badge>
+    <Badge tone="danger">Danger</Badge>
+    <Badge tone="accent">Accent</Badge>
+    <Badge size="md">Neutral, medium</Badge>
+    <Badge size="md" tone="info">
+      Info, medium
+    </Badge>
+    <Badge size="md" tone="success" dot>
+      With a dot
+    </Badge>
+  </div>
+</Example>
+
+<Example
+  title="<Icon name>"
+  code={`
+    <div className="helia-display-row">
+      <span>
+        <Icon name="gauge-high" /> gauge-high
+      </span>
+      <span>
+        <Icon name="memory" /> memory
+      </span>
+      <span>
+        <Icon name="microchip" /> microchip
+      </span>
+      <span>
+        <Icon name="chart-line" /> chart-line
+      </span>
+      <span>
+        <Icon name="circle-info" /> circle-info
+      </span>
+      <span>
+        <Icon name="arrow-right" /> arrow-right
+      </span>
+    </div>
+  `}
+>
+  <div className="helia-display-row">
+    <span>
+      <Icon name="gauge-high" /> gauge-high
+    </span>
+    <span>
+      <Icon name="memory" /> memory
+    </span>
+    <span>
+      <Icon name="microchip" /> microchip
+    </span>
+    <span>
+      <Icon name="chart-line" /> chart-line
+    </span>
+    <span>
+      <Icon name="circle-info" /> circle-info
+    </span>
+    <span>
+      <Icon name="arrow-right" /> arrow-right
+    </span>
+  </div>
+</Example>

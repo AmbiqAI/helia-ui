@@ -1,0 +1,103 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A gallery example: the live parts on a stage, and the MDX that produces them
+ * under a native disclosure. Documentation furniture for this site, not a part.
+ *
+ * The source is a prop rather than something read back off the slot, because
+ * nothing in Astro hands a component the MDX of its own children. One string
+ * feeds both the disclosure and `data-example-tags`, which the docs suite reads
+ * back to assert the stage holds the parts the source names.
+ */
+import { Code } from '@astrojs/starlight/components';
+
+import { dedent, exampleTags } from '../lib/example-source';
+
+interface Props {
+  /** The prop, class or part the example exists to show. */
+  title: string;
+  /** The MDX that renders the slot. Indent it freely; `dedent` squares it up. */
+  code: string;
+  class?: string;
+}
+
+const { title, code, class: className } = Astro.props;
+const source = dedent(code);
+---
+
+<div class:list={['example', 'not-content', className]}>
+  <div class="example__bar">
+    <p class="example__title">{title}</p>
+  </div>
+  <div
+    class="example__stage"
+    data-example-stage
+    data-example-tags={exampleTags(source).join(' ')}
+  >
+    <slot />
+  </div>
+  <details class="example__source">
+    <summary>Show code</summary>
+    <Code code={source} lang="mdx" />
+  </details>
+</div>
+
+<style>
+  .example {
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: var(--helia-radius-md);
+    display: grid;
+    /* The stage is the only row that may grow, so a wide preview scrolls
+       inside the example rather than widening the grid cell it sits in. */
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .example__bar {
+    align-items: center;
+    background: var(--sl-color-gray-6);
+    border-bottom: 1px solid var(--sl-color-gray-5);
+    display: flex;
+    gap: var(--helia-space-2);
+    justify-content: space-between;
+    padding: var(--helia-space-2) var(--helia-space-3);
+  }
+
+  .example__title {
+    font-family: var(--helia-font-mono);
+    font-size: var(--helia-text-label);
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .example__stage {
+    min-width: 0;
+    padding: var(--helia-space-4);
+  }
+
+  .example__source {
+    border-top: 1px solid var(--sl-color-gray-5);
+    min-width: 0;
+  }
+
+  .example__source summary {
+    cursor: pointer;
+    font-size: var(--helia-text-label);
+    padding: var(--helia-space-2) var(--helia-space-3);
+  }
+
+  /* The block is already framed by the example, so it keeps neither the gap
+     it would take from prose nor a second radius inside this one. */
+  /* style-lint: allow global -- Expressive Code writes the block's markup, so it carries no component scope */
+  .example__source :global(.expressive-code) {
+    margin: 0;
+  }
+
+  /* style-lint: allow global -- Expressive Code writes the block's markup, so it carries no component scope */
+  .example__source :global(.expressive-code .frame pre) {
+    border-inline: 0;
+    border-radius: 0;
+  }
+</style>
