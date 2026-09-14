@@ -1,0 +1,89 @@
+---
+title: Charting candidates
+description: Three charting libraries drawing the same three charts, so the choice can be made by eye and by cost.
+---
+
+import ChartCandidateMui from '../../../islands/ChartCandidateMui';
+import ChartCandidatePlot from '../../../islands/ChartCandidatePlot';
+import ChartCandidateRecharts from '../../../islands/ChartCandidateRecharts';
+import { candidates, formatBytes } from '../../../lib/chart-candidates';
+
+The package draws charts with one library today. This page is where a second
+choice is made rather than argued: three candidates, the same three charts, the
+same numbers, the same card, the same palette. Anything that differs between
+the rows below is the library.
+
+Every chart carries a title and a subtitle, and the subtitle says what is
+plotted against what, so no axis is titled. Gridlines are horizontal only and
+drawn in the hairline token. Series colours are two accents and a neutral, read
+from the `--helia-*` custom properties at runtime, so a theme switch moves the
+plots with the page.
+
+The series are synthetic. Nothing on this page is a measurement of any part.
+
+## The facts
+
+<table>
+  <thead>
+    <tr>
+      <th>Library</th>
+      <th>Licence</th>
+      <th>Version</th>
+      <th>Island JavaScript</th>
+      <th>Server render</th>
+      <th>Theming</th>
+    </tr>
+  </thead>
+  <tbody>
+    {candidates.map((candidate) => (
+      <tr key={candidate.id}>
+        <td>
+          {candidate.name}
+          <br />
+          <code>{candidate.pkg}</code>
+        </td>
+        <td>{candidate.licence}</td>
+        <td>{candidate.version}</td>
+        <td>{formatBytes(candidate.bytes)}</td>
+        <td>{candidate.serverRender}</td>
+        <td>{candidate.theming}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+Licence and version are the installed packages'. The byte figures are minified
+JavaScript, not compressed, and count every chunk this page loads for that
+island, minus the React runtime the page pays for once whichever library wins.
+The three overlap: around 79 KB of d3 is common to all of them, so this page
+loads less than the column adds up to. Recharts is already a peer dependency
+of the package, so its bytes are a cost the React layer pays anyway; the other
+two would be new.
+
+## MUI X Charts
+
+The community charts package is MIT. It needs `@mui/material` as a peer, and
+although the `@emotion` peers are marked optional in this major, MUI's styling
+engine loads `@emotion/react` at runtime and the server render fails without
+it, so `@emotion/react` and `@emotion/styled` came in as well. `@mui/system`
+arrives with `@mui/material`. Four new packages, then, and MUI's styling layer
+alongside its charts.
+
+<ChartCandidateMui client:load />
+
+## Recharts
+
+Already a peer dependency and already wrapped by the package's shadcn chart
+component. Here it is used through its own primitives rather than the wrapper,
+so the comparison is between libraries and not between a library and a wrapper.
+
+<ChartCandidateRecharts client:load />
+
+## Observable Plot
+
+Not a React library at all: `Plot.plot` builds a figure element against a DOM
+and hands it back, so an island owns the node and the width. That makes it the
+cheapest to drop into a page that is not React, and the one that needs an
+adapter in a page that is.
+
+<ChartCandidatePlot client:only="react" />

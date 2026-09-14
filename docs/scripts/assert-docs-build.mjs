@@ -64,6 +64,7 @@ const REACT_LANE = [
   'react/data-display',
   'react/navigation',
   'react/versioning',
+  'react/charts-candidates',
 ];
 
 const failures = [];

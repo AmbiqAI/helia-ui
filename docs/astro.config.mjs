@@ -145,6 +145,12 @@ export default defineConfig({
             { label: 'Data display', slug: 'react/data-display' },
             { label: 'Navigation', slug: 'react/navigation' },
             { label: 'Versioning', slug: 'react/versioning' },
+            /* A decision page rather than a reference one, so it sits with
+               the components it would change rather than under Foundations. */
+            {
+              label: 'Charting candidates',
+              slug: 'react/charts-candidates',
+            },
             /* Last on purpose: it reads the pages above it back against the
                Astro parts, so it only makes sense after them. */
             { label: 'Cohesion', slug: 'react/cohesion' },

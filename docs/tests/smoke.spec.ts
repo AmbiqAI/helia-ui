@@ -48,6 +48,10 @@ const routes = [
   { path: `${base}/react/data-display/`, heading: 'Data display' },
   { path: `${base}/react/navigation/`, heading: 'Navigation' },
   { path: `${base}/react/versioning/`, heading: 'Versioning' },
+  {
+    path: `${base}/react/charts-candidates/`,
+    heading: 'Charting candidates',
+  },
   { path: `${base}/react/cohesion/`, heading: 'Cohesion' },
 ];
 
@@ -528,4 +532,24 @@ test('a titled terminal frame holds the frame corner', async ({ page }) => {
   expect(corner.display).not.toBe('none');
   expect(corner.frame).not.toBe('0px');
   expect(corner.header).toBe(corner.frame);
+});
+
+/*
+ * The comparison page only compares if every candidate drew every chart: a
+ * library that fails to mount leaves its cards standing and the page still
+ * looks whole. Three libraries, three charts each, and an SVG in all nine.
+ */
+test('every charting candidate draws all three charts', async ({ page }) => {
+  await page.goto(`${base}/react/charts-candidates/`);
+
+  const panels = page.locator('[data-chart-candidate]');
+  await expect(panels).toHaveCount(9);
+
+  for (const library of ['mui', 'recharts', 'plot']) {
+    const drawn = page.locator(
+      `[data-chart-library="${library}"] [data-chart-candidate] svg`,
+    );
+    await expect(drawn.first()).toBeVisible();
+    expect(await drawn.count()).toBeGreaterThanOrEqual(3);
+  }
 });
