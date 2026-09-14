@@ -47,6 +47,7 @@ const routes = [
   { path: `${base}/react/data-display/`, heading: 'Data display' },
   { path: `${base}/react/navigation/`, heading: 'Navigation' },
   { path: `${base}/react/versioning/`, heading: 'Versioning' },
+  { path: `${base}/react/cohesion/`, heading: 'Cohesion' },
 ];
 
 for (const route of routes) {
@@ -285,4 +286,33 @@ test('mermaid fences render to themed inline SVG', async ({ page }) => {
   const dark = await fillFor('dark');
   expect(light).not.toBe('');
   expect(dark).not.toBe(light);
+});
+
+/*
+ * The cohesion page's claim, measured rather than asserted. The two buttons are
+ * drawn by different code -- a recipe class and a generated Tailwind class
+ * string -- so a token that stopped reaching one of them shows up here as a
+ * step no reviewer would have to spot by eye. Height is compared within a pixel
+ * because the two paths round a `min-height` against different box content;
+ * radius has to be exact, since both resolve the same token.
+ */
+test(`${base}/react/cohesion/ draws the button pair the same`, async ({
+  page,
+}) => {
+  await page.goto(`${base}/react/cohesion/`);
+
+  const astro = page.locator('[data-cohesion="astro-button"]');
+  const react = page.locator('[data-cohesion="react-button"]');
+  await expect(astro).toBeVisible();
+  await expect(react).toBeVisible();
+
+  const radius = (locator: typeof astro) =>
+    locator.evaluate((node) => getComputedStyle(node).borderRadius);
+  expect(await radius(react)).toBe(await radius(astro));
+
+  const height = async (locator: typeof astro) =>
+    (await locator.boundingBox())?.height ?? 0;
+  expect(Math.abs((await height(react)) - (await height(astro)))).toBeLessThan(
+    1,
+  );
 });

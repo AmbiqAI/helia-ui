@@ -67,6 +67,16 @@
   --helia-space-6: 2rem;
 
   /*
+   * Control heights. The height of a size step belongs to the step, not to the
+   * recipe that draws it: the Astro button and the React one are separate code
+   * paths, and reading the same number is the only thing that puts them on the
+   * same row. `lg` is the disclosure row rather than a third button step.
+   */
+  --helia-control-sm: 2.35rem;
+  --helia-control-md: 2.85rem;
+  --helia-control-lg: 3.25rem;
+
+  /*
    * Radius scale, derived so one primitive still sets the shape language. The
    * base step is `--helia-radius` from tokens.css: now that both layers share
    * the prefix an alias of it here would be a self-reference, which CSS treats

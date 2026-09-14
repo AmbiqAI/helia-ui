@@ -136,6 +136,67 @@ const ACCENT_RULE = {
   replacement: '-subtle',
 };
 
+/*
+ * The shadcn/Astro alignment, in the same reapply-after-an-add form as the
+ * accent rename above. `shadcn add` writes its own ring, radius, icon and
+ * height ladders back into a regenerated file; these rules put them back onto
+ * the hub tokens, so the two rendering paths land on the same pixels again
+ * without anyone having to remember which class strings were edited.
+ *
+ * Per file rather than across the directory: `h-9` is a control height on a
+ * button and a scroll frame on a menu, and only the components with an Astro
+ * counterpart have been measured against one. Extend the file list when a
+ * component joins the cohesion page. See AmbiqAI/helia-ui#20.
+ */
+const inReact = (rel, names) =>
+  names.some((name) => rel === `${REACT_DIR}${name}`);
+
+const ALIGNED = [
+  'accordion.tsx',
+  'badge.tsx',
+  'button.tsx',
+  'card.tsx',
+  'input.tsx',
+  'select.tsx',
+  'tabs.tsx',
+];
+
+const ALIGN_RULES = [
+  {
+    name: 'shadcn-focus-ring',
+    files: (rel) => inReact(rel, ALIGNED),
+    pattern:
+      /(?:focus-visible:border-ring )?focus-visible:ring-\[3px\] focus-visible:ring-ring\/50/g,
+    replacement:
+      'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+  },
+  {
+    name: 'shadcn-icon-size',
+    files: (rel) => inReact(rel, ALIGNED),
+    pattern: /(\[&[>_]svg(?::not\(\[class\*='size-'\]\))?\]:)size-[34]\b/g,
+    replacement: '$1size-[1em]',
+  },
+  {
+    name: 'shadcn-transition',
+    files: (rel) => inReact(rel, ALIGNED),
+    pattern: /transition-(?:all|\[color,box-shadow\])/g,
+    replacement: 'transition-colors',
+  },
+  {
+    name: 'shadcn-pill',
+    files: (rel) => inReact(rel, ['badge.tsx', 'button.tsx']),
+    pattern: /rounded-(?:md|full)\b/g,
+    replacement: 'rounded-pill',
+  },
+  {
+    name: 'shadcn-control-height',
+    files: (rel) => inReact(rel, ['button.tsx', 'input.tsx', 'select.tsx']),
+    pattern: /\bh-(8|9|10)\b/g,
+    replacement: (_, step) =>
+      `min-h-(--helia-control-${{ 8: 'sm', 9: 'md', 10: 'lg' }[step]})`,
+  },
+];
+
 function trackedFiles() {
   return execFileSync('git', ['ls-files'], { cwd: ROOT, encoding: 'utf8' })
     .split('\n')
@@ -153,7 +214,10 @@ for (const rel of trackedFiles()) {
   const original = fs.readFileSync(abs, 'utf8');
   let next = original;
 
-  const rules = ACCENT_RULE.files(rel) ? [...RULES, ACCENT_RULE] : RULES;
+  const rules = [
+    ...RULES,
+    ...[ACCENT_RULE, ...ALIGN_RULES].filter((rule) => rule.files(rel)),
+  ];
   for (const rule of rules) {
     const hits = next.match(rule.pattern);
     if (!hits) continue;

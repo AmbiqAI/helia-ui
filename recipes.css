@@ -314,13 +314,13 @@ a.helia-chip--neutral:focus-visible {
 
 .helia-button--md {
   font-size: var(--helia-text-body);
-  min-height: 2.85rem;
+  min-height: var(--helia-control-md);
   padding: 0 var(--helia-space-5);
 }
 
 .helia-button--sm {
   font-size: var(--helia-text-small);
-  min-height: 2.35rem;
+  min-height: var(--helia-control-sm);
   padding: 0 var(--helia-space-4);
 }
 
@@ -333,6 +333,18 @@ a.helia-chip--neutral:focus-visible {
 .helia-button--primary:hover,
 .helia-button--primary:focus-visible {
   background: color-mix(in oklab, var(--helia-ink-primary) 82%, transparent);
+}
+
+/* Fixed red and fixed paper: a destructive control reads the same on both
+   canvases, so neither the fill nor the ink over it follows the theme. */
+.helia-button--danger {
+  background: var(--helia-accent-red);
+  color: var(--helia-paper-white);
+}
+
+.helia-button--danger:hover,
+.helia-button--danger:focus-visible {
+  background: color-mix(in oklab, var(--helia-accent-red) 82%, transparent);
 }
 
 .helia-button--secondary {
@@ -349,6 +361,14 @@ a.helia-chip--neutral:focus-visible {
 .helia-button--ghost:hover,
 .helia-button--ghost:focus-visible {
   background: var(--helia-surface-card-muted);
+}
+
+/* An anchor cannot be disabled, so the attribute form is the only way to say
+   it on the `href` arm of the component. */
+.helia-button:disabled,
+.helia-button[aria-disabled='true'] {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 /*
@@ -625,7 +645,7 @@ a.helia-chip--neutral:focus-visible {
      a row of cards of unequal length. */
   flex: 1 1 auto;
   font-size: var(--helia-text-body);
-  line-height: 1.55;
+  line-height: var(--helia-leading-body);
 }
 
 .helia-card-content > :first-child {
@@ -770,13 +790,24 @@ a.helia-chip--neutral:focus-visible {
 
 .helia-card-list__marker {
   color: var(--accent, var(--helia-product-accent));
-  font-size: var(--helia-text-small);
+  font-size: var(--helia-card-list-marker-size, var(--helia-text-small));
   font-variant-numeric: tabular-nums;
   font-weight: var(--helia-weight-semibold);
   /* Numerals and glyphs differ in width; a fixed column keeps the text edge
      straight down the list either way. */
   min-inline-size: var(--helia-space-4);
   text-align: center;
+}
+
+/*
+ * The bullet is a solid disc, so it carries more ink than a check or a numeral
+ * at the same step. A compact card closes the rows up around it and the column
+ * of discs starts to read as the content rather than as the marker; dropping
+ * the glyph a step is what the check and the numeral do not need.
+ */
+[data-helia-density='compact'] .helia-card-list--bullet,
+.helia-card--compact .helia-card-list--bullet {
+  --helia-card-list-marker-size: var(--helia-text-label);
 }
 
 /*

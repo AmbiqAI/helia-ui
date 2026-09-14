@@ -48,8 +48,13 @@
    * file is imported last, so its key beat the brand accent tailwind.css
    * defines and `bg-accent` compiled to the hover grey. Renamed to `subtle`
    * so `accent` means the brand accent everywhere.
+   *
+   * It is the muted card surface rather than the nav chrome because that is
+   * what `.helia-motion-surface` and the Astro button already hover to: a
+   * React control and an Astro one sitting in the same row have to answer the
+   * pointer with the same colour.
    */
-  --subtle: var(--sl-color-bg-nav);
+  --subtle: var(--helia-surface-card-muted);
   --subtle-foreground: var(--helia-ink-primary);
 
   --destructive: var(--helia-accent-red);
@@ -123,12 +128,15 @@
    * shadcn's class strings reach for a sm/md/lg/xl radius ladder that it
    * derives from one `--radius`. tailwind.css already owns `sm` and `lg` from
    * the hub scale; only the two steps it has no key for are added, onto the
-   * same scale rather than a second one. `md` and `xl` therefore land on the
-   * hub's base and large radius, which is what shadcn uses them for: controls
-   * and cards respectively.
+   * same scale rather than a second one.
+   *
+   * Both land on the hub's base radius. shadcn spends `md` on controls and
+   * `xl` on the surfaces -- card, dialog, popover, sheet -- and the hub draws
+   * every one of those with `.helia-surface`, which is one radius. A React
+   * card beside an Astro one is the case that shows a second one up.
    */
   --radius-md: var(--helia-radius-md);
-  --radius-xl: var(--helia-radius-lg);
+  --radius-xl: var(--helia-radius-md);
 
   /*
    * Generated shadcn code is written against Tailwind's stock scales, which
@@ -156,4 +164,56 @@
   --text-lg: var(--helia-text-card-title);
   --text-xl: var(--helia-text-subhead);
   --text-2xl: var(--helia-text-heading);
+}
+
+/*
+ * Motion. Tailwind resolves `duration-200` against `--transition-duration-200`
+ * before it falls back to reading the number as milliseconds, and `ease-out`
+ * against `--ease-out`, so naming the steps shadcn writes is what puts a
+ * generated `transition-colors duration-200` on the same clock as a recipe's
+ * `var(--helia-motion-base)` -- including the per-site dial and the
+ * reduced-motion block, which zero the token rather than the utility.
+ *
+ * The three keys are the three steps. A shadcn class asking for 500ms gets
+ * the number, which `check:styles` would reject in a stylesheet; the generated
+ * files are outside that lint, so the mismatch is the signal to map the class
+ * onto a step rather than to add a fourth.
+ *
+ * Not `inline`: the utility has to reference the variable for the dial to
+ * reach it at runtime, and `--default-transition-*` is read by name out of
+ * Tailwind's own utility definitions, which an inlined key never reaches.
+ */
+@theme {
+  --transition-duration-150: var(--helia-motion-fast);
+  --transition-duration-200: var(--helia-motion-base);
+  --transition-duration-300: var(--helia-motion-slow);
+
+  /* One easing. shadcn writes all three names; the hub has judged one curve. */
+  --ease-in: var(--helia-ease-out);
+  --ease-out: var(--helia-ease-out);
+  --ease-in-out: var(--helia-ease-out);
+
+  /* A bare `transition-colors` is a colour change, which is the fast step. */
+  --default-transition-duration: var(--helia-motion-fast);
+  --default-transition-timing-function: var(--helia-ease-out);
+}
+
+/*
+ * The default border colour. tailwind.css imports Tailwind's theme and
+ * utilities but not its preflight, so a bare `border` -- which every generated
+ * component writes -- sets a width and leaves the colour at the UA default of
+ * `currentColor`: a shadcn card arrives edged in ink while the Astro card
+ * beside it carries the hairline. shadcn's own setup fixes this in a base
+ * rule; this is that rule, written against the aliased token.
+ *
+ * `base` is the first layer in the order tailwind.css declares, so anything
+ * that names a border colour of its own -- every recipe here does -- still
+ * wins, and the rule only reaches elements that never had one.
+ */
+@layer base {
+  *,
+  ::after,
+  ::before {
+    border-color: var(--border);
+  }
 }

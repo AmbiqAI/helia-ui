@@ -1,0 +1,137 @@
+---
+title: Cohesion
+description: The Astro parts and their React counterparts on one page, pair by pair.
+---
+
+import Badge from '@ambiqai/helia-ui/astro/Badge';
+import Button from '@ambiqai/helia-ui/astro/Button';
+import Card from '@ambiqai/helia-ui/astro/Card';
+import CardActions from '@ambiqai/helia-ui/astro/CardActions';
+import CardContent from '@ambiqai/helia-ui/astro/CardContent';
+import CardHeader from '@ambiqai/helia-ui/astro/CardHeader';
+import AccordionGroup from '@ambiqai/helia-ui/astro/AccordionGroup';
+import CodeTabs from '@ambiqai/helia-ui/astro/CodeTabs';
+import CohesionShowcase from '../../../islands/CohesionShowcase';
+
+The two rendering paths are meant to be invisible to a reader. An Astro part
+ships no JavaScript and a React component ships Radix behaviour, but a button
+is the same button either way: the same radius, the same edge, the same focus
+ring, the same row height.
+
+This page is where that is checked rather than asserted. Each pair is the Astro
+part on the left and its React counterpart on the right, with the same content
+in both, so a value that has drifted shows up as a step between the columns.
+The docs suite measures the button pair on every run; everything else is read
+by eye.
+
+Two vocabularies do not pair one for one, and the page does not pretend they
+do. `Button` calls its outlined step `secondary` where shadcn calls it
+`outline`, and `Badge`'s tinted advisory tones — info, success, warning — have
+no shadcn counterpart, so only the three shapes that do correspond are shown.
+
+<div class="cohesion-pairs not-content">
+
+<section class="cohesion-pane cohesion-pane--astro" aria-label="Astro Button">
+  <h3>Astro</h3>
+  <div class="cohesion-row">
+    <Button data-cohesion="astro-button">Primary</Button>
+    <Button variant="secondary">Secondary</Button>
+    <Button variant="ghost">Ghost</Button>
+    <Button variant="danger">Danger</Button>
+  </div>
+  <div class="cohesion-row">
+    <Button size="sm">Small</Button>
+    <Button>Medium</Button>
+    <Button disabled>Disabled</Button>
+  </div>
+</section>
+
+<section class="cohesion-pane cohesion-pane--astro" aria-label="Astro Badge">
+  <h3>Astro</h3>
+  <div class="cohesion-row">
+    <Badge>Neutral</Badge>
+    <Badge tone="accent">Accent</Badge>
+    <Badge tone="danger">Danger</Badge>
+  </div>
+  <div class="cohesion-row">
+    <Badge size="sm">Small</Badge>
+    <Badge size="md">Medium</Badge>
+  </div>
+</section>
+
+<section class="cohesion-pane cohesion-pane--astro" aria-label="Astro Card">
+  <h3>Astro</h3>
+  <Card data-cohesion="astro-card">
+    <CardHeader>Consuming the package</CardHeader>
+    <CardContent>
+      The Astro parts take their data through props, so nothing in them knows
+      what a product or a demo is.
+    </CardContent>
+    <CardActions>
+      <Button size="sm">Read the guide</Button>
+      <Button size="sm" variant="ghost">
+        Skip
+      </Button>
+    </CardActions>
+  </Card>
+</section>
+
+<section class="cohesion-pane cohesion-pane--astro" aria-label="Astro CodeTabs">
+  <h3>Astro</h3>
+  <CodeTabs
+    ariaLabel="Install the package"
+    tabs={[
+      { label: 'npm', language: 'sh', code: 'npm install @ambiqai/helia-ui' },
+      {
+        label: 'Import',
+        language: 'tsx',
+        code: "import Button from '@ambiqai/helia-ui/astro/Button';",
+      },
+    ]}
+  />
+</section>
+
+<section
+  class="cohesion-pane cohesion-pane--astro"
+  aria-label="Astro AccordionGroup"
+>
+  <h3>Astro</h3>
+  <AccordionGroup
+    items={[
+      {
+        title: 'Ships with the package',
+        content:
+          'Tokens, the Astro parts, the React layer and the Starlight plugin.',
+      },
+      {
+        title: 'Ships with the consuming site',
+        content:
+          'The scan list, the site theme, and every island that composes the React layer.',
+      },
+    ]}
+  />
+</section>
+
+<CohesionShowcase client:load />
+
+</div>
+
+## What holds the pairs together
+
+Nothing on this page is drawn twice. The shape, the edge, the ring and the
+motion all come from the same tokens; what differs is only which file reads
+them.
+
+- `shadcn.css` aliases every shadcn variable onto a hub token, and names the
+  scales shadcn writes against — the radius ladder, the type ramp, the spacing
+  unit, the three motion steps — so a generated class cannot introduce a value
+  the hub has not already named.
+- The control heights are tokens, `--helia-control-sm`, `--helia-control-md`
+  and `--helia-control-lg`. A recipe and a class string that both read one of
+  them land on the same row.
+- The focus ring is one outline: 2px at a 2px offset, drawn in
+  `--helia-focus-ring-color`, whether it arrives as `.helia-focus-ring` or as
+  `focus-visible:outline-2`.
+- `shadcn add` rewrites the file it regenerates. Re-run
+  `node packages/helia-ui/scripts/rename-token-prefix.mjs --root .` after an
+  add to put the token-mapped class strings back.

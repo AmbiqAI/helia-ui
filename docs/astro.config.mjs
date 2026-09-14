@@ -144,6 +144,9 @@ export default defineConfig({
             { label: 'Data display', slug: 'react/data-display' },
             { label: 'Navigation', slug: 'react/navigation' },
             { label: 'Versioning', slug: 'react/versioning' },
+            /* Last on purpose: it reads the pages above it back against the
+               Astro parts, so it only makes sense after them. */
+            { label: 'Cohesion', slug: 'react/cohesion' },
           ],
         },
       ],

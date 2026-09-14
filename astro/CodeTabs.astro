@@ -236,14 +236,17 @@ const groupId = `code-tabs-${crypto.randomUUID()}`;
     overflow: hidden;
   }
 
+  /* The muted card surface rather than the nav chrome: this bar sits on the
+     same row as an Expressive Code frame's tab bar, which the Starlight plugin
+     paints with the same token. See AmbiqAI/helia-ui#17. */
   .tabs-toolbar {
     align-items: center;
-    background: var(--sl-color-bg-nav);
+    background: var(--helia-surface-card-muted);
     border-bottom: 1px solid var(--sl-color-gray-5);
     display: flex;
     gap: var(--helia-space-3);
     justify-content: space-between;
-    min-height: 2.8rem;
+    min-height: var(--helia-control-md);
     padding: 0 var(--helia-space-2) 0 var(--helia-space-1);
   }
 
@@ -312,7 +315,7 @@ const groupId = `code-tabs-${crypto.randomUUID()}`;
     display: inline-flex;
     font-size: var(--helia-text-caption);
     font-weight: var(--helia-weight-medium);
-    height: 2.8rem;
+    height: var(--helia-control-md);
     justify-content: center;
     line-height: 1;
     padding: 0 var(--helia-space-3);

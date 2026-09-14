@@ -99,11 +99,11 @@ Also accepts `HTMLAttributes<'span'>`.
 import Button from '@ambiqai/helia-ui/astro/Button';
 ```
 
-| Prop      | Type                                  | Default     | Description                                                           |
-| --------- | ------------------------------------- | ----------- | --------------------------------------------------------------------- |
-| `variant` | `'primary' \| 'secondary' \| 'ghost'` | `'primary'` | `primary` is the filled ink pill, `secondary` outlined, `ghost` bare. |
-| `size`    | `'sm' \| 'md'`                        | `'md'`      | `md` is the hero and page-level size, `sm` the in-content one.        |
-| `href`    | `string`                              | --          | Where it goes. Its presence is what makes this an anchor.             |
+| Prop      | Type                                              | Default     | Description                                                                                          |
+| --------- | ------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------- |
+| `variant` | `'primary' \| 'secondary' \| 'ghost' \| 'danger'` | `'primary'` | `primary` is the filled ink pill, `secondary` outlined, `ghost` bare, `danger` the destructive fill. |
+| `size`    | `'sm' \| 'md'`                                    | `'md'`      | `md` is the hero and page-level size, `sm` the in-content one.                                       |
+| `href`    | `string`                                          | --          | Where it goes. Its presence is what makes this an anchor.                                            |
 
 Also accepts `Omit<HTMLAttributes<'a'>, 'href'>`, `HTMLAttributes<'button'>`.
 

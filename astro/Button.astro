@@ -11,8 +11,8 @@
 import type { HTMLAttributes } from 'astro/types';
 
 interface ButtonBase {
-  /** `primary` is the filled ink pill, `secondary` outlined, `ghost` bare. */
-  variant?: 'primary' | 'secondary' | 'ghost';
+  /** `primary` is the filled ink pill, `secondary` outlined, `ghost` bare, `danger` the destructive fill. */
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   /** `md` is the hero and page-level size, `sm` the in-content one. */
   size?: 'sm' | 'md';
 }

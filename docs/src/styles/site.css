@@ -240,3 +240,66 @@
     gap: var(--helia-space-1);
   }
 }
+
+/*
+ * The cohesion page. One grid rather than two stacked columns, so a pair sits
+ * on a row and a height that has drifted reads as a step between the columns
+ * rather than as a gap further down the page. `dense` is what lets the React
+ * half, which arrives as one island after all five Astro panes, backfill the
+ * rows those panes left open in the second column.
+ */
+.cohesion-pairs {
+  align-items: start;
+  display: grid;
+  gap: var(--helia-space-5) var(--helia-space-4);
+  grid-auto-flow: row dense;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+/* The island wrapper has to be transparent to the grid for its sections to be
+   the grid's own items. */
+.cohesion-pairs > astro-island {
+  display: contents;
+}
+
+.cohesion-pane {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helia-space-3);
+  min-width: 0;
+}
+
+.cohesion-pane > h3 {
+  color: var(--helia-ink-muted);
+  font-size: var(--helia-text-label);
+  font-weight: var(--helia-weight-bold);
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.cohesion-pane--astro {
+  grid-column: 1;
+}
+
+.cohesion-pane--react {
+  grid-column: 2;
+}
+
+.cohesion-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helia-space-2);
+}
+
+@media (width < 62rem) {
+  .cohesion-pairs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cohesion-pane--astro,
+  .cohesion-pane--react {
+    grid-column: 1;
+  }
+}

@@ -53,7 +53,7 @@ const chevronMarkup = icon(faChevronDown).html.join('');
 
   details {
     border: 0;
-    border-bottom: 1px solid var(--sl-color-gray-5);
+    border-bottom: 1px solid var(--helia-surface-border);
     margin: 0;
     padding: 0;
   }
@@ -73,7 +73,7 @@ const chevronMarkup = icon(faChevronDown).html.join('');
     justify-content: space-between;
     list-style: none;
     margin: 0;
-    min-height: 3.25rem;
+    min-height: var(--helia-control-lg);
     padding: var(--helia-space-3) var(--helia-space-4);
     transition: background-color var(--helia-motion-fast) var(--helia-ease-out);
   }
@@ -91,7 +91,7 @@ const chevronMarkup = icon(faChevronDown).html.join('');
   }
 
   summary:hover {
-    background: color-mix(in srgb, var(--helia-surface-paper) 72%, transparent);
+    background: var(--helia-surface-card-muted);
   }
 
   .accordion-chevron {
@@ -106,9 +106,11 @@ const chevronMarkup = icon(faChevronDown).html.join('');
   }
 
   /* style-lint: allow global -- the chevron is set:html from Font Awesome, so the svg carries no scope */
+  /* `1em` is how `Icon` draws every other glyph in the system, so the chevron
+     scales with the summary instead of holding a size of its own. */
   .accordion-chevron :global(svg) {
-    height: 0.8rem;
-    width: 0.8rem;
+    height: 1em;
+    width: 1em;
   }
 
   details[open] .accordion-chevron {

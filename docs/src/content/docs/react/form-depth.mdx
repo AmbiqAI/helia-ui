@@ -10,7 +10,7 @@ Forms should disclose complexity gradually. Start with clear field labels and
 helper text, group fields by task, and reserve advanced settings for users who
 need direct control.
 
-<FormDepthShowcase client:only="react" />
+<FormDepthShowcase client:load />
 
 ## Schema-driven configuration
 
@@ -20,7 +20,7 @@ the same configuration contract without forcing every page to hand-author its
 own field layout. The same schema can serialize to JSON or YAML; the example below
 uses JSON here so the generated payload stays easy to inspect.
 
-<SchemaFormShowcase client:only="react" />
+<SchemaFormShowcase client:load />
 
 ## Depth principles
 
