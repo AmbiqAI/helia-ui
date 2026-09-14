@@ -40,6 +40,10 @@ const SHELL_FILES = new Set([
   pkg('starlight/Footer.astro'),
   pkg('starlight/ThemeMenu.astro'),
   pkg('starlight.css'),
+  // Mermaid bakes an id-scoped palette into every SVG it emits, so the sheet
+  // that maps those diagrams onto the tokens is an override of a foreign frame
+  // in the same way the Starlight skins are.
+  pkg('mermaid.css'),
   // Site-title colour and the markdown margins the catalog grids sit in are
   // both Starlight's frame, reached from the hub's own sheet.
   'src/styles/site.css',

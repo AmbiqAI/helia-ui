@@ -40,6 +40,9 @@ const ASTRO_LANE = [
   'callouts',
   'disclosure',
   'timeline',
+  /* Diagrams belongs here rather than anywhere else: build-time mermaid is
+     only worth the browser it costs if the page ships no island. */
+  'diagrams',
   'layout',
 ];
 
