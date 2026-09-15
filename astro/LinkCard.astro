@@ -69,8 +69,7 @@ const hasIcon = Astro.slots.has('icon');
       )
     }
     <span class="title"
-      >{title}<span class="helia-motion-cue cue" aria-hidden="true">→</span
-      ></span
+      >{title}<span class="helia-motion-cue" aria-hidden="true">→</span></span
     >
     {meta && <Fragment slot="meta">{meta}</Fragment>}
   </CardHeader>
@@ -88,21 +87,5 @@ const hasIcon = Astro.slots.has('icon');
     align-items: baseline;
     display: inline-flex;
     gap: var(--helia-space-2);
-  }
-
-  /* The cue is the same size whatever heading level the title took. */
-  .cue {
-    font-size: var(--helia-text-body);
-    transition: color var(--helia-motion-fast) var(--helia-ease-out);
-  }
-
-  /*
-   * Under the pointer the cue takes the site's second accent. No card part
-   * draws an accent edge, so the direction is the one piece of a link card
-   * that can carry a color without becoming a brim.
-   */
-  .helia-link-card:hover .cue,
-  .helia-link-card:focus-within .cue {
-    color: var(--helia-accent-secondary);
   }
 </style>

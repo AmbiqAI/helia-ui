@@ -119,7 +119,7 @@ const { items, label, layout = 'grid', class: className } = Astro.props;
     align-self: baseline;
     color: var(--sl-color-gray-3);
     font-size: var(--helia-text-meta);
-    letter-spacing: 0.07em;
+    letter-spacing: var(--helia-tracking-caps);
     text-transform: uppercase;
   }
 
@@ -127,7 +127,7 @@ const { items, label, layout = 'grid', class: className } = Astro.props;
     color: var(--sl-color-gray-3);
     font-size: var(--helia-text-caption);
     grid-column: 1 / -1;
-    line-height: 1.45;
+    line-height: var(--helia-leading-body);
     min-width: 0;
   }
 </style>

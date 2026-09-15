@@ -1,12 +1,25 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
 import { expect, test } from '@playwright/test';
 
 const gallery = '/helia-ui/gallery/';
 
-/* What the page ends with. The gallery is where an owner goes to choose, so an
- * example that quietly stops rendering is the page failing at its one job. */
-const EXAMPLES = 78;
+/*
+ * What the page ends with, read off the source rather than written down. The
+ * gallery is where an owner goes to choose, so an example that quietly stops
+ * rendering is the page failing at its one job -- and a hand-kept number only
+ * catches that until the next example is added, at which point it is a floor
+ * nobody raises. `Example` renders exactly one stage, unconditionally, so the
+ * count of opening tags is the count of stages the page owes.
+ */
+const source = readFileSync(
+  fileURLToPath(new URL('../src/content/docs/gallery.mdx', import.meta.url)),
+  'utf8',
+);
+const EXAMPLES = source.match(/<Example[\s>]/g)?.length ?? 0;
 
 /*
  * The root element each part renders. An example's source is a prop rather than
@@ -63,8 +76,10 @@ const PART_ROOTS: Record<string, string> = {
 test('every example on the gallery carries its source', async ({ page }) => {
   await page.goto(gallery);
 
+  expect(EXAMPLES, 'gallery.mdx names examples').toBeGreaterThan(0);
+
   const stages = page.locator('[data-example-stage]');
-  expect(await stages.count()).toBeGreaterThanOrEqual(EXAMPLES);
+  expect(await stages.count()).toBe(EXAMPLES);
 
   /* One disclosure per stage: an example with no source is half an example. */
   const sources = page.locator('details.example__source');

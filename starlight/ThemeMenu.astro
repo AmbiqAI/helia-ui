@@ -164,7 +164,7 @@
 
   .theme-trigger path {
     fill: currentColor;
-    opacity: 0.35;
+    opacity: var(--helia-opacity-muted);
   }
 
   .theme-menu {
@@ -176,8 +176,8 @@
     padding: var(--helia-space-1);
     position: absolute;
     right: 0;
-    top: calc(100% + 0.45rem);
-    z-index: 30;
+    top: calc(100% + var(--helia-space-2));
+    z-index: var(--helia-layer-menu);
   }
 
   .theme-menu[hidden] {

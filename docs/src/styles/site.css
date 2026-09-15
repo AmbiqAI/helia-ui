@@ -55,7 +55,7 @@
   color: var(--sl-color-gray-2);
   font-size: var(--helia-text-caption);
   font-weight: var(--helia-weight-medium);
-  line-height: 1.35;
+  line-height: var(--helia-leading-heading);
   margin-top: var(--helia-space-4);
   padding: var(--helia-space-3);
 }
@@ -231,7 +231,7 @@
   color: #626870;
   font-size: var(--helia-text-label);
   font-weight: var(--helia-weight-semibold);
-  letter-spacing: 0.06em;
+  letter-spacing: var(--helia-tracking-caps);
   text-transform: uppercase;
 }
 
@@ -283,7 +283,7 @@
   color: var(--helia-ink-muted);
   font-size: var(--helia-text-label);
   font-weight: var(--helia-weight-bold);
-  letter-spacing: 0.08em;
+  letter-spacing: var(--helia-tracking-caps);
   margin: 0;
   text-transform: uppercase;
 }

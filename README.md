@@ -25,14 +25,11 @@ A tag rather than a branch: the tarball npm builds from a branch changes under
 the consuming lockfile whenever the branch moves. The tag is the release, and
 `RELEASE.md` is its manifest.
 
-`engines` is a floor — node `>=22`, npm `>=10` — below the node 24 and npm 11
-this repository develops against, because a git install makes this manifest a
-dependency manifest in your tree: the newer range would fail outright in a
-project of your own that sets `engine-strict`. Nothing about consuming this
-package needs the newer pair — no lockfile ships with it — so the floor stays
-here, the app roots that commit a lockfile carry the requirement, and working
-on the package itself is held to it by the workflow in "Working on the
-package" rather than by this field.
+`engines` is node `>=24`, npm `>=11`: the pair this package is developed and
+tested against, and the only pair anything has ever exercised. A consumer who
+installs from a tag reads this manifest in their own tree, so a project that
+sets `engine-strict` is told the requirement at install rather than finding it
+at build.
 
 `astro` and `@astrojs/starlight` are the only required peers. Everything the
 React lane needs — `react`, `react-dom`, `radix-ui`, `cmdk`, `lucide-react`,

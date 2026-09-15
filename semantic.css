@@ -77,6 +77,25 @@
   --helia-control-lg: 3.25rem;
 
   /*
+   * Stacking. Three steps rather than a free number, because a z-index only
+   * means anything against the other z-indexes in the same stacking context:
+   * `content` lifts a card part over a stretched link, `overlay` puts chrome
+   * over media, and `menu` is the one layer that has to clear the page frame.
+   */
+  --helia-layer-content: 1;
+  --helia-layer-overlay: 10;
+  --helia-layer-menu: 30;
+
+  /*
+   * Fade steps. Disabled is the one that carries meaning, so it is named for
+   * the state rather than the value; muted is the decorative knock-back a
+   * glyph takes when it is a backdrop for something else. 0 and 1 stay
+   * literals: they are absence and presence, not steps on this scale.
+   */
+  --helia-opacity-disabled: 0.5;
+  --helia-opacity-muted: 0.35;
+
+  /*
    * Radius scale. The base step is `--helia-radius` from tokens.css: now that
    * both layers share the prefix an alias of it here would be a self-reference,
    * which CSS treats as a cycle and drops. The four steps are derived from this

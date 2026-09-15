@@ -158,7 +158,7 @@ const {
   .timeline-header h2 {
     font-size: var(--helia-text-page);
     font-weight: var(--helia-weight-medium);
-    letter-spacing: -0.055em;
+    letter-spacing: var(--helia-tracking-page);
     line-height: 1;
     margin: 0;
   }
@@ -198,7 +198,7 @@ const {
     color: var(--sl-color-white);
     font-size: var(--helia-text-body);
     font-weight: var(--helia-weight-semibold);
-    line-height: 1.4;
+    line-height: var(--helia-leading-heading);
     padding-top: var(--helia-space-px);
     text-align: end;
   }
@@ -230,7 +230,7 @@ const {
     margin-top: var(--helia-space-1);
     position: relative;
     width: 0.62rem;
-    z-index: 1;
+    z-index: var(--helia-layer-content);
   }
 
   .timeline-items {
@@ -275,14 +275,14 @@ const {
     color: var(--sl-color-white);
     font-size: var(--helia-text-heading);
     font-weight: var(--helia-weight-medium);
-    letter-spacing: -0.025em;
-    line-height: 1.25;
+    letter-spacing: var(--helia-tracking-heading);
+    line-height: var(--helia-leading-heading);
     margin: 0;
   }
 
   .timeline-item p {
     color: var(--sl-color-gray-2);
-    line-height: 1.65;
+    line-height: var(--helia-leading-body);
     margin: var(--helia-space-2) 0 0;
     max-width: 52rem;
   }

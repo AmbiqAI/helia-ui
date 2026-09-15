@@ -219,7 +219,7 @@ const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&r
     transform: translate(-50%, -50%);
     transition: transform var(--helia-motion-base) var(--helia-ease-out);
     width: 3.5rem;
-    z-index: 2;
+    z-index: var(--helia-layer-content);
   }
 
   button:hover {
@@ -237,13 +237,13 @@ const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&r
   .media-embed__duration {
     background: color-mix(in srgb, #090b10 82%, transparent);
     border-radius: var(--helia-radius-xs);
-    bottom: 0.75rem;
+    bottom: var(--helia-space-3);
     color: #ffffff;
     font-size: var(--helia-text-label);
     padding: var(--helia-space-1) var(--helia-space-2);
     position: absolute;
-    right: 0.75rem;
-    z-index: 2;
+    right: var(--helia-space-3);
+    z-index: var(--helia-layer-content);
   }
 
   youtube-embed[data-loaded='true'] > :not(iframe) {
@@ -252,7 +252,7 @@ const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&r
 
   :global(iframe) {
     border: 0;
-    z-index: 3;
+    z-index: var(--helia-layer-overlay);
   }
 
   figcaption {
@@ -262,7 +262,7 @@ const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&r
     font-size: var(--helia-text-small);
     gap: var(--helia-space-4);
     justify-content: space-between;
-    line-height: 1.45;
+    line-height: var(--helia-leading-body);
     padding-top: var(--helia-space-3);
   }
 

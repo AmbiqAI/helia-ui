@@ -87,6 +87,7 @@ const MOTION_PROPERTY = /^(transition|animation)(-[a-z-]+)?$/;
 const DURATION_LITERAL = /(?<![\w.-])\d*\.?\d+m?s(?![\w-])/;
 const EASING_LITERAL =
   /cubic-bezier\([^)]*\)|(?<![\w-])(?:ease(?:-in)?(?:-out)?|linear)(?![\w-])/;
+const OFFSET_PROPERTY = /^(top|right|bottom|left)$/;
 const RULES = [
   'arbitrary',
   'color',
@@ -94,9 +95,14 @@ const RULES = [
   'font-weight',
   'font',
   'border-radius',
+  'line-height',
+  'letter-spacing',
   'motion',
   'media',
   'spacing',
+  'offset',
+  'z-index',
+  'opacity',
   'important',
   'global',
 ];
@@ -330,12 +336,54 @@ for (const rel of [
           }
         }
 
+        /*
+         * The rules below take the same scope as motion, and for the same
+         * reason: the scales are defined in the package sheets, every consumer
+         * inherits them, and a site's own components are swept on their own.
+         *
+         * Leading and tracking follow the font-size rule in accepting any
+         * `var()`, because a recipe property is a hook whose fallback is the
+         * token. Stacking and fade name their families outright: neither has a
+         * hook form, and a z-index only means anything against the other
+         * z-indexes in its stacking context, so a free number there is a layer
+         * nobody else can sort against. 0 and 1 stay literal for opacity and 1
+         * for leading: those are absence and presence, not steps on a scale.
+         */
         if (inPackage && !tokenBlock) {
           const duration = DURATION_LITERAL.exec(bare);
           if (duration) report('motion', `${duration[0]} is not a token`);
           if (!custom && MOTION_PROPERTY.test(property)) {
             const easing = EASING_LITERAL.exec(bare);
             if (easing) report('motion', `${easing[0]} is not a token`);
+          }
+          if (!custom) {
+            if (
+              property === 'line-height' &&
+              !/^(var\(|1$|normal$|inherit$)/.test(bare)
+            ) {
+              report('line-height', `${bare} is not a token`);
+            }
+            if (
+              property === 'letter-spacing' &&
+              !/^(var\(|normal$|inherit$)/.test(bare)
+            ) {
+              report('letter-spacing', `${bare} is not a token`);
+            }
+            if (
+              property === 'z-index' &&
+              !/^(auto$|var\(--helia-layer-)/.test(bare)
+            ) {
+              report('z-index', `${bare} is not a layer token`);
+            }
+            if (
+              property === 'opacity' &&
+              !/^(0$|1$|var\(--helia-opacity-)/.test(bare)
+            ) {
+              report('opacity', `${bare} is not a token`);
+            }
+            if (OFFSET_PROPERTY.test(property) && !spacingAllowed(bare)) {
+              report('offset', `${bare} in '${property}' is not a token`);
+            }
           }
         }
       }

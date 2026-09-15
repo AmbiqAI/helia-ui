@@ -85,7 +85,7 @@ const {
       delta !== undefined && (
         <span class="delta" data-direction={direction} data-tone={deltaTone}>
           <span aria-hidden="true">{DIRECTION_GLYPH[direction]}</span>
-          <span class="sr-only">{DIRECTION_WORD[direction]}</span>
+          <span class="helia-sr-only">{DIRECTION_WORD[direction]}</span>
           {delta}
         </span>
       )
@@ -203,15 +203,5 @@ const {
     font-size: var(--helia-text-caption);
     line-height: var(--helia-leading-body);
     margin: 0;
-  }
-
-  .sr-only {
-    clip: rect(0 0 0 0);
-    clip-path: inset(50%);
-    height: 1px;
-    overflow: hidden;
-    position: absolute;
-    white-space: nowrap;
-    width: 1px;
   }
 </style>

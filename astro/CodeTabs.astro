@@ -276,7 +276,7 @@ const groupId = `code-tabs-${crypto.randomUUID()}`;
     height: 0.38rem;
     pointer-events: none;
     position: absolute;
-    right: 0.8rem;
+    right: var(--helia-space-3);
     top: 50%;
     transform: translateY(-65%) rotate(45deg);
     width: 0.38rem;
@@ -286,7 +286,7 @@ const groupId = `code-tabs-${crypto.randomUUID()}`;
     color: var(--sl-color-gray-3);
     font-size: var(--helia-text-label);
     font-weight: var(--helia-weight-semibold);
-    letter-spacing: 0.02em;
+    letter-spacing: var(--helia-tracking-label);
   }
 
   .select-control select {
@@ -386,7 +386,7 @@ const groupId = `code-tabs-${crypto.randomUUID()}`;
     border-radius: 0;
     color: light-dark(var(--shiki-light), var(--shiki-dark));
     font-size: var(--helia-text-small);
-    line-height: 1.65;
+    line-height: var(--helia-leading-body);
     margin: 0;
     min-width: max-content;
     overflow: visible;

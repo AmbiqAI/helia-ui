@@ -150,7 +150,7 @@ const showDefault = rows.some((row) => row.default);
     color: var(--sl-color-gray-3);
     font-size: var(--helia-text-meta);
     font-weight: var(--helia-weight-strong);
-    letter-spacing: 0.07em;
+    letter-spacing: var(--helia-tracking-caps);
     text-transform: uppercase;
   }
 
@@ -164,7 +164,7 @@ const showDefault = rows.some((row) => row.default);
   tbody td {
     background: var(--helia-surface-card);
     color: var(--sl-color-gray-2);
-    line-height: 1.45;
+    line-height: var(--helia-leading-body);
   }
 
   tbody tr:last-child :is(th, td) {

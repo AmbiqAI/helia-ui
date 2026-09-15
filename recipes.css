@@ -169,19 +169,48 @@
 }
 
 /*
- * The directional cue on a link card: the arrow moves, the card does not.
+ * Text for the screen reader alone. It is a recipe rather than a scoped copy in
+ * each part that needs one, because the clip that hides an element without
+ * hiding it from the accessibility tree has to be exactly right every time: a
+ * `display: none` or a zero height takes it out of that tree with it.
+ */
+.helia-sr-only {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/*
+ * The directional cue: the arrow moves, what carries it does not. Size, travel
+ * and hover color are all here, so a link card, an icon row and a section
+ * header wearing the class behave the same without each restating it.
+ *
  * `:focus-within` rather than `:focus-visible` because the focus lands on the
  * stretched header link, not on the element wearing this class.
  */
 .helia-motion-cue {
   display: inline-block;
-  transition: transform var(--helia-motion-fast) var(--helia-ease-out);
+  /* The cue is the same size whatever heading level the title took. */
+  font-size: var(--helia-text-body);
+  transition:
+    color var(--helia-motion-fast) var(--helia-ease-out),
+    transform var(--helia-motion-fast) var(--helia-ease-out);
 }
 
+/*
+ * Under the pointer the cue takes the site's second accent. No card part draws
+ * an accent edge, so the direction is the one piece of a link that can carry a
+ * color without becoming a brim.
+ */
 :where(a, button):hover .helia-motion-cue,
 :where(a, button):focus-visible .helia-motion-cue,
 .helia-card:hover .helia-motion-cue,
 .helia-card:focus-within .helia-motion-cue {
+  color: var(--helia-accent-secondary);
   transform: translateX(var(--helia-motion-cue-distance));
 }
 
@@ -367,7 +396,7 @@ a.helia-chip--neutral:focus-visible {
    it on the `href` arm of the component. */
 .helia-button:disabled,
 .helia-button[aria-disabled='true'] {
-  opacity: 0.5;
+  opacity: var(--helia-opacity-disabled);
   pointer-events: none;
 }
 
@@ -481,7 +510,7 @@ a.helia-chip--neutral:focus-visible {
 
 .helia-card--media-background > :not(.helia-card-media) {
   position: relative;
-  z-index: 1;
+  z-index: var(--helia-layer-content);
 }
 
 /*
@@ -609,7 +638,7 @@ a.helia-chip--neutral:focus-visible {
 .helia-card-header__action,
 .helia-card-header__meta {
   position: relative;
-  z-index: 1;
+  z-index: var(--helia-layer-content);
 }
 
 /* The link covers the card, so the ring belongs to the card. */
@@ -817,7 +846,7 @@ a.helia-chip--neutral:focus-visible {
     --helia-card-list-gap,
     calc(var(--helia-card-pad, var(--helia-space-4)) / 2)
   );
-  line-height: 1.55;
+  line-height: var(--helia-leading-body);
   list-style: none;
 }
 
@@ -972,11 +1001,6 @@ a.helia-chip--neutral:focus-visible {
   gap: var(--helia-space-2);
   line-height: var(--helia-leading-heading);
   margin: 0;
-}
-
-/* The same size whatever heading level the title took. */
-.helia-icon-row__cue {
-  font-size: var(--helia-text-body);
 }
 
 .helia-icon-row__line {
@@ -1214,6 +1238,7 @@ a.helia-chip--neutral:focus-visible {
   border-radius: 43% 57% 68% 32% / 58% 42% 58% 42%;
   height: 112%;
   left: -35%;
+  /* style-lint: allow opacity -- fitted artwork, not a UI state */
   opacity: 0.68;
   top: -48%;
   transform: rotate(-18deg);
@@ -1226,6 +1251,7 @@ a.helia-chip--neutral:focus-visible {
   border-radius: 65% 35% 46% 54% / 38% 58% 42% 62%;
   bottom: -55%;
   height: 118%;
+  /* style-lint: allow opacity -- fitted artwork, not a UI state */
   opacity: 0.62;
   right: -32%;
   transform: rotate(22deg);
@@ -1238,6 +1264,7 @@ a.helia-chip--neutral:focus-visible {
   border-radius: 37% 63% 52% 48% / 66% 35% 65% 34%;
   height: 78%;
   left: 28%;
+  /* style-lint: allow opacity -- fitted artwork, not a UI state */
   opacity: 0.48;
   top: 14%;
   transform: rotate(31deg);
@@ -1251,6 +1278,7 @@ a.helia-chip--neutral:focus-visible {
   bottom: -28%;
   height: 62%;
   left: 8%;
+  /* style-lint: allow opacity -- fitted artwork, not a UI state */
   opacity: 0.38;
   transform: rotate(-28deg);
   width: 72%;
@@ -1427,9 +1455,11 @@ a.helia-chip--neutral:focus-visible {
  */
 .helia-band {
   box-sizing: border-box;
-  margin-inline: calc(50% - 50cqw - var(--sl-content-pad-x));
+  margin-inline: calc(
+    50% - 50cqw - var(--sl-content-pad-x, var(--helia-space-6))
+  );
   padding-block: var(--helia-band-rhythm, clamp(2.5rem, 6vw, 5rem));
-  width: calc(100cqw + 2 * var(--sl-content-pad-x));
+  width: calc(100cqw + 2 * var(--sl-content-pad-x, var(--helia-space-6)));
 }
 
 /* A run of bands is one alternating rhythm, not a stack of sections. */

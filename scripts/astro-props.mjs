@@ -4,8 +4,8 @@
 /*
  * Generates the Astro parts reference from the parts themselves.
  *
- *   node scripts/astro-props.mjs           write the page
- *   node scripts/astro-props.mjs --check   fail if the page is out of date
+ *   node scripts/astro-props.mjs           write the page and the doc table
+ *   node scripts/astro-props.mjs --check   fail if either is out of date
  *
  * The contract of a part is its `Props` interface, the defaults in its
  * `Astro.props` destructure, and the `@slot` lines in its component doc
@@ -21,9 +21,16 @@
  * The gallery links live here rather than in the parts: a part is consumed by
  * sites that are not this one, and a URL into this docs site would be wrong in
  * every one of them.
+ *
+ * The card family table in the hub's design-system document is generated from
+ * the same reading, into a marked region rather than a whole file, because the
+ * prose around it is the argument the table is evidence for. That document
+ * belongs to the hub, so when the package is the root of its own repository
+ * there is nothing there to write and the step says so and stops.
  */
 
 import {
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -47,6 +54,40 @@ const OUT_PATH = join(
 
 /** The docs site's base path. Its own `astro.config.mjs` sets the same value. */
 const DOCS_BASE = '/helia-ui';
+
+/** The hub document the card family table is spliced into, and its markers. */
+const CONTRACT_PATH = join(PACKAGE_ROOT, '../../docs/design-system.md');
+const CONTRACT_REGIONS = {
+  'card-family': contractTable,
+  'card-family-values': valuesTable,
+};
+
+/*
+ * The card family, in the order the document argues them, with the class each
+ * part renders. The class is the one thing about a part that its own source
+ * does not declare -- it is written into the markup and into recipes.css -- so
+ * it is named here. Everything else in the row is read out of the part, which
+ * is the point: a hand-written copy of a contract drifts from it.
+ */
+const CARD_FAMILY = [
+  ['Card', '.helia-card'],
+  ['CardMedia', '.helia-card-media'],
+  ['CardHeader', '.helia-card-header'],
+  ['CardContent', '.helia-card-content'],
+  ['CardActions', '.helia-card-actions'],
+  ['CardList', '.helia-card-list'],
+  ['CardQuote', '.helia-card-quote'],
+  ['Badge', '.helia-badge'],
+  ['Media', '.helia-media'],
+  ['Reveal', '.helia-motion-reveal'],
+  ['StatCard', '.helia-stat-card'],
+  ['LinkCard', '.helia-link-card'],
+  ['IconTile', '.helia-icon-tile'],
+  ['IconRow', '.helia-icon-row'],
+  ['SplitPanel', '.helia-split-panel'],
+  ['BigNumber', '.helia-big-number'],
+  ['Sparkline', '.helia-sparkline'],
+];
 
 /**
  * Where each part is shown working. Every part must have an entry: a part with
@@ -517,6 +558,93 @@ function render(parts) {
   return `${head}\n${parts.map(section).join('\n')}`;
 }
 
+/** A list of code spans, or the word for an empty one. */
+function spans(names) {
+  return names.length > 0 ? names.map(code).join(', ') : 'none';
+}
+
+function contractTable(parts) {
+  const byName = new Map(parts.map((part) => [part.name, part]));
+  const rows = [];
+  for (const [name, className] of CARD_FAMILY) {
+    const part = byName.get(name);
+    if (!part) {
+      failures.push(`${name}: in CARD_FAMILY but not a part under astro/.`);
+      continue;
+    }
+    const props = spans(part.props.map((prop) => prop.name));
+    const slots = spans(part.doc.slots.map((slot) => slot.name));
+    rows.push(
+      `| ${code(name)} | ${code(className)} | ${cell(props)} | ${cell(slots)} |`,
+    );
+  }
+  return [
+    '| Component | Class | Props | Slots |',
+    '| --- | --- | --- | --- |',
+    ...rows,
+  ].join('\n');
+}
+
+/** The literal members of a union type, or none when the type is not one. */
+function options(type) {
+  const parts = type
+    .trim()
+    .replace(/^\|\s*/, '')
+    .split('|')
+    .map((part) => part.trim());
+  if (parts.length < 2) return [];
+  if (!parts.every((part) => /^'[^']*'$/.test(part))) return [];
+  return parts.map((part) => part.slice(1, -1));
+}
+
+/*
+ * What each prop of the family accepts and what it renders when nobody passes
+ * one. The union is the vocabulary and the destructure is the default, so both
+ * are in the part already, and the prose that used to name them was a copy.
+ */
+function valuesTable(parts) {
+  const byName = new Map(parts.map((part) => [part.name, part]));
+  const rows = [];
+  for (const [name] of CARD_FAMILY) {
+    const part = byName.get(name);
+    if (!part) continue;
+    for (const prop of part.props) {
+      const values = options(prop.type);
+      if (values.length === 0) continue;
+      const fallback = prop.default
+        ? code(prop.default.replace(/^'(.*)'$/, '$1'))
+        : '--';
+      rows.push(
+        `| ${code(name)} | ${code(prop.name)} | ${cell(spans(values))} | ${cell(fallback)} |`,
+      );
+    }
+  }
+  return [
+    '| Component | Prop | Values | Default |',
+    '| --- | --- | --- | --- |',
+    ...rows,
+  ].join('\n');
+}
+
+/**
+ * Splice a generated body between a region's markers, keeping the prose around
+ * it. A document that has lost a marker is a failure rather than something to
+ * repair: the region is the contract between the generator and the writing.
+ */
+function splice(document, region, body) {
+  const begin = `<!-- generated: ${region}. Edit the parts, not this table. -->`;
+  const end = `<!-- /generated: ${region} -->`;
+  const from = document.indexOf(begin);
+  const to = document.indexOf(end);
+  if (from === -1 || to === -1 || to < from) {
+    console.error(
+      `${CONTRACT_PATH} is missing the ${region} markers.\nExpected:\n${begin}\n${end}`,
+    );
+    process.exit(1);
+  }
+  return `${document.slice(0, from)}${begin}\n\n${body}\n\n${document.slice(to)}`;
+}
+
 /* --------------------------------------------------------------------- main */
 
 const files = readdirSync(ASTRO_DIR)
@@ -525,6 +653,12 @@ const files = readdirSync(ASTRO_DIR)
   .map((entry) => join(ASTRO_DIR, entry));
 
 const parts = files.map(readPart).filter(Boolean);
+
+/* Built before the gate below so a part named in CARD_FAMILY but missing from
+   astro/ is reported with the other contract problems, not after them. */
+const contractBodies = Object.entries(CONTRACT_REGIONS).map(
+  ([region, build]) => [region, build(parts)],
+);
 
 if (failures.length > 0) {
   for (const failure of failures) console.error(failure);
@@ -564,4 +698,46 @@ if (process.argv.includes('--check')) {
   mkdirSync(dirname(OUT_PATH), { recursive: true });
   writeFileSync(OUT_PATH, output);
   console.log(`astro-props: ${parts.length} parts written to ${OUT_PATH}.`);
+}
+
+/* ------------------------------------------------- the hub's contract table */
+
+if (!existsSync(CONTRACT_PATH)) {
+  console.log(
+    `astro-props: no ${CONTRACT_PATH}; the card family table belongs to the hub.`,
+  );
+} else {
+  const current = readFileSync(CONTRACT_PATH, 'utf8');
+  const contractConfig = await prettier.resolveConfig(CONTRACT_PATH);
+  const spliced = contractBodies.reduce(
+    (document, [region, body]) => splice(document, region, body),
+    current,
+  );
+  const contract = await prettier.format(spliced, {
+    ...contractConfig,
+    filepath: CONTRACT_PATH,
+    parser: 'markdown',
+  });
+
+  if (process.argv.includes('--check')) {
+    if (current !== contract) {
+      const scratch = join(
+        mkdtempSync(join(tmpdir(), 'helia-card-family-')),
+        'design-system.md',
+      );
+      writeFileSync(scratch, contract);
+      console.error(
+        `${CONTRACT_PATH} card family table is out of date.\nGenerated form: ${scratch}\nRun: node packages/helia-ui/scripts/astro-props.mjs`,
+      );
+      process.exit(1);
+    }
+    console.log(
+      `astro-props: ${contractBodies.length} card family regions, tables up to date.`,
+    );
+  } else {
+    writeFileSync(CONTRACT_PATH, contract);
+    console.log(
+      `astro-props: ${contractBodies.length} card family regions written to ${CONTRACT_PATH}.`,
+    );
+  }
 }

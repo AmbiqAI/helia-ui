@@ -169,7 +169,7 @@ const candidates: Candidate[] = [
     font-family: var(--helia-font-sans);
     font-size: var(--helia-text-small);
     gap: var(--helia-space-px);
-    line-height: 1.5;
+    line-height: var(--helia-leading-body);
     margin: 0;
   }
 
@@ -183,7 +183,7 @@ const candidates: Candidate[] = [
     color: var(--helia-ink-muted);
     font-family: var(--helia-font-mono);
     font-size: var(--helia-text-label);
-    letter-spacing: 0.08em;
+    letter-spacing: var(--helia-tracking-caps);
     margin: 0;
     text-transform: uppercase;
   }
@@ -208,9 +208,8 @@ const candidates: Candidate[] = [
     margin: 0;
   }
 
-  /* The tighter value is spelled out: it is the half of the comparison that
-     the token layer does not carry. */
   .display--tight {
+    /* style-lint: allow letter-spacing -- the half of the comparison the token layer does not carry */
     letter-spacing: -0.055em;
   }
 
@@ -264,7 +263,7 @@ const candidates: Candidate[] = [
     color: var(--helia-ink-secondary);
     font-size: var(--helia-text-label);
     font-weight: var(--helia-weight-bold);
-    letter-spacing: 0.08em;
+    letter-spacing: var(--helia-tracking-caps);
     text-transform: uppercase;
   }
 

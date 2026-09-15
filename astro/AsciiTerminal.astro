@@ -314,8 +314,8 @@ const transcript = normalizedLines
   announced; this carries the reading order instead, and doubles as the
   clipboard source. */
   }
-  <span class="sr-only" data-transcript>{transcript}</span>
-  {interactive && <span class="sr-only" aria-live="polite" data-status />}
+  <span class="helia-sr-only" data-transcript>{transcript}</span>
+  {interactive && <span class="helia-sr-only" aria-live="polite" data-status />}
 
   {interactive && <script is:inline set:html={BEHAVIOR} />}
 </helia-ascii-terminal>
@@ -386,7 +386,7 @@ const transcript = normalizedLines
     color: var(--ascii-ink);
     font-size: var(--helia-text-small);
     font-weight: var(--helia-weight-semibold);
-    line-height: 1.25;
+    line-height: var(--helia-leading-heading);
   }
 
   .ascii-terminal__actions {
@@ -455,7 +455,7 @@ const transcript = normalizedLines
     font-family: var(--helia-font-mono);
     /* style-lint: allow font-size -- monospace terminal ramp, not the prose scale */
     font-size: clamp(0.76rem, 1.4vw, 0.86rem);
-    line-height: 1.55;
+    line-height: var(--helia-leading-body);
     margin: 0;
     min-width: max-content;
     padding: var(--helia-space-4);
@@ -513,16 +513,6 @@ const transcript = normalizedLines
     margin-left: 0.16em;
     transform: translateY(0.15em);
     width: 0.5em;
-  }
-
-  .sr-only {
-    clip: rect(0 0 0 0);
-    clip-path: inset(50%);
-    height: 1px;
-    overflow: hidden;
-    position: absolute;
-    white-space: nowrap;
-    width: 1px;
   }
 
   @keyframes ascii-caret {
