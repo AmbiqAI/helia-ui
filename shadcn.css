@@ -30,7 +30,13 @@
 
   --card: var(--helia-surface-card);
   --card-foreground: var(--helia-ink-primary);
-  --popover: var(--helia-surface-paper);
+  /*
+   * A popover is a card that floats, not a second paper. In light the paper
+   * ground resolves to the same #f5f5f7 as the muted card surface, so a menu
+   * row highlighted with a muted surface had nothing to stand out from; on the
+   * card surface the highlight is a step on both themes.
+   */
+  --popover: var(--helia-surface-card);
   --popover-foreground: var(--helia-ink-primary);
 
   /* Near-monochrome accent: ink on canvas, inverted by the theme flip. */
@@ -49,12 +55,12 @@
    * defines and `bg-accent` compiled to the hover gray. Renamed to `subtle`
    * so `accent` means the brand accent everywhere.
    *
-   * It is the muted card surface rather than the nav chrome because that is
-   * what `.helia-motion-surface` and the Astro button already hover to: a
-   * React control and an Astro one sitting in the same row have to answer the
-   * pointer with the same color.
+   * It is the hover surface rather than the nav chrome because that is what
+   * `.helia-motion-surface` and the Astro button already answer the pointer
+   * with: a React control and an Astro one sitting in the same row have to
+   * move to the same color.
    */
-  --subtle: var(--helia-surface-card-muted);
+  --subtle: var(--helia-surface-hover);
   --subtle-foreground: var(--helia-ink-primary);
 
   --destructive: var(--helia-accent-red);
@@ -101,10 +107,10 @@
 [data-helia-theme],
 .helia-theme-scope {
   --card: var(--helia-surface-card);
-  --popover: var(--helia-surface-paper);
+  --popover: var(--helia-surface-card);
   --secondary: var(--helia-surface-card-muted);
   --muted: var(--helia-surface-card-muted);
-  --subtle: var(--helia-surface-card-muted);
+  --subtle: var(--helia-surface-hover);
   --radius: var(--helia-radius-md);
   --chart-2: var(--helia-accent-secondary);
   --transition-duration-150: var(--helia-motion-fast);
@@ -240,5 +246,48 @@
   ::after,
   ::before {
     border-color: var(--border);
+  }
+}
+
+/*
+ * The rest of preflight, restated for the generated parts only.
+ *
+ * A generated class string is written for a page where preflight has already
+ * run, so it is silent about everything preflight guarantees: it never says
+ * `background-color: transparent` on a button, never zeroes the UA's
+ * `padding: 1px 6px`, and never turns off a list marker. With preflight absent
+ * the UA widget styling showed through wherever the class string said nothing
+ * -- the switch thumb sat 6px outside its track on the UA's button padding,
+ * every unselected tab segment, close button and unchecked control painted
+ * itself `ButtonFace` (mid gray in light, dark gray in dark, which is what
+ * read as disabled), a bare `border` came out `outset` rather than solid, and
+ * the breadcrumb `ol` kept its decimal markers and 40px indent.
+ *
+ * Scoped to `[data-slot]` and its subtree rather than applied to the document:
+ * every shadcn part carries a `data-slot`, so that subtree is exactly the code
+ * written against preflight, and Starlight's chrome and the hub's own recipes
+ * -- authored against the UA defaults -- are left alone. `:where()` keeps the
+ * specificity at zero, so any utility or recipe that names one of these
+ * properties still wins; `base` is the lowest layer besides.
+ */
+@layer base {
+  :is(button, input, optgroup, select, textarea):where(
+    [data-slot],
+    [data-slot] *
+  ) {
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    border-style: solid;
+    background-color: transparent;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+  }
+
+  :is(ol, ul, menu):where([data-slot], [data-slot] *) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 }

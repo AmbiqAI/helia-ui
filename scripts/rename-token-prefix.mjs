@@ -195,6 +195,134 @@ const ALIGN_RULES = [
     replacement: (_, step) =>
       `min-h-(--helia-control-${{ 8: 'sm', 9: 'md', 10: 'lg' }[step]})`,
   },
+
+  /*
+   * The geometry and surface rules below are the second half of the same job:
+   * where the ladders above put a regenerated file back on the hub's scales,
+   * these put it back on the hub's grounds and insets. Each one replaces a
+   * literal shadcn writes that only lands correctly on Tailwind's own scales
+   * or on a page where preflight has run. See AmbiqAI/helia-ui#52.
+   */
+
+  /*
+   * `w-6` reads the hub's `--spacing-6` (2rem), not Tailwind's 1.5rem, so the
+   * small switch came out as wide as the default one and its thumb stopped
+   * two thirds of the way along. Pinned to the value the travel assumes:
+   * `translate-x-[calc(100%-2px)]` is track minus thumb minus both borders.
+   */
+  {
+    name: 'shadcn-switch-track',
+    files: (rel) => inReact(rel, ['switch.tsx']),
+    pattern: /data-\[size=sm\]:w-6\b/g,
+    replacement: 'data-[size=sm]:w-[1.5rem]',
+  },
+
+  /*
+   * The unchecked control keeps a surface of its own rather than the UA button
+   * face, and it is the same muted surface the slider track and the tab list
+   * stand on.
+   */
+  {
+    name: 'shadcn-unchecked-surface',
+    files: (rel) => inReact(rel, ['checkbox.tsx', 'radio-group.tsx']),
+    pattern: /dark:bg-input\/30 /g,
+    replacement: 'bg-secondary ',
+  },
+
+  /*
+   * A muted surface lightened by an alpha step hovers the wrong way on a light
+   * theme. The hover surface is a token.
+   */
+  {
+    name: 'shadcn-secondary-hover',
+    files: (rel) => inReact(rel, ['button.tsx']),
+    pattern: /hover:bg-secondary\/82/g,
+    replacement: 'hover:bg-subtle hover:text-subtle-foreground',
+  },
+
+  /*
+   * The overlay close buttons. shadcn insets them by a fixed `top-4 right-4`
+   * that has nothing to do with the container's own padding, and dims them
+   * with `opacity-70`, which is close enough to the disabled step to read as
+   * one. The inset is a variable with the dialog's own padding as its
+   * fallback, so one class string serves the dialog, the sheet and the palette
+   * and only the two containers that differ declare anything: two competing
+   * declarations of the same variable would be decided by their order in the
+   * emitted stylesheet, which is not something a component can reason about.
+   */
+  {
+    name: 'shadcn-overlay-close',
+    files: (rel) => inReact(rel, ['dialog.tsx', 'sheet.tsx']),
+    pattern:
+      /absolute top-4 right-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none(?: data-\[state=open\]:bg-(?:subtle|secondary))?(?: data-\[state=open\]:text-muted-foreground)?/g,
+    replacement:
+      'absolute top-[var(--helia-overlay-inset,var(--helia-space-6))] right-[var(--helia-overlay-inset,var(--helia-space-6))] inline-flex size-(--helia-control-sm) items-center justify-center rounded-pill text-muted-foreground transition-colors hover:bg-subtle hover:text-subtle-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none',
+  },
+  {
+    name: 'shadcn-overlay-inset',
+    files: (rel) => inReact(rel, ['sheet.tsx']),
+    pattern: /bg-background shadow-lg/g,
+    replacement:
+      'bg-background [--helia-overlay-inset:var(--helia-space-4)] shadow-lg',
+  },
+
+  /*
+   * The palette has no content padding of its own, so its close button is
+   * inset by the amount that centers an icon button on the search row, and the
+   * row is a control height rather than a bare multiple.
+   */
+  {
+    name: 'shadcn-command-row',
+    files: (rel) => inReact(rel, ['command.tsx']),
+    pattern:
+      /'overflow-hidden p-0'|\*\*:data-\[slot=command-input-wrapper\]:h-12 |\[&_\[cmdk-input\]\]:h-12 |flex h-9 items-center gap-2 border-b px-3|'flex h-10 w-full rounded-md|size-4 shrink-0 opacity-50/g,
+    replacement: (match) =>
+      ({
+        "'overflow-hidden p-0'":
+          "'overflow-hidden p-0 [--helia-overlay-inset:calc((var(--helia-control-md)_-_var(--helia-control-sm))/2)]'",
+        '**:data-[slot=command-input-wrapper]:h-12 ': '',
+        '[&_[cmdk-input]]:h-12 ': '',
+        'flex h-9 items-center gap-2 border-b px-3':
+          'flex h-(--helia-control-md) items-center gap-2 border-b px-3',
+        "'flex h-10 w-full rounded-md": "'flex h-full w-full rounded-md",
+        'size-4 shrink-0 opacity-50': 'size-4 shrink-0 text-muted-foreground',
+      })[match],
+  },
+
+  /*
+   * Select drops below its trigger like every other menu. shadcn's default is
+   * Radix's item-aligned position, which lifts the list over the heading above
+   * the control, and its popper branch clamps the viewport to the trigger's
+   * own height.
+   */
+  {
+    name: 'shadcn-select-popper',
+    files: (rel) => inReact(rel, ['select.tsx']),
+    pattern:
+      /position = 'item-aligned',(?:\n(\s*)align = 'center',)?|position=\{position\}\n(\s*)(?:align=\{align\}\n\s*)?\{\.\.\.props\}|'h-\[var\(--radix-select-trigger-height\)\] w-full/g,
+    replacement: (match, declIndent, propIndent) => {
+      if (match.startsWith('position =')) {
+        const indent = declIndent ?? '  ';
+        return `position = 'popper',\n${indent}align = 'start',\n${indent}sideOffset = 4,`;
+      }
+      if (match.startsWith('position={'))
+        return `position={position}\n${propIndent}align={align}\n${propIndent}sideOffset={sideOffset}\n${propIndent}{...props}`;
+      return "'w-full";
+    },
+  },
+
+  /*
+   * Both menu surfaces answer the pointer as well as the keyboard: Radix marks
+   * the pointed-at row with `data-highlighted` and only moves DOM focus on
+   * keyboard navigation.
+   */
+  {
+    name: 'shadcn-highlighted-item',
+    files: (rel) => inReact(rel, ['select.tsx', 'dropdown-menu.tsx']),
+    pattern: /focus:bg-subtle focus:text-subtle-foreground(?! data-\[high)/g,
+    replacement:
+      'focus:bg-subtle focus:text-subtle-foreground data-[highlighted]:bg-subtle data-[highlighted]:text-subtle-foreground',
+  },
 ];
 
 function trackedFiles() {

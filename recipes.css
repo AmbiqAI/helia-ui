@@ -77,7 +77,7 @@
 .helia-motion-surface:focus-visible,
 .helia-hover-surface:hover,
 .helia-hover-surface:focus-visible {
-  background: var(--helia-surface-card-muted);
+  background: var(--helia-surface-hover);
   border-color: var(
     --helia-hover-border,
     var(--sl-color-gray-4, var(--helia-sl-gray-4))

@@ -5,7 +5,7 @@ import { InfoIcon } from 'lucide-react';
 
 import { Button } from '@ambiqai/helia-ui/react/button';
 import {
-  Command,
+  CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
@@ -119,7 +119,7 @@ export default function OverlayShowcase() {
               </DialogHeader>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button variant="ghost">Cancel</Button>
+                  <Button variant="secondary">Cancel</Button>
                 </DialogClose>
                 <DialogClose asChild>
                   <Button>Generate</Button>
@@ -180,32 +180,30 @@ export default function OverlayShowcase() {
           </Button>
         </div>
 
-        <Dialog open={paletteOpen} onOpenChange={setPaletteOpen}>
-          <DialogContent className="p-0">
-            <DialogHeader className="sr-only">
-              <DialogTitle>Command palette</DialogTitle>
-              <DialogDescription>
-                Search the product list by name.
-              </DialogDescription>
-            </DialogHeader>
-            <Command>
-              <CommandInput placeholder="Search products" />
-              <CommandList>
-                <CommandEmpty>No product found.</CommandEmpty>
-                <CommandGroup heading="Products">
-                  {products.map((product) => (
-                    <CommandItem
-                      key={product}
-                      onSelect={() => setPaletteOpen(false)}
-                    >
-                      {product}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </DialogContent>
-        </Dialog>
+        {/* The package's own palette wrapper rather than a dialog with a
+            command inside it: the wrapper is what carries the close button's
+            inset for a surface that has no content padding of its own. */}
+        <CommandDialog
+          open={paletteOpen}
+          onOpenChange={setPaletteOpen}
+          title="Command palette"
+          description="Search the product list by name."
+        >
+          <CommandInput placeholder="Search products" />
+          <CommandList>
+            <CommandEmpty>No product found.</CommandEmpty>
+            <CommandGroup heading="Products">
+              {products.map((product) => (
+                <CommandItem
+                  key={product}
+                  onSelect={() => setPaletteOpen(false)}
+                >
+                  {product}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </CommandDialog>
       </div>
     </TooltipProvider>
   );

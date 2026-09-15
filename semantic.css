@@ -374,6 +374,21 @@
     var(--helia-surface-tint) var(--helia-surface-tint-amount),
     var(--helia-surface-muted)
   );
+
+  /*
+   * The surface a control answers the pointer with. It is a mix toward the
+   * page ink rather than a fourth gray, because it has to read as a step on
+   * whichever ground the control sits on: in light the paper ground and the
+   * muted card surface are the same #f5f5f7, so a highlight drawn with the
+   * muted surface -- which is what the hover surface used to be -- disappeared
+   * on every popover and menu. Mixing ink moves in the same direction in both
+   * themes, so one value covers the flip.
+   */
+  --helia-surface-hover: color-mix(
+    in srgb,
+    var(--helia-ink-primary) 8%,
+    var(--helia-surface-card)
+  );
 }
 
 :root[data-theme='light'] {

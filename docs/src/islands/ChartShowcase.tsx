@@ -94,26 +94,27 @@ export default function ChartShowcase({ animate = false }: Props) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {motionReady ? (
-            <ChartContainer config={latencyConfig}>
-              <BarChart data={comparisonData} accessibilityLayer>
-                <CartesianGrid vertical={false} />
-                <XAxis dataKey="engine" tickLine={false} axisLine={false} />
-                <YAxis domain={[0, 9.25]} tickLine={false} axisLine={false} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="latency" fill="var(--color-latency)" radius={5}>
-                  <LabelList
-                    dataKey="latency"
-                    position="top"
-                    formatter={(value) => `${String(value)} ms`}
-                    className="fill-foreground"
-                  />
-                </Bar>
-              </BarChart>
-            </ChartContainer>
-          ) : (
-            <div aria-hidden="true" className="aspect-video" />
-          )}
+          <ChartContainer config={latencyConfig}>
+            <BarChart data={comparisonData} accessibilityLayer>
+              <CartesianGrid vertical={false} />
+              <XAxis dataKey="engine" tickLine={false} axisLine={false} />
+              <YAxis domain={[0, 9.25]} tickLine={false} axisLine={false} />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Bar
+                dataKey="latency"
+                fill="var(--color-latency)"
+                radius={5}
+                isAnimationActive={motionReady}
+              >
+                <LabelList
+                  dataKey="latency"
+                  position="top"
+                  formatter={(value) => `${String(value)} ms`}
+                  className="fill-foreground"
+                />
+              </Bar>
+            </BarChart>
+          </ChartContainer>
         </CardContent>
       </Card>
 
@@ -125,36 +126,36 @@ export default function ChartShowcase({ animate = false }: Props) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {motionReady ? (
-            <ChartContainer config={footprintConfig}>
-              <ScatterChart accessibilityLayer>
-                <CartesianGrid />
-                <XAxis
-                  type="number"
-                  dataKey="ram"
-                  name="Peak RAM"
-                  unit=" KB"
-                  domain={[168, 220]}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  type="number"
-                  dataKey="latency"
-                  name="Latency"
-                  unit=" ms"
-                  domain={[4, 13]}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <ZAxis range={[80, 80]} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Scatter data={footprintData} fill="var(--color-latency)" />
-              </ScatterChart>
-            </ChartContainer>
-          ) : (
-            <div aria-hidden="true" className="aspect-video" />
-          )}
+          <ChartContainer config={footprintConfig}>
+            <ScatterChart accessibilityLayer>
+              <CartesianGrid />
+              <XAxis
+                type="number"
+                dataKey="ram"
+                name="Peak RAM"
+                unit=" KB"
+                domain={[168, 220]}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                type="number"
+                dataKey="latency"
+                name="Latency"
+                unit=" ms"
+                domain={[4, 13]}
+                tickLine={false}
+                axisLine={false}
+              />
+              <ZAxis range={[80, 80]} />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Scatter
+                data={footprintData}
+                fill="var(--color-latency)"
+                isAnimationActive={motionReady}
+              />
+            </ScatterChart>
+          </ChartContainer>
         </CardContent>
       </Card>
     </div>
