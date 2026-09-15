@@ -99,12 +99,15 @@ product hue, the accent steps move with it.
 
 ## Library candidates
 
-Observable Plot is the shipped choice: it draws the `Chart` and `ChartGroup`
-Astro parts at build and the `ChartPlot` React component in the browser. The
-comparison stays here because the reasoning is worth keeping, and because the
-fourth candidate reopens one part of it — whether a chart on a HELIA surface
-should be something a reader can hover, zoom, filter and select, which Plot
-does not do and ECharts does.
+Both questions below are now settled: Observable Plot is the static layer and
+Apache ECharts is the interactive one, so `Chart`, `ChartGroup` and `ChartPlot`
+draw with Plot and `ChartInteractive` draws with ECharts wherever hovering,
+zooming, toggling or selecting is the point.
+
+The comparison stays here because it is the evidence for that split rather than
+an open question: the rows below are what each library costs in island bytes,
+what it can render on the server, how it takes a theme, and which interactions
+it has without being written by hand.
 
 Every chart carries a title and a subtitle, and the subtitle says what is
 plotted against what, so no axis is titled. Gridlines are horizontal only and

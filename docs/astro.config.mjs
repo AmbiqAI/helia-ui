@@ -179,6 +179,7 @@ export default defineConfig({
         'class-variance-authority',
         'cmdk',
         'cn',
+        'echarts',
         'lucide-react',
         'radix-ui',
         'react',

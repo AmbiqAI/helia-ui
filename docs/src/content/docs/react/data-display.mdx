@@ -1,9 +1,10 @@
 ---
 title: Data display
-description: The static data table, the Plot chart, and the shadcn chart wrapper over Recharts.
+description: The static data table, the Plot chart, the interactive ECharts chart, and the shadcn chart wrapper over Recharts.
 ---
 
 import DataTable from '@ambiqai/helia-ui/astro/DataTable';
+import ChartInteractiveShowcase from '../../../islands/ChartInteractiveShowcase';
 import ChartPlotShowcase from '../../../islands/ChartPlotShowcase';
 import ChartShowcase from '../../../islands/ChartShowcase';
 import MkDocsChartMigration from '../../../islands/MkDocsChartMigration';
@@ -46,6 +47,27 @@ import { ChartPlot } from '@ambiqai/helia-ui/react/chart-plot';
 ```
 
 <ChartPlotShowcase client:load />
+
+## Interactive charts
+
+`ChartInteractive` takes the same props as `ChartPlot` and draws them with
+Apache ECharts, which is the interactive layer: a tooltip on hover, a legend
+that toggles a series, a zoom on the axis, a brush that hands the selected rows
+back through `onSelect`. The title, subtitle, legend and caption are the same
+HTML and the same classes as the Plot parts, so the two are one figure with
+different behavior; ECharts is given the plot area and nothing else.
+
+Reach for `Chart` first. The Astro part ships inline SVG and zero JavaScript,
+and `ChartPlot` redraws the same figure in the browser when the data is not
+known until the page runs. `ChartInteractive` costs an island and a charting
+library, so it earns its place only when the reader has to do something to the
+chart to get the answer — narrow a range, drop a series, select a group.
+
+```tsx
+import { ChartInteractive } from '@ambiqai/helia-ui/react/chart-interactive';
+```
+
+<ChartInteractiveShowcase client:load />
 
 ## Plots
 

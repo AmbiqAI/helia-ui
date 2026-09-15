@@ -1722,6 +1722,32 @@ a.helia-chip--neutral:focus-visible {
   gap: var(--helia-space-1);
 }
 
+/*
+ * The interactive chart's legend is a control rather than a key: each entry
+ * toggles its series, so it is a button and it says whether it is on. Off is
+ * marked in the type as well as the swatch, because a swatch alone at this
+ * size is not a difference anyone catches.
+ */
+.helia-chart__toggle {
+  align-items: center;
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: var(--helia-space-1);
+  padding: 0;
+}
+
+.helia-chart__toggle[aria-pressed='false'] {
+  color: var(--helia-ink-muted);
+}
+
+.helia-chart__toggle[aria-pressed='false'] .helia-chart__swatch {
+  background: var(--helia-chart-grid);
+}
+
 /* A bar rather than a dot: it is the shape of the mark it names in three of
    the five kinds, and it reads at this size where a circle does not. */
 .helia-chart__swatch {
@@ -1747,6 +1773,14 @@ a.helia-chip--neutral:focus-visible {
   display: block;
   height: auto;
   max-width: 100%;
+  width: 100%;
+}
+
+/* ECharts sizes its own root to the box it measured, so the scaling rule above
+   is not only unnecessary for it but wrong: an auto height taken from the
+   viewBox would disagree with the box and the resize observer would chase it. */
+[data-chart-interactive] .helia-chart__plot svg {
+  height: 100%;
   width: 100%;
 }
 

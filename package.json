@@ -51,6 +51,7 @@
   },
   "files": [
     "astro",
+    "chart-echarts-theme.ts",
     "chart-plot-spec.ts",
     "scripts/pyref.mjs",
     "scripts/lib/pyref-render.mjs",
@@ -85,6 +86,7 @@
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "cn": "^0.3.0",
+    "echarts": "^6.1.0",
     "lucide-react": "^1.45.0",
     "radix-ui": "^1.6.7",
     "react": "^19",
@@ -110,6 +112,9 @@
       "optional": true
     },
     "cn": {
+      "optional": true
+    },
+    "echarts": {
       "optional": true
     },
     "lucide-react": {
@@ -142,6 +147,7 @@
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "cn": "^0.3.0",
+    "echarts": "^6.1.0",
     "lucide-react": "^1.45.0",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",

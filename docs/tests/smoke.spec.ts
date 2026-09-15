@@ -97,6 +97,12 @@ const accessibilityRoutes: { path: string; theme?: 'dark' }[] = [
        never produces. Four hydrated chart libraries land here as well. */
     path: `${base}/react/charts-candidates/`,
   },
+  {
+    /* The interactive chart's legend is a row of buttons over a drawn plot
+       area, which is the one place in the package where a control's name and
+       its pressed state come from markup the charting library never sees. */
+    path: `${base}/react/data-display/`,
+  },
 ];
 
 for (const { path, theme } of accessibilityRoutes) {
@@ -554,6 +560,80 @@ test('a titled terminal frame holds the frame corner', async ({ page }) => {
  * library that fails to mount leaves its cards standing and the page still
  * looks whole. Four libraries, three charts each, and an SVG in all twelve.
  */
+const dataDisplay = `${base}/react/data-display/`;
+
+/* The plot area is drawn into a measured box, so a box with no height is a
+   chart with nothing in it -- the failure the explicit aspect and minimum
+   height exist to prevent, and one that reads as an empty page rather than as
+   an error. */
+test('the interactive chart draws a sized plot area', async ({ page }) => {
+  await page.goto(dataDisplay);
+
+  const figures = page.locator('[data-chart-interactive]');
+  await expect(figures).toHaveCount(3);
+
+  const plot = figures.first().locator('.helia-chart__plot svg');
+  await expect(plot).toBeVisible();
+
+  const box = await plot.boundingBox();
+  expect(box?.width ?? 0).toBeGreaterThan(0);
+  expect(box?.height ?? 0).toBeGreaterThan(0);
+});
+
+test('the interactive legend toggles a series off', async ({ page }) => {
+  await page.goto(dataDisplay);
+
+  const figure = page.locator('[data-chart-interactive]').nth(1);
+  const toggle = figure.locator('.helia-chart__toggle').first();
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+
+  /* Polled rather than counted once: the marks arrive when the island draws,
+     which is after the frame the toggle is already in. */
+  const marks = figure.locator('.helia-chart__plot svg path');
+  await expect.poll(() => marks.count()).toBeGreaterThan(0);
+  const before = await marks.count();
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+
+  /* The series leaves the plot, not just the legend: the toggle dispatches
+     into the chart's own selection rather than keeping a second answer to
+     which series are drawn. */
+  await expect(async () => {
+    expect(await marks.count()).toBeLessThan(before);
+  }).toPass();
+});
+
+test('zooming the interactive chart narrows the axis', async ({ page }) => {
+  await page.goto(dataDisplay);
+
+  const figure = page.locator('[data-chart-interactive]').first();
+  const plot = figure.locator('.helia-chart__plot');
+  await expect(plot.locator('svg')).toBeVisible();
+
+  /* The wheel goes to whatever is under the pointer, and the pointer is placed
+     in viewport coordinates: a chart this far down the page has to be brought
+     into the viewport first or the scroll lands on nothing. */
+  await plot.scrollIntoViewIfNeeded();
+  const labels = plot.locator('svg text');
+  await expect(labels.first()).toBeVisible();
+  const before = await labels.allTextContents();
+
+  const box = await plot.boundingBox();
+  expect(box).not.toBeNull();
+  await page.mouse.move(
+    (box?.x ?? 0) + (box?.width ?? 0) / 2,
+    (box?.y ?? 0) + (box?.height ?? 0) / 2,
+  );
+  await page.mouse.wheel(0, -900);
+
+  /* The ticks are the axis extent made visible: a narrower window drops the
+     weeks that fell outside it. */
+  await expect(async () => {
+    expect(await labels.allTextContents()).not.toEqual(before);
+  }).toPass();
+});
+
 test('every charting candidate draws all three charts', async ({ page }) => {
   await page.goto(`${base}/react/charts-candidates/`);
 

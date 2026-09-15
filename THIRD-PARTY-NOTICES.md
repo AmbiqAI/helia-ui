@@ -176,6 +176,7 @@ Supplied by the consuming site, not distributed with this package. License names
 - **class-variance-authority** ^0.7.1 — Apache-2.0
 - **cmdk** ^1.1.1 — MIT
 - **cn** ^0.3.0 — MIT
+- **echarts** ^6.1.0 — Apache-2.0
 - **lucide-react** ^1.45.0 — ISC
 - **radix-ui** ^1.6.7 — MIT
 - **react** ^19 — MIT
