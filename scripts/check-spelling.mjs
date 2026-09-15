@@ -227,11 +227,7 @@ const ESCAPE = 'spelling: allow';
  */
 const GENERATED = ['THIRD-PARTY-NOTICES.md', pkg('THIRD-PARTY-NOTICES.md')];
 
-/**
- * The running handoff is swept by whoever owns it.
- * TODO(AmbiqAI/helia-ui#37): drop this once that work lands.
- */
-const PENDING = ['docs/handoff.md'];
+const PENDING = [];
 
 /** This file is the word list, so every British form in it is deliberate. */
 const SELF = pkg('scripts/check-spelling.mjs');
