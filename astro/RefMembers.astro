@@ -1,0 +1,133 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * The index of what is on a reference page: every symbol, its kind, and a
+ * sentence, each one an anchor.
+ *
+ * A generated module page can carry fifty symbols, and the page outline does
+ * not list them: the entries are rendered by `RefSymbol`, whose heading a
+ * Markdown table of contents never sees. This part is the page's own contents
+ * list, and it is also the member list a class uses for its methods.
+ *
+ * Links default to `#<id>`, the symbol's own anchor, because the common case is
+ * an index of the page it sits on. `href` overrides that for an index that
+ * points off the page.
+ */
+export interface RefMemberItem {
+  /** The symbol's fully qualified path. Used as the anchor unless `href` is set. */
+  id: string;
+  /** The short name, shown as the link text. */
+  name: string;
+  /** What the symbol is, shown beside the name. */
+  kind?: string;
+  /** One line about it. */
+  summary?: string;
+  /** Where the link goes, when the target is not an anchor on this page. */
+  href?: string;
+}
+
+interface Props {
+  /** The items, in the order the page renders them. */
+  items: readonly RefMemberItem[];
+  /**
+   * Accessible name for the list, for example "On this page".
+   *
+   * It names the `<ul>` rather than a `<nav>` landmark. A page-level index of
+   * symbols sits inside the article, and a second navigation landmark called
+   * "On this page" collides with the one Starlight already puts in the page.
+   */
+  label?: string;
+  /** `grid` lays the items out in columns on a wide screen; `list` keeps one per row. */
+  layout?: 'grid' | 'list';
+  /** Forwarded to the wrapper. */
+  class?: string;
+}
+
+const { items, label, layout = 'grid', class: className } = Astro.props;
+---
+
+<div
+  class:list={['helia-ref-members', `helia-ref-members--${layout}`, className]}
+>
+  <ul aria-label={label}>
+    {
+      items.map((item) => (
+        <li>
+          <a class="helia-focus-ring" href={item.href ?? `#${item.id}`}>
+            <code>{item.name}</code>
+          </a>
+          {item.kind && (
+            <span class="helia-ref-members__kind">{item.kind}</span>
+          )}
+          {item.summary && (
+            <span class="helia-ref-members__summary">{item.summary}</span>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .helia-ref-members ul {
+    display: grid;
+    gap: var(--helia-space-3);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  @media (width >= 42rem) {
+    .helia-ref-members--grid ul {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* The kind column takes what is left rather than its content width, so an
+     item never pushes its own cell wider than the column it sits in. */
+  .helia-ref-members li {
+    display: grid;
+    column-gap: var(--helia-space-2);
+    row-gap: var(--helia-space-1);
+    grid-template-columns: max-content minmax(0, 1fr);
+    margin: 0;
+    min-width: 0;
+  }
+
+  .helia-ref-members a {
+    color: var(--sl-color-white);
+    min-width: 0;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+  }
+
+  .helia-ref-members a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .helia-ref-members code {
+    background: transparent;
+    border: 0;
+    color: inherit;
+    font-size: var(--helia-text-small);
+    padding: 0;
+  }
+
+  .helia-ref-members__kind {
+    align-self: baseline;
+    color: var(--sl-color-gray-3);
+    font-size: var(--helia-text-meta);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .helia-ref-members__summary {
+    color: var(--sl-color-gray-3);
+    font-size: var(--helia-text-caption);
+    grid-column: 1 / -1;
+    line-height: 1.45;
+    min-width: 0;
+  }
+</style>

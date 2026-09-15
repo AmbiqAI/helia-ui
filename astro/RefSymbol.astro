@@ -1,0 +1,243 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * One entry in an API reference: the symbol's header, its signature, and
+ * whatever the caller puts in the body.
+ *
+ * The header is fixed and the body is a slot, which is the split the reference
+ * model implies. Kind, name, language, source and the availability marks come
+ * off the model and always arrange the same way, so they are props; the body is
+ * prose, tables and examples in an order the extractor chose, so it is a slot.
+ *
+ * `id` is the anchor and it is the symbol's fully qualified path, not a
+ * slugified heading. A reference outlives its rendering: links written against
+ * `#helia.profiler.profile_model` have to keep resolving when the page is
+ * restyled, regenerated, or served by a different site generator. The heading
+ * is therefore not the anchor's source, and the self-link points at the id.
+ *
+ * @slot default -- The body: description, parameter tables, examples, members.
+ */
+import type { ReferenceLanguage, SymbolKind } from '../reference-model';
+import Badge from './Badge.astro';
+import Chip from './Chip.astro';
+import CodeBlock from './CodeBlock.astro';
+
+/**
+ * Grammars Expressive Code is configured for here. Narrower than the model's
+ * language list on purpose: an unhighlighted signature reads fine, a signature
+ * highlighted with the wrong grammar does not.
+ */
+type SignatureLanguage =
+  'bash' | 'c' | 'cpp' | 'json' | 'plaintext' | 'python' | 'tsx' | 'typescript';
+
+interface Props {
+  /** The symbol's fully qualified path. Doubles as the anchor and the self-link target. */
+  id: string;
+  /** The short name shown in the header. */
+  name: string;
+  /** What the symbol is. Rendered as the leading badge. */
+  kind: SymbolKind;
+  /** Which language it belongs to. Rendered as the trailing chip and, unless `signatureLanguage` overrides it, picks the grammar. */
+  language: ReferenceLanguage;
+  /** The declaration, as source text. Already wrapped by the extractor. */
+  signature: string;
+  /** Grammar override, for a signature that is not written in the symbol's own language. */
+  signatureLanguage?: SignatureLanguage;
+  /** One sentence under the header. Everything longer belongs in the body. */
+  summary?: string;
+  /** Where the symbol is declared. Shown as a link when `url` is set, as plain text otherwise. */
+  source?: { path: string; line?: number; url?: string };
+  /** The release it first appeared in. */
+  since?: string;
+  /** The deprecation notice, already one sentence. Its presence is what marks the symbol. */
+  deprecated?: string;
+  /** Heading rank. A module page puts its symbols at 2 and their members at 3. */
+  level?: 2 | 3 | 4;
+  /** Forwarded to the article. */
+  class?: string;
+}
+
+const {
+  id,
+  name,
+  kind,
+  language,
+  signature,
+  signatureLanguage,
+  summary,
+  source,
+  since,
+  deprecated,
+  level = 2,
+  class: className,
+} = Astro.props;
+
+/** How each language names itself. `cpp` is the only one a reader would not recognize. */
+const LANGUAGE_LABELS: Record<ReferenceLanguage, string> = {
+  c: 'C',
+  cpp: 'C++',
+  python: 'Python',
+  typescript: 'TypeScript',
+  rust: 'Rust',
+};
+
+/* Rust has no Expressive Code grammar configured here, so it falls back rather
+ * than highlighting Rust as something else. */
+const GRAMMARS: Record<ReferenceLanguage, SignatureLanguage> = {
+  c: 'c',
+  cpp: 'cpp',
+  python: 'python',
+  typescript: 'typescript',
+  rust: 'plaintext',
+};
+
+const Heading = `h${level}` as 'h2' | 'h3' | 'h4';
+const sourceLabel = source
+  ? source.line === undefined
+    ? source.path
+    : `${source.path}:${source.line}`
+  : undefined;
+---
+
+<article class:list={['helia-ref-symbol', className]} id={id}>
+  <header class="helia-ref-symbol__header">
+    <div class="helia-ref-symbol__marks">
+      <Badge tone="neutral">{kind}</Badge>
+      {deprecated && <Badge tone="warning">Deprecated</Badge>}
+      {since && <span class="helia-ref-symbol__since">Since {since}</span>}
+    </div>
+
+    <div class="helia-ref-symbol__title">
+      <Heading class="helia-ref-symbol__name">
+        <a class="helia-focus-ring" href={`#${id}`}>{name}</a>
+      </Heading>
+      <Chip tone="static" class="helia-ref-symbol__language">
+        {LANGUAGE_LABELS[language]}
+      </Chip>
+    </div>
+
+    {summary && <p class="helia-ref-symbol__summary">{summary}</p>}
+
+    {
+      sourceLabel && (
+        <p class="helia-ref-symbol__source">
+          {source?.url ? (
+            <a class="helia-focus-ring" href={source.url}>
+              <code>{sourceLabel}</code>
+            </a>
+          ) : (
+            <code>{sourceLabel}</code>
+          )}
+        </p>
+      )
+    }
+  </header>
+
+  {
+    deprecated && (
+      <p class="helia-ref-symbol__deprecated">
+        <span>Deprecated.</span> {deprecated}
+      </p>
+    )
+  }
+
+  <div class="helia-ref-symbol__signature">
+    <CodeBlock
+      variant="bare"
+      language={signatureLanguage ?? GRAMMARS[language]}
+      code={signature}
+    />
+  </div>
+
+  <div class="helia-ref-symbol__body"><slot /></div>
+</article>
+
+<style>
+  .helia-ref-symbol {
+    border-top: 1px solid var(--sl-color-hairline);
+    padding-top: var(--helia-space-5);
+  }
+
+  .helia-ref-symbol__marks {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--helia-space-2);
+  }
+
+  .helia-ref-symbol__since {
+    color: var(--sl-color-gray-3);
+    font-size: var(--helia-text-caption);
+  }
+
+  .helia-ref-symbol__title {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--helia-space-3);
+    margin-top: var(--helia-space-2);
+  }
+
+  .helia-ref-symbol__name {
+    font-family: var(--helia-font-mono);
+    font-size: var(--helia-text-subhead);
+    line-height: 1.25;
+    margin: 0;
+  }
+
+  .helia-ref-symbol__name a {
+    color: var(--sl-color-white);
+    text-decoration: none;
+  }
+
+  .helia-ref-symbol__name a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .helia-ref-symbol__language {
+    flex: none;
+    font-family: var(--helia-font-mono);
+  }
+
+  .helia-ref-symbol__summary {
+    color: var(--sl-color-gray-2);
+    margin: var(--helia-space-3) 0 0;
+    max-width: 46rem;
+  }
+
+  .helia-ref-symbol__source {
+    color: var(--sl-color-gray-3);
+    font-size: var(--helia-text-caption);
+    margin: var(--helia-space-2) 0 0;
+  }
+
+  .helia-ref-symbol__source code {
+    background: transparent;
+    border: 0;
+    color: inherit;
+    font-size: inherit;
+    padding: 0;
+  }
+
+  .helia-ref-symbol__deprecated {
+    color: var(--sl-color-gray-2);
+    font-size: var(--helia-text-small);
+    margin: var(--helia-space-4) 0 0;
+  }
+
+  .helia-ref-symbol__deprecated span {
+    color: var(--sl-color-orange-high);
+    font-weight: var(--helia-weight-strong);
+  }
+
+  .helia-ref-symbol__signature {
+    margin-top: var(--helia-space-4);
+  }
+
+  .helia-ref-symbol__body {
+    margin-top: var(--helia-space-4);
+    min-width: 0;
+  }
+</style>

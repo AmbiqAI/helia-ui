@@ -101,6 +101,11 @@ const EXAMPLES = {
   Media: { page: 'media', label: 'Media', anchor: 'generative-artwork' },
   MediaEmbed: { page: 'media', label: 'Media', anchor: 'hosted-video' },
   Mosaic: { page: 'gallery', label: 'Gallery', anchor: 'mosaic' },
+  RefMembers: { page: 'gallery', label: 'Gallery', anchor: 'reference' },
+  RefNav: { page: 'gallery', label: 'Gallery', anchor: 'reference' },
+  RefParams: { page: 'gallery', label: 'Gallery', anchor: 'reference' },
+  RefSection: { page: 'gallery', label: 'Gallery', anchor: 'reference' },
+  RefSymbol: { page: 'gallery', label: 'Gallery', anchor: 'reference' },
   Reveal: { page: 'gallery', label: 'Gallery', anchor: 'reveal-on-scroll' },
   SectionHeader: { page: 'layout', label: 'Layout', anchor: 'section-header' },
   ShowcaseCarousel: {

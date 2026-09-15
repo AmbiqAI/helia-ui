@@ -1,19 +1,42 @@
 ---
 title: Python API reference
-description: Generating Starlight reference pages from a Python package with helia-ui-pyref, the replacement for mkdocstrings.
+description: Generating a Starlight API reference from a Python package with helia-ui-pyref, the replacement for mkdocstrings.
 ---
 
 import DataTable from '@ambiqai/helia-ui/astro/DataTable';
 
 MkDocs product sites build their API reference with `mkdocstrings`, which has
-no Starlight equivalent. `helia-ui-pyref` is the replacement: it reads a
-[griffe](https://mkdocstrings.github.io/griffe/) JSON dump of a Python package
-and writes one Starlight Markdown page per module, plus the sidebar fragment
-that literate-nav produces.
+no Starlight equivalent. `helia-ui-pyref` is the replacement, and it runs in two
+steps. An extractor maps a [griffe](https://mkdocstrings.github.io/griffe/) JSON
+dump onto the reference model; a renderer turns that model into MDX pages that
+compose the package's `RefSymbol`, `RefParams`, `RefSection` and `RefMembers`
+parts, into the JSON the model is, and into the two text artifacts an agent
+reads instead of the pages.
 
-The generator never imports the package it documents. griffe loads by AST, so
-a package with hardware or compiler dependencies dumps on any machine, and the
+The split is what keeps four languages looking like one reference. Only
+`scripts/lib/pyref-extract.mjs` knows Python. A C, C++ or TypeScript extractor
+produces the same model and gets the same pages without touching the renderer.
+
+The generator never imports the package it documents. griffe loads by AST, so a
+package with hardware or compiler dependencies dumps on any machine, and the
 site build needs no Python at all.
+
+## The contract
+
+The JSON is the source of truth and the pages are a view of it.
+
+That ordering decides everything else on this page. The model is written out
+whole and per module, with sorted keys and no timestamp, so it diffs. Every
+symbol keeps a stable id, and that id is the page anchor, so a URL plus a
+fragment names one symbol and keeps naming it after the reference is
+regenerated or restyled. A consumer that wants the data takes the JSON and
+never parses HTML.
+
+The model is `@ambiqai/helia-ui/reference-model`: TypeScript types plus
+`validateReferenceModel`, a hand-written guard with no dependencies. A site
+that loads a `reference.json` validates it before rendering, and an extractor
+that adds a field its own language happens to have fails that guard rather
+than reaching the parts.
 
 ## Running it
 
@@ -25,12 +48,13 @@ griffe dump helia_aot --docstyle google -f > griffe.json
 npx helia-ui-pyref \
   --input ../griffe.json \
   --out src/content/docs/reference/api \
+  --public public \
   --base /helia-aot/ \
   --sidebar src/generated/api-sidebar.json
 ```
 
-Pages land at `<out>/<module path>/index.md`, so `helia_aot.air.model` becomes
-`reference/api/helia_aot/air/model/index.md` and serves at
+Pages land at `<out>/<module path>/index.mdx`, so `helia_aot.air.model` becomes
+`reference/api/helia_aot/air/model/index.mdx` and serves at
 `/helia-aot/reference/api/helia_aot/air/model/`. That is the same shape the
 MkDocs `api/` tree had, so inbound links survive the move.
 
@@ -41,9 +65,19 @@ MkDocs `api/` tree had, so inbound links survive the move.
     ['--input <file>', 'required', 'The griffe dump to read.'],
     ['--out <dir>', 'required', 'Directory the module pages are written into.'],
     [
+      '--public <dir>',
+      'public',
+      'Directory the JSON and text artifacts are written into.',
+    ],
+    [
       '--base <path>',
       '/',
-      'Site base path, prefixed onto cross-reference URLs.',
+      'Site base path, prefixed onto every URL the pages and artifacts carry.',
+    ],
+    [
+      '--site <origin>',
+      'not set',
+      'Origin for the absolute URLs in llms.txt. Without it they are site-root relative.',
     ],
     [
       '--package <name>',
@@ -56,10 +90,21 @@ MkDocs `api/` tree had, so inbound links survive the move.
       'Write the Starlight sidebar fragment as JSON.',
     ],
     [
-      '--check',
-      'off',
-      'Regenerate into a temporary directory and exit 1 on drift.',
+      '--source-root <dir>',
+      'not set',
+      'Strip this prefix from the source paths in the model.',
     ],
+    [
+      '--source-url <template>',
+      'not set',
+      'Link template for source, with {path} and {line}.',
+    ],
+    [
+      '--commit <sha>',
+      'not set',
+      'Commit of the documented source, recorded in generatedFrom.',
+    ],
+    ['--check', 'off', 'Compare against what is on disk and exit 1 on drift.'],
     ['--quiet', 'off', 'Report only the warning count, not each warning.'],
     ['--route-prefix <path>', 'reference/api', 'Route the pages serve under.'],
   ]}
@@ -90,32 +135,74 @@ parsed, so a different style means re-dumping with
 `griffe dump <package> --docstyle numpy -f`; the generator refuses rather than
 pretend it can reinterpret sections it is handed.
 
+## The artifacts
+
+Alongside the pages, a run writes four kinds of file under
+`<public>/<route prefix>/`.
+
+<DataTable
+  caption="What a run publishes"
+  columns={['File', 'What it holds']}
+  rows={[
+    [
+      'reference.json',
+      'Every module in one document, with $schema and a generatedFrom block naming the tool, its version and the source commit.',
+    ],
+    [
+      '<module path>.json',
+      'One module on its own, without its subtree. This is what a page links to.',
+    ],
+    [
+      'llms.txt',
+      'The title, one line of description, and every module page with its JSON link.',
+    ],
+    [
+      'llms-full.txt',
+      'Every module rendered as Markdown, in module order, concatenated.',
+    ],
+  ]}
+/>
+
+`public/` is served at the site root, so `reference/api/helia_aot/air.json`
+resolves at `/helia-aot/reference/api/helia_aot/air.json`. Every generated page
+carries a **Machine-readable model** link to exactly that file, one line under
+the module description.
+
+The JSON is byte-stable across runs: keys are sorted and nothing is stamped
+with a time. A reference regenerated from an unchanged dump produces unchanged
+files, which is what makes `--check` mean something.
+
 ## The griffe pin
 
 griffe's `dump` output is a convenience format, not a versioned schema. The
-generator targets **griffe 1.7.3** and checks the top-level shape
-before it renders anything: a JSON object of packages, each a `module` with
-`name`, `path` and `members`. Anything else is refused with the command that
-produces a dump it understands, rather than emitting plausible-looking pages
-from a tree it misread.
+extractor targets **griffe 1.7.3** and checks the top-level shape before it
+reads anything: a JSON object of packages, each a `module` with `name`, `path`
+and `members`. Anything else is refused with the command that produces a dump
+it understands, rather than emitting plausible-looking pages from a tree it
+misread.
 
-Pin griffe in the Python repository. When you lift the pin, run `--check` (see
-below) and read the diff before committing it.
+Pin griffe in the Python repository. When you lift the pin, run `--check` and
+read the diff before committing it.
 
 ## Keeping the pages honest in CI
 
-Generated pages are committed, so the site builds without Python. `--check`
-regenerates into a temporary directory and diffs against what is committed,
-exiting 1 on drift and naming every file that is stale, missing or orphaned.
+Generated pages and artifacts are committed, so the site builds without Python.
+`--check` renders in memory and compares against what is on disk, exiting 1 on
+drift and naming every file that is stale, missing or orphaned.
 
 ```yaml
 - run: uv run griffe dump helia_aot --docstyle google -f > griffe.json
-- run: npx helia-ui-pyref --input griffe.json --out docs/src/content/docs/reference/api --base /helia-aot/ --check
+- run: npx helia-ui-pyref --input griffe.json --out docs/src/content/docs/reference/api --public docs/public --base /helia-aot/ --check
 ```
 
 Put it in the same workflow that builds the docs. A docstring edited without
 regenerating the reference then fails the pull request rather than shipping a
 page that disagrees with the code.
+
+A run records what it wrote in `<out>/.pyref-manifest.json` and removes only
+those files next time. A hand-written index page or a partial kept in the same
+directory survives, which was not true when the directory was emptied before
+every run.
 
 ## The sidebar fragment
 
@@ -136,82 +223,119 @@ labeled `Overview`.
 
 ## What the output looks like
 
-Google-style sections become tables, consistently: `Args` and `Other Args`,
-`Attributes`, `Returns`, `Yields`, `Receives`, `Raises` and `Warns`. `Examples`
-becomes prose and fenced Python, and a Google admonition becomes a Starlight
-aside.
+Google-style sections become fields of the model, and the renderer puts each
+one where it belongs: parameters, returns and raises become `RefParams` tables
+inside a labeled `RefSection`, examples become prose and a fenced block, and a
+Google admonition stays an aside in the symbol's description. A module page
+opens with its own `RefMembers` index, because a generated page carries more
+symbols than a table of contents will show.
 
-````md
+```mdx
 ---
 title: 'handler'
+description: 'Base class for all AOT code-generation handlers.'
 sidebar:
   order: 2
 ---
 
-## <span id="helia_aot.aot.handlers.handler.AotHandler"></span>AotHandler
+import RefMembers from '@ambiqai/helia-ui/astro/RefMembers';
+import RefParams from '@ambiqai/helia-ui/astro/RefParams';
+import RefSection from '@ambiqai/helia-ui/astro/RefSection';
+import RefSymbol from '@ambiqai/helia-ui/astro/RefSymbol';
 
-```python
-AotHandler(context: CodeGenContext)
-```
+[Machine-readable model](/helia-aot/reference/api/helia_aot/aot/handlers/handler.json)
 
-Base class for all AOT code-generation handlers.
+<RefMembers
+  label="On this page"
+  items={[
+    {
+      id: 'helia_aot.aot.handlers.handler.AotHandler',
+      name: 'AotHandler',
+      kind: 'class',
+    },
+  ]}
+/>
+
+<RefSymbol
+  id={"helia_aot.aot.handlers.handler.AotHandler"}
+  name={"AotHandler"}
+  kind={"class"}
+  language={"python"}
+  signature={"AotHandler(context: CodeGenContext)"}
+  level={2}
+  summary={"Base class for all AOT code-generation handlers."}
+  source={{ "path": "src/helia_aot/aot/handlers/handler.py", "line": 41 }}
+>
 
 :::note[Lifecycle]
-The lifecycle of an AOT handler consists of three main stages:
-
-1. resolve() — inspect AIR, add any scratch tensors, choose kernels
-2. plan() — (optional) adjust memory plan or other per-handler scheduling
-3. emit() — write out headers, C sources, assets, etc.
+An AOT handler resolves, plans and emits, in that order.
 
 :::
 
-**Parameters**
+<RefSection title="Parameters">
+  <RefParams
+    caption={'Parameters of AotHandler'}
+    density={'compact'}
+    rows={[
+      {
+        name: 'context',
+        type: 'CodeGenContext',
+        default: 'Required',
+        description: 'Code generation context.',
+      },
+    ]}
+  />
+</RefSection>
 
-| Name      | Type             | Description             | Default    |
-| --------- | ---------------- | ----------------------- | ---------- |
-| `context` | `CodeGenContext` | Code generation context | _required_ |
-
-### <span id="helia_aot.aot.handlers.handler.AotHandler.resolve"></span>AotHandler.resolve
-
-`abstractmethod`
-
-```python
-resolve() -> None
+</RefSymbol>
 ```
-````
 
-Every symbol heading carries two anchors. Starlight slugs the heading text, and
-the `<span>` reproduces the `mkdocstrings` anchor — the full dotted path — so a
-link written against the MkDocs site still lands on the right symbol. Those
-dotted anchors are what cross-references resolve to.
+## Anchors
+
+`RefSymbol` renders the symbol's id as the element id, and that id is the fully
+qualified dotted path — the same anchor `mkdocstrings` produced. A link written
+against the MkDocs site still lands on the right symbol, and so does a link
+written against a page this generator produced two designs ago.
+
+Cross-references resolve to those anchors. The symbol heading is rendered by the
+part rather than written as Markdown, so it does not appear in Starlight's table
+of contents; the `RefMembers` index at the top of each page is what lists the
+symbols instead.
 
 ## Cross-references
 
 `[Name][module.path]` in a docstring becomes a link to the page and anchor that
-carries the symbol, prefixed with `--base`. A reference that resolves to
-nothing keeps its text and is reported as a warning rather than shipped as a
-dead link. Cross-reference syntax inside backticks or a fenced block is left
-alone, so `[w][z][y][x]` describing an array layout stays what it is.
+carries the symbol, prefixed with `--base`. The extractor leaves the syntax
+alone and the renderer resolves it, because only the renderer knows the routes.
+A reference that resolves to nothing keeps its text and is reported as a warning
+rather than shipped as a dead link. Cross-reference syntax inside backticks or a
+fenced block is left alone, so `[w][z][y][x]` describing an array layout stays
+what it is.
 
 ## Where it differs from mkdocstrings
 
 :::note[Deliberate differences]
-Three, all of them reported rather than silent:
+Four, all of them reported rather than silent:
 
 - **Imported names are not re-documented.** `mkdocstrings` renders an imported
   symbol wherever it is imported. A module that declares `__all__` instead gets
   a **Re-exports** table linking to the canonical page, which keeps one page
   per symbol.
-- **Attributes are one table.** The `Attributes:` docstring section and the
-  public attribute members are merged, so a dataclass and a pydantic model
-  render the same way whichever way the fields are documented.
+- **Attributes are symbols.** The `Attributes:` docstring section and the public
+  attribute members are merged into one list of attribute symbols, so a
+  dataclass and a pydantic model render the same way whichever way the fields
+  are documented. An UPPER_CASE module-level name is labeled a constant.
 - **Docstring headings are shifted.** A module docstring starting at `#` would
   emit a second top-level heading under the page title; headings are shifted so
   the shallowest sits at `--heading-level`. Slugs are unaffected, so anchors
   into docstring headings still work.
+- **Prose is escaped for MDX.** A page is MDX now, so a `{` or a `<` in a
+  docstring is escaped before it reaches the page. Code spans and fenced blocks
+  are left alone. The Markdown in `llms-full.txt` is not escaped, because it is
+  not MDX.
 
 :::
 
 Material-specific content in docstrings — `:material-icon:` shortcodes,
-`pymdownx` fences — is passed through untouched. Converting it is part of
-moving the authored pages, not of generating the reference.
+`pymdownx` fences — is passed through untouched. Converting it is part of moving
+the authored pages, not of generating the reference.

@@ -731,6 +731,144 @@ Also accepts `HTMLAttributes<'div'>`.
 
 [See it rendered on Gallery](/helia-ui/gallery/#mosaic)
 
+## RefMembers
+
+**Use it for:** The index of what is on a reference page: every symbol, its kind, and a sentence, each one an anchor.
+
+```ts
+import RefMembers from '@ambiqai/helia-ui/astro/RefMembers';
+```
+
+| Prop           | Type                       | Default  | Description                                                                                                                                                                                                                                                                           |
+| -------------- | -------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `items` (req.) | `readonly RefMemberItem[]` | --       | The items, in the order the page renders them.                                                                                                                                                                                                                                        |
+| `label`        | `string`                   | --       | Accessible name for the list, for example "On this page". It names the `<ul>` rather than a `<nav>` landmark. A page-level index of symbols sits inside the article, and a second navigation landmark called "On this page" collides with the one Starlight already puts in the page. |
+| `layout`       | `'grid' \| 'list'`         | `'grid'` | `grid` lays the items out in columns on a wide screen; `list` keeps one per row.                                                                                                                                                                                                      |
+| `class`        | `string`                   | --       | Forwarded to the wrapper.                                                                                                                                                                                                                                                             |
+
+**RefMemberItem**
+
+| Prop          | Type     | Default | Description                                                                 |
+| ------------- | -------- | ------- | --------------------------------------------------------------------------- |
+| `id` (req.)   | `string` | --      | The symbol's fully qualified path. Used as the anchor unless `href` is set. |
+| `name` (req.) | `string` | --      | The short name, shown as the link text.                                     |
+| `kind`        | `string` | --      | What the symbol is, shown beside the name.                                  |
+| `summary`     | `string` | --      | One line about it.                                                          |
+| `href`        | `string` | --      | Where the link goes, when the target is not an anchor on this page.         |
+
+**Slots** -- none.
+
+[See it rendered on Gallery](/helia-ui/gallery/#reference)
+
+## RefNav
+
+**Use it for:** The module tree of a reference, as nested lists of links.
+
+```ts
+import RefNav from '@ambiqai/helia-ui/astro/RefNav';
+```
+
+| Prop           | Type                    | Default | Description                                                                                                                                       |
+| -------------- | ----------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `items` (req.) | `readonly RefNavItem[]` | --      | The tree, in the order the reference publishes it.                                                                                                |
+| `label`        | `string`                | --      | Accessible name for the navigation, for example "API reference".                                                                                  |
+| `current`      | `string`                | --      | The `href` of the page being viewed, marked with `aria-current="page"`.                                                                           |
+| `depth`        | `number`                | `0`     | Nesting depth. The part sets this on itself as it recurses so that only the outermost call renders the `<nav>` element; a caller leaves it alone. |
+| `class`        | `string`                | --      | Forwarded to the outermost element.                                                                                                               |
+
+**RefNavItem**
+
+| Prop           | Type                    | Default | Description                                                          |
+| -------------- | ----------------------- | ------- | -------------------------------------------------------------------- |
+| `label` (req.) | `string`                | --      | What the entry is called. Usually the last segment of a module path. |
+| `href`         | `string`                | --      | Where it goes. An entry with no link is a grouping label.            |
+| `items`        | `readonly RefNavItem[]` | --      | Submodules.                                                          |
+
+**Slots** -- none.
+
+[See it rendered on Gallery](/helia-ui/gallery/#reference)
+
+## RefParams
+
+**Use it for:** The table under a symbol: its parameters, its return values, or the errors it raises.
+
+```ts
+import RefParams from '@ambiqai/helia-ui/astro/RefParams';
+```
+
+| Prop               | Type                                      | Default         | Description                                                                              |
+| ------------------ | ----------------------------------------- | --------------- | ---------------------------------------------------------------------------------------- |
+| `caption` (req.)   | `string`                                  | --              | What the table lists. Rendered as the table's `<caption>`, so it is the accessible name. |
+| `rows` (req.)      | `readonly RefParamsRow[]`                 | --              | The rows, in declaration order. Order is the extractor's decision, not this part's.      |
+| `density`          | `'comfortable' \| 'default' \| 'compact'` | `'default'`     | `compact` for a long generated reference, `comfortable` for a short hand-written one.    |
+| `nameLabel`        | `string`                                  | `'Name'`        | Header for the name column. `Property` and `Field` are the usual overrides.              |
+| `typeLabel`        | `string`                                  | `'Type'`        | Header for the type column.                                                              |
+| `defaultLabel`     | `string`                                  | `'Default'`     | Header for the default column. `Requirement` is the usual override.                      |
+| `descriptionLabel` | `string`                                  | `'Description'` | Header for the description column.                                                       |
+| `class`            | `string`                                  | --              | Forwarded to the scroll box, so a layout can size it without reaching inside.            |
+
+**RefParamsRow**
+
+| Prop                 | Type     | Default | Description                                                          |
+| -------------------- | -------- | ------- | -------------------------------------------------------------------- |
+| `name`               | `string` | --      | The parameter, field or return label. Omit for an unnamed return.    |
+| `type`               | `string` | --      | The declared type, as source text.                                   |
+| `default`            | `string` | --      | The default as written, or a requirement note such as "Required".    |
+| `description` (req.) | `string` | --      | What it is for, in a sentence. The only column that is always shown. |
+
+**Slots** -- none.
+
+[See it rendered on Gallery](/helia-ui/gallery/#reference)
+
+## RefSection
+
+**Use it for:** A labeled block inside a reference entry: "Parameters", "Returns", "Examples".
+
+```ts
+import RefSection from '@ambiqai/helia-ui/astro/RefSection';
+```
+
+| Prop           | Type     | Default | Description                                                                     |
+| -------------- | -------- | ------- | ------------------------------------------------------------------------------- |
+| `title` (req.) | `string` | --      | The label above the content.                                                    |
+| `id`           | `string` | --      | Anchor, when something needs to link straight to this section.                  |
+| `class`        | `string` | --      | Forwarded to the wrapper, so a page can space sections without reaching inside. |
+
+**Slots**
+
+- `default` -- The section's content: a table, a code block, or prose.
+
+[See it rendered on Gallery](/helia-ui/gallery/#reference)
+
+## RefSymbol
+
+**Use it for:** One entry in an API reference: the symbol's header, its signature, and whatever the caller puts in the body.
+
+```ts
+import RefSymbol from '@ambiqai/helia-ui/astro/RefSymbol';
+```
+
+| Prop                | Type                                                                                   | Default | Description                                                                                                                  |
+| ------------------- | -------------------------------------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `id` (req.)         | `string`                                                                               | --      | The symbol's fully qualified path. Doubles as the anchor and the self-link target.                                           |
+| `name` (req.)       | `string`                                                                               | --      | The short name shown in the header.                                                                                          |
+| `kind` (req.)       | `SymbolKind`                                                                           | --      | What the symbol is. Rendered as the leading badge.                                                                           |
+| `language` (req.)   | `ReferenceLanguage`                                                                    | --      | Which language it belongs to. Rendered as the trailing chip and, unless `signatureLanguage` overrides it, picks the grammar. |
+| `signature` (req.)  | `string`                                                                               | --      | The declaration, as source text. Already wrapped by the extractor.                                                           |
+| `signatureLanguage` | `'bash' \| 'c' \| 'cpp' \| 'json' \| 'plaintext' \| 'python' \| 'tsx' \| 'typescript'` | --      | Grammar override, for a signature that is not written in the symbol's own language.                                          |
+| `summary`           | `string`                                                                               | --      | One sentence under the header. Everything longer belongs in the body.                                                        |
+| `source`            | `{ path: string; line?: number; url?: string }`                                        | --      | Where the symbol is declared. Shown as a link when `url` is set, as plain text otherwise.                                    |
+| `since`             | `string`                                                                               | --      | The release it first appeared in.                                                                                            |
+| `deprecated`        | `string`                                                                               | --      | The deprecation notice, already one sentence. Its presence is what marks the symbol.                                         |
+| `level`             | `2 \| 3 \| 4`                                                                          | `2`     | Heading rank. A module page puts its symbols at 2 and their members at 3.                                                    |
+| `class`             | `string`                                                                               | --      | Forwarded to the article.                                                                                                    |
+
+**Slots**
+
+- `default` -- The body: description, parameter tables, examples, members.
+
+[See it rendered on Gallery](/helia-ui/gallery/#reference)
+
 ## Reveal
 
 **Use it for:** Entry animation for whatever it wraps: a short fade and rise the first time the element reaches the viewport.

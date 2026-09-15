@@ -46,6 +46,11 @@ const PART_ROOTS: Record<string, string> = {
   Media: '.helia-media',
   MediaEmbed: '.media-embed',
   Mosaic: '.helia-mosaic',
+  RefMembers: '.helia-ref-members',
+  RefNav: '.helia-ref-nav',
+  RefParams: '.helia-ref-params',
+  RefSection: '.helia-ref-section',
+  RefSymbol: '.helia-ref-symbol',
   Reveal: 'helia-reveal',
   SectionHeader: '.section-header',
   ShowcaseCarousel: 'showcase-carousel',
@@ -160,4 +165,50 @@ test('an icon row is one anchor around its tile and its title', async ({
   /* An anchor inside the anchor is invalid markup and the production assert
      fails the build on it, so the row is the only link in the row. */
   await expect(row.locator('a')).toHaveCount(0);
+});
+
+/*
+ * The Reference section is the claim that one model renders the same reference
+ * for every language. Three symbols, three languages, one table: if the C entry
+ * loses a column the section has stopped making its point.
+ */
+test('the reference section renders all three languages from one model', async ({
+  page,
+}) => {
+  await page.goto(`${gallery}#reference`);
+
+  const symbols = page.locator('.helia-ref-symbol');
+  await expect(symbols).toHaveCount(3);
+
+  for (const language of ['Python', 'C', 'TypeScript']) {
+    await expect(
+      page
+        .locator('.helia-ref-symbol__language', { hasText: language })
+        .first(),
+    ).toBeVisible();
+  }
+
+  /* The anchor is the symbol's own dotted path, which is what makes a link to
+     one symbol survive a regeneration. Attribute form, because a dotted id is
+     not a valid CSS id selector. */
+  for (const id of ['helia.profiler.profile_model', 'profileModel']) {
+    await expect(page.locator(`.helia-ref-symbol[id="${id}"]`)).toHaveCount(1);
+  }
+});
+
+test('a reference params table carries the four columns', async ({ page }) => {
+  await page.goto(`${gallery}#reference`);
+
+  const tables = page.locator('.helia-ref-params table');
+  await expect(tables).toHaveCount(3);
+
+  for (let index = 0; index < 3; index += 1) {
+    const headers = tables.nth(index).locator('thead th');
+    await expect(headers).toHaveText([
+      'Name',
+      'Type',
+      'Default',
+      'Description',
+    ]);
+  }
 });

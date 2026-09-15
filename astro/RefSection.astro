@@ -1,0 +1,49 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A labeled block inside a reference entry: "Parameters", "Returns",
+ * "Examples".
+ *
+ * The label is a `<p>` rather than a heading. A generated reference already
+ * nests three heading levels deep by the time it reaches a symbol's sections,
+ * and promoting "Returns" to an `<h5>` puts twenty of them in the page outline
+ * and buries the symbols the reader came for. The label is styled, not ranked.
+ *
+ * @slot default -- The section's content: a table, a code block, or prose.
+ */
+interface Props {
+  /** The label above the content. */
+  title: string;
+  /** Anchor, when something needs to link straight to this section. */
+  id?: string;
+  /** Forwarded to the wrapper, so a page can space sections without reaching inside. */
+  class?: string;
+}
+
+const { title, id, class: className } = Astro.props;
+---
+
+<section class:list={['helia-ref-section', className]} id={id}>
+  <p class="helia-ref-section__label">{title}</p>
+  <div class="helia-ref-section__body"><slot /></div>
+</section>
+
+<style>
+  .helia-ref-section {
+    margin-top: var(--helia-space-5);
+  }
+
+  .helia-ref-section__label {
+    color: var(--sl-color-gray-3);
+    font-size: var(--helia-text-meta);
+    font-weight: var(--helia-weight-strong);
+    letter-spacing: 0.07em;
+    margin: 0 0 var(--helia-space-3);
+    text-transform: uppercase;
+  }
+
+  .helia-ref-section__body {
+    min-width: 0;
+  }
+</style>

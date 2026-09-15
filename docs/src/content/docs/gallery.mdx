@@ -34,6 +34,11 @@ import Masonry from '@ambiqai/helia-ui/astro/Masonry';
 import Media from '@ambiqai/helia-ui/astro/Media';
 import MediaEmbed from '@ambiqai/helia-ui/astro/MediaEmbed';
 import Mosaic from '@ambiqai/helia-ui/astro/Mosaic';
+import RefMembers from '@ambiqai/helia-ui/astro/RefMembers';
+import RefNav from '@ambiqai/helia-ui/astro/RefNav';
+import RefParams from '@ambiqai/helia-ui/astro/RefParams';
+import RefSection from '@ambiqai/helia-ui/astro/RefSection';
+import RefSymbol from '@ambiqai/helia-ui/astro/RefSymbol';
 import Reveal from '@ambiqai/helia-ui/astro/Reveal';
 import RevealReplay from '../../components/RevealReplay.astro';
 import SectionHeader from '@ambiqai/helia-ui/astro/SectionHeader';
@@ -48,6 +53,12 @@ import {
   trafficSeries,
   weightSeries,
 } from '../../lib/chart-gallery-data';
+import {
+  REFERENCE_EXAMPLES,
+  REFERENCE_NAV,
+  paramRows,
+  symbolProps,
+} from '../../lib/reference-gallery-model';
 
 This page is for choosing. Every option the card parts and the motion system
 offer is on it, side by side, each one showing the exact source that produces
@@ -2310,6 +2321,144 @@ code follows.
     />
   </SplitPanel>
 </Example>
+
+## Reference
+
+An API reference is generated, not written, and it is generated for four
+languages. The extractors differ, the model they produce does not, and these
+parts render the model: the same header, the same table, the same columns for
+a Python function, a C function and a TypeScript function. Everything below
+comes from one hand-written model in `src/lib/reference-gallery-model.ts`.
+
+<Example
+  title="RefSymbol, Python"
+  code={`
+    <RefSymbol {...symbolProps(REFERENCE_EXAMPLES.python)} level={3}>
+      <RefSection title="Parameters">
+        <RefParams
+          caption="Parameters of profile_model"
+          density="compact"
+          rows={paramRows(REFERENCE_EXAMPLES.python)}
+        />
+      </RefSection>
+    </RefSymbol>
+  `}
+>
+  <RefSymbol {...symbolProps(REFERENCE_EXAMPLES.python)} level={3}>
+    <RefSection title="Parameters">
+      <RefParams
+        caption="Parameters of profile_model"
+        density="compact"
+        rows={paramRows(REFERENCE_EXAMPLES.python)}
+      />
+    </RefSection>
+  </RefSymbol>
+</Example>
+
+<Example
+  title="RefSymbol, C"
+  code={`
+    <RefSymbol {...symbolProps(REFERENCE_EXAMPLES.c)} level={3}>
+      <RefSection title="Parameters">
+        <RefParams
+          caption="Parameters of profile_model"
+          density="compact"
+          rows={paramRows(REFERENCE_EXAMPLES.c)}
+        />
+      </RefSection>
+    </RefSymbol>
+  `}
+>
+  <RefSymbol {...symbolProps(REFERENCE_EXAMPLES.c)} level={3}>
+    <RefSection title="Parameters">
+      <RefParams
+        caption="Parameters of profile_model"
+        density="compact"
+        rows={paramRows(REFERENCE_EXAMPLES.c)}
+      />
+    </RefSection>
+  </RefSymbol>
+</Example>
+
+<Example
+  title="RefSymbol, TypeScript"
+  code={`
+    <RefSymbol {...symbolProps(REFERENCE_EXAMPLES.typescript)} level={3}>
+      <RefSection title="Parameters">
+        <RefParams
+          caption="Parameters of profileModel"
+          density="compact"
+          rows={paramRows(REFERENCE_EXAMPLES.typescript)}
+        />
+      </RefSection>
+    </RefSymbol>
+  `}
+>
+  <RefSymbol {...symbolProps(REFERENCE_EXAMPLES.typescript)} level={3}>
+    <RefSection title="Parameters">
+      <RefParams
+        caption="Parameters of profileModel"
+        density="compact"
+        rows={paramRows(REFERENCE_EXAMPLES.typescript)}
+      />
+    </RefSection>
+  </RefSymbol>
+</Example>
+
+A generated module page carries more symbols than a table of contents will
+show, so it indexes itself; a site that builds its own sidebar takes the same
+tree as nested links.
+
+<div className="gallery-grid not-content">
+  <Example
+    title="RefMembers"
+    code={`
+      <RefMembers
+        label="On this page"
+        items={[
+          {
+            id: 'helia.profiler.profile_model',
+            name: 'profile_model',
+            kind: 'function',
+            summary: 'Run a model on a connected target.',
+          },
+          {
+            id: 'helia.profiler.ProfileResult',
+            name: 'ProfileResult',
+            kind: 'class',
+            summary: 'The measurements a run produced.',
+          },
+        ]}
+      />
+    `}
+  >
+    <RefMembers
+      label="On this page"
+      items={[
+        {
+          id: 'helia.profiler.profile_model',
+          name: 'profile_model',
+          kind: 'function',
+          summary: 'Run a model on a connected target.',
+        },
+        {
+          id: 'helia.profiler.ProfileResult',
+          name: 'ProfileResult',
+          kind: 'class',
+          summary: 'The measurements a run produced.',
+        },
+      ]}
+    />
+  </Example>
+  <Example
+    title="RefNav"
+    code={`
+      <RefNav label="API reference" items={REFERENCE_NAV} />
+    `}
+  >
+    <RefNav label="API reference" items={REFERENCE_NAV} />
+  </Example>
+</div>
 
 ## Other parts
 

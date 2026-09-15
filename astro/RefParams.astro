@@ -1,0 +1,187 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * The table under a symbol: its parameters, its return values, or the errors
+ * it raises.
+ *
+ * One part for all three because they are one table with columns missing.
+ * Parameters fill every column; returns usually have no name and never a
+ * default; raises are a type and a sentence. Splitting them into three parts
+ * would be three sets of column rules to keep aligned, and a reference page
+ * where the tables do not line up reads as three unrelated tables.
+ *
+ * A column appears when a row has something to put in it. An empty `Default`
+ * column on a reference of positional-only C functions is a column of
+ * whitespace the reader has to scan past on every symbol.
+ *
+ * The table scrolls inside its own box rather than widening the page, because
+ * a signature with long generic types is common and a reference that reflows
+ * the article column is worse than one that scrolls.
+ */
+export interface RefParamsRow {
+  /** The parameter, field or return label. Omit for an unnamed return. */
+  name?: string;
+  /** The declared type, as source text. */
+  type?: string;
+  /** The default as written, or a requirement note such as "Required". */
+  default?: string;
+  /** What it is for, in a sentence. The only column that is always shown. */
+  description: string;
+}
+
+interface Props {
+  /** What the table lists. Rendered as the table's `<caption>`, so it is the accessible name. */
+  caption: string;
+  /** The rows, in declaration order. Order is the extractor's decision, not this part's. */
+  rows: readonly RefParamsRow[];
+  /** `compact` for a long generated reference, `comfortable` for a short hand-written one. */
+  density?: 'comfortable' | 'default' | 'compact';
+  /** Header for the name column. `Property` and `Field` are the usual overrides. */
+  nameLabel?: string;
+  /** Header for the type column. */
+  typeLabel?: string;
+  /** Header for the default column. `Requirement` is the usual override. */
+  defaultLabel?: string;
+  /** Header for the description column. */
+  descriptionLabel?: string;
+  /** Forwarded to the scroll box, so a layout can size it without reaching inside. */
+  class?: string;
+}
+
+const {
+  caption,
+  rows,
+  density = 'default',
+  nameLabel = 'Name',
+  typeLabel = 'Type',
+  defaultLabel = 'Default',
+  descriptionLabel = 'Description',
+  class: className,
+} = Astro.props;
+
+const showName = rows.some((row) => row.name);
+const showType = rows.some((row) => row.type);
+const showDefault = rows.some((row) => row.default);
+---
+
+<div
+  class:list={[
+    'helia-ref-params',
+    'helia-surface',
+    `helia-ref-params--${density}`,
+    className,
+  ]}
+>
+  <table>
+    <caption>{caption}</caption>
+    <thead>
+      <tr>
+        {showName && <th scope="col">{nameLabel}</th>}
+        {showType && <th scope="col">{typeLabel}</th>}
+        {showDefault && <th scope="col">{defaultLabel}</th>}
+        <th scope="col">{descriptionLabel}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((row) => (
+          <tr>
+            {showName && (
+              <th scope="row">{row.name && <code>{row.name}</code>}</th>
+            )}
+            {showType && <td>{row.type && <code>{row.type}</code>}</td>}
+            {showDefault && <td class="default">{row.default}</td>}
+            <td>{row.description}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .helia-ref-params {
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  .helia-ref-params > table {
+    background: var(--helia-surface-card);
+    border-collapse: collapse;
+    display: table;
+    font-size: var(--helia-text-small);
+    margin: 0;
+    min-width: 40rem;
+    max-width: none;
+    width: 100%;
+  }
+
+  caption {
+    background: var(--sl-color-bg-nav);
+    border-bottom: 1px solid var(--sl-color-gray-5);
+    color: var(--sl-color-gray-2);
+    font-size: var(--helia-text-caption);
+    font-weight: var(--helia-weight-medium);
+    padding: var(--helia-space-3);
+    text-align: left;
+  }
+
+  th,
+  td {
+    border-bottom: 1px solid var(--sl-color-gray-5);
+    padding: var(--helia-space-3);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .helia-ref-params--compact :is(th, td),
+  .helia-ref-params--compact caption {
+    padding: var(--helia-space-2) var(--helia-space-3);
+  }
+
+  .helia-ref-params--comfortable :is(th, td),
+  .helia-ref-params--comfortable caption {
+    padding: var(--helia-space-4);
+  }
+
+  thead th {
+    background: var(--sl-color-bg-nav);
+    color: var(--sl-color-gray-3);
+    font-size: var(--helia-text-meta);
+    font-weight: var(--helia-weight-strong);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  tbody th {
+    background: var(--helia-surface-card);
+    color: var(--sl-color-white);
+    font-weight: var(--helia-weight-medium);
+    white-space: nowrap;
+  }
+
+  tbody td {
+    background: var(--helia-surface-card);
+    color: var(--sl-color-gray-2);
+    line-height: 1.45;
+  }
+
+  tbody tr:last-child :is(th, td) {
+    border-bottom: 0;
+  }
+
+  code {
+    background: transparent;
+    border: 0;
+    color: inherit;
+    font-size: var(--helia-text-caption);
+    padding: 0;
+    white-space: nowrap;
+  }
+
+  .default {
+    color: var(--sl-color-gray-3);
+    white-space: nowrap;
+  }
+</style>

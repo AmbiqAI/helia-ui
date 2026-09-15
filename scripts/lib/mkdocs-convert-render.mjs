@@ -14,6 +14,8 @@
 
 import { posix } from 'node:path';
 
+import { escapeMdx, isElementName, mapOutsideCode } from './markdown.mjs';
+
 /* Material has twelve admonition types, Starlight's Aside has four. The
  * collapsing is the mapping table in the package's migration guide.
  *
@@ -222,102 +224,6 @@ function replaceIcons(text, ctx) {
     return `<Icon name="${fa}" />`;
   });
 }
-
-/*
- * MDX reads `{` as an expression and `<` as a tag, so any prose that meant
- * them literally has to be escaped or the page will not compile. Code spans
- * are exempt: MDX does not read inside them.
- */
-function escapeMdx(text) {
-  return text
-    .replace(/[{}]/g, (c) => `\\${c}`)
-    .replace(/<(\/?)([A-Za-z][\w.-]*)?/g, (m, slash, name) =>
-      name && isElementName(name) ? m : `&lt;${slash}${name ?? ''}`,
-    );
-}
-
-function mapOutsideCode(text, fn) {
-  return text
-    .split(/(`+[^`]*`+)/g)
-    .map((part) => (part.startsWith('`') ? part : fn(part)))
-    .join('');
-}
-
-/*
- * A `<` only means a tag if what follows it names one. Prose in these pages
- * writes things like `<prefix>` and `<N>` meaning "substitute a value here",
- * and MDX would read those as components that are never closed.
- */
-const HTML_TAGS = new Set([
-  'a',
-  'abbr',
-  'aside',
-  'b',
-  'blockquote',
-  'br',
-  'button',
-  'canvas',
-  'caption',
-  'code',
-  'col',
-  'colgroup',
-  'dd',
-  'details',
-  'div',
-  'dl',
-  'dt',
-  'em',
-  'figure',
-  'figcaption',
-  'footer',
-  'h1',
-  'h2',
-  'h3',
-  'h4',
-  'h5',
-  'h6',
-  'header',
-  'hr',
-  'i',
-  'iframe',
-  'img',
-  'input',
-  'kbd',
-  'label',
-  'li',
-  'main',
-  'mark',
-  'nav',
-  'ol',
-  'p',
-  'picture',
-  'pre',
-  'q',
-  's',
-  'samp',
-  'section',
-  'select',
-  'small',
-  'source',
-  'span',
-  'strong',
-  'sub',
-  'summary',
-  'sup',
-  'table',
-  'tbody',
-  'td',
-  'tfoot',
-  'th',
-  'thead',
-  'tr',
-  'u',
-  'ul',
-  'video',
-]);
-
-const isElementName = (name) =>
-  HTML_TAGS.has(name.toLowerCase()) || /^[A-Z]/.test(name);
 
 const hasTag = (line) => {
   for (const m of line.matchAll(/<\/?([A-Za-z][\w.-]*)/g)) {

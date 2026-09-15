@@ -1,0 +1,129 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * The module tree of a reference, as nested lists of links.
+ *
+ * The same data drives a site's sidebar and an in-page index of submodules, so
+ * this renders the tree and nothing else: no collapse state, no icons, no
+ * current-page highlight beyond `aria-current`. A sidebar that needs disclosure
+ * gets it from the site's own navigation, which is the thing that knows how
+ * much room it has.
+ *
+ * The part recurses into itself rather than flattening, because nesting is the
+ * one fact a module tree carries and a flat list with indentation says it to
+ * sighted readers only.
+ */
+export interface RefNavItem {
+  /** What the entry is called. Usually the last segment of a module path. */
+  label: string;
+  /** Where it goes. An entry with no link is a grouping label. */
+  href?: string;
+  /** Submodules. */
+  items?: readonly RefNavItem[];
+}
+
+interface Props {
+  /** The tree, in the order the reference publishes it. */
+  items: readonly RefNavItem[];
+  /** Accessible name for the navigation, for example "API reference". */
+  label?: string;
+  /** The `href` of the page being viewed, marked with `aria-current="page"`. */
+  current?: string;
+  /**
+   * Nesting depth. The part sets this on itself as it recurses so that only the
+   * outermost call renders the `<nav>` element; a caller leaves it alone.
+   */
+  depth?: number;
+  /** Forwarded to the outermost element. */
+  class?: string;
+}
+
+const { items, label, current, depth = 0, class: className } = Astro.props;
+const Wrapper = depth === 0 ? 'nav' : 'div';
+---
+
+<Wrapper
+  class:list={[depth === 0 && 'helia-ref-nav', className]}
+  aria-label={depth === 0 ? label : undefined}
+>
+  <ul class="helia-ref-nav__list">
+    {
+      items.map((item) => (
+        <li>
+          {item.href ? (
+            <a
+              class="helia-focus-ring"
+              href={item.href}
+              aria-current={item.href === current ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          ) : (
+            <span class="helia-ref-nav__group">{item.label}</span>
+          )}
+          {item.items && item.items.length > 0 && (
+            <Astro.self
+              items={item.items}
+              current={current}
+              depth={depth + 1}
+            />
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</Wrapper>
+
+<style>
+  .helia-ref-nav {
+    font-size: var(--helia-text-small);
+  }
+
+  .helia-ref-nav__list {
+    display: grid;
+    gap: var(--helia-space-1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Every level but the first is stepped in, which is what makes the nesting
+     legible at a glance in a column this narrow. The wrapper is this same
+     component recursing, so it carries this file's scope and needs no
+     `:global`. */
+  li > div > .helia-ref-nav__list {
+    border-left: 1px solid var(--sl-color-hairline);
+    margin-top: var(--helia-space-1);
+    padding-left: var(--helia-space-3);
+  }
+
+  .helia-ref-nav li {
+    margin: 0;
+    min-width: 0;
+  }
+
+  .helia-ref-nav a {
+    color: var(--sl-color-gray-2);
+    display: block;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+  }
+
+  .helia-ref-nav a:hover {
+    color: var(--sl-color-white);
+  }
+
+  .helia-ref-nav a[aria-current='page'] {
+    color: var(--sl-color-text-accent);
+    font-weight: var(--helia-weight-medium);
+  }
+
+  .helia-ref-nav__group {
+    color: var(--sl-color-gray-3);
+    display: block;
+    font-size: var(--helia-text-meta);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+</style>
