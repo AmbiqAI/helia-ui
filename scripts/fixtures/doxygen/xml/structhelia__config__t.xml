@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="structhelia__config__t" kind="struct" language="C++" prot="public">
+    <compoundname>helia_config_t</compoundname>
+    <includes refid="helia__sample_8h" local="no">helia_sample.h</includes>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structhelia__config__t_1ac1e9f07c0ed1f2b252d09553b270bf96" prot="public" static="no" mutable="no">
+        <type>void *</type>
+        <definition>void* helia_config_t::arena</definition>
+        <argsstring></argsstring>
+        <name>arena</name>
+        <qualifiedname>helia_config_t::arena</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Base of the scratch arena. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/helia_sample.h" line="46" column="10" bodyfile="src/helia_sample.h" bodystart="46" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structhelia__config__t_1a4fea244aa777943981a45e742625cd78" prot="public" static="no" mutable="no">
+        <type>size_t</type>
+        <definition>size_t helia_config_t::arena_bytes</definition>
+        <argsstring></argsstring>
+        <name>arena_bytes</name>
+        <qualifiedname>helia_config_t::arena_bytes</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Size of the arena, in bytes. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/helia_sample.h" line="47" column="12" bodyfile="src/helia_sample.h" bodystart="47" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structhelia__config__t_1ade57b2723217d0958c5c39fb0334b138" prot="public" static="no" mutable="no">
+        <type>char</type>
+        <definition>char helia_config_t::name[HELIA_MAX_NAME]</definition>
+        <argsstring>[HELIA_MAX_NAME]</argsstring>
+        <name>name</name>
+        <qualifiedname>helia_config_t::name</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/helia_sample.h" line="48" column="10" bodyfile="src/helia_sample.h" bodystart="48" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+<para>Where a model puts its working memory. </para>
+    </briefdescription>
+    <detaileddescription>
+<para>The caller owns the arena. The runtime never allocates. </para>
+    </detaileddescription>
+    <location file="src/helia_sample.h" line="44" column="1" bodyfile="src/helia_sample.h" bodystart="45" bodyend="49"/>
+    <listofallmembers>
+      <member refid="structhelia__config__t_1ac1e9f07c0ed1f2b252d09553b270bf96" prot="public" virt="non-virtual"><scope>helia_config_t</scope><name>arena</name></member>
+      <member refid="structhelia__config__t_1a4fea244aa777943981a45e742625cd78" prot="public" virt="non-virtual"><scope>helia_config_t</scope><name>arena_bytes</name></member>
+      <member refid="structhelia__config__t_1ade57b2723217d0958c5c39fb0334b138" prot="public" virt="non-virtual"><scope>helia_config_t</scope><name>name</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

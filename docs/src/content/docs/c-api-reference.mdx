@@ -1,0 +1,248 @@
+---
+title: C and C++ API reference
+description: Generating a Starlight API reference from a Doxygen XML dump with helia-ui-doxyref, beside the Python one.
+---
+
+import DataTable from '@ambiqai/helia-ui/astro/DataTable';
+
+C and C++ projects document their headers with [Doxygen](https://www.doxygen.nl/),
+which generates its own HTML and has no Starlight equivalent.
+`helia-ui-doxyref` is the replacement, and it is the Python generator's twin.
+An extractor maps Doxygen's XML onto the reference model; the same renderer the
+Python reference goes through turns that model into MDX pages that compose the
+package's `RefSymbol`, `RefParams`, `RefSection` and `RefMembers` parts, into
+the JSON the model is, and into the two text artifacts an agent reads instead
+of the pages.
+
+That shared renderer is the whole point. Only `scripts/lib/doxyref-extract.mjs`
+knows C. A C reference and a Python reference are the same pages with different
+content, not two designs that drift.
+
+The generator never compiles the code it documents. Doxygen parses, so a
+firmware header that only builds for a Cortex-M target documents on any
+machine, and the site build needs no toolchain at all.
+
+## The contract
+
+The JSON is the source of truth and the pages are a view of it.
+
+The model is written out whole and per module, with sorted keys and no
+timestamp, so it diffs. Every symbol keeps a stable id, and that id is the page
+anchor, so a URL plus a fragment names one symbol and keeps naming it after the
+reference is regenerated or restyled. A consumer that wants the data takes the
+JSON and never parses HTML.
+
+The model is `@ambiqai/helia-ui/reference-model`: TypeScript types plus
+`validateReferenceModel`, a hand-written guard with no dependencies. It is the
+same model the Python extractor produces, which is why `direction` exists on a
+parameter at all — C is the language that needs it.
+
+## The Doxygen configuration
+
+Two settings, on top of whatever the project already sets:
+
+```ini
+GENERATE_XML       = YES
+XML_PROGRAMLISTING = NO
+```
+
+`GENERATE_XML` is what produces the input. `XML_PROGRAMLISTING` copies every
+documented file's full source into the XML; the generator does not read it, and
+leaving it on multiplies the dump size for nothing. A `@code` block inside a
+comment is unaffected and still becomes a fenced block on the page.
+
+`OPTIMIZE_OUTPUT_FOR_C = YES` is worth setting for a C project, and
+`EXTRACT_ALL = YES` decides whether undocumented declarations appear. Both are
+the project's call: the generator publishes what Doxygen emitted.
+
+## Running it
+
+```sh
+# In the C repository:
+doxygen Doxyfile
+
+# In the docs site:
+npx helia-ui-doxyref \
+  --xml ../build/xml \
+  --out src/content/docs/reference/api \
+  --public public \
+  --base /helia-sdk/ \
+  --sidebar src/generated/api-sidebar.json
+```
+
+<DataTable
+  caption="Command-line options"
+  columns={['Option', 'Default', 'What it does']}
+  rows={[
+    ['--xml <dir>', 'required', "Doxygen's XML_OUTPUT directory."],
+    ['--out <dir>', 'required', 'Directory the module pages are written into.'],
+    [
+      '--public <dir>',
+      'public',
+      'Directory the JSON and text artifacts are written into.',
+    ],
+    [
+      '--base <path>',
+      '/',
+      'Site base path, prefixed onto every URL the pages and artifacts carry.',
+    ],
+    [
+      '--site <origin>',
+      'not set',
+      'Origin for the absolute URLs in llms.txt. Without it they are site-root relative.',
+    ],
+    [
+      '--name <library>',
+      "Doxygen's PROJECT_NAME",
+      'The library the reference documents. It names the root page and the route under it.',
+    ],
+    [
+      '--language <c|cpp>',
+      'read from the dump',
+      'Override the language on every symbol.',
+    ],
+    [
+      '--sidebar <file>',
+      'not written',
+      'Write the Starlight sidebar fragment as JSON.',
+    ],
+    [
+      '--source-root <dir>',
+      'not set',
+      'Strip this prefix from the source paths in the model.',
+    ],
+    [
+      '--source-url <template>',
+      'not set',
+      'Link template for source, with {path} and {line}.',
+    ],
+    [
+      '--commit <sha>',
+      'not set',
+      'Commit of the documented source, recorded in generatedFrom.',
+    ],
+    ['--check', 'off', 'Compare against what is on disk and exit 1 on drift.'],
+    ['--quiet', 'off', 'Report only the warning count, not each warning.'],
+    ['--route-prefix <path>', 'reference/api', 'Route the pages serve under.'],
+    ['--heading-level <n>', '2', 'Rank of a symbol heading.'],
+    ['--show-root-heading', 'off', "Repeat the module's name as a heading."],
+    ['--no-show-signature', 'off', 'Leave the declaration off every symbol.'],
+  ]}
+/>
+
+## What maps to what
+
+Doxygen's tree is compounds holding `memberdef` entries. The extractor folds
+that onto the model once, here:
+
+<DataTable
+  caption="Doxygen compounds and members in the reference model"
+  columns={['Doxygen', 'Model', 'Notes']}
+  rows={[
+    [
+      'compound file',
+      'module',
+      'One page per header. The route drops the extension so it splits like every other module path; the title keeps it.',
+    ],
+    [
+      'compound namespace, group',
+      'module',
+      'A member a group claims is not repeated on the page for the file that declares it.',
+    ],
+    [
+      'compound struct, class, union, interface',
+      'symbol',
+      'On the module that declares it, with its fields and methods nested under it.',
+    ],
+    ['compound dir, page, example', 'dropped', 'Navigation, not API surface.'],
+    ['memberdef function', 'function', 'A method when it sits inside a class.'],
+    ['memberdef variable', 'attribute', 'A struct field or a global.'],
+    ['memberdef define', 'macro', 'Rendered as the #define, value included.'],
+    ['memberdef typedef', 'type', 'Same kind a TypeScript alias takes.'],
+    ['memberdef enum', 'enum', 'Its enumvalue children become members.'],
+    ['enumvalue', 'constant', ''],
+  ]}
+/>
+
+Doxygen's commands become fields rather than prose, so the renderer draws them
+as the same tables every other language gets.
+
+<DataTable
+  caption="Doxygen commands and the fields they become"
+  columns={['Command', 'Field']}
+  rows={[
+    ['@param, with [in], [out] or [in,out]', 'params, with direction'],
+    ['@return, @returns', 'returns'],
+    ['@retval', 'returns, named'],
+    ['@throws, @exception', 'raises'],
+    ['@since', 'since'],
+    ['@deprecated', 'deprecated'],
+    ['@brief', 'summary, and the page description'],
+    ['@note, @warning, @see, @par', 'an aside in the description'],
+  ]}
+/>
+
+A declaration is the authority on which parameters exist and how they are
+typed; the comment is the authority on what they mean. A `@param` naming an
+argument the declaration does not have is reported as a warning rather than
+rendered as a row nobody can pass.
+
+## Descriptions
+
+Brief and detailed descriptions are rendered to Markdown: paragraphs,
+`@code` blocks as fenced blocks in the symbol's language, lists, tables, links
+and emphasis. A `ref` — Doxygen's cross-reference to another documented symbol
+— becomes the identifier in a code span, because Doxygen's ids name its own
+output files rather than model symbols, and the renderer owns routes.
+
+Cross-references written in the model's own syntax, `[Name][symbol_id]`, do
+resolve: the renderer turns them into a link to the page and anchor that
+carries the symbol, prefixed with `--base`.
+
+## The language
+
+Doxygen reports a `.h` file as C++ whatever is in it, so the `language`
+attribute alone would label every C project C++. A dump with no class and no
+namespace, out of files that are all C translation units or headers, is read as
+C. `--language` settles it either way, and the value reaches the page as the
+chip beside each symbol and the grammar its declaration is highlighted with.
+
+## The artifacts
+
+Alongside the pages, a run writes four kinds of file under
+`<public>/<route prefix>/`: `reference.json`, one `<module path>.json` per
+module, `llms.txt` and `llms-full.txt`. They are what the Python generator
+writes, in the same places, because they are the same renderer. The Python
+reference page describes them in full.
+
+## Keeping the pages honest in CI
+
+Generated pages and artifacts are committed, so the site builds without
+Doxygen. `--check` renders in memory and compares against what is on disk,
+exiting 1 on drift and naming every file that is stale, missing or orphaned.
+
+```yaml
+- run: doxygen Doxyfile
+- run: npx helia-ui-doxyref --xml build/xml --out docs/src/content/docs/reference/api --public docs/public --base /helia-sdk/ --check
+```
+
+Put it in the same workflow that builds the docs. A comment edited without
+regenerating the reference then fails the pull request rather than shipping a
+page that disagrees with the header.
+
+A run records what it wrote in `<out>/.doxyref-manifest.json` and removes only
+those files next time, so a hand-written index page kept in the same directory
+survives.
+
+## The Doxygen version
+
+Doxygen's XML is a schema'd format that ships its own `compound.xsd`, so the
+extractor takes the version from `index.xml` and records it in `generatedFrom`
+rather than pinning one release. It was developed against **Doxygen 1.17.0**,
+and the fixture its tests run on is that release's own output rather than a
+hand-written approximation, so a change in the format fails a test instead of a
+product site.
+
+The XML is read by a small reader in the package. Adding a parser dependency
+would have meant a product repository installing one to build its docs, and
+these generators run with nothing installed but this package.

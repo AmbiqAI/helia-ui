@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.17.0" xml:lang="en-US">
+  <compound refid="structhelia__config__t" kind="struct"><name>helia_config_t</name>
+    <member refid="structhelia__config__t_1ac1e9f07c0ed1f2b252d09553b270bf96" kind="variable"><name>arena</name></member>
+    <member refid="structhelia__config__t_1a4fea244aa777943981a45e742625cd78" kind="variable"><name>arena_bytes</name></member>
+    <member refid="structhelia__config__t_1ade57b2723217d0958c5c39fb0334b138" kind="variable"><name>name</name></member>
+  </compound>
+  <compound refid="helia__sample_8h" kind="file"><name>helia_sample.h</name>
+    <member refid="helia__sample_8h_1a9deacb0158b3452eb367f2d88e8dfa1e" kind="define"><name>HELIA_MAX_NAME</name></member>
+    <member refid="helia__sample_8h_1a16ab4a87d09df5d7e601c5417bb5bda2" kind="enum"><name>helia_status_t</name></member>
+    <member refid="helia__sample_8h_1a16ab4a87d09df5d7e601c5417bb5bda2a62292ace52d8d731cef866539f95782a" kind="enumvalue"><name>HELIA_OK</name></member>
+    <member refid="helia__sample_8h_1a16ab4a87d09df5d7e601c5417bb5bda2a671c2ab6beb00081f3ce1caa3c363ba0" kind="enumvalue"><name>HELIA_ERR_ARG</name></member>
+    <member refid="helia__sample_8h_1a16ab4a87d09df5d7e601c5417bb5bda2a3ec5ccc97eaf076cfa98c05f9decf36e" kind="enumvalue"><name>HELIA_ERR_MEMORY</name></member>
+    <member refid="helia__sample_8h_1a6ce77dbefa4b2bbdb16588b41a7abaa4" kind="typedef"><name>helia_model_t</name></member>
+    <member refid="helia__sample_8h_1a49a7ebfe7b5b52a9eae00a9bc01338bd" kind="function"><name>helia_model_load</name></member>
+    <member refid="helia__sample_8h_1a3a2db799d14fb02712b2d7d84f982d9a" kind="function"><name>helia_model_run</name></member>
+  </compound>
+  <compound refid="deprecated" kind="page"><name>deprecated</name>
+  </compound>
+  <compound refid="dir_68267d1309a1af8e8297ef4c3efbcdba" kind="dir"><name>src</name>
+  </compound>
+</doxygenindex>

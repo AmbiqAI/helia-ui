@@ -1,0 +1,218 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="helia__sample_8h" kind="file" language="C++">
+    <compoundname>helia_sample.h</compoundname>
+    <includes local="no">stddef.h</includes>
+    <incdepgraph>
+      <node id="1">
+        <label>src/helia_sample.h</label>
+        <link refid="helia__sample_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>stddef.h</label>
+      </node>
+    </incdepgraph>
+    <innerclass refid="structhelia__config__t" prot="public">helia_config_t</innerclass>
+    <sectiondef kind="define">
+      <memberdef kind="define" id="helia__sample_8h_1a9deacb0158b3452eb367f2d88e8dfa1e" prot="public" static="no">
+        <name>HELIA_MAX_NAME</name>
+        <initializer>32</initializer>
+        <briefdescription>
+<para>Largest model name the runtime will accept, in bytes. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Fixed rather than allocated so that a name fits in the descriptor and the descriptor fits in TCM. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/helia_sample.h" line="23" column="9" bodyfile="src/helia_sample.h" bodystart="23" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="enum">
+      <memberdef kind="enum" id="helia__sample_8h_1a16ab4a87d09df5d7e601c5417bb5bda2" prot="public" static="no" strong="no">
+        <type></type>
+        <name>helia_status_t</name>
+        <enumvalue id="helia__sample_8h_1a16ab4a87d09df5d7e601c5417bb5bda2a62292ace52d8d731cef866539f95782a" prot="public">
+          <name>HELIA_OK</name>
+          <initializer>= 0</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+<para>The call succeeded. </para>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="helia__sample_8h_1a16ab4a87d09df5d7e601c5417bb5bda2a671c2ab6beb00081f3ce1caa3c363ba0" prot="public">
+          <name>HELIA_ERR_ARG</name>
+          <initializer>= 1</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+<para>A pointer argument was null or a size was zero. </para>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="helia__sample_8h_1a16ab4a87d09df5d7e601c5417bb5bda2a3ec5ccc97eaf076cfa98c05f9decf36e" prot="public">
+          <name>HELIA_ERR_MEMORY</name>
+          <initializer>= 2</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+<para>The arena could not satisfy the allocation. </para>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+<para>What a runtime call reports back. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="since"><para>0.2 </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/helia_sample.h" line="32" column="1" bodyfile="src/helia_sample.h" bodystart="33" bodyend="37"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="helia__sample_8h_1a6ce77dbefa4b2bbdb16588b41a7abaa4" prot="public" static="no">
+        <type>struct helia_model</type>
+        <definition>typedef struct helia_model helia_model_t</definition>
+        <argsstring></argsstring>
+        <name>helia_model_t</name>
+        <briefdescription>
+<para>Opaque handle to a loaded model. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/helia_sample.h" line="26" column="26" bodyfile="src/helia_sample.h" bodystart="26" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="helia__sample_8h_1a49a7ebfe7b5b52a9eae00a9bc01338bd" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="helia__sample_8h_1a16ab4a87d09df5d7e601c5417bb5bda2" kindref="member">helia_status_t</ref></type>
+        <definition>helia_status_t helia_model_load</definition>
+        <argsstring>(const helia_config_t *config, helia_model_t **model)</argsstring>
+        <name>helia_model_load</name>
+        <param>
+          <type>const <ref refid="structhelia__config__t" kindref="compound">helia_config_t</ref> *</type>
+          <declname>config</declname>
+        </param>
+        <param>
+          <type><ref refid="helia__sample_8h_1a6ce77dbefa4b2bbdb16588b41a7abaa4" kindref="member">helia_model_t</ref> **</type>
+          <declname>model</declname>
+        </param>
+        <briefdescription>
+<para>Load a model into the caller&apos;s arena. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>The arena must outlive the handle. Nothing is copied out of <computeroutput>config</computeroutput>, so it may live on the stack.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">config</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Arena and name for the model. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="out">model</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Receives the handle on success, untouched on failure. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para><ref refid="helia__sample_8h_1a16ab4a87d09df5d7e601c5417bb5bda2a62292ace52d8d731cef866539f95782a" kindref="member">HELIA_OK</ref>, or <ref refid="helia__sample_8h_1a16ab4a87d09df5d7e601c5417bb5bda2a3ec5ccc97eaf076cfa98c05f9decf36e" kindref="member">HELIA_ERR_MEMORY</ref> when the arena is too small. </para>
+</simplesect>
+<simplesect kind="since"><para>0.2</para>
+</simplesect>
+<programlisting><codeline><highlight class="normal">helia_config_t<sp/>config<sp/>=<sp/>{<sp/>.arena<sp/>=<sp/>buffer,<sp/>.arena_bytes<sp/>=<sp/>sizeof(buffer)<sp/>};</highlight></codeline>
+<codeline><highlight class="normal">helia_model_t<sp/>*model;</highlight></codeline>
+<codeline><highlight class="normal">if<sp/>(helia_model_load(&amp;config,<sp/>&amp;model)<sp/>!=<sp/>HELIA_OK)<sp/>return<sp/>-1;</highlight></codeline>
+</programlisting> </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/helia_sample.h" line="68" column="16" declfile="src/helia_sample.h" declline="68" declcolumn="16"/>
+      </memberdef>
+      <memberdef kind="function" id="helia__sample_8h_1a3a2db799d14fb02712b2d7d84f982d9a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="helia__sample_8h_1a16ab4a87d09df5d7e601c5417bb5bda2" kindref="member">helia_status_t</ref></type>
+        <definition>helia_status_t helia_model_run</definition>
+        <argsstring>(helia_model_t *model, const float *input, size_t *scratch, float *output)</argsstring>
+        <name>helia_model_run</name>
+        <param>
+          <type><ref refid="helia__sample_8h_1a6ce77dbefa4b2bbdb16588b41a7abaa4" kindref="member">helia_model_t</ref> *</type>
+          <declname>model</declname>
+        </param>
+        <param>
+          <type>const float *</type>
+          <declname>input</declname>
+        </param>
+        <param>
+          <type>size_t *</type>
+          <declname>scratch</declname>
+        </param>
+        <param>
+          <type>float *</type>
+          <declname>output</declname>
+        </param>
+        <briefdescription>
+<para>Run one inference pass. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">model</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A handle from <ref refid="helia__sample_8h_1a49a7ebfe7b5b52a9eae00a9bc01338bd" kindref="member">helia_model_load()</ref>. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">input</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Input tensor, in the model&apos;s declared layout. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="inout">scratch</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Scratch block, resized to what the pass needed. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="out">output</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Receives the output tensor. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para><ref refid="helia__sample_8h_1a16ab4a87d09df5d7e601c5417bb5bda2a62292ace52d8d731cef866539f95782a" kindref="member">HELIA_OK</ref> on success.</para>
+</simplesect>
+<xrefsect id="deprecated_1_deprecated000001"><xreftitle>Deprecated</xreftitle><xrefdescription><para>Use helia_model_invoke() instead; this entry point ignores the model&apos;s quantization parameters. </para>
+</xrefdescription></xrefsect></para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/helia_sample.h" line="82" column="16" declfile="src/helia_sample.h" declline="82" declcolumn="16"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+<para>A miniature HELIA runtime header. </para>
+    </briefdescription>
+    <detaileddescription>
+<para>The fixture the Doxygen extractor is tested against. It is deliberately small and deliberately complete: one struct, one enum, one typedef, one macro and two functions, one of which writes through an out-parameter. </para>
+    </detaileddescription>
+    <location file="src/helia_sample.h"/>
+  </compounddef>
+</doxygen>

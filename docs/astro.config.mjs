@@ -112,6 +112,7 @@ export default defineConfig({
           items: [
             { label: 'Feature mapping', slug: 'migrating-from-mkdocs' },
             { label: 'Python API reference', slug: 'python-api-reference' },
+            { label: 'C and C++ API reference', slug: 'c-api-reference' },
           ],
         },
         {
