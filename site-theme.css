@@ -46,13 +46,13 @@
   /**
    * dial: --helia-accent-secondary
    * changes: The second accent, for a treatment that needs two: a gradient, a
-   *   chart series, a hero band. Leave it equal to the first and nothing pairs.
+   *   tone, a hero band. Leave it equal to the first and nothing pairs.
    * values: Any color, on the same terms as the first accent.
    * default: var(--helia-accent-slate)
-   * reads: `Badge` tone `secondary`, `LinkCard`'s directional cue under the
-   *   pointer, and `--chart-2` in `shadcn.css`, so the second series of a
-   *   React chart. `EditorialBand` pairs it with the first accent when the
-   *   hero treatment is `gradient`.
+   * reads: `Badge` tone `secondary` and `LinkCard`'s directional cue under the
+   *   pointer. `EditorialBand` pairs it with the first accent when the hero
+   *   treatment is `gradient`. Charts do not read it: the series ramp is
+   *   `--helia-chart-*`, which is a palette rather than a dial.
    */
   --helia-accent-secondary: var(--helia-accent-slate);
 

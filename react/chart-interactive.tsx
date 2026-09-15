@@ -73,8 +73,10 @@ export type ChartZoom = 'none' | 'inside' | 'slider';
 /** Which of the two renderers draws the plot area. */
 export type ChartRenderer = 'svg' | 'canvas';
 
-const CHART_ASPECT = 'var(--helia-chart-aspect, 16 / 9)';
-const CHART_MIN_HEIGHT = 'var(--helia-chart-min-height, 10rem)';
+/* The frame is the one react/chart.tsx sets, on the same two properties, so a
+   Recharts card and an ECharts card in the same row have the same shape. */
+const CHART_ASPECT = 'var(--chart-aspect, 16 / 9)';
+const CHART_MIN_HEIGHT = 'var(--chart-min-height, 10rem)';
 
 /* Outer padding only: `containLabel` measures the ticks, so these do not have
    to be guessed from the longest label. The slider is the one thing that needs

@@ -73,17 +73,19 @@
   --radius: var(--helia-radius-md);
 
   /*
-   * The chart ramp is the hub's accent set in the order the catalog reads
-   * best. The second series is the site's second accent, which is the case the
-   * dial was named for: a two-series chart is the commonest place a site has to
-   * pair two colors, and a site that leaves the dial alone gets the neutral
-   * it defaults to rather than a hue it never chose.
+   * Recharts reads this ramp, Plot and ECharts read `--helia-chart-*`, and the
+   * three draw the same figure on the same page. Aliasing rather than
+   * restating is what keeps them one ramp: the series order, the per-theme
+   * inversion and the 3:1 floor are all decided once, in semantic.css.
+   *
+   * shadcn stops at five; the token layer offers six. A Recharts chart that
+   * needs the sixth reads `--helia-chart-6` directly.
    */
-  --chart-1: var(--helia-accent-cyan);
-  --chart-2: var(--helia-accent-secondary);
-  --chart-3: var(--helia-accent-blue);
-  --chart-4: var(--helia-accent-orange);
-  --chart-5: var(--helia-accent-pink);
+  --chart-1: var(--helia-chart-1);
+  --chart-2: var(--helia-chart-2);
+  --chart-3: var(--helia-chart-3);
+  --chart-4: var(--helia-chart-4);
+  --chart-5: var(--helia-chart-5);
 
   /*
    * The chart frame is the card's shape, not the drawing's. Recharts measures
@@ -122,7 +124,7 @@
   --muted: var(--helia-surface-card-muted);
   --subtle: var(--helia-surface-hover);
   --radius: var(--helia-radius-md);
-  --chart-2: var(--helia-accent-secondary);
+  --chart-2: var(--helia-chart-2);
   --transition-duration-150: var(--helia-motion-fast);
   --transition-duration-200: var(--helia-motion-base);
   --transition-duration-300: var(--helia-motion-slow);

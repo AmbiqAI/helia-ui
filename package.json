@@ -11,7 +11,7 @@
     "npm": ">=11"
   },
   "scripts": {
-    "validate": "npm run format:check && npm run check:spdx && npm run check:notices && npm run check:spelling && npm run check:styles && npm run check:boundaries && npm run check:islands && npm run check:astro-props && npm run check:site-theme && npm run check:foundations && npm run check:peers && npm run check:discoverability",
+    "validate": "npm run format:check && npm run check:spdx && npm run check:notices && npm run check:spelling && npm run check:styles && npm run check:boundaries && npm run check:islands && npm run check:shadcn-align && npm run check:astro-props && npm run check:site-theme && npm run check:foundations && npm run check:peers && npm run check:discoverability",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check:spdx": "node scripts/check-spdx.mjs",
@@ -21,6 +21,7 @@
     "check:styles": "node scripts/check-style-literals.mjs",
     "check:boundaries": "node scripts/check-component-boundaries.mjs",
     "check:islands": "node scripts/check-islands.mjs",
+    "check:shadcn-align": "node scripts/rename-token-prefix.mjs --check",
     "check:astro-props": "node scripts/astro-props.mjs --check",
     "check:site-theme": "node scripts/site-theme-doc.mjs --check",
     "check:foundations": "node scripts/foundations-doc.mjs --check",
@@ -41,6 +42,8 @@
   "exports": {
     "./astro/*": "./astro/*.astro",
     "./react/*": "./react/*.tsx",
+    "./chart-plot-spec": "./chart-plot-spec.ts",
+    "./chart-echarts-theme": "./chart-echarts-theme.ts",
     "./reference-model": "./reference-model.ts",
     "./starlight": "./starlight/index.ts",
     "./starlight/*": "./starlight/*",

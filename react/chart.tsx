@@ -8,7 +8,11 @@ import * as RechartsPrimitive from 'recharts';
 import type { TooltipValueType } from 'recharts';
 
 // Format: { THEME_NAME: CSS_SELECTOR }
-const THEMES = { light: '', dark: '.dark' } as const;
+/* Upstream ships `.dark` here, which nothing in this package sets: the theme
+   flips on the attribute Starlight already owns, the same one
+   `@custom-variant dark` keys on in shadcn.css. Reapplied after a regeneration
+   by scripts/rename-token-prefix.mjs. */
+const THEMES = { light: '', dark: "[data-theme='dark']" } as const;
 
 const INITIAL_DIMENSION = { width: 320, height: 200 } as const;
 

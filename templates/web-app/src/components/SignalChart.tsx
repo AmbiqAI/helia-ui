@@ -10,9 +10,9 @@ import {
 import { WINDOW_SECONDS, type StreamPoint } from '../stream/use-stream';
 
 /*
- * `var(--chart-1)` is the package's ramp, aliased to the hub accents in
- * shadcn.css, so the trace follows the theme flip without this file knowing a
- * color.
+ * `var(--chart-1)` is the package's ramp, aliased in shadcn.css to the same
+ * `--helia-chart-*` series the Plot and ECharts parts draw with, so the trace
+ * follows the theme flip without this file knowing a color.
  */
 const chartConfig = {
   signal: { label: 'PPG', color: 'var(--chart-1)' },

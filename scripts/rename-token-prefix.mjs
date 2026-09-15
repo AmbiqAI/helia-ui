@@ -5,8 +5,9 @@
  * One-shot rename onto the single `--helia-` package prefix.
  *
  * The design system used two prefixes: `--ds-*` for the shared primitives in
- * src/styles/tokens.css and `--hub-*` for the hub's semantic layer. Both are
- * now `--helia-`; the two layers stay in separate files but share the prefix.
+ * the package's tokens.css and `--hub-*` for the semantic layer in its
+ * semantic.css. Both are now `--helia-`; the two layers stay in separate
+ * files but share the prefix.
  * The site-named class prefix `hub-` moves to `helia-` with them.
  *
  * This is committed rather than thrown away because aitg-handbook consumes
@@ -28,7 +29,7 @@
  * it.
  *
  * Flags: --root <dir> (default: the package this script ships in),
- * --tokens-only, --dry-run.
+ * --tokens-only, --dry-run, --check.
  */
 
 import fs from 'node:fs';
@@ -116,9 +117,9 @@ const RULES = tokensOnly ? TOKEN_RULES : [...TOKEN_RULES, ...CLASS_RULES];
  * and `bg-accent` meant "hover gray". Renaming shadcn's pair to `subtle`
  * leaves `accent` meaning the brand accent everywhere.
  *
- * Scoped to the generated components: src/styles/shadcn.css is hand-authored,
- * was renamed once, and discusses the old names in its comments, so a rerun
- * must leave it alone. The lookbehinds spare `--sl-color-accent` (Starlight's
+ * Scoped to the generated components: the package's shadcn.css is
+ * hand-authored, was renamed once, and discusses the old names in its
+ * comments, so a rerun must leave it alone. The lookbehinds spare `--sl-color-accent` (Starlight's
  * own accent), `--sidebar-accent` (namespaced, so no collision) and the
  * `--helia-accent-*` card palette.
  *
@@ -137,6 +138,30 @@ const ACCENT_RULE = {
 };
 
 /*
+ * `shadcn add` writes the `utils` alias from components.json into every
+ * component it generates, and that alias is only resolvable inside this
+ * package: react/ ships as source, so a consumer's bundler resolves the import
+ * with its own config and neither the hub nor the docs app maps `@`. Rewriting
+ * to the `cn` peer -- which is where the helper actually comes from, and what
+ * every component already imports -- is one specifier away from upstream and
+ * is the only form that resolves on both sides of the package boundary.
+ *
+ * A react/utils.ts re-export would leave the generated text byte-identical to
+ * upstream, which is the stronger claim, but it would ship that unresolvable
+ * `@/` import to consumers. Hence the rewrite.
+ *
+ * Blanket over the generated directory rather than an alignment rule: like the
+ * accent rename it has nothing to say about a component's shape, and it
+ * matches nothing in a committed tree, so it has no post-state for --check.
+ */
+const CN_IMPORT_RULE = {
+  name: 'shadcn-cn-import',
+  files: (rel) => rel.startsWith(REACT_DIR) && rel.endsWith('.tsx'),
+  pattern: /from '@\/(?:react|lib)\/utils'/g,
+  replacement: "from 'cn'",
+};
+
+/*
  * The shadcn/Astro alignment, in the same reapply-after-an-add form as the
  * accent rename above. `shadcn add` writes its own ring, radius, icon and
  * height ladders back into a regenerated file; these rules put them back onto
@@ -147,6 +172,14 @@ const ACCENT_RULE = {
  * button and a scroll frame on a menu, and only the components with an Astro
  * counterpart have been measured against one. Extend the file list when a
  * component joins the cohesion page. See AmbiqAI/helia-ui#20.
+ *
+ * `post` is what `--check` asserts: the literal the rule leaves behind, and
+ * the files it has to be in. That list is narrower than `files`, which is
+ * deliberately broad -- a rule offers itself to every aligned component, but
+ * only some of them have the shape it rewrites, and an upstream accordion has
+ * no focus ring to move. The point of the assertion is that a rule which
+ * quietly stops matching everywhere is caught, because a zero-match rewrite
+ * and a correct one are otherwise indistinguishable in the output.
  */
 const inReact = (rel, names) =>
   names.some((name) => rel === `${REACT_DIR}${name}`);
@@ -169,24 +202,44 @@ const ALIGN_RULES = [
       /(?:focus-visible:border-ring )?focus-visible:ring-\[3px\] focus-visible:ring-ring\/50/g,
     replacement:
       'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+    post: {
+      text: 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+      files: ['badge.tsx', 'button.tsx', 'input.tsx', 'select.tsx'],
+    },
   },
   {
     name: 'shadcn-icon-size',
     files: (rel) => inReact(rel, ALIGNED),
     pattern: /(\[&[>_]svg(?::not\(\[class\*='size-'\]\))?\]:)size-[34]\b/g,
     replacement: '$1size-[1em]',
+    post: {
+      text: ']:size-[1em]',
+      files: ['badge.tsx', 'button.tsx', 'select.tsx', 'tabs.tsx'],
+    },
   },
   {
     name: 'shadcn-transition',
     files: (rel) => inReact(rel, ALIGNED),
     pattern: /transition-(?:all|\[color,box-shadow\])/g,
     replacement: 'transition-colors',
+    post: {
+      text: 'transition-colors',
+      files: [
+        'accordion.tsx',
+        'badge.tsx',
+        'button.tsx',
+        'input.tsx',
+        'select.tsx',
+        'tabs.tsx',
+      ],
+    },
   },
   {
     name: 'shadcn-pill',
     files: (rel) => inReact(rel, ['badge.tsx', 'button.tsx']),
     pattern: /rounded-(?:md|full)\b/g,
     replacement: 'rounded-pill',
+    post: { text: 'rounded-pill', files: ['badge.tsx', 'button.tsx'] },
   },
   {
     name: 'shadcn-control-height',
@@ -194,6 +247,10 @@ const ALIGN_RULES = [
     pattern: /\bh-(8|9|10)\b/g,
     replacement: (_, step) =>
       `min-h-(--helia-control-${{ 8: 'sm', 9: 'md', 10: 'lg' }[step]})`,
+    post: {
+      text: 'min-h-(--helia-control-',
+      files: ['button.tsx', 'input.tsx', 'select.tsx'],
+    },
   },
 
   /*
@@ -215,6 +272,7 @@ const ALIGN_RULES = [
     files: (rel) => inReact(rel, ['switch.tsx']),
     pattern: /data-\[size=sm\]:w-6\b/g,
     replacement: 'data-[size=sm]:w-[1.5rem]',
+    post: { text: 'data-[size=sm]:w-[1.5rem]', files: ['switch.tsx'] },
   },
 
   /*
@@ -227,6 +285,10 @@ const ALIGN_RULES = [
     files: (rel) => inReact(rel, ['checkbox.tsx', 'radio-group.tsx']),
     pattern: /dark:bg-input\/30 /g,
     replacement: 'bg-secondary ',
+    post: {
+      text: 'bg-secondary ',
+      files: ['checkbox.tsx', 'radio-group.tsx'],
+    },
   },
 
   /*
@@ -238,6 +300,10 @@ const ALIGN_RULES = [
     files: (rel) => inReact(rel, ['button.tsx']),
     pattern: /hover:bg-secondary\/82/g,
     replacement: 'hover:bg-subtle hover:text-subtle-foreground',
+    post: {
+      text: 'hover:bg-subtle hover:text-subtle-foreground',
+      files: ['button.tsx'],
+    },
   },
 
   /*
@@ -257,6 +323,10 @@ const ALIGN_RULES = [
       /absolute top-4 right-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none(?: data-\[state=open\]:bg-(?:subtle|secondary))?(?: data-\[state=open\]:text-muted-foreground)?/g,
     replacement:
       'absolute top-[var(--helia-overlay-inset,var(--helia-space-6))] right-[var(--helia-overlay-inset,var(--helia-space-6))] inline-flex size-(--helia-control-sm) items-center justify-center rounded-pill text-muted-foreground transition-colors hover:bg-subtle hover:text-subtle-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none',
+    post: {
+      text: 'absolute top-[var(--helia-overlay-inset,var(--helia-space-6))]',
+      files: ['dialog.tsx', 'sheet.tsx'],
+    },
   },
   {
     name: 'shadcn-overlay-inset',
@@ -264,6 +334,10 @@ const ALIGN_RULES = [
     pattern: /bg-background shadow-lg/g,
     replacement:
       'bg-background [--helia-overlay-inset:var(--helia-space-4)] shadow-lg',
+    post: {
+      text: '[--helia-overlay-inset:var(--helia-space-4)]',
+      files: ['sheet.tsx'],
+    },
   },
 
   /*
@@ -287,6 +361,7 @@ const ALIGN_RULES = [
         "'flex h-10 w-full rounded-md": "'flex h-full w-full rounded-md",
         'size-4 shrink-0 opacity-50': 'size-4 shrink-0 text-muted-foreground',
       })[match],
+    post: { text: 'h-(--helia-control-md)', files: ['command.tsx'] },
   },
 
   /*
@@ -309,6 +384,7 @@ const ALIGN_RULES = [
         return `position={position}\n${propIndent}align={align}\n${propIndent}sideOffset={sideOffset}\n${propIndent}{...props}`;
       return "'w-full";
     },
+    post: { text: "position = 'popper'", files: ['select.tsx'] },
   },
 
   /*
@@ -322,6 +398,26 @@ const ALIGN_RULES = [
     pattern: /focus:bg-subtle focus:text-subtle-foreground(?! data-\[high)/g,
     replacement:
       'focus:bg-subtle focus:text-subtle-foreground data-[highlighted]:bg-subtle data-[highlighted]:text-subtle-foreground',
+    post: {
+      text: 'data-[highlighted]:bg-subtle',
+      files: ['select.tsx', 'dropdown-menu.tsx'],
+    },
+  },
+
+  /*
+   * Recharts is told which selector means dark so it can emit one style block
+   * per theme. Upstream's answer is Tailwind's `.dark` class, which nothing in
+   * this package sets: the theme flips on the `data-theme` attribute Starlight
+   * owns, and shadcn.css keys `@custom-variant dark` on the same attribute. A
+   * regenerated chart.tsx otherwise emits a dark block that never matches, and
+   * every series silently keeps its light color.
+   */
+  {
+    name: 'shadcn-dark-selector',
+    files: (rel) => inReact(rel, ['chart.tsx']),
+    pattern: /dark: '\.dark'/g,
+    replacement: `dark: "[data-theme='dark']"`,
+    post: { text: `dark: "[data-theme='dark']"`, files: ['chart.tsx'] },
   },
 ];
 
@@ -330,6 +426,49 @@ function trackedFiles() {
     .split('\n')
     .filter(Boolean);
 }
+
+/*
+ * --check asserts the alignment is still applied, which is the half of this
+ * script that rots without saying so. A rewrite that matches nothing is
+ * indistinguishable from one that matched and landed, so an upstream rename of
+ * a class string would take an alignment away on the next `shadcn add` and the
+ * script would keep reporting a clean run.
+ */
+function check() {
+  const misses = [];
+  for (const rule of ALIGN_RULES) {
+    if (!rule.post) {
+      misses.push(`${rule.name}: no post-state declared`);
+      continue;
+    }
+    for (const name of rule.post.files) {
+      const rel = `${REACT_DIR}${name}`;
+      const abs = path.join(ROOT, rel);
+      if (!fs.existsSync(abs)) {
+        misses.push(`${rule.name}: ${rel} is missing`);
+        continue;
+      }
+      if (!fs.readFileSync(abs, 'utf8').includes(rule.post.text))
+        misses.push(`${rule.name}: ${rel} does not contain ${rule.post.text}`);
+    }
+  }
+
+  console.log(`rename-token-prefix --check: root ${ROOT}`);
+  if (!misses.length) {
+    console.log(`  ${ALIGN_RULES.length} alignment rules applied`);
+    return 0;
+  }
+  for (const miss of misses) console.error(`  ${miss}`);
+  console.error(
+    '  Re-run `node scripts/rename-token-prefix.mjs` after a `shadcn add`, or',
+  );
+  console.error(
+    '  update the rule if upstream changed the string it rewrites.',
+  );
+  return 1;
+}
+
+if (args.includes('--check')) process.exit(check());
 
 const counts = new Map();
 let filesChanged = 0;
@@ -344,7 +483,9 @@ for (const rel of trackedFiles()) {
 
   const rules = [
     ...RULES,
-    ...[ACCENT_RULE, ...ALIGN_RULES].filter((rule) => rule.files(rel)),
+    ...[ACCENT_RULE, CN_IMPORT_RULE, ...ALIGN_RULES].filter((rule) =>
+      rule.files(rel),
+    ),
   ];
   for (const rule of rules) {
     const hits = next.match(rule.pattern);

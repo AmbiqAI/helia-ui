@@ -5,8 +5,8 @@
  * three candidates do not have.
  *
  * Two things are being shown here rather than one. The first is the figure:
- * the same three charts, themed through `heliaEchartsTheme`, so the row can be
- * read against the rows above it. The second is what an interactive library
+ * the same three charts, themed through the package's own ECharts theme, so
+ * the row can be read against the rows above it. The second is what an interactive library
  * costs and gives -- a tooltip on hover, a legend that toggles a series, a
  * zoom on the line, a brush over the scatter -- which none of the others
  * offer without being written by hand.
@@ -32,7 +32,14 @@ import {
 } from 'echarts/components';
 import * as echarts from 'echarts/core';
 import { SVGRenderer } from 'echarts/renderers';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+import {
+  chartEchartsPaletteKey,
+  chartEchartsTheme,
+  readChartEchartsPalette,
+  HELIA_ECHARTS_THEME,
+} from '@ambiqai/helia-ui/chart-echarts-theme';
 
 import {
   accuracyFraming,
@@ -44,10 +51,6 @@ import {
   seriesLabels,
   type ChartFraming,
 } from '../lib/chart-data';
-import {
-  HELIA_ECHARTS_THEME,
-  heliaEchartsTheme,
-} from '../lib/chart-echarts-theme';
 import { CandidateRow, ChartPanel } from './chart-candidate-frame';
 
 echarts.use([
@@ -62,7 +65,22 @@ echarts.use([
   TooltipComponent,
   SVGRenderer,
 ]);
-echarts.registerTheme(HELIA_ECHARTS_THEME, heliaEchartsTheme);
+/* The theme is the package's, so the candidate is judged on the library rather
+   than on a second set of colors. Registration is global and keyed on the
+   palette, exactly as react/chart-interactive.tsx does it: with no document to
+   read -- the build -- every entry comes back as its own `var()`, which is what
+   lets the SSR figure arrive already in the reader's theme. */
+let registeredPalette: string | null = null;
+
+function registerTheme(node?: Element): void {
+  const palette = readChartEchartsPalette(node);
+  const key = chartEchartsPaletteKey(palette);
+  if (key === registeredPalette) return;
+  echarts.registerTheme(HELIA_ECHARTS_THEME, chartEchartsTheme(palette));
+  registeredPalette = key;
+}
+
+registerTheme();
 
 type Option = Parameters<echarts.ECharts['setOption']>[0];
 
@@ -185,6 +203,20 @@ function EChartsPanel({
   option: Option;
 }) {
   const host = useRef<HTMLDivElement | null>(null);
+  const [generation, setGeneration] = useState(0);
+
+  /* Resolved colors do not follow the toggle the way a `var()` does, so the
+     instance is rebuilt against the new cascade instead. */
+  useEffect(() => {
+    const observer = new MutationObserver(() =>
+      setGeneration((value) => value + 1),
+    );
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const node = host.current;
@@ -192,6 +224,7 @@ function EChartsPanel({
     /* The build's SVG goes first: `init` would otherwise mount the instance
        beside it and the panel would hold two figures. */
     node.replaceChildren();
+    registerTheme(node);
     const chart = echarts.init(node, HELIA_ECHARTS_THEME, { renderer: 'svg' });
     chart.setOption(option);
     const observer = new ResizeObserver(() => chart.resize());
@@ -200,7 +233,7 @@ function EChartsPanel({
       observer.disconnect();
       chart.dispose();
     };
-  }, [option]);
+  }, [option, generation]);
 
   return (
     <ChartPanel framing={framing}>

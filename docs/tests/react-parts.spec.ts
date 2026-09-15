@@ -273,6 +273,30 @@ test('every chart card draws a sized chart', async ({ page }) => {
 });
 
 /*
+ * Recharts reads `--chart-*` and the Plot and ECharts parts read
+ * `--helia-chart-*`. While those were two different ramps the same series was
+ * a different color in each library on the same page, and nothing failed. The
+ * assertion is the painted mark against the token, because the alias is what
+ * would go missing and an alias has no other visible effect.
+ */
+test('a Recharts series is painted the shared chart ramp', async ({ page }) => {
+  await page.goto(`${base}/react/data-display/`);
+
+  const bar = page
+    .locator('[data-slot="chart"] .recharts-bar-rectangle path')
+    .first();
+  await expect(bar).toBeAttached({ timeout: 15_000 });
+
+  /* Polled: the fill is `var(--color-latency)`, which resolves through the
+     style block the chart writes for its own id after hydration. */
+  await expect
+    .poll(() => bar.evaluate((node) => getComputedStyle(node).fill), {
+      timeout: 15_000,
+    })
+    .toBe(await resolveToken(page, '--helia-chart-1'));
+});
+
+/*
  * The menu drops below its trigger rather than over the heading above it, and
  * the row under the pointer is a color the popover ground is not: they were
  * the same value in light, so nothing appeared to happen on hover.

@@ -10,8 +10,10 @@
  * Scope: <style> blocks in src/components (recursively), src/styles, and the
  * stylesheets of packages/helia-ui. Literals are allowed in tokens.css and in
  * custom property declarations on a bare :root selector in the files that
- * define tokens, which is where the scales are defined. React islands are out
- * of scope; they carry their own MUI palette.
+ * define tokens, which is where the scales are defined. React components and
+ * islands are out of scope: they have no <style> block to scan, and the
+ * utility classes they do carry resolve through the same tokens by way of
+ * shadcn.css.
  */
 
 import fs from 'node:fs';
