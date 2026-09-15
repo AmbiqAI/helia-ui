@@ -1,0 +1,59 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A square frame around one glyph: the mark that lets a row, a card or a panel
+ * stand up without artwork.
+ *
+ * It is the same recipe as the card header's disc -- `.helia-icon-tile` and
+ * `.helia-card-mark` share one definition in `recipes.css`, and differ only in
+ * the box they take and the radius they round to. A tile written here and a
+ * disc written by `CardHeader` therefore tint, center and color their glyph
+ * identically, so a column that mixes them lines up.
+ *
+ * The box comes off the control-height scale rather than the card padding
+ * hook, because a tile is as often beside a line of text as it is inside a
+ * card, and a control height is the measure that reads in both places.
+ *
+ * `--accent` is the per-instance dial: set it in a `style` attribute and the
+ * tint and the glyph follow it, which is how a list of collections gives each
+ * entry its own color without the part learning what a collection is.
+ *
+ * @slot default -- The glyph, when `name` is not the way to reach it: an inline `<svg>`, a brand mark, a numeral.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import type { IconName } from '@fortawesome/fontawesome-svg-core';
+import Icon from './Icon.astro';
+
+interface Props extends HTMLAttributes<'span'> {
+  /** Font Awesome solid name in kebab case, e.g. `gauge-high`. Omit it and the slot carries the glyph. */
+  name?: IconName;
+  /** Accessible name for the glyph. Omit it where the text beside the tile already says the same thing. */
+  label?: string;
+  /** The box, on the control-height scale. */
+  size?: 'sm' | 'md' | 'lg';
+  /** What stands in for the frame: a hairline edge, the accent at tint weight, or the accent solid. */
+  variant?: 'outlined' | 'tinted' | 'filled';
+}
+
+const {
+  name,
+  label,
+  size = 'md',
+  variant = 'tinted',
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<span
+  class:list={[
+    'helia-icon-tile',
+    size !== 'md' && `helia-icon-tile--${size}`,
+    variant !== 'tinted' && `helia-icon-tile--${variant}`,
+    className,
+  ]}
+  {...rest}
+>
+  {name ? <Icon name={name} label={label} /> : <slot />}
+</span>

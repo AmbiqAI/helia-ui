@@ -6,7 +6,7 @@ const gallery = '/helia-ui/gallery/';
 
 /* What the page ends with. The gallery is where an owner goes to choose, so an
  * example that quietly stops rendering is the page failing at its one job. */
-const EXAMPLES = 75;
+const EXAMPLES = 78;
 
 /*
  * The root element each part renders. An example's source is a prop rather than
@@ -38,6 +38,8 @@ const PART_ROOTS: Record<string, string> = {
   EditorialBand: '.editorial-band',
   Eyebrow: '.helia-eyebrow',
   Icon: '.helia-icon',
+  IconRow: '.helia-icon-row',
+  IconTile: '.helia-icon-tile',
   LinkCard: '.helia-link-card',
   Masonry: '.helia-masonry',
   Media: '.helia-media',
@@ -46,6 +48,7 @@ const PART_ROOTS: Record<string, string> = {
   Reveal: 'helia-reveal',
   SectionHeader: '.section-header',
   ShowcaseCarousel: 'showcase-carousel',
+  SplitPanel: '.helia-split-panel',
   StatCard: '.helia-stat-card',
   Timeline: '.timeline',
 };
@@ -105,4 +108,37 @@ test('an example renders the parts its source names', async ({ page }) => {
   expect(missing, 'named in an example source but not on its stage').toEqual(
     [],
   );
+});
+
+test('the rows and panels section renders all three parts', async ({
+  page,
+}) => {
+  await page.goto(gallery);
+
+  await expect(page.locator('.helia-icon-tile').first()).toBeVisible();
+  await expect(page.locator('a.helia-icon-row').first()).toBeVisible();
+  await expect(page.locator('.helia-split-panel')).toHaveCount(1);
+
+  /* The panel exists for the code slot; an empty one is the example not doing
+     the job the section claims for it. */
+  await expect(
+    page.locator('.helia-split-panel__code helia-code-tabs'),
+  ).toHaveCount(1);
+});
+
+test('an icon row is one anchor around its tile and its title', async ({
+  page,
+}) => {
+  await page.goto(gallery);
+
+  const rows = page.locator('a.helia-icon-row');
+  expect(await rows.count()).toBeGreaterThan(0);
+
+  const row = rows.first();
+  await expect(row.locator('.helia-icon-tile')).toHaveCount(1);
+  await expect(row.locator('.helia-icon-row__title')).toHaveCount(1);
+
+  /* An anchor inside the anchor is invalid markup and the production assert
+     fails the build on it, so the row is the only link in the row. */
+  await expect(row.locator('a')).toHaveCount(0);
 });

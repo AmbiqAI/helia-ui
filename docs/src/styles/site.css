@@ -20,6 +20,21 @@
 .helia-media-surface-grid {
   display: grid;
   gap: var(--helia-space-3);
+}
+
+/*
+ * The docs column is narrower than a page of the sites the package ships to,
+ * so a grid that names no count fits to it. A grid that names one has said
+ * what it wants, and this sheet loads after the recipes: without the exclusion
+ * a `columns={2}` example would render at whatever count the width allowed,
+ * which is the one thing the example is there to show.
+ */
+.helia-card-grid:not(
+  .helia-card-grid--2,
+  .helia-card-grid--3,
+  .helia-card-grid--4
+),
+.helia-media-surface-grid {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
 }
 

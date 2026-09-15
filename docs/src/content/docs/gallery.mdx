@@ -26,6 +26,8 @@ import EditorialBand from '@ambiqai/helia-ui/astro/EditorialBand';
 import Example from '../../components/Example.astro';
 import Eyebrow from '@ambiqai/helia-ui/astro/Eyebrow';
 import Icon from '@ambiqai/helia-ui/astro/Icon';
+import IconRow from '@ambiqai/helia-ui/astro/IconRow';
+import IconTile from '@ambiqai/helia-ui/astro/IconTile';
 import LinkCard from '@ambiqai/helia-ui/astro/LinkCard';
 import Masonry from '@ambiqai/helia-ui/astro/Masonry';
 import Media from '@ambiqai/helia-ui/astro/Media';
@@ -35,6 +37,7 @@ import Reveal from '@ambiqai/helia-ui/astro/Reveal';
 import RevealReplay from '../../components/RevealReplay.astro';
 import SectionHeader from '@ambiqai/helia-ui/astro/SectionHeader';
 import ShowcaseCarousel from '@ambiqai/helia-ui/astro/ShowcaseCarousel';
+import SplitPanel from '@ambiqai/helia-ui/astro/SplitPanel';
 import StatCard from '@ambiqai/helia-ui/astro/StatCard';
 import Timeline from '@ambiqai/helia-ui/astro/Timeline';
 import {
@@ -1996,6 +1999,154 @@ its type with it.
       density="compact"
     />
   </ChartGroup>
+</Example>
+
+## Rows and panels
+
+Three parts for an index rather than a grid of cards: the tile that marks an
+entry, the row that is one entry, and the panel that sets a short piece of
+writing beside the code it describes.
+
+### Icon tiles
+
+The box comes off the control-height scale and the frame is one of three.
+`--accent` is per instance, so a list can give every entry a color of its own
+without the part learning what the list holds.
+
+<Example
+  title="<IconTile size variant />"
+  code={`
+    <div className="helia-display-row">
+      <IconTile name="microchip" size="sm" />
+      <IconTile name="microchip" />
+      <IconTile name="microchip" size="lg" />
+      <IconTile name="gauge-high" variant="outlined" />
+      <IconTile name="gauge-high" variant="filled" />
+      <IconTile
+        name="chart-line"
+        size="lg"
+        variant="filled"
+        style="--accent: var(--helia-accent-cyan)"
+      />
+    </div>
+  `}
+>
+  <div className="helia-display-row">
+    <IconTile name="microchip" size="sm" />
+    <IconTile name="microchip" />
+    <IconTile name="microchip" size="lg" />
+    <IconTile name="gauge-high" variant="outlined" />
+    <IconTile name="gauge-high" variant="filled" />
+    <IconTile
+      name="chart-line"
+      size="lg"
+      variant="filled"
+      style="--accent: var(--helia-accent-cyan)"
+    />
+  </div>
+</Example>
+
+### Icon rows
+
+The anchor is the row itself, so the tile, the title and the line are one hit
+area and one accessible name. Hover tints the row where it sits; nothing
+lifts. Two to a desktop column and one to a phone is `CardGrid columns={2}`.
+
+<Example
+  title="<IconRow href title icon />"
+  code={`
+    <CardGrid columns={2}>
+      <IconRow href="/helia-ui/cards/" title="Cards" icon="layer-group">
+        Every part of the card family, and the modifiers that move them.
+      </IconRow>
+      <IconRow href="/helia-ui/code/" title="Code" icon="code">
+        Fences, language tabs and the terminal transcript.
+      </IconRow>
+      <IconRow href="/helia-ui/layout/" title="Layout" icon="table-columns">
+        Bands, grids and the two mosaics.
+      </IconRow>
+      <IconRow href="/helia-ui/foundations/" title="Foundations" icon="palette">
+        The tokens every recipe on this page is built from.
+      </IconRow>
+    </CardGrid>
+  `}
+>
+  <CardGrid columns={2}>
+    <IconRow href="/helia-ui/cards/" title="Cards" icon="layer-group">
+      Every part of the card family, and the modifiers that move them.
+    </IconRow>
+    <IconRow href="/helia-ui/code/" title="Code" icon="code">
+      Fences, language tabs and the terminal transcript.
+    </IconRow>
+    <IconRow href="/helia-ui/layout/" title="Layout" icon="table-columns">
+      Bands, grids and the two mosaics.
+    </IconRow>
+    <IconRow href="/helia-ui/foundations/" title="Foundations" icon="palette">
+      The tokens every recipe on this page is built from.
+    </IconRow>
+  </CardGrid>
+</Example>
+
+### Split panel
+
+The `code` slot is what the panel exists for: the block is the answer to the
+sentence beside it rather than a fence further down the page. `ratio` gives the
+two columns their share of the width, and below 62rem the text leads and the
+code follows.
+
+<Example
+  title='<SplitPanel ratio="3:2">'
+  code={`
+    <SplitPanel ratio="3:2" titleAs="h4">
+      <span slot="eyebrow">Quickstart</span>
+      <span slot="title">Profile a model on the board</span>
+      <div slot="body">
+        The command reads the model, runs it on the attached board and writes
+        the layer timings beside it.
+      </div>
+      <CodeTabs
+        slot="code"
+        ariaLabel="Profiler quickstart"
+        tabs={[
+          {
+            label: 'Shell',
+            language: 'bash',
+            code: 'npm run profile -- model',
+          },
+          {
+            label: 'Python',
+            language: 'python',
+            code: "profile('model')",
+          },
+        ]}
+      />
+    </SplitPanel>
+  `}
+>
+  <SplitPanel ratio="3:2" titleAs="h4">
+    <span slot="eyebrow">Quickstart</span>
+    <span slot="title">Profile a model on the board</span>
+    <div slot="body">
+      The command reads the model, runs it on the attached board and writes the
+      layer timings beside it.
+    </div>
+    <CodeTabs
+      slot="code"
+      ariaLabel="Profiler quickstart"
+      tabs={[
+        {
+          label: 'Shell',
+          language: 'bash',
+          code: 'npm run profile -- model',
+        },
+        {
+          label: 'Python',
+          language: 'python',
+          code: "profile('model')",
+        },
+      ]}
+    />
+  </SplitPanel>
 </Example>
 
 ## Other parts

@@ -1,0 +1,90 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A linked row: an `IconTile`, a title with the directional cue, and one line
+ * about where the row goes.
+ *
+ * It is the entry a long index is made of, where a card per item would be a
+ * page of boxes. Two of them fit a desktop column and one a phone, so a run of
+ * rows belongs in `<CardGrid columns={2}>`; on its own a row takes the width
+ * it is given.
+ *
+ * With `href` the row's root element is the anchor, rather than a stretched
+ * link over a frame the way a card does it. A row has no frame to stretch
+ * over, and an anchor around the whole row is one hit area and one accessible
+ * name. The cost is that the row's own line may not carry a link of its own:
+ * a nested anchor is invalid, and `assert:production` fails the build on it.
+ *
+ * Hover is the surface transition and nothing else. A row is text on the page
+ * rather than an object above it, so it tints where it sits; it never lifts.
+ *
+ * @slot default -- The one line under the title.
+ * @slot icon -- A glyph for the tile, when `icon` is not the way to reach it.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import type { IconName } from '@fortawesome/fontawesome-svg-core';
+import IconTile from './IconTile.astro';
+
+interface Props extends Omit<HTMLAttributes<'a'>, 'title'> {
+  /** The row's text, and the link's accessible name. */
+  title: string;
+  /** Where the row goes. Without it the row renders as plain content, with no link and no hover. */
+  href?: string;
+  /** Heading level for the title. Pick the one the page outline needs; `p` leaves the outline alone. */
+  titleAs?: 'h2' | 'h3' | 'h4' | 'p';
+  /** Font Awesome solid name for the tile. Omit it and the `icon` slot carries the glyph. */
+  icon?: IconName;
+  /** The tile's frame. Passed straight to `IconTile`. */
+  variant?: 'outlined' | 'tinted' | 'filled';
+  /** The tile's box. Passed straight to `IconTile`. */
+  size?: 'sm' | 'md' | 'lg';
+}
+
+const {
+  title,
+  href,
+  titleAs: Title = 'h3',
+  icon,
+  variant = 'tinted',
+  size = 'md',
+  class: className,
+  ...rest
+} = Astro.props;
+
+const Root = href ? 'a' : 'div';
+const hasLine = Astro.slots.has('default');
+---
+
+<Root
+  class:list={[
+    'helia-icon-row',
+    'not-content',
+    href && ['helia-motion-surface', 'helia-focus-ring'],
+    className,
+  ]}
+  href={href}
+  {...rest}
+>
+  <IconTile name={icon} variant={variant} size={size}>
+    <slot name="icon" />
+  </IconTile>
+  <div class="helia-icon-row__text">
+    <Title class="helia-icon-row__title"
+      >{title}{
+        href && (
+          <span class="helia-motion-cue helia-icon-row__cue" aria-hidden="true">
+            →
+          </span>
+        )
+      }</Title
+    >
+    {
+      hasLine && (
+        <div class="helia-icon-row__line">
+          <slot />
+        </div>
+      )
+    }
+  </div>
+</Root>

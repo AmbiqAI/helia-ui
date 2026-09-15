@@ -540,6 +540,55 @@ Also accepts `HTMLAttributes<'span'>`.
 
 [See it rendered on Primitives](/helia-ui/primitives/#icon)
 
+## IconRow
+
+**Use it for:** A linked row: an `IconTile`, a title with the directional cue, and one line about where the row goes.
+
+```ts
+import IconRow from '@ambiqai/helia-ui/astro/IconRow';
+```
+
+| Prop           | Type                                 | Default    | Description                                                                                     |
+| -------------- | ------------------------------------ | ---------- | ----------------------------------------------------------------------------------------------- |
+| `title` (req.) | `string`                             | --         | The row's text, and the link's accessible name.                                                 |
+| `href`         | `string`                             | --         | Where the row goes. Without it the row renders as plain content, with no link and no hover.     |
+| `titleAs`      | `'h2' \| 'h3' \| 'h4' \| 'p'`        | `'h3'`     | Heading level for the title. Pick the one the page outline needs; `p` leaves the outline alone. |
+| `icon`         | `IconName`                           | --         | Font Awesome solid name for the tile. Omit it and the `icon` slot carries the glyph.            |
+| `variant`      | `'outlined' \| 'tinted' \| 'filled'` | `'tinted'` | The tile's frame. Passed straight to `IconTile`.                                                |
+| `size`         | `'sm' \| 'md' \| 'lg'`               | `'md'`     | The tile's box. Passed straight to `IconTile`.                                                  |
+
+Also accepts `Omit<HTMLAttributes<'a'>, 'title'>`.
+
+**Slots**
+
+- `default` -- The one line under the title.
+- `icon` -- A glyph for the tile, when `icon` is not the way to reach it.
+
+[See it rendered on Gallery](/helia-ui/gallery/#icon-rows)
+
+## IconTile
+
+**Use it for:** A square frame around one glyph: the mark that lets a row, a card or a panel stand up without artwork.
+
+```ts
+import IconTile from '@ambiqai/helia-ui/astro/IconTile';
+```
+
+| Prop      | Type                                 | Default    | Description                                                                                        |
+| --------- | ------------------------------------ | ---------- | -------------------------------------------------------------------------------------------------- |
+| `name`    | `IconName`                           | --         | Font Awesome solid name in kebab case, e.g. `gauge-high`. Omit it and the slot carries the glyph.  |
+| `label`   | `string`                             | --         | Accessible name for the glyph. Omit it where the text beside the tile already says the same thing. |
+| `size`    | `'sm' \| 'md' \| 'lg'`               | `'md'`     | The box, on the control-height scale.                                                              |
+| `variant` | `'outlined' \| 'tinted' \| 'filled'` | `'tinted'` | What stands in for the frame: a hairline edge, the accent at tint weight, or the accent solid.     |
+
+Also accepts `HTMLAttributes<'span'>`.
+
+**Slots**
+
+- `default` -- The glyph, when `name` is not the way to reach it: an inline `<svg>`, a brand mark, a numeral.
+
+[See it rendered on Gallery](/helia-ui/gallery/#icon-tiles)
+
 ## LinkCard
 
 **Use it for:** A whole card that is one link: a title, a line about it, and a cue that moves when the card is under the pointer.
@@ -711,6 +760,34 @@ import ShowcaseCarousel from '@ambiqai/helia-ui/astro/ShowcaseCarousel';
 - `default` -- The cards, in the same order as `tabs`.
 
 [See it rendered on Layout](/helia-ui/layout/#showcase-carousel)
+
+## SplitPanel
+
+**Use it for:** A wide panel holding a short piece of writing beside the thing it describes: a quickstart, a release note, an API call with the call shown.
+
+```ts
+import SplitPanel from '@ambiqai/helia-ui/astro/SplitPanel';
+```
+
+| Prop      | Type                                      | Default     | Description                                                                                                        |
+| --------- | ----------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------ |
+| `tone`    | `'tinted' \| 'muted' \| 'plain'`          | `'tinted'`  | The ground. `tinted` carries the accent at tint weight, `muted` the recessed fill, `plain` a hairline and no fill. |
+| `ratio`   | `'1:1' \| '2:3' \| '3:2'`                 | `'1:1'`     | The share of the width the text column and the code column take at the wide end.                                   |
+| `density` | `'compact' \| 'default' \| 'comfortable'` | `'default'` | Inner padding.                                                                                                     |
+| `titleAs` | `'h2' \| 'h3' \| 'h4'`                    | `'h2'`      | Heading level for the title. Pick the one the page outline needs.                                                  |
+| `as`      | `'section' \| 'div' \| 'aside'`           | `'section'` | Element to render. A panel that is a section of the page should stay a `section`.                                  |
+
+Also accepts `HTMLAttributes<'section'>`.
+
+**Slots**
+
+- `eyebrow` -- The label above the title, rendered in an `Eyebrow`.
+- `title` -- The heading's text. The panel renders the heading element itself, so keep the slot phrasing.
+- `body` -- The line or two under the title.
+- `actions` -- The controls under the body, usually `Button`s.
+- `code` -- The block beside the text: a `CodeBlock`, a `CodeTabs`, or anything that frames itself.
+
+[See it rendered on Gallery](/helia-ui/gallery/#split-panel)
 
 ## StatCard
 

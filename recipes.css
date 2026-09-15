@@ -696,34 +696,44 @@ a.helia-chip--neutral:focus-visible {
  */
 
 /*
- * The leading mark. The header's `icon` slot, its `step` numeral and a quote's
- * initials are one disc, so a row that mixes them lines up. The size comes off
- * the density hook rather than a fixed value, because a compact row and an
- * editorial tile want the same proportion, not the same pixels.
+ * The icon frame, in one definition. The card header's `icon` slot, its `step`
+ * numeral, a quote's initials and `IconTile` are the same thing -- a ground
+ * that centers one glyph -- so they share the recipe and differ only in the
+ * two hooks below it: the box they take and the radius they round to. A column
+ * that mixes a card's disc and a tile therefore tints and aligns alike.
  */
-.helia-card-mark {
-  --helia-card-mark-box: var(
-    --helia-card-mark-size,
-    calc(var(--helia-card-pad, var(--helia-space-4)) + var(--helia-space-4))
-  );
-
+.helia-card-mark,
+.helia-icon-tile {
   align-items: center;
-  /* Tonal rather than filled: the disc is a ground for the glyph, and at this
+  /* Tonal rather than filled: the frame is a ground for the glyph, and at this
      weight it reads on the paper card and the dark one alike. */
   background: color-mix(
     in oklab,
     var(--accent, var(--helia-product-accent)) 14%,
     var(--helia-surface-card-muted)
   );
-  block-size: var(--helia-card-mark-box);
-  border-radius: var(--helia-radius-pill);
+  block-size: var(--helia-icon-frame-box);
+  border-radius: var(--helia-icon-frame-radius);
   color: var(--helia-ink-primary);
   display: inline-flex;
   flex-shrink: 0;
   font-size: var(--helia-text-body);
-  inline-size: var(--helia-card-mark-box);
+  inline-size: var(--helia-icon-frame-box);
   justify-content: center;
   line-height: 1;
+}
+
+/*
+ * The leading mark on a card. Round, and sized off the density hook rather
+ * than a fixed value, because a compact row and an editorial tile want the
+ * same proportion, not the same pixels.
+ */
+.helia-card-mark {
+  --helia-icon-frame-box: var(
+    --helia-card-mark-size,
+    calc(var(--helia-card-pad, var(--helia-space-4)) + var(--helia-space-4))
+  );
+  --helia-icon-frame-radius: var(--helia-radius-pill);
 }
 
 /* The glyph carries the accent; a numeral or a set of initials does not,
@@ -736,6 +746,42 @@ a.helia-chip--neutral:focus-visible {
   font-variant-numeric: tabular-nums;
   font-weight: var(--helia-weight-bold);
   text-transform: uppercase;
+}
+
+/*
+ * The tile. Square, and sized off the control scale rather than the card
+ * padding hook: a tile is as often beside a line of text as inside a card, and
+ * a control height is the measure that reads in both places. The glyph takes
+ * the accent, as it does in the disc.
+ */
+.helia-icon-tile {
+  --helia-icon-frame-box: var(--helia-control-md);
+  --helia-icon-frame-radius: var(--helia-radius-md);
+
+  color: var(--accent, var(--helia-product-accent));
+}
+
+.helia-icon-tile--sm {
+  --helia-icon-frame-box: var(--helia-control-sm);
+  --helia-icon-frame-radius: var(--helia-radius-sm);
+}
+
+.helia-icon-tile--lg {
+  --helia-icon-frame-box: var(--helia-control-lg);
+}
+
+/* No fill, so the frame is the hairline every other edge in the package
+   draws -- the tile carries the accent in its glyph, never in its edge. */
+.helia-icon-tile--outlined {
+  background: transparent;
+  border: 1px solid var(--helia-surface-border);
+}
+
+/* The accent solid, with the fixed paper over it: the mix that reads as a tint
+   at 14% is a field at 100%, and theme ink on it would follow the wrong side. */
+.helia-icon-tile--filled {
+  background: var(--accent, var(--helia-product-accent));
+  color: var(--helia-paper-white);
 }
 
 /*
@@ -875,6 +921,162 @@ a.helia-chip--neutral:focus-visible {
 .helia-card-quote__detail {
   color: var(--helia-ink-muted);
   font-weight: var(--helia-weight-regular);
+}
+
+/*
+ * The linked row. It is an index entry rather than an object on the page, so
+ * it carries no fill and no edge at rest and tints where it sits on hover --
+ * `--helia-hover-border` keeps the surface transition from growing an edge the
+ * row never had. Two of them fit a desktop column; the grid owns that, not
+ * the row.
+ */
+.helia-icon-row {
+  --helia-hover-border: transparent;
+
+  align-items: start;
+  border: 1px solid transparent;
+  border-radius: var(--helia-radius-md);
+  color: inherit;
+  display: flex;
+  gap: var(--helia-space-3);
+  padding: var(--helia-space-3);
+  text-decoration: none;
+}
+
+.helia-icon-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helia-space-1);
+  /* Lets a long title wrap rather than widening the row out of its column. */
+  min-width: 0;
+}
+
+.helia-icon-row__title {
+  align-items: baseline;
+  color: var(--helia-ink-primary);
+  display: flex;
+  font-size: var(--helia-text-card-title);
+  font-weight: var(--helia-weight-medium);
+  gap: var(--helia-space-2);
+  line-height: var(--helia-leading-heading);
+  margin: 0;
+}
+
+/* The same size whatever heading level the title took. */
+.helia-icon-row__cue {
+  font-size: var(--helia-text-body);
+}
+
+.helia-icon-row__line {
+  color: var(--helia-ink-secondary);
+  font-size: var(--helia-text-body);
+  line-height: var(--helia-leading-body);
+}
+
+.helia-icon-row__line > :first-child {
+  margin-block-start: 0;
+}
+
+.helia-icon-row__line > :last-child {
+  margin-block-end: 0;
+}
+
+/*
+ * The split panel: a piece of writing beside the thing it describes. The
+ * columns are a grid rather than a row of flex children because the code
+ * column has to be allowed to be narrower than the block inside it, which is
+ * what `minmax(0, …)` gives it and what lets a long line scroll in the frame
+ * instead of widening the panel.
+ */
+.helia-split-panel {
+  /* The accent at tint weight, and no edge: the fill already draws the
+     boundary a border would state a second time. */
+  background: color-mix(
+    in oklab,
+    var(--accent, var(--helia-product-accent)) 8%,
+    var(--helia-surface-card-muted)
+  );
+  border-radius: var(--helia-radius-lg);
+  display: grid;
+  gap: var(--helia-split-panel-pad, var(--helia-space-5));
+  padding: var(--helia-split-panel-pad, var(--helia-space-5));
+}
+
+.helia-split-panel--compact {
+  --helia-split-panel-pad: var(--helia-space-4);
+}
+
+.helia-split-panel--comfortable {
+  --helia-split-panel-pad: var(--helia-space-6);
+}
+
+.helia-split-panel--muted {
+  background: var(--helia-surface-card-muted);
+}
+
+.helia-split-panel--plain {
+  background: transparent;
+  border: 1px solid var(--helia-surface-border);
+}
+
+.helia-split-panel__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helia-space-3);
+  min-width: 0;
+}
+
+.helia-split-panel__title {
+  color: var(--helia-ink-primary);
+  font-size: var(--helia-text-subhead);
+  font-weight: var(--helia-weight-semibold);
+  line-height: var(--helia-leading-heading);
+  margin: 0;
+}
+
+.helia-split-panel__body {
+  color: var(--helia-ink-secondary);
+  font-size: var(--helia-text-body);
+  line-height: var(--helia-leading-body);
+}
+
+.helia-split-panel__actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helia-space-2);
+}
+
+/* The body is prose the caller writes, so the panel takes its outer margins
+   off the way the card's content part does. */
+.helia-split-panel__body > :first-child {
+  margin-block-start: 0;
+}
+
+.helia-split-panel__body > :last-child {
+  margin-block-end: 0;
+}
+
+.helia-split-panel__code {
+  /* The code frame owns its own width; this column only has to stop being
+     the widest thing in the grid. */
+  min-width: 0;
+}
+
+/* Side by side only where both columns still hold a readable measure. Below
+   that the text leads and the code follows, which is the reading order. */
+@media (width >= 62rem) {
+  .helia-split-panel:has(.helia-split-panel__code) {
+    grid-template-columns: var(--helia-split-panel-ratio, 1fr 1fr);
+  }
+
+  .helia-split-panel--2-3 {
+    --helia-split-panel-ratio: 2fr 3fr;
+  }
+
+  .helia-split-panel--3-2 {
+    --helia-split-panel-ratio: 3fr 2fr;
+  }
 }
 
 .helia-badge {

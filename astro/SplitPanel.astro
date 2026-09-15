@@ -1,0 +1,105 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A wide panel holding a short piece of writing beside the thing it describes:
+ * a quickstart, a release note, an API call with the call shown.
+ *
+ * The `code` slot is what it exists for. A fenced block in prose is the page's
+ * width and the page's rhythm; a block in this panel is the answer to the
+ * sentence beside it, on the same ground, at whatever share of the width
+ * `ratio` gives it. `CodeBlock` and `CodeTabs` both fit, and so does anything
+ * else that owns its own frame.
+ *
+ * The panel takes the large radius and, on the two tinted grounds, no edge:
+ * the fill already separates it from the page, and a border on top of a fill
+ * is a second statement of the same boundary. `plain` is the case where there
+ * is no fill to do that work, so it keeps the hairline.
+ *
+ * Padding follows `density` the way a card's does, at one step up: a panel is
+ * a band of the page rather than an item in a row.
+ *
+ * @slot eyebrow -- The label above the title, rendered in an `Eyebrow`.
+ * @slot title -- The heading's text. The panel renders the heading element itself, so keep the slot phrasing.
+ * @slot body -- The line or two under the title.
+ * @slot actions -- The controls under the body, usually `Button`s.
+ * @slot code -- The block beside the text: a `CodeBlock`, a `CodeTabs`, or anything that frames itself.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import Eyebrow from './Eyebrow.astro';
+
+interface Props extends HTMLAttributes<'section'> {
+  /** The ground. `tinted` carries the accent at tint weight, `muted` the recessed fill, `plain` a hairline and no fill. */
+  tone?: 'tinted' | 'muted' | 'plain';
+  /** The share of the width the text column and the code column take at the wide end. */
+  ratio?: '1:1' | '2:3' | '3:2';
+  /** Inner padding. */
+  density?: 'compact' | 'default' | 'comfortable';
+  /** Heading level for the title. Pick the one the page outline needs. */
+  titleAs?: 'h2' | 'h3' | 'h4';
+  /** Element to render. A panel that is a section of the page should stay a `section`. */
+  as?: 'section' | 'div' | 'aside';
+}
+
+const {
+  tone = 'tinted',
+  ratio = '1:1',
+  density = 'default',
+  titleAs: Title = 'h2',
+  as: Element = 'section',
+  class: className,
+  ...rest
+} = Astro.props;
+
+const hasCode = Astro.slots.has('code');
+---
+
+<Element
+  class:list={[
+    'helia-split-panel',
+    'not-content',
+    tone !== 'tinted' && `helia-split-panel--${tone}`,
+    ratio !== '1:1' && `helia-split-panel--${ratio.replace(':', '-')}`,
+    density !== 'default' && `helia-split-panel--${density}`,
+    className,
+  ]}
+  {...rest}
+>
+  <div class="helia-split-panel__text">
+    {
+      Astro.slots.has('eyebrow') && (
+        <Eyebrow>
+          <slot name="eyebrow" />
+        </Eyebrow>
+      )
+    }
+    {
+      Astro.slots.has('title') && (
+        <Title class="helia-split-panel__title">
+          <slot name="title" />
+        </Title>
+      )
+    }
+    {
+      Astro.slots.has('body') && (
+        <div class="helia-split-panel__body">
+          <slot name="body" />
+        </div>
+      )
+    }
+    {
+      Astro.slots.has('actions') && (
+        <div class="helia-split-panel__actions">
+          <slot name="actions" />
+        </div>
+      )
+    }
+  </div>
+  {
+    hasCode && (
+      <div class="helia-split-panel__code">
+        <slot name="code" />
+      </div>
+    )
+  }
+</Element>
