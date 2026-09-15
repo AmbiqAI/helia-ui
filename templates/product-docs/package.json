@@ -18,7 +18,8 @@
     "test": "playwright test",
     "//prebuild": "An API reference is generated, not written. Uncomment the line for the language the source is in, rename it to prebuild, and commit what it writes so the site builds without the toolchain.",
     "//prebuild:python": "helia-ui-pyref --input ../griffe.json --out src/content/docs/reference/api --public public --base /PRODUCT-REPO-NAME/ --sidebar src/generated/api-sidebar.json",
-    "//prebuild:c": "helia-ui-doxyref --xml ../build/xml --out src/content/docs/reference/api --public public --base /PRODUCT-REPO-NAME/ --sidebar src/generated/api-sidebar.json"
+    "//prebuild:c": "helia-ui-doxyref --xml ../build/xml --out src/content/docs/reference/api --public public --base /PRODUCT-REPO-NAME/ --sidebar src/generated/api-sidebar.json",
+    "//prebuild:typescript": "helia-ui-tsref --json ../build/api.json --out src/content/docs/reference/api --public public --base /PRODUCT-REPO-NAME/ --sidebar src/generated/api-sidebar.json"
   },
   "dependencies": {
     "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v0.1.0-alpha.5",

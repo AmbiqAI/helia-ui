@@ -1,0 +1,1033 @@
+{
+  "id": 0,
+  "name": "helia-sample",
+  "variant": "project",
+  "kind": 1,
+  "flags": {},
+  "comment": {
+    "summary": [
+      {
+        "kind": "text",
+        "text": "A miniature HELIA runtime, in TypeScript.\n\nDeliberately small and deliberately varied: one of everything the extractor\nhas to map, and nothing it does not. It is a fixture, not a product."
+      }
+    ]
+  },
+  "children": [
+    {
+      "id": 1,
+      "name": "tensors",
+      "variant": "declaration",
+      "kind": 4,
+      "flags": {
+        "isNamespace": true
+      },
+      "comment": {
+        "summary": [
+          {
+            "kind": "text",
+            "text": "Helpers for building the tensors a model takes."
+          }
+        ]
+      },
+      "children": [
+        {
+          "id": 2,
+          "name": "zeros",
+          "variant": "declaration",
+          "kind": 64,
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/index.ts",
+              "line": 114,
+              "character": 18
+            }
+          ],
+          "signatures": [
+            {
+              "id": 3,
+              "name": "zeros",
+              "variant": "signature",
+              "kind": 4096,
+              "flags": {},
+              "comment": {
+                "summary": [
+                  {
+                    "kind": "text",
+                    "text": "Allocate a zeroed tensor."
+                  }
+                ],
+                "blockTags": [
+                  {
+                    "tag": "@returns",
+                    "content": [
+                      {
+                        "kind": "text",
+                        "text": "The allocated tensor."
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@throws",
+                    "content": [
+                      {
+                        "kind": "text",
+                        "text": "{RangeError} when "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`length`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": " is negative."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "sources": [
+                {
+                  "fileName": "src/index.ts",
+                  "line": 114,
+                  "character": 18
+                }
+              ],
+              "parameters": [
+                {
+                  "id": 4,
+                  "name": "length",
+                  "variant": "param",
+                  "kind": 32768,
+                  "flags": {},
+                  "comment": {
+                    "summary": [
+                      {
+                        "kind": "text",
+                        "text": "Number of elements."
+                      }
+                    ]
+                  },
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "number"
+                  }
+                },
+                {
+                  "id": 5,
+                  "name": "precision",
+                  "variant": "param",
+                  "kind": 32768,
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "summary": [
+                      {
+                        "kind": "text",
+                        "text": "Storage the elements take."
+                      }
+                    ]
+                  },
+                  "type": {
+                    "type": "reference",
+                    "target": 23,
+                    "name": "Precision",
+                    "package": "@ambiqai/helia-sample"
+                  },
+                  "defaultValue": "'f32'"
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "target": {
+                  "sourceFileName": "typescript/lib/lib.es5.d.ts",
+                  "qualifiedName": "Float32Array"
+                },
+                "name": "Float32Array",
+                "package": "typescript"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Functions",
+          "children": [2]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "src/index.ts",
+          "line": 105,
+          "character": 17
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Status",
+      "variant": "declaration",
+      "kind": 8,
+      "flags": {},
+      "comment": {
+        "summary": [
+          {
+            "kind": "text",
+            "text": "What the runtime reports when a call does not succeed."
+          }
+        ]
+      },
+      "children": [
+        {
+          "id": 7,
+          "name": "Ok",
+          "variant": "declaration",
+          "kind": 16,
+          "flags": {},
+          "comment": {
+            "summary": [
+              {
+                "kind": "text",
+                "text": "The call succeeded."
+              }
+            ]
+          },
+          "sources": [
+            {
+              "fileName": "src/index.ts",
+              "line": 16,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": 0
+          }
+        },
+        {
+          "id": 8,
+          "name": "BadArgument",
+          "variant": "declaration",
+          "kind": 16,
+          "flags": {},
+          "comment": {
+            "summary": [
+              {
+                "kind": "text",
+                "text": "An argument was missing or out of range."
+              }
+            ]
+          },
+          "sources": [
+            {
+              "fileName": "src/index.ts",
+              "line": 18,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": 1
+          }
+        },
+        {
+          "id": 9,
+          "name": "OutOfMemory",
+          "variant": "declaration",
+          "kind": 16,
+          "flags": {},
+          "comment": {
+            "summary": [
+              {
+                "kind": "text",
+                "text": "The arena could not satisfy the allocation."
+              }
+            ]
+          },
+          "sources": [
+            {
+              "fileName": "src/index.ts",
+              "line": 20,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": 2
+          }
+        }
+      ],
+      "groups": [
+        {
+          "title": "Enumeration Members",
+          "children": [7, 8, 9]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "src/index.ts",
+          "line": 14,
+          "character": 12
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "ModelRunner",
+      "variant": "declaration",
+      "kind": 128,
+      "flags": {},
+      "comment": {
+        "summary": [
+          {
+            "kind": "text",
+            "text": "A loaded model, ready to run.\n\nNothing is copied out of the config, so the arena may live on the caller's\nstack for as long as the runner does."
+          }
+        ]
+      },
+      "children": [
+        {
+          "id": 11,
+          "name": "constructor",
+          "variant": "declaration",
+          "kind": 512,
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/index.ts",
+              "line": 50,
+              "character": 2
+            }
+          ],
+          "signatures": [
+            {
+              "id": 12,
+              "name": "ModelRunner",
+              "variant": "signature",
+              "kind": 16384,
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/index.ts",
+                  "line": 50,
+                  "character": 2
+                }
+              ],
+              "parameters": [
+                {
+                  "id": 13,
+                  "name": "name",
+                  "variant": "param",
+                  "kind": 32768,
+                  "flags": {},
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "target": 10,
+                "name": "ModelRunner",
+                "package": "@ambiqai/helia-sample"
+              }
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "name": "name",
+          "variant": "declaration",
+          "kind": 1024,
+          "flags": {
+            "isReadonly": true
+          },
+          "comment": {
+            "summary": [
+              {
+                "kind": "text",
+                "text": "The name the descriptor was loaded under."
+              }
+            ]
+          },
+          "sources": [
+            {
+              "fileName": "src/index.ts",
+              "line": 48,
+              "character": 11
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "string"
+          }
+        },
+        {
+          "id": 15,
+          "name": "run",
+          "variant": "declaration",
+          "kind": 2048,
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/index.ts",
+              "line": 69,
+              "character": 2
+            }
+          ],
+          "signatures": [
+            {
+              "id": 16,
+              "name": "run",
+              "variant": "signature",
+              "kind": 4096,
+              "flags": {},
+              "comment": {
+                "summary": [
+                  {
+                    "kind": "text",
+                    "text": "Run one inference pass."
+                  }
+                ],
+                "blockTags": [
+                  {
+                    "tag": "@returns",
+                    "content": [
+                      {
+                        "kind": "text",
+                        "text": "The output tensor, owned by the caller."
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@throws",
+                    "content": [
+                      {
+                        "kind": "text",
+                        "text": "{RangeError} when "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`input`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": " is not the length the model expects."
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@since",
+                    "content": [
+                      {
+                        "kind": "text",
+                        "text": "0.3"
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@example",
+                    "content": [
+                      {
+                        "kind": "text",
+                        "text": "Run a single frame through a freshly loaded model.\n"
+                      },
+                      {
+                        "kind": "code",
+                        "text": "```ts\nconst runner = loadModel('kws');\nconst output = runner.run(new Float32Array(320));\n```"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "sources": [
+                {
+                  "fileName": "src/index.ts",
+                  "line": 69,
+                  "character": 2
+                }
+              ],
+              "parameters": [
+                {
+                  "id": 17,
+                  "name": "input",
+                  "variant": "param",
+                  "kind": 32768,
+                  "flags": {},
+                  "comment": {
+                    "summary": [
+                      {
+                        "kind": "text",
+                        "text": "Samples to run, in the model's input layout."
+                      }
+                    ]
+                  },
+                  "type": {
+                    "type": "reference",
+                    "target": {
+                      "sourceFileName": "typescript/lib/lib.es5.d.ts",
+                      "qualifiedName": "Float32Array"
+                    },
+                    "name": "Float32Array",
+                    "package": "typescript"
+                  }
+                },
+                {
+                  "id": 18,
+                  "name": "scratch",
+                  "variant": "param",
+                  "kind": 32768,
+                  "flags": {
+                    "isOptional": true
+                  },
+                  "comment": {
+                    "summary": [
+                      {
+                        "kind": "text",
+                        "text": "Reused between calls when it is supplied."
+                      }
+                    ]
+                  },
+                  "type": {
+                    "type": "reference",
+                    "target": {
+                      "sourceFileName": "typescript/lib/lib.es5.d.ts",
+                      "qualifiedName": "Float32Array"
+                    },
+                    "name": "Float32Array",
+                    "package": "typescript"
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "target": {
+                  "sourceFileName": "typescript/lib/lib.es5.d.ts",
+                  "qualifiedName": "Float32Array"
+                },
+                "name": "Float32Array",
+                "package": "typescript"
+              }
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": "Constructors",
+          "children": [11]
+        },
+        {
+          "title": "Properties",
+          "children": [14]
+        },
+        {
+          "title": "Methods",
+          "children": [15]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "src/index.ts",
+          "line": 46,
+          "character": 13
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "name": "ModelConfig",
+      "variant": "declaration",
+      "kind": 256,
+      "flags": {},
+      "comment": {
+        "summary": [
+          {
+            "kind": "text",
+            "text": "Where a model puts its working memory."
+          }
+        ],
+        "blockTags": [
+          {
+            "tag": "@since",
+            "content": [
+              {
+                "kind": "text",
+                "text": "0.2"
+              }
+            ]
+          }
+        ]
+      },
+      "children": [
+        {
+          "id": 20,
+          "name": "arenaBytes",
+          "variant": "declaration",
+          "kind": 1024,
+          "flags": {},
+          "comment": {
+            "summary": [
+              {
+                "kind": "text",
+                "text": "Bytes of scratch the model may use."
+              }
+            ]
+          },
+          "sources": [
+            {
+              "fileName": "src/index.ts",
+              "line": 30,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "number"
+          }
+        },
+        {
+          "id": 21,
+          "name": "name",
+          "variant": "declaration",
+          "kind": 1024,
+          "flags": {
+            "isOptional": true
+          },
+          "comment": {
+            "summary": [
+              {
+                "kind": "text",
+                "text": "Name recorded in the descriptor."
+              }
+            ]
+          },
+          "sources": [
+            {
+              "fileName": "src/index.ts",
+              "line": 32,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "string"
+          }
+        },
+        {
+          "id": 22,
+          "name": "precision",
+          "variant": "declaration",
+          "kind": 1024,
+          "flags": {
+            "isOptional": true
+          },
+          "comment": {
+            "summary": [
+              {
+                "kind": "text",
+                "text": "Weight storage to load."
+              }
+            ]
+          },
+          "sources": [
+            {
+              "fileName": "src/index.ts",
+              "line": 34,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "reference",
+            "target": 23,
+            "name": "Precision",
+            "package": "@ambiqai/helia-sample"
+          }
+        }
+      ],
+      "groups": [
+        {
+          "title": "Properties",
+          "children": [20, 21, 22]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "src/index.ts",
+          "line": 28,
+          "character": 17
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "name": "Precision",
+      "variant": "declaration",
+      "kind": 2097152,
+      "flags": {},
+      "comment": {
+        "summary": [
+          {
+            "kind": "text",
+            "text": "How a model's weights are stored."
+          }
+        ]
+      },
+      "sources": [
+        {
+          "fileName": "src/index.ts",
+          "line": 11,
+          "character": 12
+        }
+      ],
+      "type": {
+        "type": "union",
+        "types": [
+          {
+            "type": "literal",
+            "value": "f32"
+          },
+          {
+            "type": "literal",
+            "value": "f16"
+          },
+          {
+            "type": "literal",
+            "value": "int8"
+          }
+        ]
+      }
+    },
+    {
+      "id": 24,
+      "name": "MAX_ARENA_BYTES",
+      "variant": "declaration",
+      "kind": 32,
+      "flags": {
+        "isConst": true
+      },
+      "comment": {
+        "summary": [
+          {
+            "kind": "text",
+            "text": "Largest arena the runtime will allocate, in bytes."
+          }
+        ]
+      },
+      "sources": [
+        {
+          "fileName": "src/index.ts",
+          "line": 38,
+          "character": 13
+        }
+      ],
+      "type": {
+        "type": "literal",
+        "value": 1048576
+      },
+      "defaultValue": "1048576"
+    },
+    {
+      "id": 25,
+      "name": "loadModel",
+      "variant": "declaration",
+      "kind": 64,
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "src/index.ts",
+          "line": 84,
+          "character": 16
+        }
+      ],
+      "signatures": [
+        {
+          "id": 26,
+          "name": "loadModel",
+          "variant": "signature",
+          "kind": 4096,
+          "flags": {},
+          "comment": {
+            "summary": [
+              {
+                "kind": "text",
+                "text": "Load a model into a fresh arena."
+              }
+            ],
+            "blockTags": [
+              {
+                "tag": "@returns",
+                "content": [
+                  {
+                    "kind": "text",
+                    "text": "A runner bound to the arena."
+                  }
+                ]
+              },
+              {
+                "tag": "@throws",
+                "content": [
+                  {
+                    "kind": "text",
+                    "text": "{RangeError} when "
+                  },
+                  {
+                    "kind": "code",
+                    "text": "`config.arenaBytes`"
+                  },
+                  {
+                    "kind": "text",
+                    "text": " exceeds "
+                  },
+                  {
+                    "kind": "inline-tag",
+                    "tag": "@link",
+                    "text": "MAX_ARENA_BYTES",
+                    "target": 24
+                  },
+                  {
+                    "kind": "text",
+                    "text": "."
+                  }
+                ]
+              },
+              {
+                "tag": "@since",
+                "content": [
+                  {
+                    "kind": "text",
+                    "text": "0.2"
+                  }
+                ]
+              }
+            ]
+          },
+          "sources": [
+            {
+              "fileName": "src/index.ts",
+              "line": 84,
+              "character": 16
+            }
+          ],
+          "parameters": [
+            {
+              "id": 27,
+              "name": "source",
+              "variant": "param",
+              "kind": 32768,
+              "flags": {},
+              "comment": {
+                "summary": [
+                  {
+                    "kind": "text",
+                    "text": "Descriptor name to load."
+                  }
+                ]
+              },
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 28,
+              "name": "config",
+              "variant": "param",
+              "kind": 32768,
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "summary": [
+                  {
+                    "kind": "text",
+                    "text": "Arena and precision for the model."
+                  }
+                ]
+              },
+              "type": {
+                "type": "reference",
+                "target": 19,
+                "name": "ModelConfig",
+                "package": "@ambiqai/helia-sample"
+              },
+              "defaultValue": "{ arenaBytes: 65536 }"
+            }
+          ],
+          "type": {
+            "type": "reference",
+            "target": 10,
+            "name": "ModelRunner",
+            "package": "@ambiqai/helia-sample"
+          }
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "name": "describeStatus",
+      "variant": "declaration",
+      "kind": 64,
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "src/index.ts",
+          "line": 100,
+          "character": 16
+        }
+      ],
+      "signatures": [
+        {
+          "id": 30,
+          "name": "describeStatus",
+          "variant": "signature",
+          "kind": 4096,
+          "flags": {},
+          "comment": {
+            "summary": [
+              {
+                "kind": "text",
+                "text": "Describe a status code in one sentence."
+              }
+            ],
+            "blockTags": [
+              {
+                "tag": "@returns",
+                "content": [
+                  {
+                    "kind": "text",
+                    "text": "The description."
+                  }
+                ]
+              },
+              {
+                "tag": "@deprecated",
+                "content": [
+                  {
+                    "kind": "text",
+                    "text": "Use the "
+                  },
+                  {
+                    "kind": "code",
+                    "text": "`Status`"
+                  },
+                  {
+                    "kind": "text",
+                    "text": " enum directly; this table is not localized."
+                  }
+                ]
+              }
+            ]
+          },
+          "sources": [
+            {
+              "fileName": "src/index.ts",
+              "line": 100,
+              "character": 16
+            }
+          ],
+          "parameters": [
+            {
+              "id": 31,
+              "name": "status",
+              "variant": "param",
+              "kind": 32768,
+              "flags": {},
+              "comment": {
+                "summary": [
+                  {
+                    "kind": "text",
+                    "text": "The code to describe."
+                  }
+                ]
+              },
+              "type": {
+                "type": "reference",
+                "target": 6,
+                "name": "Status",
+                "package": "@ambiqai/helia-sample"
+              }
+            },
+            {
+              "id": 32,
+              "name": "verbose",
+              "variant": "param",
+              "kind": 32768,
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "summary": [
+                  {
+                    "kind": "text",
+                    "text": "Whether to append the numeric value."
+                  }
+                ]
+              },
+              "type": {
+                "type": "intrinsic",
+                "name": "boolean"
+              },
+              "defaultValue": "false"
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "string"
+          }
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "title": "Namespaces",
+      "children": [1]
+    },
+    {
+      "title": "Enumerations",
+      "children": [6]
+    },
+    {
+      "title": "Classes",
+      "children": [10]
+    },
+    {
+      "title": "Interfaces",
+      "children": [19]
+    },
+    {
+      "title": "Type Aliases",
+      "children": [23]
+    },
+    {
+      "title": "Variables",
+      "children": [24]
+    },
+    {
+      "title": "Functions",
+      "children": [25, 29]
+    }
+  ],
+  "packageName": "@ambiqai/helia-sample",
+  "packageVersion": "0.3.0",
+  "readme": [
+    {
+      "kind": "text",
+      "text": "# helia-sample\n\nA fixture package."
+    }
+  ],
+  "symbolIdMap": {},
+  "files": {
+    "entries": {
+      "1": "src/index.ts"
+    },
+    "reflections": {
+      "1": 0
+    }
+  },
+  "schemaVersion": "2.0"
+}

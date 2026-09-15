@@ -34,6 +34,7 @@
   "bin": {
     "helia-ui-pyref": "./scripts/pyref.mjs",
     "helia-ui-doxyref": "./scripts/doxyref.mjs",
+    "helia-ui-tsref": "./scripts/tsref.mjs",
     "helia-ui-mkdocs-convert": "./scripts/mkdocs-convert.mjs",
     "helia-ui-serve-dist": "./scripts/serve-dist.mjs"
   },
@@ -63,6 +64,8 @@
     "scripts/doxyref.mjs",
     "scripts/lib/doxyref-extract.mjs",
     "scripts/lib/xml.mjs",
+    "scripts/tsref.mjs",
+    "scripts/lib/tsref-extract.mjs",
     "scripts/lib/reference-render.mjs",
     "scripts/lib/markdown.mjs",
     "scripts/mkdocs-convert.mjs",

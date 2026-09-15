@@ -1,0 +1,248 @@
+---
+title: TypeScript API reference
+description: Generating a Starlight API reference from a TypeDoc JSON dump with helia-ui-tsref, beside the Python and C ones.
+---
+
+import DataTable from '@ambiqai/helia-ui/astro/DataTable';
+
+TypeScript projects document their exports with
+[TypeDoc](https://typedoc.org/), which generates its own HTML and has no
+Starlight equivalent. `helia-ui-tsref` is the replacement, and it is the third
+of the same generator. An extractor maps TypeDoc's JSON onto the reference
+model; the same renderer the Python and C references go through turns that
+model into MDX pages that compose the package's `RefSymbol`, `RefParams`,
+`RefSection` and `RefMembers` parts, into the JSON the model is, and into the
+two text artifacts an agent reads instead of the pages.
+
+That shared renderer is the whole point. Only
+`scripts/lib/tsref-extract.mjs` knows TypeScript. A TypeScript reference, a C
+reference and a Python reference are the same pages with different content,
+not three designs that drift.
+
+## The contract
+
+The JSON is the source of truth and the pages are a view of it.
+
+The model is written out whole and per module, with sorted keys and no
+timestamp, so it diffs. Every symbol keeps a stable id, and that id is the page
+anchor, so a URL plus a fragment names one symbol and keeps naming it after the
+reference is regenerated or restyled. A consumer that wants the data takes the
+JSON and never parses HTML.
+
+The model is `@ambiqai/helia-ui/reference-model`: TypeScript types plus
+`validateReferenceModel`, a hand-written guard with no dependencies. It is the
+same model the Python and Doxygen extractors produce, which is why an
+interface and a type alias both land on `type` — that is the word the model
+uses for a name given to a shape, in every language it covers.
+
+## Running it
+
+TypeDoc produces the input, in the TypeScript repository. The generator never
+runs the compiler itself, so a site build needs no toolchain.
+
+```sh
+# In the TypeScript repository:
+npx typedoc --json build/api.json --entryPoints src/index.ts
+
+# In the docs site:
+npx helia-ui-tsref \
+  --json ../build/api.json \
+  --out src/content/docs/reference/api \
+  --public public \
+  --base /helia-sdk/ \
+  --sidebar src/generated/api-sidebar.json
+```
+
+One entry point puts every symbol on the package's own page. Several entry
+points put each on a page of its own, and an entry point named `sensors/imu`
+is two levels of route rather than one segment nobody can navigate.
+
+<DataTable
+  caption="Command-line options"
+  columns={['Option', 'Default', 'What it does']}
+  rows={[
+    ['--json <file>', 'required', 'The file typedoc --json wrote.'],
+    ['--out <dir>', 'required', 'Directory the module pages are written into.'],
+    [
+      '--public <dir>',
+      'public',
+      'Directory the JSON and text artifacts are written into.',
+    ],
+    [
+      '--base <path>',
+      '/',
+      'Site base path, prefixed onto every URL the pages and artifacts carry.',
+    ],
+    [
+      '--site <origin>',
+      'not set',
+      'Origin for the absolute URLs in llms.txt. Without it they are site-root relative.',
+    ],
+    [
+      '--name <library>',
+      "TypeDoc's package name",
+      'The library the reference documents. It names the root page and the route under it.',
+    ],
+    [
+      '--sidebar <file>',
+      'not written',
+      'Write the Starlight sidebar fragment as JSON.',
+    ],
+    [
+      '--source-root <dir>',
+      'not set',
+      'Strip this prefix from the source paths in the model.',
+    ],
+    [
+      '--source-url <template>',
+      "TypeDoc's own source links",
+      'Link template for source, with {path} and {line}.',
+    ],
+    [
+      '--commit <sha>',
+      'not set',
+      'Commit of the documented source, recorded in generatedFrom.',
+    ],
+    ['--check', 'off', 'Compare against what is on disk and exit 1 on drift.'],
+    ['--quiet', 'off', 'Report only the warning count, not each warning.'],
+    ['--route-prefix <path>', 'reference/api', 'Route the pages serve under.'],
+    ['--heading-level <n>', '2', 'Rank of a symbol heading.'],
+    ['--show-root-heading', 'off', "Repeat the module's name as a heading."],
+    ['--no-show-signature', 'off', 'Leave the declaration off every symbol.'],
+  ]}
+/>
+
+## What maps to what
+
+TypeDoc's JSON is a tree of reflections, each tagged with a numeric `kind` out
+of its `ReflectionKind` enum. The extractor folds that onto the model once,
+here:
+
+<DataTable
+  caption="TypeDoc reflections in the reference model"
+  columns={['Reflection', 'Model', 'Notes']}
+  rows={[
+    [
+      'project (1)',
+      'root module',
+      'The package itself, named for its manifest.',
+    ],
+    ['module (2)', 'module', 'One page per entry point.'],
+    ['namespace (4)', 'module', 'Nested under whatever contains it.'],
+    ['class (128)', 'class', 'Its members nested under it.'],
+    [
+      'interface (256)',
+      'type',
+      'A name given to a shape, which is what the model calls a type.',
+    ],
+    ['type alias (2097152)', 'type', 'The same kind a C typedef takes.'],
+    ['enum (8)', 'enum', 'Its members become constants.'],
+    ['enum member (16)', 'constant', 'With the initializer it was given.'],
+    ['function (64)', 'function', ''],
+    ['method (2048)', 'method', 'Nested under its class or interface.'],
+    ['constructor (512)', 'method', ''],
+    ['property (1024)', 'attribute', 'Nested under its class or interface.'],
+    ['accessor (262144)', 'attribute', 'Documented off its getter.'],
+    [
+      'variable (32)',
+      'constant',
+      'An attribute when it is a let or a var, because that is mutable state.',
+    ],
+    [
+      'reference (4194304)',
+      'dropped',
+      'A re-export, documented where the symbol is defined.',
+    ],
+    ['document (8388608)', 'dropped', 'Prose, not API surface.'],
+  ]}
+/>
+
+TSDoc's block tags become fields rather than prose, so the renderer draws them
+as the same tables every other language gets.
+
+<DataTable
+  caption="TSDoc tags and the fields they become"
+  columns={['Tag', 'Field']}
+  rows={[
+    ['@param, and a comment on the parameter itself', 'params'],
+    ['@returns, @return', 'returns, typed from the declaration'],
+    ['@throws, @exception', 'raises, typed from a leading {Type}'],
+    ['@since', 'since'],
+    ['@deprecated, as a tag or a modifier', 'deprecated'],
+    ['@example', 'examples, prose and fenced code paired'],
+    ['@remarks', 'description'],
+    ['@see, and any other tag', 'an aside in the description'],
+  ]}
+/>
+
+A declaration is the authority on which parameters exist and how they are
+typed; the comment is the authority on what they mean. A `@param` naming an
+argument the declaration does not have is reported as a warning rather than
+rendered as a row nobody can pass.
+
+## Declarations
+
+TypeDoc keeps a structured type rather than the text the declaration used, so
+the extractor rebuilds the source text: type parameters, unions,
+intersections, arrays, tuples, mapped and conditional types, and the call
+signature of a function type. That is a gain rather than a loss, because an
+inferred return type gets spelled out on the page instead of being absent.
+
+A declaration that would run past 120 characters wraps one parameter per line,
+which is what the Python and C generators do with a long one.
+
+An overloaded function has one signature in the model, because the id is the
+page anchor and inventing ids for the rest would give the page anchors nobody
+writes a link against. The first signature is documented and the others are
+reported as warnings.
+
+## Descriptions
+
+TypeDoc splits a comment into parts: text, code, and inline tags. Text and
+code are already Markdown and pass through. An inline `{@link Foo}` becomes
+the identifier in a code span, because TypeDoc's link target is a reflection
+id rather than a model id, and the renderer owns routes.
+
+Cross-references written in the model's own syntax, `[Name][symbol_id]`, do
+resolve: the renderer turns them into a link to the page and anchor that
+carries the symbol, prefixed with `--base`.
+
+## The artifacts
+
+Alongside the pages, a run writes four kinds of file under
+`<public>/<route prefix>/`: `reference.json`, one `<module path>.json` per
+module, `llms.txt` and `llms-full.txt`. They are what the Python and C
+generators write, in the same places, because they are the same renderer. The
+Python reference page describes them in full.
+
+## Keeping the pages honest in CI
+
+Generated pages and artifacts are committed, so the site builds without
+TypeDoc. `--check` renders in memory and compares against what is on disk,
+exiting 1 on drift and naming every file that is stale, missing or orphaned.
+
+```yaml
+- run: npx typedoc --json build/api.json
+- run: npx helia-ui-tsref --json build/api.json --out docs/src/content/docs/reference/api --public docs/public --base /helia-sdk/ --check
+```
+
+Put it in the same workflow that builds the docs. A comment edited without
+regenerating the reference then fails the pull request rather than shipping a
+page that disagrees with the source.
+
+A run records what it wrote in `<out>/.tsref-manifest.json` and removes only
+those files next time, so a hand-written index page kept in the same directory
+survives.
+
+## The TypeDoc version
+
+TypeDoc stamps its JSON with a `schemaVersion`, so the extractor reads the
+version from the dump and records it in `generatedFrom` rather than pinning
+one release. It was written against **schema version 2.0**, which is what
+TypeDoc has emitted since 0.26.
+
+The fixture its tests run on is hand-written against TypeDoc's documented
+`ProjectReflection` shape rather than captured from a run, because TypeDoc is
+not a dependency of this package and these generators install nothing. The
+sample the fixture describes is committed beside it, so a run of TypeDoc
+regenerates the file in one command whenever the tool is at hand.
