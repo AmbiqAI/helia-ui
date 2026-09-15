@@ -1596,6 +1596,14 @@ a.helia-chip--neutral:focus-visible {
 
 .helia-masonry > * {
   break-inside: avoid;
+  /*
+   * The gap below is the only vertical margin an item is allowed. A page sheet
+   * that puts its rhythm on `* + *` exempts the first child of the DOM, which
+   * is the first item of the first column and of no other: left in place, that
+   * step sits against a column break, and an engine that keeps a margin there
+   * starts every later column lower than the first. See AmbiqAI/helia-ui#56.
+   */
+  margin-block-start: 0;
   margin-block-end: var(--helia-layout-gap, var(--helia-space-4));
 }
 

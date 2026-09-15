@@ -1526,9 +1526,10 @@ itself, so the cards cascade in rather than the block arriving as one.
 ### Masonry
 
 `Masonry` packs cards of unequal height into columns with no dead space under
-the short ones. It is CSS columns and no script, so the packing is right in the
-first paint; the cost is a reading order that runs down each column before it
-moves across.
+the short ones. It is CSS columns, so the packing is right in the first paint;
+the cost is a reading order that runs down each column before it moves across.
+Masonry packs by column with no JavaScript; use `CardGrid` when rows must
+align.
 
 <Example
   title="<Masonry columns={3}>"

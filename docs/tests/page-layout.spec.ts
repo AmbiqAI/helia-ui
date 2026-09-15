@@ -26,6 +26,66 @@ test('the page layout section shows each part working', async ({ page }) => {
   }
 });
 
+test('every masonry column starts at the same top', async ({ page }) => {
+  await page.goto(gallery);
+
+  const masonry = page.locator('[data-example-stage] .helia-masonry').first();
+  const frame = (await masonry.boundingBox())!;
+  const items = await masonry.locator('> *').all();
+  const boxes = await Promise.all(
+    items.map(async (item) => (await item.boundingBox())!),
+  );
+  const gap = await masonry.evaluate((element) =>
+    Number.parseFloat(getComputedStyle(element).columnGap),
+  );
+
+  /* Which column an item landed in is the browser's decision and nothing in
+     the markup records it, so the x position is the only handle on it. */
+  const columns = new Map<number, { y: number; bottom: number }[]>();
+  for (const box of boxes) {
+    const x = Math.round(box.x);
+    const column = columns.get(x) ?? [];
+    column.push({ y: box.y, bottom: box.y + box.height });
+    columns.set(x, column);
+  }
+  expect(columns.size).toBe(3);
+
+  for (const [x, column] of columns) {
+    const top = Math.min(...column.map((item) => item.y));
+    expect(Math.abs(top - frame.y), `column at ${x}`).toBeLessThanOrEqual(1);
+  }
+
+  /* The set ends on the tallest column, and the item that ends it carries no
+     trailing gap out of the container. */
+  const lowest = Math.max(...boxes.map((box) => box.y + box.height));
+  const trailing = frame.y + frame.height - lowest;
+  expect(trailing).toBeGreaterThanOrEqual(-1);
+  expect(trailing).toBeLessThanOrEqual(gap);
+});
+
+test('the masonry item keeps no margin from the page rhythm', async ({
+  page,
+}) => {
+  await page.goto(gallery);
+
+  /* Starlight puts the page rhythm on `* + *` and exempts the first child of
+     the DOM, which is the first item of the first column and of no other. The
+     examples opt out with `not-content`; dropping it puts the recipe in front
+     of the rule a page that forgets the class would hand it. */
+  const margins = await page
+    .locator('.helia-masonry')
+    .last()
+    .evaluate((element) => {
+      element.classList.remove('not-content');
+      return [...element.children].map(
+        (child) => getComputedStyle(child).marginBlockStart,
+      );
+    });
+
+  expect(margins.length).toBeGreaterThan(2);
+  expect(margins.filter((margin) => margin !== '0px')).toEqual([]);
+});
+
 test('the mosaic feature takes two columns and two rows', async ({ page }) => {
   await page.goto(gallery);
 
