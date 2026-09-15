@@ -249,6 +249,99 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
   } satisfies Plot.PlotOptions & { document?: Document };
 }
 
+/** The default box a sparkline is laid out in: a control, not a figure. */
+export const SPARKLINE_WIDTH = 120;
+export const SPARKLINE_HEIGHT = 32;
+
+export type SparklineKind = 'line' | 'area';
+
+const SPARKLINE_STROKE_WIDTH = 1.5;
+const SPARKLINE_MARKER_RADIUS = 2.5;
+/* Room for the stroke and the end marker, which are drawn on the frame edge
+   and would otherwise be halved by it. */
+const SPARKLINE_INSET = 3;
+
+export interface SparklineSpec {
+  kind: SparklineKind;
+  /** The series, in order. The index is the horizontal position. */
+  values: readonly number[];
+  width: number;
+  height: number;
+  /** The one series color, as a `var()` so the drawing follows the theme. */
+  color: string;
+  /** Draws a dot on the last point. */
+  marker: boolean;
+  /** The DOM Plot builds against. Omitted in the browser, where there is one. */
+  document?: Document;
+}
+
+/**
+ * The Plot options for a sparkline: one series, no axes, no gridlines.
+ *
+ * The vertical domain is the data's own extent rather than a zero baseline. A
+ * sparkline is read for shape and not for level -- it has no axis to read a
+ * level off -- and anchoring at zero flattens a series that moves inside a
+ * narrow band, which is the series a sparkline is usually there to show.
+ */
+export function sparklinePlotOptions(spec: SparklineSpec): Plot.PlotOptions {
+  const { kind, values, width, height, color, marker } = spec;
+  const points = values.map((value, index) => ({ index, value }));
+  const min = points.length > 0 ? Math.min(...values) : 0;
+  const max = points.length > 0 ? Math.max(...values) : 0;
+  /* A flat series has no extent to scale into, so it is given one and draws
+     down the middle of the box rather than on its floor. */
+  const domain: [number, number] =
+    min === max ? [min - 1, max + 1] : [min, max];
+
+  const marks: Plot.Markish[] = [];
+  if (kind === 'area') {
+    marks.push(
+      Plot.areaY(points, {
+        x: 'index',
+        y: 'value',
+        fill: color,
+        fillOpacity: AREA_FILL_OPACITY,
+        curve: 'monotone-x',
+      }),
+    );
+  }
+  marks.push(
+    Plot.lineY(points, {
+      x: 'index',
+      y: 'value',
+      stroke: color,
+      strokeWidth: SPARKLINE_STROKE_WIDTH,
+      curve: 'monotone-x',
+    }),
+  );
+  if (marker && points.length > 0) {
+    marks.push(
+      Plot.dot([points[points.length - 1]], {
+        x: 'index',
+        y: 'value',
+        fill: color,
+        r: SPARKLINE_MARKER_RADIUS,
+        stroke: 'none',
+      }),
+    );
+  }
+
+  return {
+    document: spec.document,
+    width,
+    height,
+    marginTop: SPARKLINE_INSET,
+    marginRight: SPARKLINE_INSET,
+    marginBottom: SPARKLINE_INSET,
+    marginLeft: SPARKLINE_INSET,
+    className: 'helia-sparkline-plot',
+    style: { background: 'transparent' },
+    x: { axis: null },
+    y: { axis: null, domain },
+    marks,
+  } satisfies Plot.PlotOptions & { document?: Document };
+}
+
 /*
  * `var()` in a presentation attribute is a CSS declaration by specification,
  * but an inline style is the form every engine has substituted for years, and

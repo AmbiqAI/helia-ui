@@ -1,0 +1,191 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * One figure at the top of the type scale, with its label, its change, and
+ * room for a trend under it.
+ *
+ * It carries no frame: it is the figure itself, so a page sets it on whatever
+ * ground it already has, and `CardContent variant="stats"` lays a row of them
+ * out the way it lays out `StatCard`s. Where the figure needs a card of its
+ * own, that is `StatCard`.
+ *
+ * The number is the child, so it can carry markup; `unit` is set beside it a
+ * step down, because a unit read at the display size competes with the figure
+ * it qualifies. The figures are tabular, so a row or a column of them lines up
+ * on the digit rather than on the glyph width.
+ *
+ * `direction` draws the arrow and `deltaTone` picks the ink, and they are two
+ * props because up is not always good: a figure that counts open findings goes
+ * up and reads negative. Neither is decided here.
+ *
+ * @slot default -- The figure itself, with whatever markup it needs.
+ * @slot sparkline -- A `Sparkline` under the figure, showing how it got there.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import Eyebrow from './Eyebrow.astro';
+
+/* The arrow family the motion cue draws from. It carries no cue class: a
+   figure is not a target, so nothing here moves under the pointer. */
+const DIRECTION_GLYPH = { up: '↑', down: '↓', flat: '→' } as const;
+/* The same three read out, because a screen reader announcing an arrow
+   character is not something any of them agree on. */
+const DIRECTION_WORD = { up: 'up', down: 'down', flat: 'flat' } as const;
+
+interface Props extends HTMLAttributes<'div'> {
+  /** What the figure counts. Rendered as the eyebrow. */
+  label: string;
+  /** Which end of the figure the label sits at. */
+  labelPosition?: 'above' | 'below';
+  /** Which step the figure is set at. */
+  scale?: 'display' | 'heading';
+  /** What the figure is measured in, set beside it a step down. */
+  unit?: string;
+  /** The change beside the figure. Omit it and nothing renders. */
+  delta?: string;
+  /** Which way the change went. Draws the arrow; says nothing about whether it is good. */
+  direction?: 'up' | 'down' | 'flat';
+  /** Whether the change reads well or badly. The composition decides, not the direction. */
+  deltaTone?: 'positive' | 'negative' | 'neutral';
+  /** A note under the figure: provenance, units, a caveat. */
+  caption?: string;
+}
+
+const {
+  label,
+  labelPosition = 'above',
+  scale = 'display',
+  unit,
+  delta,
+  direction = 'flat',
+  deltaTone = 'neutral',
+  caption,
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<div
+  class:list={['helia-big-number', `helia-big-number--${scale}`, className]}
+  {...rest}
+>
+  {labelPosition === 'above' && <Eyebrow>{label}</Eyebrow>}
+  <p class="figure">
+    {
+      /* The unit is inside the quantity, not beside it: a figure whose column
+        is narrow enough to wrap must break before the delta and never between
+        the number and what it is measured in. */
+    }
+    <span class="quantity">
+      <span class="value"><slot /></span>
+      {unit && <span class="unit">{unit}</span>}
+    </span>
+    {
+      delta !== undefined && (
+        <span class="delta" data-direction={direction} data-tone={deltaTone}>
+          <span aria-hidden="true">{DIRECTION_GLYPH[direction]}</span>
+          <span class="sr-only">{DIRECTION_WORD[direction]}</span>
+          {delta}
+        </span>
+      )
+    }
+  </p>
+  {labelPosition === 'below' && <Eyebrow>{label}</Eyebrow>}
+  {
+    Astro.slots.has('sparkline') && (
+      <span class="spark">
+        <slot name="sparkline" />
+      </span>
+    )
+  }
+  {caption && <p class="caption">{caption}</p>}
+</div>
+
+<style>
+  .helia-big-number {
+    display: grid;
+    gap: var(--helia-space-2);
+    justify-items: start;
+  }
+
+  .helia-big-number--display {
+    --helia-big-number-step: var(--helia-text-display);
+    --helia-big-number-tracking: var(--helia-tracking-display);
+    --helia-big-number-unit-step: var(--helia-text-subhead);
+  }
+
+  .helia-big-number--heading {
+    --helia-big-number-step: var(--helia-text-heading);
+    --helia-big-number-tracking: var(--helia-tracking-heading);
+    --helia-big-number-unit-step: var(--helia-text-body);
+  }
+
+  .figure {
+    align-items: baseline;
+    color: var(--helia-ink-primary);
+    display: flex;
+    flex-wrap: wrap;
+    /* A hook before the step, so a composition that owns the row -- the stats
+       variant of a card body -- can drop every figure in it at once. */
+    font-size: var(--helia-big-number-size, var(--helia-big-number-step));
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--helia-weight-strong);
+    gap: var(--helia-space-2);
+    letter-spacing: var(--helia-big-number-tracking);
+    line-height: var(--helia-leading-tight);
+    margin: 0;
+  }
+
+  .quantity {
+    align-items: baseline;
+    display: inline-flex;
+    gap: var(--helia-space-1);
+  }
+
+  .unit {
+    color: var(--helia-ink-secondary);
+    /* Its own hook, because the unit does not scale with the figure: the row
+       that drops the figure a step drops the unit further. */
+    font-size: var(
+      --helia-big-number-unit-size,
+      var(--helia-big-number-unit-step)
+    );
+    font-weight: var(--helia-weight-medium);
+    letter-spacing: normal;
+  }
+
+  .delta {
+    align-items: baseline;
+    color: var(--helia-ink-secondary);
+    display: inline-flex;
+    font-size: var(--helia-text-caption);
+    font-weight: var(--helia-weight-semibold);
+    gap: var(--helia-space-1);
+    letter-spacing: normal;
+  }
+
+  .delta[data-tone='positive'] {
+    color: var(--helia-tone-success-ink);
+  }
+
+  .delta[data-tone='negative'] {
+    color: var(--helia-tone-critical-ink);
+  }
+
+  .caption {
+    color: var(--helia-ink-muted);
+    font-size: var(--helia-text-caption);
+    line-height: var(--helia-leading-body);
+    margin: 0;
+  }
+
+  .sr-only {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+</style>

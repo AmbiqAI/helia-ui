@@ -1,0 +1,112 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A trend at control size, drawn at build and shipped as inline SVG.
+ *
+ * It takes the same path as `Chart`: Observable Plot lays the line out against
+ * a `linkedom` document, the colors are written as custom properties rather
+ * than resolved, and no chart code reaches the browser. What it leaves out is
+ * the frame -- no axes, no gridlines, no title -- because a sparkline is read
+ * beside a figure that already says what the number is.
+ *
+ * One series only. The color is `--helia-chart-1` unless the composition sets
+ * `--accent`, which is how a sparkline in a product card takes the product's
+ * hue without a prop for it.
+ *
+ * `ariaLabel` is required: the drawing has no axis and no title, so the
+ * sentence a screen reader gets is the only reading of it there is.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import { parseHTML } from 'linkedom';
+import * as Plot from '@observablehq/plot';
+
+import {
+  SPARKLINE_HEIGHT,
+  SPARKLINE_WIDTH,
+  inlineChartColors,
+  labelChartSvg,
+  sparklinePlotOptions,
+  type SparklineKind,
+} from '../chart-plot-spec';
+
+interface Props extends HTMLAttributes<'span'> {
+  /** The series, in order. The index is the horizontal position. */
+  values: readonly number[];
+  /** What the trend says, as one sentence. The accessible name of the SVG. */
+  ariaLabel: string;
+  /** `line` draws the stroke alone; `area` fills under it as well. */
+  kind?: SparklineKind;
+  /** The width, in pixels, Plot lays the sparkline out at. It ships at that size. */
+  width?: number;
+  /** The height, in pixels, Plot lays the sparkline out at. */
+  height?: number;
+  /** Draws a dot on the last point, where a reader looks first. */
+  marker?: boolean;
+  /** The last point written out, set beside the line. The caller formats it, units and all. */
+  lastValue?: string;
+}
+
+const {
+  values,
+  ariaLabel,
+  kind = 'line',
+  width = SPARKLINE_WIDTH,
+  height = SPARKLINE_HEIGHT,
+  marker = false,
+  lastValue,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const { document } = parseHTML('<!doctype html><html><body></body></html>');
+
+const figure = Plot.plot(
+  sparklinePlotOptions({
+    kind,
+    values,
+    width,
+    height,
+    color: 'var(--accent, var(--helia-chart-1))',
+    marker,
+    document: document as unknown as Document,
+  }),
+);
+
+inlineChartColors(figure as unknown as Element);
+labelChartSvg(figure as unknown as Element, ariaLabel);
+
+const svg = (figure as unknown as { outerHTML: string }).outerHTML;
+---
+
+<span
+  class:list={['helia-sparkline', className]}
+  data-sparkline-kind={kind}
+  {...rest}
+>
+  <span class="helia-sparkline__plot" set:html={svg} />
+  {lastValue !== undefined && <span class="value">{lastValue}</span>}
+</span>
+
+<style>
+  .helia-sparkline {
+    align-items: center;
+    display: inline-flex;
+    gap: var(--helia-space-2);
+  }
+
+  /* The drawing keeps the size it was laid out at: it is a control beside a
+     figure, not a figure that scales into a column. */
+  /* style-lint: allow global -- Plot writes the svg and it arrives through set:html, so it carries no scope */
+  .helia-sparkline__plot :global(svg) {
+    display: block;
+    overflow: visible;
+  }
+
+  .value {
+    color: var(--helia-ink-secondary);
+    font-size: var(--helia-text-label);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--helia-leading-tight);
+  }
+</style>

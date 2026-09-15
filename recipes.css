@@ -883,6 +883,15 @@ a.helia-chip--neutral:focus-visible {
   padding: 0;
 }
 
+/* A `BigNumber` in the row is the same figure without the card around it, so
+   the row sets its step from the same hook and the two are interchangeable. */
+.helia-card-content--stats .helia-big-number {
+  --helia-big-number-size: var(--helia-stat-size);
+  --helia-big-number-unit-size: var(--helia-text-caption);
+
+  gap: var(--helia-space-1);
+}
+
 .helia-card-quote {
   display: grid;
   gap: var(--helia-space-3);

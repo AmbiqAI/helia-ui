@@ -8,9 +8,10 @@
  * sits on the baseline of every card in a row.
  *
  * `variant="stats"` is the same region laid out as a row of figures rather
- * than as prose. The figures are `StatCard`s the consumer hands in, so the
- * figure and its label keep one definition; the row strips their edge and
- * their padding, because a card inside a card is not what the row means.
+ * than as prose. The figures are the `StatCard`s or `BigNumber`s the consumer
+ * hands in, so the figure and its label keep one definition; the row sets the
+ * step for both, and strips the nested cards' edge and padding, because a card
+ * inside a card is not what the row means.
  *
  * @slot default -- The card's prose, or the figures when `variant` is `stats`.
  */

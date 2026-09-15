@@ -793,6 +793,40 @@ test('the gallery charts are inline SVG in the served HTML', async ({
 });
 
 /*
+ * The sparkline makes the same claim with less to show for it: no axes, no
+ * title, nothing that gives a late-arriving drawing away. So the assertion is
+ * the served HTML again -- four figures, three in the stats row and one in the
+ * stat card -- and the written palette that lets them follow the theme.
+ */
+const GALLERY_SPARKLINES = 4;
+
+test('the gallery sparklines are inline SVG in the served HTML', async ({
+  page,
+  request,
+}) => {
+  const response = await request.get(`${base}/gallery/`);
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+
+  /* The class attribute rather than the bare name: the part's scoped style
+     block is inlined into this same page and names the class too. */
+  const plots = html.match(/class="helia-sparkline__plot/g) ?? [];
+  expect(plots).toHaveLength(GALLERY_SPARKLINES);
+
+  /* The accessible name is set on the SVG element itself, so finding it in the
+     response proves the line and not just its box was drawn. */
+  expect(html).toContain(
+    'aria-label="Routes emitted, rising across the quarter."',
+  );
+  expect(html).toContain('stroke: var(--accent, var(--helia-chart-1))');
+
+  await page.goto(`${base}/gallery/`);
+  const drawn = page.locator('.helia-sparkline__plot svg');
+  await expect(drawn).toHaveCount(GALLERY_SPARKLINES);
+  await expect(drawn.first()).toBeVisible();
+});
+
+/*
  * The colors are custom properties rather than resolved hues, which is the
  * only reason a figure drawn at build can follow the theme toggle. Reading a
  * series stroke back in both themes is the assertion that they still are.

@@ -13,6 +13,7 @@
  * this component has no idea whether up is good.
  *
  * @slot default -- The figure itself, with whatever unit or markup it needs.
+ * @slot sparkline -- A `Sparkline` under the figure, showing how it got there.
  */
 import type { HTMLAttributes } from 'astro/types';
 import type { CardTone } from './Card.astro';
@@ -60,10 +61,23 @@ const {
         )
       }
     </p>
+    {
+      Astro.slots.has('sparkline') && (
+        <div class="spark">
+          <slot name="sparkline" />
+        </div>
+      )
+    }
   </CardContent>
 </Card>
 
 <style>
+  .spark {
+    /* Under the figure and hard against it: the trend is the same reading as
+       the number, not a second one. */
+    margin-top: var(--helia-space-2);
+  }
+
   .value {
     align-items: baseline;
     color: var(--helia-ink-primary);

@@ -113,6 +113,34 @@ Also accepts `HTMLAttributes<'section'>`.
 
 [See it rendered on Gallery](/helia-ui/gallery/#band)
 
+## BigNumber
+
+**Use it for:** One figure at the top of the type scale, with its label, its change, and room for a trend under it.
+
+```ts
+import BigNumber from '@ambiqai/helia-ui/astro/BigNumber';
+```
+
+| Prop            | Type                                    | Default     | Description                                                                         |
+| --------------- | --------------------------------------- | ----------- | ----------------------------------------------------------------------------------- |
+| `label` (req.)  | `string`                                | --          | What the figure counts. Rendered as the eyebrow.                                    |
+| `labelPosition` | `'above' \| 'below'`                    | `'above'`   | Which end of the figure the label sits at.                                          |
+| `scale`         | `'display' \| 'heading'`                | `'display'` | Which step the figure is set at.                                                    |
+| `unit`          | `string`                                | --          | What the figure is measured in, set beside it a step down.                          |
+| `delta`         | `string`                                | --          | The change beside the figure. Omit it and nothing renders.                          |
+| `direction`     | `'up' \| 'down' \| 'flat'`              | `'flat'`    | Which way the change went. Draws the arrow; says nothing about whether it is good.  |
+| `deltaTone`     | `'positive' \| 'negative' \| 'neutral'` | `'neutral'` | Whether the change reads well or badly. The composition decides, not the direction. |
+| `caption`       | `string`                                | --          | A note under the figure: provenance, units, a caveat.                               |
+
+Also accepts `HTMLAttributes<'div'>`.
+
+**Slots**
+
+- `default` -- The figure itself, with whatever markup it needs.
+- `sparkline` -- A `Sparkline` under the figure, showing how it got there.
+
+[See it rendered on Gallery](/helia-ui/gallery/#figures)
+
 ## Button
 
 **Use it for:** The call to action: a pill-shaped link or button.
@@ -761,6 +789,30 @@ import ShowcaseCarousel from '@ambiqai/helia-ui/astro/ShowcaseCarousel';
 
 [See it rendered on Layout](/helia-ui/layout/#showcase-carousel)
 
+## Sparkline
+
+**Use it for:** A trend at control size, drawn at build and shipped as inline SVG.
+
+```ts
+import Sparkline from '@ambiqai/helia-ui/astro/Sparkline';
+```
+
+| Prop               | Type                | Default            | Description                                                                            |
+| ------------------ | ------------------- | ------------------ | -------------------------------------------------------------------------------------- |
+| `values` (req.)    | `readonly number[]` | --                 | The series, in order. The index is the horizontal position.                            |
+| `ariaLabel` (req.) | `string`            | --                 | What the trend says, as one sentence. The accessible name of the SVG.                  |
+| `kind`             | `SparklineKind`     | `'line'`           | `line` draws the stroke alone; `area` fills under it as well.                          |
+| `width`            | `number`            | `SPARKLINE_WIDTH`  | The width, in pixels, Plot lays the sparkline out at. It ships at that size.           |
+| `height`           | `number`            | `SPARKLINE_HEIGHT` | The height, in pixels, Plot lays the sparkline out at.                                 |
+| `marker`           | `boolean`           | `false`            | Draws a dot on the last point, where a reader looks first.                             |
+| `lastValue`        | `string`            | --                 | The last point written out, set beside the line. The caller formats it, units and all. |
+
+Also accepts `HTMLAttributes<'span'>`.
+
+**Slots** -- none.
+
+[See it rendered on Gallery](/helia-ui/gallery/#figures)
+
 ## SplitPanel
 
 **Use it for:** A wide panel holding a short piece of writing beside the thing it describes: a quickstart, a release note, an API call with the call shown.
@@ -812,6 +864,7 @@ Also accepts `HTMLAttributes<'div'>`.
 **Slots**
 
 - `default` -- The figure itself, with whatever unit or markup it needs.
+- `sparkline` -- A `Sparkline` under the figure, showing how it got there.
 
 [See it rendered on Gallery](/helia-ui/gallery/#statcard)
 

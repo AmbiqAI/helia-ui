@@ -7,6 +7,7 @@ import AccordionGroup from '@ambiqai/helia-ui/astro/AccordionGroup';
 import AsciiTerminal from '@ambiqai/helia-ui/astro/AsciiTerminal';
 import Badge from '@ambiqai/helia-ui/astro/Badge';
 import Band from '@ambiqai/helia-ui/astro/Band';
+import BigNumber from '@ambiqai/helia-ui/astro/BigNumber';
 import Button from '@ambiqai/helia-ui/astro/Button';
 import Callout from '@ambiqai/helia-ui/astro/Callout';
 import Card from '@ambiqai/helia-ui/astro/Card';
@@ -37,6 +38,7 @@ import Reveal from '@ambiqai/helia-ui/astro/Reveal';
 import RevealReplay from '../../components/RevealReplay.astro';
 import SectionHeader from '@ambiqai/helia-ui/astro/SectionHeader';
 import ShowcaseCarousel from '@ambiqai/helia-ui/astro/ShowcaseCarousel';
+import Sparkline from '@ambiqai/helia-ui/astro/Sparkline';
 import SplitPanel from '@ambiqai/helia-ui/astro/SplitPanel';
 import StatCard from '@ambiqai/helia-ui/astro/StatCard';
 import Timeline from '@ambiqai/helia-ui/astro/Timeline';
@@ -441,6 +443,165 @@ because the component has no idea whether up is good.
     <StatCard label="Bundle" tone="elevated" density="compact">
       <span>84 kB</span>
     </StatCard>
+  </Example>
+</div>
+
+## Figures
+
+`BigNumber` is the figure with no card around it: the number at the display
+step, the unit beside it a step down, and the label above or below. `Sparkline`
+is the trend at control size, drawn by the same Plot-at-build path as `Chart`
+and shipped as inline SVG -- no axes, no gridlines, one series in
+`--helia-chart-1` unless the composition sets `--accent`.
+
+The arrow and the ink are two props. `direction` says which way the number
+went; `deltaTone` says whether that reads well, and only the composition knows,
+because a figure that counts open findings goes up and that is not good news.
+Both parts set their figures in tabular numerals, so a row of them lines up on
+the digit.
+
+Every number below is invented and describes this documentation site. Nothing
+here is a measurement of any part.
+
+<Example
+  title='<CardContent variant="stats"> of three BigNumbers'
+  code={`
+    <Card>
+      <CardContent variant="stats">
+        <BigNumber label="Routes emitted" delta="+18" direction="up">
+          <span>206</span>
+          <Sparkline
+            slot="sparkline"
+            values={[164, 171, 169, 178, 186, 191, 199, 206]}
+            ariaLabel="Routes emitted, rising across the quarter."
+            marker
+          />
+        </BigNumber>
+        <BigNumber label="Build time" unit="s" delta="-18%" direction="down">
+          <span>41</span>
+          <Sparkline
+            slot="sparkline"
+            kind="area"
+            values={[58, 56, 57, 51, 48, 47, 43, 41]}
+            ariaLabel="Build time, falling across the quarter."
+            marker
+          />
+        </BigNumber>
+        <BigNumber label="Pages published" delta="+9" direction="up">
+          <span>128</span>
+          <Sparkline
+            slot="sparkline"
+            values={[96, 101, 104, 110, 113, 119, 124, 128]}
+            ariaLabel="Pages published, rising across the quarter."
+            marker
+          />
+        </BigNumber>
+      </CardContent>
+    </Card>
+  `}
+>
+  <Card>
+    <CardContent variant="stats">
+      <BigNumber label="Routes emitted" delta="+18" direction="up">
+        <span>206</span>
+        <Sparkline
+          slot="sparkline"
+          values={[164, 171, 169, 178, 186, 191, 199, 206]}
+          ariaLabel="Routes emitted, rising across the quarter."
+          marker
+        />
+      </BigNumber>
+      <BigNumber label="Build time" unit="s" delta="-18%" direction="down">
+        <span>41</span>
+        <Sparkline
+          slot="sparkline"
+          kind="area"
+          values={[58, 56, 57, 51, 48, 47, 43, 41]}
+          ariaLabel="Build time, falling across the quarter."
+          marker
+        />
+      </BigNumber>
+      <BigNumber label="Pages published" delta="+9" direction="up">
+        <span>128</span>
+        <Sparkline
+          slot="sparkline"
+          values={[96, 101, 104, 110, 113, 119, 124, 128]}
+          ariaLabel="Pages published, rising across the quarter."
+          marker
+        />
+      </BigNumber>
+    </CardContent>
+  </Card>
+</Example>
+
+<div className="gallery-grid gallery-grid--wide not-content">
+  <Example
+    title="<StatCard> with a sparkline"
+    code={`
+      <StatCard
+        label="Build time"
+        delta="-18%"
+        deltaTone="success"
+        density="compact"
+      >
+        <span>41s</span>
+        <Sparkline
+          slot="sparkline"
+          kind="area"
+          values={[58, 56, 57, 51, 48, 47, 43, 41]}
+          ariaLabel="Build time, falling across the quarter."
+          lastValue="41s"
+          width={110}
+          height={28}
+        />
+      </StatCard>
+    `}
+  >
+    <StatCard
+      label="Build time"
+      delta="-18%"
+      deltaTone="success"
+      density="compact"
+    >
+      <span>41s</span>
+      <Sparkline
+        slot="sparkline"
+        kind="area"
+        values={[58, 56, 57, 51, 48, 47, 43, 41]}
+        ariaLabel="Build time, falling across the quarter."
+        lastValue="41s"
+        width={110}
+        height={28}
+      />
+    </StatCard>
+  </Example>
+  <Example
+    title='direction="down" deltaTone="neutral"'
+    code={`
+      <BigNumber
+        label="Transferred weight"
+        labelPosition="below"
+        scale="heading"
+        unit="kB"
+        delta="-12%"
+        direction="down"
+        caption="Neutral because nothing here knows whether lighter is the goal."
+      >
+        <span>84</span>
+      </BigNumber>
+    `}
+  >
+    <BigNumber
+      label="Transferred weight"
+      labelPosition="below"
+      scale="heading"
+      unit="kB"
+      delta="-12%"
+      direction="down"
+      caption="Neutral because nothing here knows whether lighter is the goal."
+    >
+      <span>84</span>
+    </BigNumber>
   </Example>
 </div>
 
