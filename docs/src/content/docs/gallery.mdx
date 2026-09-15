@@ -488,7 +488,13 @@ here is a measurement of any part.
             marker
           />
         </BigNumber>
-        <BigNumber label="Build time" unit="s" delta="-18%" direction="down">
+        <BigNumber
+          label="Build time"
+          unit="s"
+          delta="-18%"
+          direction="down"
+          deltaTone="success"
+        >
           <span>41</span>
           <Sparkline
             slot="sparkline"
@@ -522,7 +528,13 @@ here is a measurement of any part.
           marker
         />
       </BigNumber>
-      <BigNumber label="Build time" unit="s" delta="-18%" direction="down">
+      <BigNumber
+        label="Build time"
+        unit="s"
+        delta="-18%"
+        direction="down"
+        deltaTone="success"
+      >
         <span>41</span>
         <Sparkline
           slot="sparkline"
@@ -592,7 +604,7 @@ here is a measurement of any part.
       <BigNumber
         label="Transferred weight"
         labelPosition="below"
-        scale="heading"
+        step="heading"
         unit="kB"
         delta="-12%"
         direction="down"
@@ -605,7 +617,7 @@ here is a measurement of any part.
     <BigNumber
       label="Transferred weight"
       labelPosition="below"
-      scale="heading"
+      step="heading"
       unit="kB"
       delta="-12%"
       direction="down"
@@ -638,13 +650,13 @@ card is the target and the cue is inside the same hit area.
     </LinkCard>
   </Example>
   <Example
-    title='overline="Tokens" tone="ghost"'
+    title='eyebrow="Tokens" tone="ghost"'
     code={`
       <LinkCard
         titleAs="h4"
         href="/helia-ui/foundations/"
         title="Foundations"
-        overline="Tokens"
+        eyebrow="Tokens"
         tone="ghost"
       >
         The scales every part compiles against.
@@ -655,7 +667,7 @@ card is the target and the cue is inside the same hit area.
       titleAs="h4"
       href="/helia-ui/foundations/"
       title="Foundations"
-      overline="Tokens"
+      eyebrow="Tokens"
       tone="ghost"
     >
       The scales every part compiles against.
@@ -692,7 +704,7 @@ card is the target and the cue is inside the same hit area.
         titleAs="h4"
         href="/helia-ui/gallery/"
         title="Gallery"
-        overline="Reference"
+        eyebrow="Reference"
         meta="Astro parts · React parts"
       >
         <Icon slot="icon" name="book" />
@@ -704,7 +716,7 @@ card is the target and the cue is inside the same hit area.
       titleAs="h4"
       href="/helia-ui/gallery/"
       title="Gallery"
-      overline="Reference"
+      eyebrow="Reference"
       meta="Astro parts · React parts"
     >
       <Icon slot="icon" name="book" />
@@ -731,7 +743,7 @@ tone, density and the lift reach all of them unchanged.
     title='<CardHeader> with <Icon slot="icon">'
     code={`
       <Card density="comfortable">
-        <CardHeader titleAs="h4" overline="Profiling">
+        <CardHeader titleAs="h4" eyebrow="Profiling">
           <Icon slot="icon" name="gauge-high" />
           <span>Latency you can budget</span>
         </CardHeader>
@@ -743,7 +755,7 @@ tone, density and the lift reach all of them unchanged.
     `}
   >
     <Card density="comfortable">
-      <CardHeader titleAs="h4" overline="Profiling">
+      <CardHeader titleAs="h4" eyebrow="Profiling">
         <Icon slot="icon" name="gauge-high" />
         <span>Latency you can budget</span>
       </CardHeader>
@@ -757,7 +769,7 @@ tone, density and the lift reach all of them unchanged.
     title="<CardList items={[...]} />"
     code={`
       <Card density="comfortable">
-        <CardHeader titleAs="h4" overline="Included">
+        <CardHeader titleAs="h4" eyebrow="Included">
           <span>What the SDK ships with</span>
         </CardHeader>
         <CardList
@@ -771,7 +783,7 @@ tone, density and the lift reach all of them unchanged.
     `}
   >
     <Card density="comfortable">
-      <CardHeader titleAs="h4" overline="Included">
+      <CardHeader titleAs="h4" eyebrow="Included">
         <span>What the SDK ships with</span>
       </CardHeader>
       <CardList
@@ -784,10 +796,10 @@ tone, density and the lift reach all of them unchanged.
     </Card>
   </Example>
   <Example
-    title='<CardHeader step={2} overline="Step two">'
+    title='<CardHeader step={2} eyebrow="Step two">'
     code={`
       <Card density="comfortable">
-        <CardHeader titleAs="h4" step={2} overline="Step two">
+        <CardHeader titleAs="h4" step={2} eyebrow="Step two">
           <span>Quantise the graph</span>
         </CardHeader>
         <CardContent>
@@ -798,7 +810,7 @@ tone, density and the lift reach all of them unchanged.
     `}
   >
     <Card density="comfortable">
-      <CardHeader titleAs="h4" step={2} overline="Step two">
+      <CardHeader titleAs="h4" step={2} eyebrow="Step two">
         <span>Quantise the graph</span>
       </CardHeader>
       <CardContent>
@@ -833,7 +845,7 @@ tone, density and the lift reach all of them unchanged.
     title='<CardContent variant="stats">'
     code={`
       <Card density="comfortable">
-        <CardHeader titleAs="h4" overline="Measured on device">
+        <CardHeader titleAs="h4" eyebrow="Measured on device">
           <span>Keyword spotting</span>
         </CardHeader>
         <CardContent variant="stats">
@@ -845,7 +857,7 @@ tone, density and the lift reach all of them unchanged.
     `}
   >
     <Card density="comfortable">
-      <CardHeader titleAs="h4" overline="Measured on device">
+      <CardHeader titleAs="h4" eyebrow="Measured on device">
         <span>Keyword spotting</span>
       </CardHeader>
       <CardContent variant="stats">
@@ -859,7 +871,7 @@ tone, density and the lift reach all of them unchanged.
     title='<CardHeader scale="display">'
     code={`
       <Card density="comfortable" tone="filled">
-        <CardHeader titleAs="h4" scale="display" overline="Platform">
+        <CardHeader titleAs="h4" scale="display" eyebrow="Platform">
           <span>Ship the model, not the toolchain</span>
         </CardHeader>
         <CardContent>
@@ -869,7 +881,7 @@ tone, density and the lift reach all of them unchanged.
     `}
   >
     <Card density="comfortable" tone="filled">
-      <CardHeader titleAs="h4" scale="display" overline="Platform">
+      <CardHeader titleAs="h4" scale="display" eyebrow="Platform">
         <span>Ship the model, not the toolchain</span>
       </CardHeader>
       <CardContent>
@@ -892,7 +904,7 @@ row all come off the density hook, so nothing here is restyled per size.
     title='density="compact"'
     code={`
       <Card density="compact">
-        <CardHeader titleAs="h4" overline="Profiling">
+        <CardHeader titleAs="h4" eyebrow="Profiling">
           <Icon slot="icon" name="gauge-high" />
           <span>Latency you can budget</span>
         </CardHeader>
@@ -901,7 +913,7 @@ row all come off the density hook, so nothing here is restyled per size.
     `}
   >
     <Card density="compact">
-      <CardHeader titleAs="h4" overline="Profiling">
+      <CardHeader titleAs="h4" eyebrow="Profiling">
         <Icon slot="icon" name="gauge-high" />
         <span>Latency you can budget</span>
       </CardHeader>
@@ -912,7 +924,7 @@ row all come off the density hook, so nothing here is restyled per size.
     title='<CardList marker="bullet" />'
     code={`
       <Card density="compact">
-        <CardHeader titleAs="h4" overline="Included">
+        <CardHeader titleAs="h4" eyebrow="Included">
           <span>What the SDK ships with</span>
         </CardHeader>
         <CardList
@@ -927,7 +939,7 @@ row all come off the density hook, so nothing here is restyled per size.
     `}
   >
     <Card density="compact">
-      <CardHeader titleAs="h4" overline="Included">
+      <CardHeader titleAs="h4" eyebrow="Included">
         <span>What the SDK ships with</span>
       </CardHeader>
       <CardList
@@ -944,7 +956,7 @@ row all come off the density hook, so nothing here is restyled per size.
     title='step={2} density="compact"'
     code={`
       <Card density="compact">
-        <CardHeader titleAs="h4" step={2} overline="Step two">
+        <CardHeader titleAs="h4" step={2} eyebrow="Step two">
           <span>Quantise the graph</span>
         </CardHeader>
         <CardContent>Calibration travels with the artifact.</CardContent>
@@ -952,7 +964,7 @@ row all come off the density hook, so nothing here is restyled per size.
     `}
   >
     <Card density="compact">
-      <CardHeader titleAs="h4" step={2} overline="Step two">
+      <CardHeader titleAs="h4" step={2} eyebrow="Step two">
         <span>Quantise the graph</span>
       </CardHeader>
       <CardContent>Calibration travels with the artifact.</CardContent>
@@ -978,7 +990,7 @@ row all come off the density hook, so nothing here is restyled per size.
     title='variant="stats" density="compact"'
     code={`
       <Card density="compact">
-        <CardHeader titleAs="h4" overline="Measured on device">
+        <CardHeader titleAs="h4" eyebrow="Measured on device">
           <span>Keyword spotting</span>
         </CardHeader>
         <CardContent variant="stats">
@@ -989,7 +1001,7 @@ row all come off the density hook, so nothing here is restyled per size.
     `}
   >
     <Card density="compact">
-      <CardHeader titleAs="h4" overline="Measured on device">
+      <CardHeader titleAs="h4" eyebrow="Measured on device">
         <span>Keyword spotting</span>
       </CardHeader>
       <CardContent variant="stats">
@@ -1002,7 +1014,7 @@ row all come off the density hook, so nothing here is restyled per size.
     title='scale="display" density="compact"'
     code={`
       <Card density="compact" tone="filled">
-        <CardHeader titleAs="h4" scale="display" overline="Platform">
+        <CardHeader titleAs="h4" scale="display" eyebrow="Platform">
           <span>Ship the model, not the toolchain</span>
         </CardHeader>
         <CardContent>The type carries it at any density.</CardContent>
@@ -1010,7 +1022,7 @@ row all come off the density hook, so nothing here is restyled per size.
     `}
   >
     <Card density="compact" tone="filled">
-      <CardHeader titleAs="h4" scale="display" overline="Platform">
+      <CardHeader titleAs="h4" scale="display" eyebrow="Platform">
         <span>Ship the model, not the toolchain</span>
       </CardHeader>
       <CardContent>The type carries it at any density.</CardContent>
@@ -1722,7 +1734,7 @@ align.
         </CardContent>
       </Card>
       <Card tone="filled">
-        <CardHeader titleAs="h4" overline="Included">
+        <CardHeader titleAs="h4" eyebrow="Included">
           <span>What the column keeps</span>
         </CardHeader>
         <CardList
@@ -1752,7 +1764,7 @@ align.
       </CardContent>
     </Card>
     <Card tone="filled">
-      <CardHeader titleAs="h4" overline="Included">
+      <CardHeader titleAs="h4" eyebrow="Included">
         <span>What the column keeps</span>
       </CardHeader>
       <CardList
@@ -1845,7 +1857,7 @@ set of parts.
           style="--accent: var(--helia-accent-purple)"
         />
       </CardMedia>
-      <CardHeader titleAs="h4" overline="Featured">
+      <CardHeader titleAs="h4" eyebrow="Featured">
         <span>The one the section is about</span>
       </CardHeader>
       <CardContent>
@@ -1930,7 +1942,7 @@ set of parts.
       </CardContent>
     </Card>
     <Card tone="filled">
-      <CardHeader titleAs="h4" overline="Covered">
+      <CardHeader titleAs="h4" eyebrow="Covered">
         <span>What a note can hold</span>
       </CardHeader>
       <CardList

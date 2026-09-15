@@ -108,6 +108,14 @@ export default function NavigationShowcase() {
             </TabsList>
             <TabsContent value="overview" className="text-sm">
               What the product is and when to reach for it.
+              {/* Author's prose inside two generated slots at once. The
+                  restated preflight in `shadcn.css` is for the parts that are
+                  a list; a list the author wrote keeps its markers, and the
+                  docs smoke asserts it. */}
+              <ul data-consumer-list>
+                <li>Where it runs.</li>
+                <li>What it needs.</li>
+              </ul>
             </TabsContent>
             <TabsContent value="quickstart" className="text-sm">
               The shortest path from install to a running model.

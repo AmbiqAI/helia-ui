@@ -40,7 +40,7 @@ const {
 <section
   class:list={[
     'helia-band',
-    `helia-band--${tone}`,
+    tone !== 'plain' && `helia-band--${tone}`,
     density !== 'default' && `helia-band--${density}`,
     className,
   ]}

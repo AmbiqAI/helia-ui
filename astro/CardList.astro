@@ -49,7 +49,7 @@ const glyph = icon ?? (marker === 'check' ? 'check' : 'circle');
 <List
   class:list={[
     'helia-card-list',
-    `helia-card-list--${marker}`,
+    marker !== 'check' && `helia-card-list--${marker}`,
     padding !== 'none' && `helia-surface--pad-${padding}`,
     className,
   ]}

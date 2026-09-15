@@ -16,6 +16,7 @@
  * @slot sparkline -- A `Sparkline` under the figure, showing how it got there.
  */
 import type { HTMLAttributes } from 'astro/types';
+import type { BadgeTone } from './Badge.astro';
 import type { CardTone } from './Card.astro';
 import Badge from './Badge.astro';
 import Card from './Card.astro';
@@ -28,7 +29,7 @@ interface Props extends HTMLAttributes<'div'> {
   /** The change beside the figure. Omit it and no badge renders. */
   delta?: string;
   /** Which way the change reads. The component does not decide. */
-  deltaTone?: 'neutral' | 'info' | 'success' | 'warning' | 'danger' | 'accent';
+  deltaTone?: BadgeTone;
   /** What stands in for the card's edge and fill. Passed straight to `Card`. */
   tone?: CardTone;
   /** Moves the padding step the parts default to. Passed straight to `Card`. */

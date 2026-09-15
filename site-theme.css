@@ -129,7 +129,7 @@
    *   palette leaves it; `tinted` pulls the first accent into it; `gradient`
    *   runs the first accent into the second across the band.
    * default: plain
-   * reads: `EditorialBand`, for the `paper` and `subtle` tones. A site's own
+   * reads: `EditorialBand`, for the `paper` tone. A site's own
    *   hero composition reads it too, which is why the package names the value
    *   rather than leaving each site to spell the choice its own way.
    */

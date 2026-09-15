@@ -17,12 +17,13 @@
  *
  * `direction` draws the arrow and `deltaTone` picks the ink, and they are two
  * props because up is not always good: a figure that counts open findings goes
- * up and reads negative. Neither is decided here.
+ * up and reads `danger`. Neither is decided here.
  *
  * @slot default -- The figure itself, with whatever markup it needs.
  * @slot sparkline -- A `Sparkline` under the figure, showing how it got there.
  */
 import type { HTMLAttributes } from 'astro/types';
+import type { BadgeTone } from './Badge.astro';
 import Eyebrow from './Eyebrow.astro';
 
 /* The arrow family the motion cue draws from. It carries no cue class: a
@@ -37,8 +38,8 @@ interface Props extends HTMLAttributes<'div'> {
   label: string;
   /** Which end of the figure the label sits at. */
   labelPosition?: 'above' | 'below';
-  /** Which step the figure is set at. */
-  scale?: 'display' | 'heading';
+  /** Which rung of the type ladder the figure is set at. */
+  step?: 'display' | 'heading';
   /** What the figure is measured in, set beside it a step down. */
   unit?: string;
   /** The change beside the figure. Omit it and nothing renders. */
@@ -46,7 +47,7 @@ interface Props extends HTMLAttributes<'div'> {
   /** Which way the change went. Draws the arrow; says nothing about whether it is good. */
   direction?: 'up' | 'down' | 'flat';
   /** Whether the change reads well or badly. The composition decides, not the direction. */
-  deltaTone?: 'positive' | 'negative' | 'neutral';
+  deltaTone?: BadgeTone;
   /** A note under the figure: provenance, units, a caveat. */
   caption?: string;
 }
@@ -54,7 +55,7 @@ interface Props extends HTMLAttributes<'div'> {
 const {
   label,
   labelPosition = 'above',
-  scale = 'display',
+  step = 'display',
   unit,
   delta,
   direction = 'flat',
@@ -66,7 +67,7 @@ const {
 ---
 
 <div
-  class:list={['helia-big-number', `helia-big-number--${scale}`, className]}
+  class:list={['helia-big-number', `helia-big-number--${step}`, className]}
   {...rest}
 >
   {labelPosition === 'above' && <Eyebrow>{label}</Eyebrow>}
@@ -104,7 +105,10 @@ const {
 <style>
   .helia-big-number {
     display: grid;
-    gap: var(--helia-space-2);
+    /* A hook rather than a bare step, so a composition that owns the row can
+       close the figure up without a rule of matching weight to outrank this
+       one. Same shape as the size hooks below. */
+    gap: var(--helia-big-number-gap, var(--helia-space-2));
     justify-items: start;
   }
 
@@ -164,12 +168,34 @@ const {
     letter-spacing: normal;
   }
 
-  .delta[data-tone='positive'] {
+  /*
+   * The advisory tones, on the same vocabulary the `Badge` takes, so a
+   * consumer mapping its statuses onto a tone gets the same answer from a
+   * framed figure and an unframed one. The ink rather than the fill: the delta
+   * is a reading, not a pill. `neutral` is the base above.
+   */
+  .delta[data-tone='info'] {
+    color: var(--helia-tone-important-ink);
+  }
+
+  .delta[data-tone='success'] {
     color: var(--helia-tone-success-ink);
   }
 
-  .delta[data-tone='negative'] {
+  .delta[data-tone='warning'] {
+    color: var(--helia-tone-warning-ink);
+  }
+
+  .delta[data-tone='danger'] {
     color: var(--helia-tone-critical-ink);
+  }
+
+  .delta[data-tone='accent'] {
+    color: var(--helia-product-accent);
+  }
+
+  .delta[data-tone='secondary'] {
+    color: var(--helia-accent-secondary);
   }
 
   .caption {

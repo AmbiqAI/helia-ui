@@ -31,8 +31,8 @@ interface Props extends Omit<HTMLAttributes<'a'>, 'title'> {
   title: string;
   /** Where the row goes. Without it the row renders as plain content, with no link and no hover. */
   href?: string;
-  /** Heading level for the title. Pick the one the page outline needs; `p` leaves the outline alone. */
-  titleAs?: 'h2' | 'h3' | 'h4' | 'p';
+  /** Heading level for the title. Pick the one the page outline needs. */
+  titleAs?: 'h2' | 'h3' | 'h4';
   /** Font Awesome solid name for the tile. Omit it and the `icon` slot carries the glyph. */
   icon?: IconName;
   /** The tile's frame. Passed straight to `IconTile`. */

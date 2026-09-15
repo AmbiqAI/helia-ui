@@ -10,15 +10,20 @@
  * Consecutive bands butt against each other rather than stacking a gap, so a
  * run of them reads as one alternating rhythm.
  *
- * `tone` picks which ground the band paints; `--helia-hero-treatment` decides
- * what that ground is made of, which is the site theme's say rather than the
- * caller's. The two are independent: a `base` band has nothing to treat.
+ * The geometry and the rhythm are `Band`'s: this part wears `.helia-band` and
+ * `.helia-band__inner`, so the two kinds of band on one page sit on the same
+ * measure and the same vertical step. What it adds is the ground, which it
+ * takes from `--helia-hero-treatment` rather than from the caller.
+ *
+ * `tone` picks whether the band paints at all; the treatment decides what that
+ * paint is made of, which is the site theme's say. The two are independent: a
+ * `base` band has nothing to treat.
  *
  * @slot default -- The band's content, held to the readable width.
  */
 interface Props {
-  /** The ground. `base` is the page background; `paper` and `subtle` both paint the paper fill. */
-  tone?: 'base' | 'paper' | 'subtle';
+  /** The ground. `base` is the page background; `paper` paints the paper fill. */
+  tone?: 'base' | 'paper';
   /** Anchor for the section, so a nav or a deep link can reach it. */
   id?: string;
 }
@@ -26,33 +31,30 @@ interface Props {
 const { tone = 'base', id } = Astro.props;
 ---
 
-<section class:list={['editorial-band', `editorial-band--${tone}`]} id={id}>
-  <div class="editorial-band__inner">
+<section
+  class:list={[
+    'helia-band',
+    'editorial-band',
+    tone !== 'base' && `editorial-band--${tone}`,
+  ]}
+  id={id}
+>
+  <div class="helia-band__inner">
     <slot />
   </div>
 </section>
 
 <style>
-  /* style-lint: allow-file global -- resets the spacing of the markdown slotted into the band */
+  /*
+   * The gutter is the one piece of geometry the recipe cannot supply: there it
+   * arrives with the ground, and here every band reserves it, so a plain band
+   * and a painted one put their first line on the same baseline.
+   */
   .editorial-band {
-    box-sizing: border-box;
-    margin-inline: calc(50% - 50cqw - var(--sl-content-pad-x));
-    /*
-     * The geometry belongs to the band, not to the tone or the treatment:
-     * every band reserves the same gutter and the same rhythm, so a plain one
-     * and a painted one put their first line on the same baseline. Only the
-     * ground below changes.
-     */
-    padding: clamp(2.25rem, 6vw, 4.5rem) clamp(1rem, 4vw, 2.5rem);
-    width: calc(100cqw + 2 * var(--sl-content-pad-x));
+    padding-inline: clamp(1rem, 4vw, 2.5rem);
   }
 
-  .editorial-band + .editorial-band {
-    margin-top: 0;
-  }
-
-  .editorial-band--paper,
-  .editorial-band--subtle {
+  .editorial-band--paper {
     --band-ground: var(--helia-surface-paper);
 
     background: var(--band-ground);
@@ -83,8 +85,7 @@ const { tone = 'base', id } = Astro.props;
    * accents mixed rather than either end of the run.
    */
   @container style(--helia-hero-treatment: tinted) {
-    .editorial-band--paper,
-    .editorial-band--subtle {
+    .editorial-band--paper {
       --band-ground: color-mix(
         in srgb,
         var(--helia-product-accent) 8%,
@@ -94,8 +95,7 @@ const { tone = 'base', id } = Astro.props;
   }
 
   @container style(--helia-hero-treatment: gradient) {
-    .editorial-band--paper,
-    .editorial-band--subtle {
+    .editorial-band--paper {
       --band-bleed: color-mix(
         in srgb,
         color-mix(
@@ -121,18 +121,5 @@ const { tone = 'base', id } = Astro.props;
         )
       );
     }
-  }
-
-  .editorial-band__inner {
-    margin-inline: auto;
-    max-width: var(--sl-content-width);
-  }
-
-  :global(.editorial-band__inner > :first-child) {
-    margin-top: 0;
-  }
-
-  :global(.editorial-band__inner > :last-child) {
-    margin-bottom: 0;
   }
 </style>

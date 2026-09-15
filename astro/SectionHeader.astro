@@ -9,14 +9,20 @@
  * arrangement, not a container: the trailing link sits on the baseline of the
  * title block, which only works if the header knows both.
  *
- * The title is an `<h2>`, so the part belongs to a page section rather than to
- * a card.
+ * The title defaults to an `<h2>`, so the part belongs to a page section
+ * rather than to a card; `titleAs` moves it where the page outline needs
+ * something else.
  */
-interface Props {
+import type { HTMLAttributes } from 'astro/types';
+import Eyebrow from './Eyebrow.astro';
+
+interface Props extends Omit<HTMLAttributes<'header'>, 'title'> {
   /** The uppercase label above the title. */
   eyebrow?: string;
   /** The section's heading. Required. */
   title: string;
+  /** Heading level for the title. Pick the one the page outline needs. */
+  titleAs?: 'h2' | 'h3' | 'h4';
   /** One line about the section, under the title. */
   description?: string;
   /** Where the trailing link goes. Without it, no link renders. */
@@ -28,16 +34,19 @@ interface Props {
 const {
   eyebrow,
   title,
+  titleAs: Title = 'h2',
   description,
   href,
   linkLabel = 'View all',
+  class: className,
+  ...rest
 } = Astro.props;
 ---
 
-<header class="section-header">
-  <div>
-    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
-    <h2>{title}</h2>
+<header class:list={['section-header', className]} {...rest}>
+  <div class="text">
+    {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+    <Title class="title">{title}</Title>
     {description && <p class="description">{description}</p>}
   </div>
   {
@@ -62,23 +71,22 @@ const {
       var(--helia-space-4);
   }
 
-  .eyebrow {
-    color: var(--sl-color-accent-high);
-    font-size: var(--helia-text-caption);
-    font-weight: var(--helia-weight-bold);
-    letter-spacing: var(--helia-tracking-caps);
-    margin: 0 0 var(--helia-space-2);
-    text-transform: uppercase;
+  /* The label is the `Eyebrow` part's and carries no margin of its own, so the
+     step between the three lines is the column's gap rather than a rule this
+     header has to reach into the part to write. */
+  .text {
+    display: grid;
+    gap: var(--helia-space-2);
   }
 
-  h2 {
+  .title {
     font-size: var(--helia-text-section);
     margin: 0;
   }
 
   .description {
     color: var(--sl-color-gray-2);
-    margin: var(--helia-space-2) 0 0;
+    margin: 0;
     max-width: 42rem;
   }
 

@@ -57,6 +57,11 @@ Issue references below are to `AmbiqAI/helia-ui`.
   with the button pair's radius and height asserted on every docs run (#20).
 - Source for every gallery example, in an expandable panel beside it (#18).
 - A typeface comparison page in the package docs (#16).
+- `SectionHeader` takes `titleAs`, a `class` and the rest props of a
+  `<header>`, so a section that is not the page's second level can say so and a
+  layout can reach the element (#60).
+- `BadgeTone`, exported from `Badge`: the one advisory tone vocabulary, which
+  `StatCard` and `BigNumber` now take as well (#60).
 
 ### Changed
 
@@ -86,6 +91,17 @@ Issue references below are to `AmbiqAI/helia-ui`.
   from a git tag reads that manifest in their own tree (#22).
 - The optional peers and `typescript` are declared where the package's own
   checks need them, since npm 11 does not materialise optional peers (#22).
+- `SectionHeader` draws its label with the `Eyebrow` part instead of a copy of
+  it, so the label takes the muted ink and the label step the other three
+  titled parts take, rather than the accent and the caption step (#60).
+- `EditorialBand` composes the `.helia-band` recipe for its geometry and
+  rhythm, so the two kinds of band on one page sit on the same measure and the
+  same vertical step. Its ground, its treatment queries and its bleed cap are
+  unchanged (#60).
+- The row of figures sets `--helia-big-number-gap` rather than writing `gap` at
+  the same weight as the part's own rule (#60).
+- `CardList`, `Band` and `EditorialBand` no longer emit a modifier class for
+  the default value of `marker` and `tone`, which no sheet defined (#60).
 
 ### Fixed
 
@@ -98,6 +114,10 @@ Issue references below are to `AmbiqAI/helia-ui`.
   candidate, shipping the bare display utilities to every visitor (#8).
 - `astro preview` daemonised under agent environments and held a per-project
   lock, so smoke runs hung (#2).
+- The restated preflight in `shadcn.css` took the markers and the indent off
+  every list an author slotted into a card, a dialog or a tab panel. The list
+  reset now names the generated parts that are a list; the control reset still
+  takes the subtree (#60).
 
 ### Breaking
 
@@ -126,6 +146,26 @@ Issue references below are to `AmbiqAI/helia-ui`.
   (#5, #19).
 - `engines` on the package is `node >=22.12.0`, `npm >=10`, a floor rather than
   a pin; the monorepo root and the docs app require node 24 and npm 11 (#22).
+- The label above a title is `eyebrow` on every part that takes one:
+  `CardHeader` and `LinkCard` rename `overline`, and `CardHeader`'s named slot
+  renames with it. There is no alias; the primitive is the `Eyebrow` part, and
+  a vocabulary with two words for it is two words to look up (#60).
+- `deltaTone` on `BigNumber` is the `BadgeTone` union `StatCard` already took.
+  `positive` and `negative` are gone: they map onto `success` and `danger`,
+  and the other five tones now reach the unframed figure too (#60).
+- `scale` on `BigNumber` is `step`. The values and the default are unchanged.
+  It names an absolute rung of the type ladder, which is what the part's own
+  `--helia-big-number-step` hook already called it, where `scale` on
+  `CardHeader` is a two-position switch off that card's own title step; one
+  name for the two read as one dial whose default inverted (#60).
+- `externalUrl` on `MediaEmbed` is `href`, the name every other link prop in
+  the package takes (#60).
+- `EditorialBand` drops the `subtle` tone. It painted the same ground as
+  `paper` and was a second name for it (#60).
+- `titleAs` on `IconRow` drops `p`, so every part that titles itself takes `h2`
+  to `h4`. A row in a long index is a heading in that index, and a part that
+  can leave the outline while its neighbors cannot is a choice made in the
+  wrong place (#60).
 
 ## What changed in 0.1.0-alpha.5
 

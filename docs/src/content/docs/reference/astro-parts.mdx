@@ -121,16 +121,16 @@ Also accepts `HTMLAttributes<'section'>`.
 import BigNumber from '@ambiqai/helia-ui/astro/BigNumber';
 ```
 
-| Prop            | Type                                    | Default     | Description                                                                         |
-| --------------- | --------------------------------------- | ----------- | ----------------------------------------------------------------------------------- |
-| `label` (req.)  | `string`                                | --          | What the figure counts. Rendered as the eyebrow.                                    |
-| `labelPosition` | `'above' \| 'below'`                    | `'above'`   | Which end of the figure the label sits at.                                          |
-| `scale`         | `'display' \| 'heading'`                | `'display'` | Which step the figure is set at.                                                    |
-| `unit`          | `string`                                | --          | What the figure is measured in, set beside it a step down.                          |
-| `delta`         | `string`                                | --          | The change beside the figure. Omit it and nothing renders.                          |
-| `direction`     | `'up' \| 'down' \| 'flat'`              | `'flat'`    | Which way the change went. Draws the arrow; says nothing about whether it is good.  |
-| `deltaTone`     | `'positive' \| 'negative' \| 'neutral'` | `'neutral'` | Whether the change reads well or badly. The composition decides, not the direction. |
-| `caption`       | `string`                                | --          | A note under the figure: provenance, units, a caveat.                               |
+| Prop            | Type                       | Default     | Description                                                                         |
+| --------------- | -------------------------- | ----------- | ----------------------------------------------------------------------------------- |
+| `label` (req.)  | `string`                   | --          | What the figure counts. Rendered as the eyebrow.                                    |
+| `labelPosition` | `'above' \| 'below'`       | `'above'`   | Which end of the figure the label sits at.                                          |
+| `step`          | `'display' \| 'heading'`   | `'display'` | Which rung of the type ladder the figure is set at.                                 |
+| `unit`          | `string`                   | --          | What the figure is measured in, set beside it a step down.                          |
+| `delta`         | `string`                   | --          | The change beside the figure. Omit it and nothing renders.                          |
+| `direction`     | `'up' \| 'down' \| 'flat'` | `'flat'`    | Which way the change went. Draws the arrow; says nothing about whether it is good.  |
+| `deltaTone`     | `BadgeTone`                | `'neutral'` | Whether the change reads well or badly. The composition decides, not the direction. |
+| `caption`       | `string`                   | --          | A note under the figure: provenance, units, a caveat.                               |
 
 Also accepts `HTMLAttributes<'div'>`.
 
@@ -275,20 +275,20 @@ Also accepts `HTMLAttributes<'div'>`.
 
 ## CardHeader
 
-**Use it for:** The title block of a card: an optional overline, the title, optional metadata under it, and an optional trailing action.
+**Use it for:** The title block of a card: an optional eyebrow, the title, optional metadata under it, and an optional trailing action.
 
 ```ts
 import CardHeader from '@ambiqai/helia-ui/astro/CardHeader';
 ```
 
-| Prop       | Type                     | Default     | Description                                                                                                                                                                                                                                                                                        |
-| ---------- | ------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `titleAs`  | `'h2' \| 'h3' \| 'h4'`   | `'h3'`      | Heading level for the title. Pick the one the page outline needs.                                                                                                                                                                                                                                  |
-| `padding`  | `PaddingStep`            | `'card'`    | Inner padding, named by spacing step. `card` follows the density dial; `none` leaves the part to own its gaps.                                                                                                                                                                                     |
-| `href`     | `string`                 | --          | Links the title, and stretches that link over the whole card.                                                                                                                                                                                                                                      |
-| `overline` | `string`                 | --          | The overline text. Prefer this to the `overline` slot in MDX: MDX merges a slotted element and the title text that follows it into one paragraph, which drops the `slot` attribute and folds the overline into the heading's accessible name. The slot stays for markup an attribute cannot carry. |
-| `step`     | `number \| string`       | --          | The position in an ordered flow, rendered as a numeral in the leading disc.                                                                                                                                                                                                                        |
-| `scale`    | `'default' \| 'display'` | `'default'` | `display` takes the title and overline up a step, for a card standing in for a hero.                                                                                                                                                                                                               |
+| Prop      | Type                     | Default     | Description                                                                                                                                                                                                                                                                                     |
+| --------- | ------------------------ | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `titleAs` | `'h2' \| 'h3' \| 'h4'`   | `'h3'`      | Heading level for the title. Pick the one the page outline needs.                                                                                                                                                                                                                               |
+| `padding` | `PaddingStep`            | `'card'`    | Inner padding, named by spacing step. `card` follows the density dial; `none` leaves the part to own its gaps.                                                                                                                                                                                  |
+| `href`    | `string`                 | --          | Links the title, and stretches that link over the whole card.                                                                                                                                                                                                                                   |
+| `eyebrow` | `string`                 | --          | The eyebrow text. Prefer this to the `eyebrow` slot in MDX: MDX merges a slotted element and the title text that follows it into one paragraph, which drops the `slot` attribute and folds the eyebrow into the heading's accessible name. The slot stays for markup an attribute cannot carry. |
+| `step`    | `number \| string`       | --          | The position in an ordered flow, rendered as a numeral in the leading disc.                                                                                                                                                                                                                     |
+| `scale`   | `'default' \| 'display'` | `'default'` | `display` takes the title and eyebrow up a step, for a card standing in for a hero.                                                                                                                                                                                                             |
 
 Also accepts `HTMLAttributes<'div'>`.
 
@@ -296,7 +296,7 @@ Also accepts `HTMLAttributes<'div'>`.
 
 - `default` -- The title text. Omit it and no heading is rendered.
 - `icon` -- A glyph for the tonal disc before the title, usually an `Icon`.
-- `overline` -- The label above the title, for markup `overline` cannot carry.
+- `eyebrow` -- The label above the title, for markup `eyebrow` cannot carry.
 - `meta` -- Metadata under the title, such as a date or an author.
 - `action` -- A trailing control, aligned to the top right of the header.
 
@@ -518,10 +518,10 @@ import DataTable from '@ambiqai/helia-ui/astro/DataTable';
 import EditorialBand from '@ambiqai/helia-ui/astro/EditorialBand';
 ```
 
-| Prop   | Type                            | Default  | Description                                                                                |
-| ------ | ------------------------------- | -------- | ------------------------------------------------------------------------------------------ |
-| `tone` | `'base' \| 'paper' \| 'subtle'` | `'base'` | The ground. `base` is the page background; `paper` and `subtle` both paint the paper fill. |
-| `id`   | `string`                        | --       | Anchor for the section, so a nav or a deep link can reach it.                              |
+| Prop   | Type                | Default  | Description                                                               |
+| ------ | ------------------- | -------- | ------------------------------------------------------------------------- |
+| `tone` | `'base' \| 'paper'` | `'base'` | The ground. `base` is the page background; `paper` paints the paper fill. |
+| `id`   | `string`            | --       | Anchor for the section, so a nav or a deep link can reach it.             |
 
 **Slots**
 
@@ -578,14 +578,14 @@ Also accepts `HTMLAttributes<'span'>`.
 import IconRow from '@ambiqai/helia-ui/astro/IconRow';
 ```
 
-| Prop           | Type                                 | Default    | Description                                                                                     |
-| -------------- | ------------------------------------ | ---------- | ----------------------------------------------------------------------------------------------- |
-| `title` (req.) | `string`                             | --         | The row's text, and the link's accessible name.                                                 |
-| `href`         | `string`                             | --         | Where the row goes. Without it the row renders as plain content, with no link and no hover.     |
-| `titleAs`      | `'h2' \| 'h3' \| 'h4' \| 'p'`        | `'h3'`     | Heading level for the title. Pick the one the page outline needs; `p` leaves the outline alone. |
-| `icon`         | `IconName`                           | --         | Font Awesome solid name for the tile. Omit it and the `icon` slot carries the glyph.            |
-| `variant`      | `'outlined' \| 'tinted' \| 'filled'` | `'tinted'` | The tile's frame. Passed straight to `IconTile`.                                                |
-| `size`         | `'sm' \| 'md' \| 'lg'`               | `'md'`     | The tile's box. Passed straight to `IconTile`.                                                  |
+| Prop           | Type                                 | Default    | Description                                                                                 |
+| -------------- | ------------------------------------ | ---------- | ------------------------------------------------------------------------------------------- |
+| `title` (req.) | `string`                             | --         | The row's text, and the link's accessible name.                                             |
+| `href`         | `string`                             | --         | Where the row goes. Without it the row renders as plain content, with no link and no hover. |
+| `titleAs`      | `'h2' \| 'h3' \| 'h4'`               | `'h3'`     | Heading level for the title. Pick the one the page outline needs.                           |
+| `icon`         | `IconName`                           | --         | Font Awesome solid name for the tile. Omit it and the `icon` slot carries the glyph.        |
+| `variant`      | `'outlined' \| 'tinted' \| 'filled'` | `'tinted'` | The tile's frame. Passed straight to `IconTile`.                                            |
+| `size`         | `'sm' \| 'md' \| 'lg'`               | `'md'`     | The tile's box. Passed straight to `IconTile`.                                              |
 
 Also accepts `Omit<HTMLAttributes<'a'>, 'title'>`.
 
@@ -632,7 +632,7 @@ import LinkCard from '@ambiqai/helia-ui/astro/LinkCard';
 | `href` (req.)  | `string`                                  | --      | Where the card goes.                                                    |
 | `title` (req.) | `string`                                  | --      | The link text, and the card's accessible name.                          |
 | `titleAs`      | `'h2' \| 'h3' \| 'h4'`                    | `'h3'`  | Heading level. Pick the one the page outline needs.                     |
-| `overline`     | `string`                                  | --      | The label above the title.                                              |
+| `eyebrow`      | `string`                                  | --      | The label above the title.                                              |
 | `meta`         | `string`                                  | --      | One line of metadata under the title, such as a date or a source.       |
 | `tone`         | `CardTone`                                | --      | What stands in for the card's edge and fill. Passed straight to `Card`. |
 | `density`      | `'default' \| 'compact' \| 'comfortable'` | --      | Moves the padding step the parts default to. Passed straight to `Card`. |
@@ -703,7 +703,7 @@ import MediaEmbed from '@ambiqai/helia-ui/astro/MediaEmbed';
 | `posterAlt`      | `string` | `''`                                               | Alternative text for the poster. Leave it empty where the title already says the same thing.                                                                  |
 | `caption`        | `string` | --                                                 | Caption under the figure. Omit it and no figcaption renders.                                                                                                  |
 | `duration`       | `string` | --                                                 | Running time, shown over the poster. Free text, for example `4:12`.                                                                                           |
-| `externalUrl`    | `string` | `` `https://www.youtube.com/watch?v=${videoId}` `` | Where the fallback and caption links go. Defaults to the watch URL for `videoId`.                                                                             |
+| `href`           | `string` | `` `https://www.youtube.com/watch?v=${videoId}` `` | Where the fallback and caption links go. Defaults to the watch URL for `videoId`.                                                                             |
 | `class`          | `string` | --                                                 | Forwarded to the figure, so a layout can size it without reaching inside.                                                                                     |
 
 **Slots** -- none.
@@ -898,13 +898,16 @@ Also accepts `HTMLAttributes<'div'>`.
 import SectionHeader from '@ambiqai/helia-ui/astro/SectionHeader';
 ```
 
-| Prop           | Type     | Default      | Description                                                |
-| -------------- | -------- | ------------ | ---------------------------------------------------------- |
-| `eyebrow`      | `string` | --           | The uppercase label above the title.                       |
-| `title` (req.) | `string` | --           | The section's heading. Required.                           |
-| `description`  | `string` | --           | One line about the section, under the title.               |
-| `href`         | `string` | --           | Where the trailing link goes. Without it, no link renders. |
-| `linkLabel`    | `string` | `'View all'` | The trailing link's text. Ignored without `href`.          |
+| Prop           | Type                   | Default      | Description                                                       |
+| -------------- | ---------------------- | ------------ | ----------------------------------------------------------------- |
+| `eyebrow`      | `string`               | --           | The uppercase label above the title.                              |
+| `title` (req.) | `string`               | --           | The section's heading. Required.                                  |
+| `titleAs`      | `'h2' \| 'h3' \| 'h4'` | `'h2'`       | Heading level for the title. Pick the one the page outline needs. |
+| `description`  | `string`               | --           | One line about the section, under the title.                      |
+| `href`         | `string`               | --           | Where the trailing link goes. Without it, no link renders.        |
+| `linkLabel`    | `string`               | `'View all'` | The trailing link's text. Ignored without `href`.                 |
+
+Also accepts `Omit<HTMLAttributes<'header'>, 'title'>`.
 
 **Slots** -- none.
 
@@ -989,15 +992,15 @@ Also accepts `HTMLAttributes<'section'>`.
 import StatCard from '@ambiqai/helia-ui/astro/StatCard';
 ```
 
-| Prop           | Type                                                                    | Default     | Description                                                                 |
-| -------------- | ----------------------------------------------------------------------- | ----------- | --------------------------------------------------------------------------- |
-| `label` (req.) | `string`                                                                | --          | What the figure counts. Rendered as the eyebrow above it.                   |
-| `delta`        | `string`                                                                | --          | The change beside the figure. Omit it and no badge renders.                 |
-| `deltaTone`    | `'neutral' \| 'info' \| 'success' \| 'warning' \| 'danger' \| 'accent'` | `'neutral'` | Which way the change reads. The component does not decide.                  |
-| `tone`         | `CardTone`                                                              | --          | What stands in for the card's edge and fill. Passed straight to `Card`.     |
-| `density`      | `'default' \| 'compact' \| 'comfortable'`                               | --          | Moves the padding step the parts default to. Passed straight to `Card`.     |
-| `lift`         | `boolean`                                                               | --          | Adds the hover lift. Passed straight to `Card`.                             |
-| `interactive`  | `boolean`                                                               | --          | Adds the hover shift and the focus-visible ring. Passed straight to `Card`. |
+| Prop           | Type                                      | Default     | Description                                                                 |
+| -------------- | ----------------------------------------- | ----------- | --------------------------------------------------------------------------- |
+| `label` (req.) | `string`                                  | --          | What the figure counts. Rendered as the eyebrow above it.                   |
+| `delta`        | `string`                                  | --          | The change beside the figure. Omit it and no badge renders.                 |
+| `deltaTone`    | `BadgeTone`                               | `'neutral'` | Which way the change reads. The component does not decide.                  |
+| `tone`         | `CardTone`                                | --          | What stands in for the card's edge and fill. Passed straight to `Card`.     |
+| `density`      | `'default' \| 'compact' \| 'comfortable'` | --          | Moves the padding step the parts default to. Passed straight to `Card`.     |
+| `lift`         | `boolean`                                 | --          | Adds the hover lift. Passed straight to `Card`.                             |
+| `interactive`  | `boolean`                                 | --          | Adds the hover shift and the focus-visible ring. Passed straight to `Card`. |
 
 Also accepts `HTMLAttributes<'div'>`.
 

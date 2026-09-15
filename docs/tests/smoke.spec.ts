@@ -218,12 +218,12 @@ test('the content-first row renders six cards', async ({ page }) => {
 
 /*
  * MDX merges a slotted element and the text on the line after it into one
- * paragraph, which drops the slot attribute and leaves the overline inside the
+ * paragraph, which drops the slot attribute and leaves the eyebrow inside the
  * heading. The card then reads as one run and the heading's accessible name
  * carries both, so assert the two are separate elements and that the name is
  * the title alone.
  */
-test('a card overline stays out of the title', async ({ page }) => {
+test('a card eyebrow stays out of the title', async ({ page }) => {
   await page.goto(`${base}/layout/`);
 
   const heading = page.getByRole('heading', {
@@ -233,17 +233,17 @@ test('a card overline stays out of the title', async ({ page }) => {
   await expect(heading).toBeVisible();
 
   const header = page.locator('.helia-card-header', { has: heading }).first();
-  const overline = header.locator('.helia-eyebrow');
-  await expect(overline).toHaveText('Step one');
+  const eyebrow = header.locator('.helia-eyebrow');
+  await expect(eyebrow).toHaveText('Step one');
 
-  // The overline is a sibling of the heading, not a descendant of it.
+  // The eyebrow is a sibling of the heading, not a descendant of it.
   await expect(heading.locator('.helia-eyebrow')).toHaveCount(0);
 
   // And it sits above the title rather than beside it.
-  const overlineBox = await overline.boundingBox();
+  const eyebrowBox = await eyebrow.boundingBox();
   const headingBox = await heading.boundingBox();
-  expect(overlineBox && headingBox).toBeTruthy();
-  expect(overlineBox!.y + overlineBox!.height).toBeLessThanOrEqual(
+  expect(eyebrowBox && headingBox).toBeTruthy();
+  expect(eyebrowBox!.y + eyebrowBox!.height).toBeLessThanOrEqual(
     headingBox!.y + 1,
   );
 });

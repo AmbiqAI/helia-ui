@@ -16,16 +16,24 @@
 import type { HTMLAttributes } from 'astro/types';
 import Chip from './Chip.astro';
 
+/**
+ * The advisory tone vocabulary. Every part that tints a reading rather than a
+ * surface takes this one union, so a consumer that maps its statuses onto a
+ * tone maps them once and the mapping reaches `Badge`, `StatCard` and
+ * `BigNumber` alike.
+ */
+export type BadgeTone =
+  | 'neutral'
+  | 'info'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'accent'
+  | 'secondary';
+
 interface Props extends HTMLAttributes<'span'> {
   /** The advisory tint. `neutral` and `accent` reuse the chip tones; the rest are tinted. `secondary` takes `--helia-accent-secondary`. */
-  tone?:
-    | 'neutral'
-    | 'info'
-    | 'success'
-    | 'warning'
-    | 'danger'
-    | 'accent'
-    | 'secondary';
+  tone?: BadgeTone;
   /** Leading status dot, drawn in the badge ink. Decorative: the label carries the meaning. */
   dot?: boolean;
   /** `sm` is the in-content metadata size, `md` the standalone one. */

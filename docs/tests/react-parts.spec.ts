@@ -189,7 +189,7 @@ test('list-based parts carry no markers', async ({ page }) => {
   const lists = await page.evaluate(() =>
     [
       ...document.querySelectorAll(
-        '[data-slot] ol, [data-slot] ul, ol[data-slot], ul[data-slot]',
+        'ol[data-slot], ul[data-slot], menu[data-slot]',
       ),
     ].map((node) => ({
       slot: node.getAttribute('data-slot'),
@@ -201,6 +201,33 @@ test('list-based parts carry no markers', async ({ page }) => {
   expect(lists.length).toBeGreaterThan(0);
   expect(lists.filter((list) => list.marker !== 'none')).toEqual([]);
   expect(lists.filter((list) => list.padding !== '0px')).toEqual([]);
+});
+
+/*
+ * The other half of that contract. The reset names the parts that are a list
+ * rather than sweeping `[data-slot] *`, because the subtree of a card, a
+ * dialog or a tab panel is whatever the author put there: prose written
+ * against the UA defaults, which lost its markers and its indent to a reset
+ * meant for generated markup.
+ */
+test('a list an author slotted into a card keeps its markers', async ({
+  page,
+}) => {
+  await page.goto(`${base}/react/navigation/`);
+
+  /* It is inside both of the slots the old subtree form reached through. */
+  const list = page.locator(
+    '[data-slot="card-content"] [data-slot="tabs-content"] ul[data-consumer-list]',
+  );
+  await expect(list).toBeVisible();
+
+  const style = await list.evaluate((node) => ({
+    marker: getComputedStyle(node).listStyleType,
+    padding: getComputedStyle(node).paddingInlineStart,
+  }));
+
+  expect(style.marker).toBe('disc');
+  expect(style.padding).not.toBe('0px');
 });
 
 /*

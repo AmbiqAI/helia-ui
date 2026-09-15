@@ -26,7 +26,7 @@ interface Props {
   /** Running time, shown over the poster. Free text, for example `4:12`. */
   duration?: string;
   /** Where the fallback and caption links go. Defaults to the watch URL for `videoId`. */
-  externalUrl?: string;
+  href?: string;
   /** Forwarded to the figure, so a layout can size it without reaching inside. */
   class?: string;
 }
@@ -38,7 +38,7 @@ const {
   posterAlt = '',
   caption,
   duration,
-  externalUrl = `https://www.youtube.com/watch?v=${videoId}`,
+  href = `https://www.youtube.com/watch?v=${videoId}`,
   class: className,
 } = Astro.props;
 
@@ -88,14 +88,14 @@ const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&r
     </button>
     {duration && <span class="media-embed__duration">{duration}</span>}
     <noscript>
-      <a href={externalUrl}>Watch {title} on YouTube</a>
+      <a href={href}>Watch {title} on YouTube</a>
     </noscript>
   </youtube-embed>
   {
     caption && (
       <figcaption>
         <span>{caption}</span>
-        <a href={externalUrl}>Watch on YouTube ↗</a>
+        <a href={href}>Watch on YouTube ↗</a>
       </figcaption>
     )
   }

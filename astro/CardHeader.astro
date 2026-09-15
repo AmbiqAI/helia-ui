@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
 /**
- * The title block of a card: an optional overline, the title, optional
+ * The title block of a card: an optional eyebrow, the title, optional
  * metadata under it, and an optional trailing action.
  *
  * Every region is a slot, so the header never has to know what the metadata
@@ -25,7 +25,7 @@
  *
  * @slot default -- The title text. Omit it and no heading is rendered.
  * @slot icon -- A glyph for the tonal disc before the title, usually an `Icon`.
- * @slot overline -- The label above the title, for markup `overline` cannot carry.
+ * @slot eyebrow -- The label above the title, for markup `eyebrow` cannot carry.
  * @slot meta -- Metadata under the title, such as a date or an author.
  * @slot action -- A trailing control, aligned to the top right of the header.
  */
@@ -41,15 +41,15 @@ interface Props extends HTMLAttributes<'div'> {
   /** Links the title, and stretches that link over the whole card. */
   href?: string;
   /**
-   * The overline text. Prefer this to the `overline` slot in MDX: MDX merges a
+   * The eyebrow text. Prefer this to the `eyebrow` slot in MDX: MDX merges a
    * slotted element and the title text that follows it into one paragraph,
-   * which drops the `slot` attribute and folds the overline into the heading's
+   * which drops the `slot` attribute and folds the eyebrow into the heading's
    * accessible name. The slot stays for markup an attribute cannot carry.
    */
-  overline?: string;
+  eyebrow?: string;
   /** The position in an ordered flow, rendered as a numeral in the leading disc. */
   step?: number | string;
-  /** `display` takes the title and overline up a step, for a card standing in for a hero. */
+  /** `display` takes the title and eyebrow up a step, for a card standing in for a hero. */
   scale?: 'default' | 'display';
 }
 
@@ -57,7 +57,7 @@ const {
   titleAs: Title = 'h3',
   padding = 'card',
   href,
-  overline,
+  eyebrow,
   step,
   scale = 'default',
   class: className,
@@ -65,7 +65,7 @@ const {
 } = Astro.props;
 
 const hasTitle = Astro.slots.has('default');
-const hasOverline = overline !== undefined || Astro.slots.has('overline');
+const hasEyebrow = eyebrow !== undefined || Astro.slots.has('eyebrow');
 const hasMeta = Astro.slots.has('meta');
 const hasAction = Astro.slots.has('action');
 const hasIcon = Astro.slots.has('icon');
@@ -91,10 +91,10 @@ const hasStep = !hasIcon && step !== undefined;
   {hasStep && <span class="helia-card-mark helia-card-mark--text">{step}</span>}
   <div class="helia-card-header__text">
     {
-      hasOverline && (
+      hasEyebrow && (
         <Eyebrow>
-          {overline}
-          <slot name="overline" />
+          {eyebrow}
+          <slot name="eyebrow" />
         </Eyebrow>
       )
     }

@@ -34,7 +34,7 @@ interface Props extends Omit<HTMLAttributes<'div'>, 'title'> {
   /** Heading level. Pick the one the page outline needs. */
   titleAs?: 'h2' | 'h3' | 'h4';
   /** The label above the title. */
-  overline?: string;
+  eyebrow?: string;
   /** One line of metadata under the title, such as a date or a source. */
   meta?: string;
   /** What stands in for the card's edge and fill. Passed straight to `Card`. */
@@ -49,7 +49,7 @@ const {
   href,
   title,
   titleAs = 'h3',
-  overline,
+  eyebrow,
   meta,
   class: className,
   ...rest
@@ -60,7 +60,7 @@ const hasIcon = Astro.slots.has('icon');
 ---
 
 <Card interactive class:list={['helia-link-card', className]} {...rest}>
-  <CardHeader titleAs={titleAs} href={href} overline={overline}>
+  <CardHeader titleAs={titleAs} href={href} eyebrow={eyebrow}>
     {
       hasIcon && (
         <Fragment slot="icon">

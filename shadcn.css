@@ -273,12 +273,15 @@
  * read as disabled), a bare `border` came out `outset` rather than solid, and
  * the breadcrumb `ol` kept its decimal markers and 40px indent.
  *
- * Scoped to `[data-slot]` and its subtree rather than applied to the document:
- * every shadcn part carries a `data-slot`, so that subtree is exactly the code
- * written against preflight, and Starlight's chrome and the hub's own recipes
- * -- authored against the UA defaults -- are left alone. `:where()` keeps the
- * specificity at zero, so any utility or recipe that names one of these
- * properties still wins; `base` is the lowest layer besides.
+ * The control reset is scoped to `[data-slot]` and its subtree rather than
+ * applied to the document: every shadcn part carries a `data-slot`, so that
+ * subtree is exactly the code written against preflight, and Starlight's
+ * chrome and the hub's own recipes -- authored against the UA defaults -- are
+ * left alone. The subtree is safe there because an author does not write a
+ * bare `<button>` into a card and expect the UA widget; it is not safe for
+ * lists, so that reset names its parts. `:where()` keeps the specificity at
+ * zero, so any utility or recipe that names one of these properties still
+ * wins; `base` is the lowest layer besides.
  */
 @layer base {
   :is(button, input, optgroup, select, textarea):where(
@@ -295,7 +298,21 @@
     letter-spacing: inherit;
   }
 
-  :is(ol, ul, menu):where([data-slot], [data-slot] *) {
+  /*
+   * The list reset is named part by part rather than taken across the subtree.
+   * `[data-slot] *` reached every list an author slotted into a card, a dialog
+   * or a tab panel and took its markers and its indent off, and that content
+   * is prose written against the UA defaults, not a generated class string.
+   * Only the parts that render `ol` or `ul` themselves were ever the ones
+   * written against preflight, and `list-style` inherits, so naming the list
+   * carries its items with it.
+   */
+  :is(ol, ul, menu):where(
+    [data-slot='breadcrumb-list'],
+    [data-slot='pagination-content'],
+    [data-slot='command-list'],
+    [data-slot='command-group']
+  ) {
     margin: 0;
     padding: 0;
     list-style: none;
