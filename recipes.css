@@ -879,7 +879,7 @@ a.helia-chip--neutral:focus-visible {
 
 .helia-badge {
   font-weight: var(--helia-weight-semibold);
-  letter-spacing: var(--helia-tracking-caps);
+  letter-spacing: var(--helia-tracking-label);
 }
 
 .helia-badge--info,

@@ -155,6 +155,7 @@
    * it is set once, large, and read as a shape.
    */
   --helia-tracking-caps: 0.08em;
+  --helia-tracking-label: 0.02em;
   --helia-tracking-wordmark: -0.035em;
   --helia-leading-tight: 1.08;
   --helia-leading-heading: 1.18;
