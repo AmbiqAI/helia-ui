@@ -1232,18 +1232,26 @@ a.helia-chip--neutral:focus-visible {
 }
 
 /*
- * The ground. The shadow is paint rather than elevation: Starlight may reserve
- * a desktop column outside `.content-panel`, and a spread this wide carries the
- * fill through it without moving the readable inner content or introducing
+ * The ground. The shadow is paint rather than elevation: a layout may reserve a
+ * column outside `.content-panel`, and a spread this wide carries the fill
+ * through it without moving the readable inner content or introducing
  * horizontal overflow. `clip-path` keeps that spread off the sections above and
  * below, so the band still has no visible edge.
+ *
+ * `--helia-band-bleed-end` is how far the ground may carry past the end of the
+ * band's own box. A layout that parks a table of contents beside the reading
+ * frame sets it to zero: that column is not the frame, and a band painting
+ * across it is a band that has escaped the page rather than its container. The
+ * layout sets it because only the layout knows whether the column is there.
  */
 .helia-band--muted,
 .helia-band--contrast,
 .helia-band--tinted {
   background: var(--helia-band-ground);
   box-shadow: 0 0 0 100vmax var(--helia-band-ground);
-  clip-path: inset(0 -100vmax);
+  clip-path: inset(
+    0 calc(-1 * var(--helia-band-bleed-end, 100vmax)) 0 -100vmax
+  );
   padding-inline: clamp(1rem, 4vw, 2.5rem);
 }
 

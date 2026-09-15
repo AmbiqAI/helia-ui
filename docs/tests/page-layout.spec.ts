@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 const gallery = '/helia-ui/gallery/';
+const layout = '/helia-ui/layout/';
 
 /* The wide layout the two arrangements below are written for. */
 test.use({ viewport: { width: 1280, height: 960 } });
@@ -39,37 +40,90 @@ test('the mosaic feature takes two columns and two rows', async ({ page }) => {
   expect(feature.height).toBeGreaterThan(support.height * 1.8);
 });
 
-test('the band ground runs past the content column to the frame', async ({
-  page,
-}) => {
-  await page.goto(gallery);
-
-  /* The last one is the composition, which is on the page rather than on an
-     example stage: a band inside a stage is clipped by the frame the example
-     promises, so it is the wrong one to ask about the bleed. */
-  const band = page.locator('.helia-band--muted').last();
-  await band.scrollIntoViewIfNeeded();
-  const box = (await band.boundingBox())!;
-  const frame = (await page.locator('.main-pane').boundingBox())!;
-  const viewport = page.viewportSize()!;
-
-  /* Sampled in the band's own top padding, which is ground and nothing else. */
+/* The paint, not the box: the ground a band carries past its own edge is a
+   shadow spread, which cannot be measured off the element. One pixel of the
+   band's own top padding is ground and nothing else, so every other pixel on
+   that line answers whether the ground reached it. */
+async function groundLine(page: Page, band: string) {
+  const element = page.locator(band).last();
+  await element.scrollIntoViewIfNeeded();
+  const box = (await element.boundingBox())!;
   const y = Math.round(box.y + 4);
   const pixel = (x: number) =>
-    page.screenshot({ clip: { x, y, width: 1, height: 1 } });
+    page.screenshot({ clip: { x: Math.round(x), y, width: 1, height: 1 } });
+  const ground = await pixel(box.x + box.width / 2);
+  const isGround = async (x: number) => (await pixel(x)).equals(ground);
+  return { box, isGround };
+}
 
-  const [ground, start, end] = await Promise.all([
-    pixel(Math.round(box.x + box.width / 2)),
-    pixel(Math.round(frame.x + 1)),
-    pixel(viewport.width - 2),
-  ]);
+for (const width of [1280, 1440]) {
+  test.describe(`at ${width}`, () => {
+    test.use({ viewport: { width, height: 960 } });
 
-  /* The paint, not the box: the band's element stops at the content column and
-     what carries the ground through the column Starlight reserves beside it is
-     a spread that cannot be measured off the element. */
-  expect(box.x + box.width).toBeLessThan(viewport.width - 2);
-  expect(start.equals(ground), 'no ground at the start of the frame').toBe(
-    true,
-  );
-  expect(end.equals(ground), 'no ground at the viewport edge').toBe(true);
+    test('the band ground fills the frame and stops at the contents', async ({
+      page,
+    }) => {
+      await page.goto(gallery);
+
+      /* The last one is the composition, which is on the page rather than on
+         an example stage: a band inside a stage is clipped by the frame the
+         example promises, so it is the wrong one to ask about the bleed. */
+      const { box, isGround } = await groundLine(page, '.helia-band--muted');
+      const frame = (await page.locator('.main-pane').boundingBox())!;
+      const toc = (await page
+        .locator('.right-sidebar-panel nav')
+        .boundingBox())!;
+      const viewport = page.viewportSize()!;
+
+      expect(box.x + box.width).toBeLessThan(viewport.width - 2);
+      /* The contents column is beside the reading frame, not inside it. */
+      expect(box.x + box.width).toBeLessThanOrEqual(toc.x);
+
+      expect(await isGround(frame.x + 1), 'start of the frame').toBe(true);
+      expect(
+        await isGround(frame.x + frame.width - 2),
+        'end of the frame',
+      ).toBe(true);
+      expect(await isGround(frame.x + frame.width + 2), 'past the frame').toBe(
+        false,
+      );
+      expect(await isGround(toc.x + 2), 'under the contents').toBe(false);
+      expect(await isGround(viewport.width - 2), 'at the viewport edge').toBe(
+        false,
+      );
+    });
+
+    test('the editorial band stops at the contents too', async ({ page }) => {
+      await page.goto(layout);
+
+      const { box } = await groundLine(page, '.editorial-band--paper');
+      const frame = (await page.locator('.main-pane').boundingBox())!;
+      const toc = (await page
+        .locator('.right-sidebar-panel nav')
+        .boundingBox())!;
+
+      expect(box.x).toBe(frame.x);
+      expect(box.x + box.width).toBeLessThanOrEqual(toc.x);
+    });
+  });
+}
+
+test.describe('with no contents column', () => {
+  /* Under 72rem Starlight reserves nothing beside the reading frame, so the
+     frame is the viewport and the ground has to reach its edge. */
+  test.use({ viewport: { width: 1100, height: 960 } });
+
+  test('the band ground runs to the viewport edge', async ({ page }) => {
+    await page.goto(gallery);
+
+    const { box, isGround } = await groundLine(page, '.helia-band--muted');
+    const frame = (await page.locator('.main-pane').boundingBox())!;
+    const viewport = page.viewportSize()!;
+
+    expect(box.x + box.width).toBeGreaterThanOrEqual(viewport.width - 2);
+    expect(await isGround(frame.x + 1), 'start of the frame').toBe(true);
+    expect(await isGround(viewport.width - 2), 'at the viewport edge').toBe(
+      true,
+    );
+  });
 });

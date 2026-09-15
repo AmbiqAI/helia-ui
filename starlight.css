@@ -177,6 +177,15 @@
   border-inline-end: 0 !important;
 }
 
+/*
+ * The table-of-contents pane carries the page ground the way the left pane
+ * does. Starlight leaves it transparent, which makes it a hole: anything the
+ * main pane paints wider than itself shows through the column.
+ */
+.right-sidebar {
+  background: var(--helia-surface-canvas);
+}
+
 @media (width >= 72rem) {
   html[data-has-toc] .right-sidebar-container {
     flex: 0 0 var(--helia-toc-width);
@@ -200,6 +209,16 @@
     flex: 1 1 auto;
     min-width: 0;
     width: calc(100% - var(--helia-toc-width)) !important;
+  }
+
+  /*
+   * Where the reading frame ends once the column above is reserved. A
+   * full-bleed part spans the main pane already, so it has nothing left to
+   * carry and stops at its own edge; below this width no column is reserved
+   * and the default carry takes the ground to the viewport.
+   */
+  html[data-has-toc] .main-pane {
+    --helia-band-bleed-end: 0px;
   }
 
   .right-sidebar-panel #starlight__on-this-page {

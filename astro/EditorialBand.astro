@@ -57,12 +57,19 @@ const { tone = 'base', id } = Astro.props;
 
     background: var(--band-ground);
     /*
-     * Starlight may reserve a desktop column outside `.content-panel`. Extend
-     * the surface paint through that space without moving the readable inner
+     * A layout may reserve a column outside `.content-panel`. Extend the
+     * surface paint through that space without moving the readable inner
      * content or introducing horizontal overflow.
+     *
+     * `--helia-band-bleed-end` caps that carry at the end of the band's own
+     * box: a layout that parks a table of contents beside the reading frame
+     * sets it to zero, because that column is not the frame. Same dial as the
+     * recipe band, so a layout states it once for both.
      */
     box-shadow: 0 0 0 100vmax var(--band-bleed, var(--band-ground));
-    clip-path: inset(0 -100vmax);
+    clip-path: inset(
+      0 calc(-1 * var(--helia-band-bleed-end, 100vmax)) 0 -100vmax
+    );
   }
 
   /*
