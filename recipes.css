@@ -291,7 +291,7 @@ a.helia-chip--neutral:focus-visible {
   color: var(--helia-ink-muted);
   font-size: var(--helia-text-label);
   font-weight: var(--helia-weight-bold);
-  letter-spacing: 0.08em;
+  letter-spacing: var(--helia-tracking-caps);
   margin: 0;
   text-transform: uppercase;
 }
@@ -879,7 +879,7 @@ a.helia-chip--neutral:focus-visible {
 
 .helia-badge {
   font-weight: var(--helia-weight-semibold);
-  letter-spacing: 0.02em;
+  letter-spacing: var(--helia-tracking-caps);
 }
 
 .helia-badge--info,

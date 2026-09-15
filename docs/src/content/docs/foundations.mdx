@@ -192,11 +192,13 @@ carrying meaning on the [gallery](/helia-ui/gallery/#content-first).
 
 ## Type
 
-One ramp of thirteen sizes, five weights, three leadings, and four tracking
+One ramp of thirteen sizes, five weights, three leadings, and six tracking
 steps. A role is named before a size is chosen: `--helia-text-body` says what
 the text is, where `0.94rem` says only how big it is. Tracking belongs to the
-face rather than to the size, so a component that sets a negative
-letter-spacing of its own is holding a value the ramp should own.
+face rather than to the size, so a component that sets a letter-spacing of its
+own is holding a value the ramp should own: uppercase labels take
+`--helia-tracking-caps` and a wordmark takes `--helia-tracking-wordmark`, the
+two steps that are roles rather than sizes.
 
 <TypeRamp />
 

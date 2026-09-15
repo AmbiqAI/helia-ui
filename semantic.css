@@ -147,6 +147,15 @@
   --helia-tracking-page: -0.015em;
   --helia-tracking-section: -0.011em;
   --helia-tracking-heading: -0.009em;
+  /*
+   * The two steps that are not sizes on the ramp. Uppercase needs the opposite
+   * sign to every step above: the caps forms have no descenders to separate
+   * them, so a label closes up at the tracking a heading wants. The wordmark is
+   * a lockup rather than a size, tightened well past the display step because
+   * it is set once, large, and read as a shape.
+   */
+  --helia-tracking-caps: 0.08em;
+  --helia-tracking-wordmark: -0.035em;
   --helia-leading-tight: 1.08;
   --helia-leading-heading: 1.18;
   --helia-leading-body: 1.6;

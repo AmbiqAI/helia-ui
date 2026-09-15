@@ -447,7 +447,7 @@ Title, one line, and a cue that moves when the card is under the pointer. The
 link lives on the title and the recipe stretches it over the card, so the whole
 card is the target and the cue is inside the same hit area.
 
-### Three link cards
+### Four link cards
 
 <div className="gallery-grid gallery-grid--wide not-content">
   <Example
@@ -508,6 +508,32 @@ card is the target and the cue is inside the same hit area.
       lift
     >
       The four shapes the rest of the system reuses.
+    </LinkCard>
+  </Example>
+  <Example
+    title='<Icon slot="icon"> and meta'
+    code={`
+      <LinkCard
+        titleAs="h4"
+        href="/helia-ui/gallery/"
+        title="Gallery"
+        overline="Reference"
+        meta="Astro parts · React parts"
+      >
+        <Icon slot="icon" name="book" />
+        Every variant on one page, with its source beside it.
+      </LinkCard>
+    `}
+  >
+    <LinkCard
+      titleAs="h4"
+      href="/helia-ui/gallery/"
+      title="Gallery"
+      overline="Reference"
+      meta="Astro parts · React parts"
+    >
+      <Icon slot="icon" name="book" />
+      Every variant on one page, with its source beside it.
     </LinkCard>
   </Example>
 </div>

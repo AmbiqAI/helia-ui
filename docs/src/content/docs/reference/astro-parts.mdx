@@ -554,6 +554,7 @@ import LinkCard from '@ambiqai/helia-ui/astro/LinkCard';
 | `title` (req.) | `string`                                  | --      | The link text, and the card's accessible name.                          |
 | `titleAs`      | `'h2' \| 'h3' \| 'h4'`                    | `'h3'`  | Heading level. Pick the one the page outline needs.                     |
 | `overline`     | `string`                                  | --      | The label above the title.                                              |
+| `meta`         | `string`                                  | --      | One line of metadata under the title, such as a date or a source.       |
 | `tone`         | `CardTone`                                | --      | What stands in for the card's edge and fill. Passed straight to `Card`. |
 | `density`      | `'default' \| 'compact' \| 'comfortable'` | --      | Moves the padding step the parts default to. Passed straight to `Card`. |
 | `lift`         | `boolean`                                 | --      | Adds the hover lift. Passed straight to `Card`.                         |
@@ -563,6 +564,7 @@ Also accepts `Omit<HTMLAttributes<'div'>, 'title'>`.
 **Slots**
 
 - `default` -- The line of description under the title.
+- `icon` -- A glyph for the tonal disc before the title, usually an `Icon`.
 
 [See it rendered on Gallery](/helia-ui/gallery/#linkcard)
 

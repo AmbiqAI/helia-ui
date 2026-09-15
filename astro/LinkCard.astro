@@ -13,7 +13,12 @@
  * The title is a prop rather than the child because the child is the line of
  * description, which is prose and wants the paragraph MDX gives it.
  *
+ * The mark and the metadata line are `CardHeader`'s, passed straight through:
+ * a row of link cards that needs either one is the same card, not a
+ * composition written out again beside it.
+ *
  * @slot default -- The line of description under the title.
+ * @slot icon -- A glyph for the tonal disc before the title, usually an `Icon`.
  */
 import type { HTMLAttributes } from 'astro/types';
 import type { CardTone } from './Card.astro';
@@ -30,6 +35,8 @@ interface Props extends Omit<HTMLAttributes<'div'>, 'title'> {
   titleAs?: 'h2' | 'h3' | 'h4';
   /** The label above the title. */
   overline?: string;
+  /** One line of metadata under the title, such as a date or a source. */
+  meta?: string;
   /** What stands in for the card's edge and fill. Passed straight to `Card`. */
   tone?: CardTone;
   /** Moves the padding step the parts default to. Passed straight to `Card`. */
@@ -43,19 +50,29 @@ const {
   title,
   titleAs = 'h3',
   overline,
+  meta,
   class: className,
   ...rest
 } = Astro.props;
 
 const hasLine = Astro.slots.has('default');
+const hasIcon = Astro.slots.has('icon');
 ---
 
 <Card interactive class:list={['helia-link-card', className]} {...rest}>
   <CardHeader titleAs={titleAs} href={href} overline={overline}>
+    {
+      hasIcon && (
+        <Fragment slot="icon">
+          <slot name="icon" />
+        </Fragment>
+      )
+    }
     <span class="title"
       >{title}<span class="helia-motion-cue cue" aria-hidden="true">→</span
       ></span
     >
+    {meta && <Fragment slot="meta">{meta}</Fragment>}
   </CardHeader>
   {
     hasLine && (

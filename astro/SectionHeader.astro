@@ -44,7 +44,7 @@ const {
     href && (
       <a href={href}>
         {linkLabel}{' '}
-        <span class="helia-arrow-right" aria-hidden="true">
+        <span class="helia-motion-cue" aria-hidden="true">
           →
         </span>
       </a>
@@ -66,7 +66,7 @@ const {
     color: var(--sl-color-accent-high);
     font-size: var(--helia-text-caption);
     font-weight: var(--helia-weight-bold);
-    letter-spacing: 0.1em;
+    letter-spacing: var(--helia-tracking-caps);
     margin: 0 0 var(--helia-space-2);
     text-transform: uppercase;
   }
