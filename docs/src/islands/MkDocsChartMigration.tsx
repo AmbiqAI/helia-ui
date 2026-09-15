@@ -31,7 +31,7 @@ const windows = [
 
 /*
  * A Plotly `trace.name` and a hand-picked hex per trace become one config
- * entry per series. The colour is a token, so the chart follows the theme
+ * entry per series. The color is a token, so the chart follows the theme
  * instead of carrying a palette of its own.
  */
 const config = {

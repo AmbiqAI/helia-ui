@@ -228,16 +228,10 @@ const ESCAPE = 'spelling: allow';
 const GENERATED = ['THIRD-PARTY-NOTICES.md', pkg('THIRD-PARTY-NOTICES.md')];
 
 /**
- * The chart evaluation and the running handoff are swept by whoever owns them.
- * TODO(AmbiqAI/helia-ui#37): drop these once that work lands.
+ * The running handoff is swept by whoever owns it.
+ * TODO(AmbiqAI/helia-ui#37): drop this once that work lands.
  */
-const PENDING = [
-  'docs/handoff.md',
-  pkg('docs/src/content/docs/react/charts-candidates.mdx'),
-  pkg('docs/src/islands/MkDocsChartMigration.tsx'),
-  pkg('docs/src/islands/chart-candidate-frame.tsx'),
-  pkg('docs/src/lib/chart-candidates.ts'),
-];
+const PENDING = ['docs/handoff.md'];
 
 /** This file is the word list, so every British form in it is deliberate. */
 const SELF = pkg('scripts/check-spelling.mjs');

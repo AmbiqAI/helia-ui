@@ -96,3 +96,35 @@ export const seriesLabels = {
   int8: 'int8',
   fp16: 'fp16',
 } as const;
+
+/*
+ * The same two comparisons in long format -- one row per point, with the
+ * series name on the row. `Chart` and Observable Plot both take that shape,
+ * and deriving it here is what keeps the palette blocks and the Plot island
+ * from restating a number between them.
+ */
+export const latencyLong = latencySeries.flatMap((point) => [
+  {
+    inputLength: point.inputLength,
+    latency: point.heliaRT,
+    runtime: seriesLabels.heliaRT,
+  },
+  {
+    inputLength: point.inputLength,
+    latency: point.heliaAOT,
+    runtime: seriesLabels.heliaAOT,
+  },
+]);
+
+export const energyLong = energySeries.flatMap((point) => [
+  {
+    target: point.target,
+    energy: point.heliaRT,
+    runtime: seriesLabels.heliaRT,
+  },
+  {
+    target: point.target,
+    energy: point.baseline,
+    runtime: seriesLabels.baseline,
+  },
+]);

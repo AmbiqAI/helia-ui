@@ -91,6 +91,12 @@ const accessibilityRoutes: { path: string; theme?: 'dark' }[] = [
        site. */
     path: `${base}/gallery/`,
   },
+  {
+    /* The palette blocks paint the off-theme ground on the page, so this is
+       the one page where a color is read against a surface the theme toggle
+       never produces. Four hydrated chart libraries land here as well. */
+    path: `${base}/react/charts-candidates/`,
+  },
 ];
 
 for (const { path, theme } of accessibilityRoutes) {
@@ -546,21 +552,133 @@ test('a titled terminal frame holds the frame corner', async ({ page }) => {
 /*
  * The comparison page only compares if every candidate drew every chart: a
  * library that fails to mount leaves its cards standing and the page still
- * looks whole. Three libraries, three charts each, and an SVG in all nine.
+ * looks whole. Four libraries, three charts each, and an SVG in all twelve.
  */
 test('every charting candidate draws all three charts', async ({ page }) => {
   await page.goto(`${base}/react/charts-candidates/`);
 
   const panels = page.locator('[data-chart-candidate]');
-  await expect(panels).toHaveCount(9);
+  await expect(panels).toHaveCount(12);
 
-  for (const library of ['mui', 'recharts', 'plot']) {
+  for (const library of ['mui', 'recharts', 'plot', 'echarts']) {
     const drawn = page.locator(
       `[data-chart-library="${library}"] [data-chart-candidate] svg`,
     );
     await expect(drawn.first()).toBeVisible();
     expect(await drawn.count()).toBeGreaterThanOrEqual(3);
   }
+});
+
+/*
+ * The palette section is the other half of the page and it is entirely Astro:
+ * the shipped palette and three candidates, each drawn on both grounds, each
+ * ground carrying the line and the bar. Sixteen figures with no island behind
+ * any of them, so a count taken from the served HTML is the assertion that the
+ * section costs nothing.
+ */
+test('the palette section draws four palettes on both grounds', async ({
+  page,
+  request,
+}) => {
+  const response = await request.get(`${base}/react/charts-candidates/`);
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html.match(/helia-chart__plot/g) ?? []).toHaveLength(16);
+
+  await page.goto(`${base}/react/charts-candidates/`);
+  await expect(page.locator('[data-chart-palette-card]')).toHaveCount(4);
+  for (const palette of ['shipped', 'a', 'b', 'c']) {
+    for (const ground of ['dark', 'light']) {
+      const block = page.locator(
+        `[data-chart-palette="${palette}"][data-chart-ground="${ground}"]`,
+      );
+      await expect(block).toHaveCount(1);
+      /* The six steps are set on the block rather than on the document, which
+         is the whole mechanism a palette change uses. */
+      const first = await block.evaluate((node) =>
+        getComputedStyle(node).getPropertyValue('--helia-chart-1').trim(),
+      );
+      expect(first).toMatch(/^#[0-9a-f]{6}$/);
+    }
+  }
+});
+
+/*
+ * The shipped block restates semantic.css so it can be drawn beside the
+ * candidates, which is a copy, which is a thing that drifts. Whichever theme
+ * the page settles in, the block for that ground has to resolve to exactly
+ * what the document resolves to.
+ *
+ * Read through a probe element rather than by comparing the property strings:
+ * `--helia-chart-2` is `var(--helia-ink-primary)` on the document and a literal
+ * in the block, and only the computed color puts those two in the same units.
+ */
+test('the shipped palette block matches the document tokens', async ({
+  page,
+}) => {
+  await page.goto(`${base}/react/charts-candidates/`);
+
+  const mismatches = await page.evaluate(() => {
+    const ground =
+      document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+    const block = document.querySelector(
+      `[data-chart-palette="shipped"][data-chart-ground="${ground}"]`,
+    );
+    if (!block) return [`no shipped ${ground} block`];
+
+    const probe = () => {
+      const node = document.createElement('span');
+      node.style.display = 'none';
+      return node;
+    };
+    const inBlock = block.appendChild(probe());
+    const onPage = document.body.appendChild(probe());
+
+    const found: string[] = [];
+    for (let step = 1; step <= 6; step += 1) {
+      const property = `var(--helia-chart-${step})`;
+      inBlock.style.color = property;
+      onPage.style.color = property;
+      const shipped = getComputedStyle(inBlock).color;
+      const document_ = getComputedStyle(onPage).color;
+      if (shipped !== document_) {
+        found.push(`--helia-chart-${step}: ${shipped} vs ${document_}`);
+      }
+    }
+    inBlock.remove();
+    onPage.remove();
+    return found;
+  });
+
+  expect(mismatches).toEqual([]);
+});
+
+/*
+ * The claim that decides issue 50: ECharts gives a legend that turns a series
+ * off, from options and not from island code. Counting the paths in the figure
+ * before and after the click is the only way to assert it without trusting the
+ * library's own state.
+ */
+test('the ECharts legend toggles a series off', async ({ page }) => {
+  await page.goto(`${base}/react/charts-candidates/`);
+
+  const panel = page
+    .locator('[data-chart-library="echarts"] [data-chart-candidate]')
+    .first();
+  /* The figure, not a path: a gridline is a horizontal segment with no height,
+     which Playwright reads as hidden however well it is drawn. */
+  await expect(panel.locator('svg').first()).toBeVisible();
+  const paths = panel.locator('svg path');
+  /* The entrance animation is the point of the animation column, so the count
+     is only stable once it has finished. */
+  await page.waitForTimeout(1500);
+  const before = await paths.count();
+  expect(before).toBeGreaterThan(0);
+
+  await panel.getByText('heliaAOT', { exact: true }).click();
+  await expect
+    .poll(async () => paths.count(), { timeout: 5000 })
+    .not.toBe(before);
 });
 
 /*

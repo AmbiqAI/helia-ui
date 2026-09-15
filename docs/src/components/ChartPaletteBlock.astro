@@ -1,0 +1,116 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * One candidate palette on one ground, drawing the two charts that decide it.
+ *
+ * The block sets `--helia-chart-1..6` on its own wrapper, so the figures under
+ * it are the shipped `Chart` part reading the shipped custom properties and
+ * nothing else about them is special. That is also the shape the pick takes
+ * when it lands: six declarations, in semantic.css instead of here.
+ *
+ * The surface and the ink ramp are set alongside them, because the page is
+ * only ever in one theme and the point of the section is to see both. Literals
+ * on the wrapper rather than `var()` is what makes the off-theme block show
+ * the off-theme pairing, the way the contrast table on Foundations does.
+ *
+ * Documentation furniture, not a part.
+ */
+import Chart from '@ambiqai/helia-ui/astro/Chart';
+
+import {
+  energyFraming,
+  energyLong,
+  latencyFraming,
+  latencyLong,
+} from '../lib/chart-data';
+import {
+  paletteGrounds,
+  type ChartPaletteCandidate,
+  type PaletteGround,
+} from '../lib/chart-palettes';
+
+interface Props {
+  palette: ChartPaletteCandidate;
+  ground: PaletteGround;
+}
+
+const { palette, ground } = Astro.props;
+const surface = paletteGrounds[ground];
+
+const style = [
+  `background: ${surface.surface}`,
+  `border-color: ${surface.hairline}`,
+  `--helia-hairline: ${surface.hairline}`,
+  `--helia-ink-primary: ${surface.inkPrimary}`,
+  `--helia-ink-secondary: ${surface.inkSecondary}`,
+  `--helia-ink-muted: ${surface.inkMuted}`,
+  `--helia-chart-grid: ${surface.hairline}`,
+  `--helia-chart-ink: ${surface.inkMuted}`,
+  ...palette.steps.map(
+    (step, index) => `--helia-chart-${index + 1}: ${step[ground]}`,
+  ),
+].join('; ');
+---
+
+<div
+  class="palette-block not-content"
+  style={style}
+  data-chart-palette={palette.id}
+  data-chart-ground={ground}
+>
+  <p class="palette-block__ground">{surface.label}</p>
+  <div class="palette-block__charts">
+    <Chart
+      title={latencyFraming.title}
+      subtitle={latencyFraming.subtitle}
+      kind="line"
+      data={latencyLong}
+      x="inputLength"
+      y="latency"
+      series="runtime"
+      width={420}
+      height={190}
+      density="compact"
+    />
+    <Chart
+      title={energyFraming.title}
+      subtitle={energyFraming.subtitle}
+      kind="bar"
+      data={energyLong}
+      x="target"
+      y="energy"
+      series="runtime"
+      width={420}
+      height={190}
+      density="compact"
+    />
+  </div>
+</div>
+
+<style>
+  .palette-block {
+    border: 1px solid;
+    border-radius: var(--helia-radius-md);
+    color: var(--helia-ink-primary);
+    padding: var(--helia-space-4);
+  }
+
+  .palette-block__ground {
+    color: var(--helia-ink-muted);
+    font-size: var(--helia-text-label);
+    margin: 0;
+  }
+
+  .palette-block__charts {
+    display: grid;
+    gap: var(--helia-space-5);
+    margin-top: var(--helia-space-2);
+  }
+
+  @media (min-width: 42rem) {
+    .palette-block__charts {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
 /*
- * The chrome and the palette the three charting candidates are judged in.
+ * The chrome and the palette the four charting candidates are judged in.
  *
  * Every panel on the comparison page is the same card, the same height and the
- * same colours, so what is left to compare is the library. Not an island
- * itself: the three candidate islands import it.
+ * same colors, so what is left to compare is the library. Not an island
+ * itself: the four candidate islands import it.
  */
 import { useEffect, useState, type ReactNode } from 'react';
 
@@ -20,14 +20,19 @@ import {
 import type { ChartFraming } from '../lib/chart-data';
 
 /*
- * Two accents and a neutral for the series, the inks for text, the hairline
- * for gridlines. Three series is the ceiling on purpose: a fourth hue turns a
- * chart into a legend the reader has to hold in their head.
+ * The first three chart tokens for the series, the inks for text, the hairline
+ * for gridlines. The series come off the shipped palette rather than off the
+ * accent scale so that every row on the page is in the same colors as every
+ * other and as the palette section above them: ECharts is themed through the
+ * tokens, and a row painted from a second palette would make the libraries
+ * look different where only the palette was. Three series is the ceiling on
+ * purpose: a fourth hue turns a chart into a legend the reader has to hold in
+ * their head.
  */
 const TOKENS = {
-  seriesA: '--helia-accent-cyan',
-  seriesB: '--helia-accent-blue',
-  seriesC: '--helia-accent-slate',
+  seriesA: '--helia-chart-1',
+  seriesB: '--helia-chart-2',
+  seriesC: '--helia-chart-3',
   ink: '--helia-ink-primary',
   inkMuted: '--helia-ink-muted',
   grid: '--helia-hairline',
@@ -39,7 +44,7 @@ export type ChartPalette = Record<keyof typeof TOKENS, string>;
 /*
  * Before the first effect the palette is the custom properties themselves, so
  * the server render and the first client render agree and a chart that can
- * take a `var()` is already in the right colours. Observable Plot cannot take
+ * take a `var()` is already in the right colors. Observable Plot cannot take
  * one, which is why `resolved` is part of the contract rather than an
  * implementation detail.
  */
@@ -72,7 +77,7 @@ export function useChartPalette(): {
     apply();
     /* The theme switch flips `data-theme` on the root and the tokens under it
        hold different values, not different names, so a chart holding resolved
-       colours has to be told to read them again. */
+       colors has to be told to read them again. */
     const observer = new MutationObserver(apply);
     observer.observe(document.documentElement, {
       attributes: true,

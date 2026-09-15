@@ -282,24 +282,27 @@
   --helia-tone-purple: #8b7aff;
 
   /*
-   * The chart palette. Six series off the accent scale, taken as the
-   * theme-aware tones above rather than the flat accents, because a series
-   * color is read against the surface it is drawn on and a hue tuned for a
-   * dark canvas is not legible on paper.
+   * The chart palette. A series color carries no meaning, so none of these is
+   * an advisory tone: aliasing them put a chart's first two series on the
+   * green and the blue a callout uses for success and information, and a
+   * reader had to unlearn that before reading the chart.
    *
-   * The order is the order a chart uses them, so the first two are the pair
-   * that has to separate at a glance and the warm step is late: a sequence
-   * that runs through the spectrum turns every chart into a legend lookup.
+   * The order is the order a chart uses them. The first two are the pair that
+   * has to separate at a glance, and they do it on lightness as much as on
+   * hue -- one blue against the page ink, which is the widest separation the
+   * palette can offer. The rest is a slate ramp at decreasing weight, so a
+   * third and fourth series stay quiet behind the two that carry the point.
    * Six is a ceiling, not a target.
+   *
+   * Every step clears 3:1 against the card surface it is drawn on, which is
+   * the graphic-object threshold: a series is a line or a bar, not text.
    */
-  --helia-chart-1: var(--helia-tone-cyan);
-  --helia-chart-2: var(--helia-tone-blue);
-  --helia-chart-3: var(--helia-tone-purple);
-  --helia-chart-4: var(--helia-tone-green);
-  --helia-chart-5: var(--helia-tone-orange);
-  /* Slate lifted toward the page ink, because `--helia-accent-slate` sits too
-     close to both grounds to read as a series on either. */
-  --helia-chart-6: #98a2b3;
+  --helia-chart-1: #7fb0ff;
+  --helia-chart-2: var(--helia-ink-primary);
+  --helia-chart-3: #9ba5ba;
+  --helia-chart-4: #828ca2;
+  --helia-chart-5: #6a758a;
+  --helia-chart-6: #596378;
 
   /* Gridlines are the hairline, at the weight the rest of the page draws an
      edge, so a chart's rules are as quiet as a card's border. */
@@ -406,8 +409,15 @@
   --helia-tone-orange: #ba5c16;
   --helia-tone-purple: #6651d9;
 
-  /* The other five chart series follow the tones above on their own. */
-  --helia-chart-6: #5d6b82;
+  /* The chart palette inverts rather than following the tones: on paper the
+     blue darkens to hold 3:1 against white, and the slate ramp runs the other
+     way so that a later series is still the quieter one. `--helia-chart-2` is
+     the page ink on both grounds and needs no value here. */
+  --helia-chart-1: #4f8ff7;
+  --helia-chart-3: #4e586c;
+  --helia-chart-4: #656f84;
+  --helia-chart-5: #768096;
+  --helia-chart-6: #8892a8;
 
   --helia-ink-caution: #a85c1f;
 

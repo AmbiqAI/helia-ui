@@ -1,0 +1,147 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * One candidate palette, stated and then drawn: the six steps with their hex
+ * values on both grounds, the closest pair in each, and the two charts under
+ * each ground.
+ *
+ * The separation figure is computed here rather than written down, so a step
+ * that moves moves the number with it and nobody has to remember to.
+ *
+ * Documentation furniture, not a part.
+ */
+import {
+  minimumSeparation,
+  paletteColours,
+  paletteGrounds,
+  type ChartPaletteCandidate,
+} from '../lib/chart-palettes';
+import ChartPaletteBlock from './ChartPaletteBlock.astro';
+
+interface Props {
+  palette: ChartPaletteCandidate;
+}
+
+const { palette } = Astro.props;
+
+const separation = (['dark', 'light'] as const).map((ground) => ({
+  ground,
+  label: paletteGrounds[ground].label,
+  ...minimumSeparation(paletteColours(palette, ground)),
+}));
+---
+
+<div class="palette-candidate not-content" data-chart-palette-card={palette.id}>
+  <table class="palette-steps">
+    <thead>
+      <tr>
+        <th scope="col">Step</th>
+        <th scope="col">Role</th>
+        <th scope="col">Dark</th>
+        <th scope="col">Light</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        palette.steps.map((step, index) => (
+          <tr>
+            <th scope="row">
+              <code>--helia-chart-{index + 1}</code>
+            </th>
+            <td>{step.role}</td>
+            <td>
+              <span class="palette-steps__value">
+                <span
+                  class="palette-steps__swatch"
+                  style={`background: ${step.dark}`}
+                />
+                <code>{step.dark}</code>
+              </span>
+            </td>
+            <td>
+              <span class="palette-steps__value">
+                <span
+                  class="palette-steps__swatch"
+                  style={`background: ${step.light}`}
+                />
+                <code>{step.light}</code>
+              </span>
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+
+  <p class="palette-candidate__separation">
+    Closest pair, CIEDE2000: {
+      separation.map((entry, index) => (
+        <>
+          {index > 0 && ', '}
+          <b data-separation={entry.ground}>{entry.delta.toFixed(1)}</b>
+          {` on ${entry.label.toLowerCase()}, between steps ${entry.between[0]} and ${entry.between[1]}`}
+        </>
+      ))
+    }.
+  </p>
+</div>
+
+<div class="palette-grounds not-content">
+  <ChartPaletteBlock palette={palette} ground="dark" />
+  <ChartPaletteBlock palette={palette} ground="light" />
+</div>
+
+<style>
+  .palette-candidate {
+    margin-top: var(--helia-space-4);
+  }
+
+  .palette-steps {
+    border-collapse: collapse;
+    font-size: var(--helia-text-caption);
+    width: 100%;
+  }
+
+  .palette-steps th,
+  .palette-steps td {
+    border-bottom: 1px solid var(--helia-hairline);
+    padding: var(--helia-space-1) var(--helia-space-2);
+    text-align: left;
+  }
+
+  .palette-steps thead th {
+    color: var(--helia-ink-muted);
+    font-weight: var(--helia-weight-medium);
+  }
+
+  .palette-steps tbody th {
+    font-weight: var(--helia-weight-regular);
+  }
+
+  .palette-steps__value {
+    align-items: center;
+    display: flex;
+    gap: var(--helia-space-2);
+  }
+
+  .palette-steps__swatch {
+    block-size: 0.75rem;
+    border: 1px solid var(--helia-hairline);
+    border-radius: var(--helia-radius-xs);
+    flex: none;
+    inline-size: 1.5rem;
+  }
+
+  .palette-candidate__separation {
+    color: var(--helia-ink-muted);
+    font-size: var(--helia-text-caption);
+    margin: var(--helia-space-3) 0 0;
+  }
+
+  .palette-grounds {
+    display: grid;
+    gap: var(--helia-space-4);
+    margin-top: var(--helia-space-4);
+  }
+</style>

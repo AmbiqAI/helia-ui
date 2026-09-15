@@ -1,38 +1,125 @@
 ---
 title: Charting candidates
-description: Three charting libraries drawing the same three charts, so the choice can be made by eye and by cost.
+description: The shipped series palette against three candidates, and four charting libraries drawing the same charts, so both choices can be made by eye and by cost.
 ---
 
+import ChartPaletteCandidate from '../../../components/ChartPaletteCandidate.astro';
+import ChartCandidateECharts from '../../../islands/ChartCandidateECharts';
 import ChartCandidateMui from '../../../islands/ChartCandidateMui';
 import ChartCandidatePlot from '../../../islands/ChartCandidatePlot';
 import ChartCandidateRecharts from '../../../islands/ChartCandidateRecharts';
-import { candidates, formatBytes } from '../../../lib/chart-candidates';
+import {
+  candidates,
+  formatBytes,
+  interactionKeys,
+  interactionLabels,
+} from '../../../lib/chart-candidates';
+import { paletteById } from '../../../lib/chart-palettes';
 
-The package draws charts with one library today. This page is where a second
-choice is made rather than argued: three candidates, the same three charts, the
-same numbers, the same card, the same palette. Anything that differs between
-the rows below is the library.
-
-Observable Plot is the shipped choice: it draws the `Chart` and `ChartGroup`
-Astro parts at build and the `ChartPlot` React component in the browser. The
-comparison stays here because the reasoning is worth keeping, not because the
-question is still open.
-
-Every chart carries a title and a subtitle, and the subtitle says what is
-plotted against what, so no axis is titled. Gridlines are horizontal only and
-drawn in the hairline token. Series colours are two accents and a neutral, read
-from the `--helia-*` custom properties at runtime, so a theme switch moves the
-plots with the page.
+Two choices are open on this page, and both are made here rather than argued.
+The first is the series palette: which six colors a chart takes, and in what
+order. The second is the library: four candidates, the same three charts, the
+same numbers, the same card.
 
 The series are synthetic. Nothing on this page is a measurement of any part.
 
-## The facts
+## Palette candidates
+
+`--helia-chart-1` through `--helia-chart-6` used to alias the advisory tones,
+so the first two series were the green and the blue that a callout uses to mean
+success and information, and a chart wore the status vocabulary whether or not
+it meant any of it. The shipped palette below replaces all six: a light modern
+blue, the page ink, and a slate ramp. It is what the tokens resolve to today,
+and the gallery charts and the React chart follow it without being touched.
+
+The three candidates after it are kept for the record. They are the other
+directions the palette could take, drawn the same way so the shipped one can be
+read against them. None of the four uses a green, and none uses a blue that
+could be read as a status color.
+
+Every step is derived from the brand scale in the package sheets: the slate
+ramp is the OKLCH hue and chroma of `--helia-accent-slate` with the lightness
+stepped, and the chromatic steps take the hue and chroma of
+`--helia-accent-cyan`, `--helia-accent-orange`, `--helia-accent-purple` and
+`--helia-accent-pink` at whatever lightness the ground calls for. The two
+grounds stand side by side because the page is only ever in one of them and a
+palette has to survive both.
+
+Under each palette are the same two charts: a two-series line and a grouped
+bar, drawn by the shipped `Chart` part with `--helia-chart-1` through
+`--helia-chart-6` set on a wrapper. Six declarations is the whole of a palette
+change, so nothing on this page is a mock-up of one. The shipped block sets the
+same values the sheet does, and the smoke suite reads them back against the
+document to keep the two from drifting apart.
+
+Each palette also carries the smallest CIEDE2000 distance between any two of
+its six steps, which is the number that decides whether a reader can tell one
+series from another. Roughly: around 1 is the just-noticeable difference for
+two patches touching each other, and two marks separated across a chart need a
+good deal more than that. It is a floor, not an average, so a palette with five
+well-spread steps and one near-duplicate scores as the near-duplicate.
+
+`--helia-product-accent` resolves to `--helia-accent-slate` on this site, so
+the product accent in A and B is a slate step, and C's highlighted series is
+amber rather than the accent: a monochrome palette whose one highlight is
+another slate is not a highlight. On a product surface that sets the dial to a
+product hue, the accent steps move with it.
+
+### Shipped. Blue and ink
+
+{paletteById.shipped.premise}
+
+{paletteById.shipped.tradeoff}
+
+<ChartPaletteCandidate palette={paletteById.shipped} />
+
+### A. Ink-led
+
+{paletteById.a.premise}
+
+{paletteById.a.tradeoff}
+
+<ChartPaletteCandidate palette={paletteById.a} />
+
+### B. Accent-led
+
+{paletteById.b.premise}
+
+{paletteById.b.tradeoff}
+
+<ChartPaletteCandidate palette={paletteById.b} />
+
+### C. Monochrome plus one
+
+{paletteById.c.premise}
+
+{paletteById.c.tradeoff}
+
+<ChartPaletteCandidate palette={paletteById.c} />
+
+## Library candidates
+
+Observable Plot is the shipped choice: it draws the `Chart` and `ChartGroup`
+Astro parts at build and the `ChartPlot` React component in the browser. The
+comparison stays here because the reasoning is worth keeping, and because the
+fourth candidate reopens one part of it — whether a chart on a HELIA surface
+should be something a reader can hover, zoom, filter and select, which Plot
+does not do and ECharts does.
+
+Every chart carries a title and a subtitle, and the subtitle says what is
+plotted against what, so no axis is titled. Gridlines are horizontal only and
+drawn in the hairline token. All four rows take their series from
+`--helia-chart-1` through `--helia-chart-3`, the same shipped palette the
+section above draws, so a difference between two rows is the library and never
+the colors.
+
+### The facts
 
 <table>
   <thead>
     <tr>
       <th>Library</th>
-      <th>Licence</th>
+      <th>License</th>
       <th>Version</th>
       <th>Island JavaScript</th>
       <th>Server render</th>
@@ -47,7 +134,7 @@ The series are synthetic. Nothing on this page is a measurement of any part.
           <br />
           <code>{candidate.pkg}</code>
         </td>
-        <td>{candidate.licence}</td>
+        <td>{candidate.license}</td>
         <td>{candidate.version}</td>
         <td>{formatBytes(candidate.bytes)}</td>
         <td>{candidate.serverRender}</td>
@@ -57,15 +144,55 @@ The series are synthetic. Nothing on this page is a measurement of any part.
   </tbody>
 </table>
 
-Licence and version are the installed packages'. The byte figures are minified
-JavaScript, not compressed, and count every chunk this page loads for that
-island, minus the React runtime the page pays for once whichever library wins.
-The three overlap: around 79 KB of d3 is common to all of them, so this page
-loads less than the column adds up to. Recharts is already a peer dependency
-of the package, so its bytes are a cost the React layer pays anyway; the other
-two would be new.
+License and version are the installed packages', read from `node_modules`. The
+byte figures are minified JavaScript, not compressed, summed over the chunks
+this page loads for that island and with the shared React runtime taken out,
+because the page pays for that once whichever library wins. The four overlap:
+around 79 KB of d3 is common to the first three, so this page loads less than
+the column adds up to. Recharts is already a peer dependency of the package, so
+its bytes are a cost the React layer pays anyway; the other three would be new.
+ECharts is imported through its tree-shaking entry points rather than its
+barrel, so its figure is the one a site would actually ship.
 
-## MUI X Charts
+### The interactions
+
+<table>
+  <thead>
+    <tr>
+      <th>Interaction</th>
+      {candidates.map((candidate) => (
+        <th key={candidate.id}>{candidate.name}</th>
+      ))}
+    </tr>
+  </thead>
+  <tbody>
+    {interactionKeys.map((column) => (
+      <tr key={column.key}>
+        <th scope="row">
+          {column.label}
+          <br />
+          <small>{column.question}</small>
+        </th>
+        {candidates.map((candidate) => (
+          <td key={candidate.id}>
+            <b>
+              {interactionLabels[candidate.interactions[column.key].support]}
+            </b>
+            <br />
+            <small>{candidate.interactions[column.key].note}</small>
+          </td>
+        ))}
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+`Native` means the library does it from options or props. `By hand` means the
+island writes it and the library only gets out of the way. `No` means neither.
+Each cell was checked against the installed package's own type declarations,
+not its documentation.
+
+### MUI X Charts
 
 The community charts package is MIT. It needs `@mui/material` as a peer, and
 although the `@emotion` peers are marked optional in this major, MUI's styling
@@ -76,7 +203,7 @@ alongside its charts.
 
 <ChartCandidateMui client:load />
 
-## Recharts
+### Recharts
 
 Already a peer dependency and already wrapped by the package's shadcn chart
 component. Here it is used through its own primitives rather than the wrapper,
@@ -84,11 +211,37 @@ so the comparison is between libraries and not between a library and a wrapper.
 
 <ChartCandidateRecharts client:load />
 
-## Observable Plot
+### Observable Plot
 
 Not a React library at all: `Plot.plot` builds a figure element against a DOM
 and hands it back, so an island owns the node and the width. That makes it the
 cheapest to drop into a page that is not React, and the one that needs an
 adapter in a page that is.
 
+This row is hydrated, and it is Plot at its ceiling rather than at its default.
+The tooltips are the `tip` mark under a pointer transform and the `crosshair`
+interaction, both of which cost a line each. The legend is not Plot's: Plot's
+own legend is a static swatch strip, so what is above each figure is a set of
+buttons, and a click filters the data and rebuilds the whole figure. There is
+no zoom and no selection below, because there is nothing in Plot to build
+either one on.
+
 <ChartCandidatePlot client:only="react" />
+
+### Apache ECharts
+
+Apache-2.0, and the only candidate here that treats a chart as something a
+reader operates. The row below has a tooltip on hover, a legend that toggles
+the series it names, a zoom on the line as both a slider and the wheel, a brush
+over the scatter that selects the marks inside it, and an entrance animation.
+None of that is written here; all of it is options.
+
+The figures in the HTML are ECharts' own server render. `echarts.init(null,
+...)` with `ssr` lays a chart out with no document at all, so the build writes
+the SVG into the page and the island's job on mount is to replace a picture
+with an instance. The theme is a JSON object registered once, and every color
+in it is a `var()` rather than a hue, which is what lets a figure rendered at
+build follow the theme toggle — the same trick the Astro `Chart` part uses, and
+the reason the SVG renderer is used on the client as well as on the server.
+
+<ChartCandidateECharts client:load />
