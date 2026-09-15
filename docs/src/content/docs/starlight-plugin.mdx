@@ -30,15 +30,22 @@ starlight({
 
 ## Options
 
-| Option                   | Type                | Default   | Effect                                                                                                                       |
-| ------------------------ | ------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `styles`                 | `boolean`           | `true`    | Splices the four package stylesheets into `customCss`. `false` leaves `customCss` untouched, and the site loads them itself. |
-| `shell.themeSelect`      | `boolean`           | `true`    | Installs the `ThemeSelect` override: the theme menu with its three choices.                                                  |
-| `shell.mobileMenuToggle` | `boolean`           | `true`    | Installs the `MobileMenuToggle` override.                                                                                    |
-| `shell.footer`           | `boolean`           | `true`    | Installs the `Footer` override, which renders the brand row and the pagination.                                              |
-| `footer.links`           | `{ label, href }[]` | `[]`      | Navigation shown on the right of the footer's brand row.                                                                     |
-| `footer.tagline`         | `string`            | undefined | One line printed under the logo.                                                                                             |
-| `footer.logo`            | `'ambiq' \| false`  | `'ambiq'` | `false` drops the brand lockup and renders the tagline on its own.                                                           |
+| Option                     | Type                | Default   | Effect                                                                                                                              |
+| -------------------------- | ------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `styles`                   | `boolean`           | `true`    | Splices the four package stylesheets into `customCss`. `false` leaves `customCss` untouched, and the site loads them itself.        |
+| `shell.themeSelect`        | `boolean`           | `true`    | Installs the `ThemeSelect` override: the theme menu with its three choices.                                                         |
+| `shell.mobileMenuToggle`   | `boolean`           | `true`    | Installs the `MobileMenuToggle` override.                                                                                           |
+| `shell.footer`             | `boolean`           | `true`    | Installs the `Footer` override, which renders the brand row and the pagination.                                                     |
+| `footer.links`             | `{ label, href }[]` | `[]`      | Navigation shown on the right of the footer's brand row.                                                                            |
+| `footer.tagline`           | `string`            | undefined | One line printed under the logo.                                                                                                    |
+| `footer.logo`              | `'ambiq' \| false`  | `'ambiq'` | `false` drops the brand lockup and renders the tagline on its own.                                                                  |
+| `shell.head`               | `boolean`           | `true`    | Installs the `Head` override: the brand font preload and the per-page discoverability tags.                                         |
+| `code`                     | `boolean`           | `true`    | Themes Expressive Code onto the package surface. `false` leaves Starlight's code frame alone.                                       |
+| `discoverability`          | `object \| false`   | `{}`      | Search-engine and agent metadata. `false` switches the lot off; see [Discoverability](/helia-ui/starlight-plugin/discoverability/). |
+| `discoverability.ogImage`  | `boolean`           | `true`    | Per-page Open Graph card at `<route>/og.svg`, with the `og:image` and `twitter:image` tags that point at it.                        |
+| `discoverability.jsonLd`   | `boolean`           | `true`    | `WebSite` and `Organization` on the home page, `TechArticle` elsewhere, and a `BreadcrumbList` from the sidebar path.               |
+| `discoverability.markdown` | `boolean`           | `true`    | `<route>/index.md` renditions and the `alternate` link that points at them.                                                         |
+| `discoverability.llms`     | `boolean`           | `true`    | `llms.txt`, `llms-full.txt`, and `content-index.json` at the site root.                                                             |
 
 ## Stylesheet order is the contract
 
@@ -91,3 +98,11 @@ which is how Starlight itself does this and keeps the values build-time
 constants rather than runtime lookups. Nothing outside the package should
 import that module: it is an implementation detail of the shell components, and
 its shape is not part of the export map.
+
+## Discoverability
+
+The plugin also emits the search-engine and agent metadata every HELIA site
+needs, so no site authors its own.
+[Discoverability](/helia-ui/starlight-plugin/discoverability/) states the
+contract: what lands in the head, which artifacts land at the site root, and how
+a page opts out of the description rule.

@@ -11,7 +11,7 @@
     "npm": ">=10"
   },
   "scripts": {
-    "validate": "npm run format:check && npm run check:spdx && npm run check:notices && npm run check:spelling && npm run check:styles && npm run check:boundaries && npm run check:islands && npm run check:astro-props && npm run check:site-theme && npm run check:foundations && npm run check:peers",
+    "validate": "npm run format:check && npm run check:spdx && npm run check:notices && npm run check:spelling && npm run check:styles && npm run check:boundaries && npm run check:islands && npm run check:astro-props && npm run check:site-theme && npm run check:foundations && npm run check:peers && npm run check:discoverability",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check:spdx": "node scripts/check-spdx.mjs",
@@ -24,6 +24,7 @@
     "check:astro-props": "node scripts/astro-props.mjs --check",
     "check:site-theme": "node scripts/site-theme-doc.mjs --check",
     "check:foundations": "node scripts/foundations-doc.mjs --check",
+    "check:discoverability": "node scripts/check-discoverability.mjs --root docs --allow-missing",
     "check:peers": "node docs/scripts/check-peer-dedupe.mjs",
     "docs:dev": "npm --prefix docs run dev",
     "docs:build": "npm --prefix docs run build",
@@ -64,6 +65,7 @@
     "scripts/lib/mkdocs-convert-render.mjs",
     "scripts/lib/material-icons.json",
     "scripts/serve-dist.mjs",
+    "scripts/check-discoverability.mjs",
     "react",
     "starlight",
     "*.css",

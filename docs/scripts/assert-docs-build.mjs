@@ -36,6 +36,7 @@ const ASTRO_LANE = [
      needed an island the lane's whole premise would be in question. */
   'gallery',
   'starlight-plugin',
+  'starlight-plugin/discoverability',
   'migrating-from-mkdocs',
   'python-api-reference',
   'primitives',

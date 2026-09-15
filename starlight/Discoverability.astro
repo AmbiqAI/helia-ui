@@ -1,0 +1,206 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/*
+ * The per-page half of discoverability: the tags only the rendering route can
+ * supply. Starlight already emits the title, the canonical link, `og:title`,
+ * `og:type`, `og:url`, `og:locale`, `og:description`, `og:site_name`,
+ * `twitter:card` and the description, so none of those is restated here -- a
+ * second `<meta name="description">` is a second answer to the same question.
+ *
+ * What is added is what Starlight leaves to the site: the image a share card
+ * needs, the two Twitter fields it does not derive from Open Graph, the
+ * structured data, the crawl directive for a draft, and the link that tells an
+ * agent where the markdown rendition of this page lives.
+ */
+import config from 'virtual:helia-ui/starlight-config';
+import { markdownHref, ogImageHref, OG_IMAGE_SIZE } from './discoverability';
+
+interface Crumb {
+  label: string;
+  href: string | undefined;
+}
+
+type SidebarEntry = {
+  type: 'link' | 'group';
+  label: string;
+  href?: string;
+  isCurrent?: boolean;
+  entries?: SidebarEntry[];
+};
+
+/** The first link anywhere under a group: the URL the group's name stands for. */
+function firstHref(entries: readonly SidebarEntry[]): string | undefined {
+  for (const entry of entries) {
+    if (entry.type === 'link') return entry.href;
+    const nested = entry.entries ? firstHref(entry.entries) : undefined;
+    if (nested) return nested;
+  }
+  return undefined;
+}
+
+/** The group path down to the current page, which is the sidebar's own trail. */
+function trailTo(entries: readonly SidebarEntry[]): Crumb[] | null {
+  for (const entry of entries) {
+    if (entry.type === 'link') {
+      if (entry.isCurrent) return [];
+      continue;
+    }
+    const nested = entry.entries ? trailTo(entry.entries) : null;
+    if (nested) {
+      return [
+        { label: entry.label, href: firstHref(entry.entries ?? []) },
+        ...nested,
+      ];
+    }
+  }
+  return null;
+}
+
+const { entry, sidebar, siteTitle } = Astro.locals.starlightRoute;
+const { discoverability, site: siteMeta } = config;
+
+const origin = Astro.site?.origin;
+const pathname = Astro.url.pathname;
+const pageUrl = origin ? new URL(pathname, origin).href : pathname;
+const base = import.meta.env.BASE_URL;
+const homePath = base.endsWith('/') ? base : `${base}/`;
+const isHome = pathname === homePath || pathname === homePath.slice(0, -1);
+
+/*
+ * Starlight's 404 is a route without a page: Astro emits it as `404.html` at
+ * the root rather than as a directory, so it has no rendition and no card
+ * beside it, and it is not a result anyone should be sent to.
+ */
+const isNotFound = entry.id === '404';
+
+const description = entry.data.description ?? siteMeta.description;
+const ogImage =
+  origin && !isNotFound
+    ? new URL(ogImageHref(pathname), origin).href
+    : undefined;
+const markdown = markdownHref(pathname);
+
+const absolute = (href: string | undefined) =>
+  href && origin ? new URL(href, origin).href : href;
+
+/*
+ * A workspace and its only section often carry the same label, and a crumb
+ * trail that says one name twice describes nothing the second time.
+ */
+const crumbs: Crumb[] = [
+  { label: siteTitle, href: absolute(homePath) },
+  ...(isHome
+    ? []
+    : [
+        ...(trailTo(sidebar as SidebarEntry[]) ?? []),
+        { label: entry.data.title, href: pageUrl },
+      ]),
+]
+  .map((crumb) => ({ label: crumb.label, href: absolute(crumb.href) }))
+  .filter(
+    (crumb, index, all) => index === 0 || crumb.label !== all[index - 1]!.label,
+  );
+
+const graph: Record<string, unknown>[] = [];
+
+if (discoverability.jsonLd && !isNotFound) {
+  const publisher = {
+    '@type': 'Organization',
+    name: 'Ambiq',
+    url: 'https://www.ambiq.com',
+  };
+
+  if (isHome) {
+    graph.push({
+      '@type': 'WebSite',
+      '@id': `${origin ?? ''}${homePath}#website`,
+      name: siteTitle,
+      url: `${origin ?? ''}${homePath}`,
+      ...(siteMeta.description ? { description: siteMeta.description } : {}),
+      publisher,
+    });
+    graph.push({ ...publisher, '@id': 'https://www.ambiq.com#organization' });
+  } else {
+    graph.push({
+      '@type': 'TechArticle',
+      '@id': `${pageUrl}#article`,
+      headline: entry.data.title,
+      ...(description ? { description } : {}),
+      url: pageUrl,
+      ...(ogImage ? { image: ogImage } : {}),
+      inLanguage: Astro.currentLocale ?? 'en',
+      isPartOf: {
+        '@type': 'WebSite',
+        name: siteTitle,
+        url: `${origin ?? ''}${homePath}`,
+      },
+      publisher,
+    });
+  }
+
+  if (crumbs.length > 1) {
+    graph.push({
+      '@type': 'BreadcrumbList',
+      '@id': `${pageUrl}#breadcrumbs`,
+      itemListElement: crumbs.map((crumb, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: crumb.label,
+        ...(crumb.href ? { item: crumb.href } : {}),
+      })),
+    });
+  }
+}
+---
+
+{
+  /* Starlight removes a draft from a production build, so this is the dev and
+     preview answer: a draft that does get served must not be indexed. */
+  (entry.data.draft || isNotFound) && (
+    <meta name="robots" content="noindex, nofollow" />
+  )
+}
+
+<meta name="twitter:title" content={entry.data.title} />
+{description && <meta name="twitter:description" content={description} />}
+
+{
+  discoverability.ogImage && ogImage && (
+    <>
+      <meta property="og:image" content={ogImage} />
+      <meta property="og:image:type" content="image/svg+xml" />
+      <meta property="og:image:width" content={String(OG_IMAGE_SIZE.width)} />
+      <meta property="og:image:height" content={String(OG_IMAGE_SIZE.height)} />
+      <meta
+        property="og:image:alt"
+        content={`${entry.data.title} — ${siteTitle}`}
+      />
+      <meta name="twitter:image" content={ogImage} />
+    </>
+  )
+}
+
+{
+  discoverability.markdown && !isNotFound && (
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href={markdown}
+      title={`${entry.data.title} as markdown`}
+    />
+  )
+}
+
+{
+  graph.length > 0 && (
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': graph,
+      })}
+    />
+  )
+}

@@ -1,0 +1,110 @@
+---
+title: Discoverability
+description: What the plugin emits so a HELIA site is legible to a search engine and to an agent reading the web.
+---
+
+import Callout from '@ambiqai/helia-ui/astro/Callout';
+
+Every HELIA site is a public front door, and two kinds of reader arrive at it:
+a search crawler that wants a title, a description, and a share card, and an
+agent that wants the page as plain text with links it can follow. The plugin
+serves both, once, so no site authors its own metadata and no two sites answer
+the same question differently.
+
+Nothing here is opt-in. Adopting `heliaStarlight()` adopts the contract below.
+
+## What Starlight already emits
+
+Starlight's own head is left alone. With `site` set in `astro.config.mjs`, it
+emits the page `<title>`, `<link rel="canonical">`, `og:title`, `og:type`,
+`og:url`, `og:locale`, `og:description`, `og:site_name`, `twitter:card`,
+`<meta name="description">`, and `<link rel="sitemap">`. Restating any of those
+would put two answers to one question in the same document, so the plugin adds
+only what Starlight leaves to the site.
+
+## What the plugin adds to the head
+
+| Tag                                                | Value                                                                                                                       |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `og:image`, `og:image:*`                           | The generated card for this route, absolute                                                                                 |
+| `twitter:title`, `twitter:description`             | The page title and description                                                                                              |
+| `twitter:image`                                    | The same card                                                                                                               |
+| `<link rel="alternate" type="text/markdown">`      | The markdown rendition of this route                                                                                        |
+| `<script type="application/ld+json">`              | `WebSite` and `Organization` on the home page, `TechArticle` elsewhere, plus a `BreadcrumbList` built from the sidebar path |
+| `<meta name="robots" content="noindex, nofollow">` | Only on a page with `draft: true`                                                                                           |
+
+The head tags come from the `Head` override. A site that sets `shell.head:
+false`, or names its own `Head` in Starlight's `components` map, takes them on
+itself.
+
+<Callout tone="note" title="Drafts in production">
+  Starlight drops a `draft: true` page from a production build, so the `noindex`
+  directive is what covers the dev server and any preview that does serve one.
+</Callout>
+
+## Every page needs a description
+
+A page with no `description` has no search result worth reading and no line in
+`llms.txt`. The build fails and lists every page that is missing one, rather
+than shipping the site description in its place on a dozen routes.
+
+An index page whose title is the whole of it opts out in frontmatter:
+
+```yaml
+---
+title: Reference
+descriptionOptional: true
+---
+```
+
+Use it sparingly. It is for a page that exists to hold a section together, not
+for a page nobody has written a description for yet.
+
+## The Open Graph card
+
+Each route gets `og.svg` beside its `index.html`: a 1200 by 630 card carrying
+the page title, the site title, and the Ambiq mark, drawn on the token surface
+in Roboto.
+
+It is an SVG rather than a PNG. Rasterizing text needs a font rasterizer, and
+none of the ways to get one -- satori with resvg, or a headless browser -- is a
+dependency the package takes on for a social preview. An SVG card is served and
+indexed like any other image, but some social scrapers will not rasterize one.
+A site that needs a PNG sets `discoverability: { ogImage: false }` and supplies
+its own through Starlight's `head` config.
+
+## Agent-facing URLs
+
+Four artifacts land at the site root, under the base path.
+
+| URL                  | What it is                                                                                                                                         |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<route>/index.md`   | The page's own markdown, frontmatter stripped, links resolved to absolute site URLs, component tags reduced to their text, code fences untouched   |
+| `llms.txt`           | The site title, its one-line description, and every route with its title and description, grouped by sidebar section and linking to the renditions |
+| `llms-full.txt`      | Every rendition concatenated in sidebar order                                                                                                      |
+| `content-index.json` | Route, title, description, section, headings, source path, and the git commit date per route                                                       |
+
+The renditions are a pure function of the source tree and the sidebar, so two
+builds of one commit produce identical bytes and a deploy diff shows only what
+actually changed.
+
+`robots.txt` is written with a `Sitemap:` line if the site does not already
+ship one; a site with its own keeps it. An RSS feed at `rss.xml` is written
+when the site has a `blog` content collection, and skipped when it has none.
+
+## Checking it
+
+`check:discoverability` reads the contract back off the built site: every HTML
+route carries a title, a description, a canonical link, `og:title`,
+`og:description`, and `og:image`; every route has a markdown rendition beside
+it; and `llms.txt` lists all of them. It runs in this site's `assert` step and
+in the hub's `validate`.
+
+```sh
+npm run build
+node node_modules/@ambiqai/helia-ui/scripts/check-discoverability.mjs --root .
+```
+
+Astro's 404 page and its redirect stubs are skipped: neither has a source page,
+and a redirect stub already carries `noindex` and a canonical link to the route
+it forwards to.

@@ -14,6 +14,14 @@
 
 import type { AstroIntegration } from 'astro';
 import type { HookParameters, StarlightPlugin } from '@astrojs/starlight/types';
+import {
+  discoverabilityIntegration,
+  resolveDiscoverability,
+  type HeliaDiscoverabilityOptions,
+  type ResolvedDiscoverability,
+} from './discoverability';
+
+export type { HeliaDiscoverabilityOptions } from './discoverability';
 
 type StarlightConfigInput = HookParameters<'config:setup'>['config'];
 
@@ -63,6 +71,12 @@ export interface HeliaStarlightOptions {
   /** Per-component opt-out of the shell overrides. Each defaults to `true`. */
   shell?: HeliaShellOptions;
   footer?: HeliaFooterOptions;
+  /**
+   * Search-engine and agent discoverability. Every part defaults to `true`;
+   * `false` switches the lot off. Needs an absolute `site` in astro.config,
+   * and the per-page tags need `shell.head` left installed.
+   */
+  discoverability?: HeliaDiscoverabilityOptions | false;
 }
 
 /** The shape the shell components read from `virtual:helia-ui/starlight-config`. */
@@ -72,6 +86,12 @@ export interface HeliaStarlightConfig {
     tagline: string | undefined;
     logo: 'ambiq' | false;
   };
+  /** The site's own title and description, which a component override cannot read. */
+  site: {
+    title: string;
+    description: string | undefined;
+  };
+  discoverability: ResolvedDiscoverability;
 }
 
 export const VIRTUAL_CONFIG_ID = 'virtual:helia-ui/starlight-config';
@@ -252,6 +272,22 @@ function mergeExpressiveCode(site: ExpressiveCodeOptions) {
   } satisfies ExpressiveCodeOptions;
 }
 
+/**
+ * The site title as one string.
+ *
+ * Starlight accepts either a plain title or a map keyed by locale, and a
+ * multilingual site gets the map. The shell components and the site-wide
+ * artifacts want one name, so the default locale's is the one that travels.
+ */
+function siteTitleOf(title: StarlightConfigInput['title']): string {
+  if (typeof title === 'string') return title;
+  const entries = Object.entries(title ?? {});
+  const preferred = entries.find(
+    ([locale]) => locale === 'en' || locale === 'root',
+  );
+  return preferred?.[1] ?? entries[0]?.[1] ?? '';
+}
+
 /** Index of the first `customCss` entry that is not a Tailwind root. */
 function insertionPoint(customCss: readonly string[]) {
   let index = 0;
@@ -297,14 +333,7 @@ export function heliaStarlight(
   options: HeliaStarlightOptions = {},
 ): StarlightPlugin {
   const { styles = true, code = true, shell = {}, footer } = options;
-
-  const resolved: HeliaStarlightConfig = {
-    footer: {
-      links: footer?.links ?? [],
-      tagline: footer?.tagline,
-      logo: footer?.logo ?? 'ambiq',
-    },
-  };
+  const discoverability = resolveDiscoverability(options.discoverability);
 
   return {
     name: '@ambiqai/helia-ui/starlight',
@@ -336,8 +365,43 @@ export function heliaStarlight(
               )
             : config.expressiveCode;
 
+        const site = {
+          title: siteTitleOf(config.title),
+          description: config.description,
+        };
+
         updateConfig({ customCss, components, expressiveCode });
-        addIntegration(configModule(resolved));
+        addIntegration(
+          configModule({
+            footer: {
+              links: footer?.links ?? [],
+              tagline: footer?.tagline,
+              logo: footer?.logo ?? 'ambiq',
+            },
+            site,
+            discoverability,
+          }),
+        );
+
+        /*
+         * The sidebar is read here rather than in the integration because this
+         * is the only hook that sees it: by `astro:config:done` it has become
+         * Starlight's own virtual module, and llms.txt groups by the sections
+         * the site's navigation declares rather than by directory.
+         */
+        if (
+          discoverability.markdown ||
+          discoverability.llms ||
+          discoverability.ogImage
+        ) {
+          addIntegration(
+            discoverabilityIntegration({
+              resolved: discoverability,
+              site,
+              sidebar: (config.sidebar ?? []) as never,
+            }),
+          );
+        }
       },
     },
   };

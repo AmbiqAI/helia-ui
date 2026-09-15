@@ -118,6 +118,13 @@ const PLUGIN_ALLOWED_PREFIXES = [
   '@astrojs/starlight/',
   'virtual:starlight/',
   'virtual:helia-ui/',
+  /*
+   * The lane also carries the plugin's Astro integrations, which run in Node
+   * at build and write files into the output directory. Node's own modules are
+   * the only way to do that, and nothing here ships to a browser; a part under
+   * astro/ or react/ still cannot reach for them.
+   */
+  'node:',
   ...FONT_PACKAGES.map((name) => `${name}/`),
 ];
 

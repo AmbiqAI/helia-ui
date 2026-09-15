@@ -95,7 +95,17 @@ export default defineConfig({
         /* Near the top on purpose: it is the page an owner picking a card
            treatment is sent to, not a reference the parts pages lead into. */
         { label: 'Gallery', slug: 'gallery' },
-        { label: 'Starlight plugin', slug: 'starlight-plugin' },
+        {
+          label: 'Starlight plugin',
+          collapsed: false,
+          items: [
+            { label: 'Adopting the plugin', slug: 'starlight-plugin' },
+            {
+              label: 'Discoverability',
+              slug: 'starlight-plugin/discoverability',
+            },
+          ],
+        },
         {
           label: 'Migrating from MkDocs',
           collapsed: false,

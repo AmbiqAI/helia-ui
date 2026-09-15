@@ -17,7 +17,7 @@
     "build": "astro build && npm run assert",
     "preview": "astro preview",
     "check": "astro check",
-    "assert": "node scripts/assert-docs-build.mjs && node scripts/check-peer-dedupe.mjs",
+    "assert": "node scripts/assert-docs-build.mjs && node scripts/check-peer-dedupe.mjs && node ../scripts/check-discoverability.mjs",
     "test": "playwright test"
   },
   "dependencies": {
