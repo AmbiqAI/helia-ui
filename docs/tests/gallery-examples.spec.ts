@@ -128,6 +128,23 @@ test('the rows and panels section renders all three parts', async ({
   ).toHaveCount(1);
 });
 
+test('an icon and its word are centered on each other', async ({ page }) => {
+  await page.goto(gallery);
+
+  const pair = page.locator('.helia-icon--pair').first();
+  await expect(pair).toBeVisible();
+
+  const glyph = await pair.locator('.helia-icon__glyph svg').boundingBox();
+  const word = await pair.locator('.helia-icon__text').boundingBox();
+  expect(glyph, 'the pair draws a glyph').not.toBeNull();
+  expect(word, 'the pair draws its word').not.toBeNull();
+
+  /* The line box of the word against the box of the glyph: an icon that reads
+     as riding high beside its label is this number growing. */
+  const center = (box: { y: number; height: number }) => box.y + box.height / 2;
+  expect(Math.abs(center(glyph!) - center(word!))).toBeLessThanOrEqual(1);
+});
+
 test('an icon row is one anchor around its tile and its title', async ({
   page,
 }) => {

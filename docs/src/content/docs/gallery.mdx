@@ -2698,48 +2698,58 @@ draw.
 </Example>
 
 <Example
-  title="<Icon name>"
+  title="<Icon name text size />"
   code={`
-    <div className="helia-display-row">
-      <span>
-        <Icon name="gauge-high" /> gauge-high
-      </span>
-      <span>
-        <Icon name="memory" /> memory
-      </span>
-      <span>
-        <Icon name="microchip" /> microchip
-      </span>
-      <span>
-        <Icon name="chart-line" /> chart-line
-      </span>
-      <span>
-        <Icon name="circle-info" /> circle-info
-      </span>
-      <span>
-        <Icon name="arrow-right" /> arrow-right
-      </span>
+    <div className="gallery-stack">
+      <div className="helia-display-row">
+        <Icon name="gauge-high" text="gauge-high" size="sm" />
+        <Icon name="memory" text="memory" size="sm" />
+        <Icon name="microchip" text="microchip" size="sm" />
+      </div>
+      <div className="helia-display-row">
+        <Icon name="gauge-high" text="gauge-high" size="md" />
+        <Icon name="memory" text="memory" size="md" />
+        <Icon name="microchip" text="microchip" size="md" />
+      </div>
+      <div className="helia-display-row">
+        <Icon name="gauge-high" text="gauge-high" size="lg" />
+        <Icon name="memory" text="memory" size="lg" />
+        <Icon name="microchip" text="microchip" size="lg" />
+      </div>
+      <div className="helia-display-row">
+        <Icon name="gauge-high" />
+        <Icon name="memory" />
+        <Icon name="microchip" />
+        <Icon name="chart-line" />
+        <Icon name="circle-info" />
+        <Icon name="arrow-right" />
+      </div>
     </div>
   `}
 >
-  <div className="helia-display-row">
-    <span>
-      <Icon name="gauge-high" /> gauge-high
-    </span>
-    <span>
-      <Icon name="memory" /> memory
-    </span>
-    <span>
-      <Icon name="microchip" /> microchip
-    </span>
-    <span>
-      <Icon name="chart-line" /> chart-line
-    </span>
-    <span>
-      <Icon name="circle-info" /> circle-info
-    </span>
-    <span>
-      <Icon name="arrow-right" /> arrow-right
-    </span>
+  <div className="gallery-stack">
+    <div className="helia-display-row">
+      <Icon name="gauge-high" text="gauge-high" size="sm" />
+      <Icon name="memory" text="memory" size="sm" />
+      <Icon name="microchip" text="microchip" size="sm" />
+    </div>
+    <div className="helia-display-row">
+      <Icon name="gauge-high" text="gauge-high" size="md" />
+      <Icon name="memory" text="memory" size="md" />
+      <Icon name="microchip" text="microchip" size="md" />
+    </div>
+    <div className="helia-display-row">
+      <Icon name="gauge-high" text="gauge-high" size="lg" />
+      <Icon name="memory" text="memory" size="lg" />
+      <Icon name="microchip" text="microchip" size="lg" />
+    </div>
+    <div className="helia-display-row">
+      <Icon name="gauge-high" />
+      <Icon name="memory" />
+      <Icon name="microchip" />
+      <Icon name="chart-line" />
+      <Icon name="circle-info" />
+      <Icon name="arrow-right" />
+    </div>
   </div>
 </Example>

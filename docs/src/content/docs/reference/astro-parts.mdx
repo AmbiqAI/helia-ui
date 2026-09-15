@@ -557,10 +557,12 @@ Also accepts `HTMLAttributes<'p'>`.
 import Icon from '@ambiqai/helia-ui/astro/Icon';
 ```
 
-| Prop          | Type       | Default | Description                                                                                                                                            |
-| ------------- | ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `name` (req.) | `IconName` | --      | Font Awesome solid name in kebab case, e.g. `gauge-high`.                                                                                              |
-| `label`       | `string`   | --      | Accessible name. Omit it for decoration next to text that already says the same thing; supply it when the icon is the only thing carrying the meaning. |
+| Prop          | Type                   | Default | Description                                                                                                                                                                                                      |
+| ------------- | ---------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name` (req.) | `IconName`             | --      | Font Awesome solid name in kebab case, e.g. `gauge-high`.                                                                                                                                                        |
+| `label`       | `string`               | --      | Accessible name. Omit it for decoration next to text that already says the same thing; supply it when the icon is the only thing carrying the meaning. `text` is already that name, so the two are not combined. |
+| `text`        | `string`               | --      | The word the glyph belongs to, drawn after it. It names the pair, so the glyph goes to the accessibility tree as decoration.                                                                                     |
+| `size`        | `'sm' \| 'md' \| 'lg'` | --      | A step on the type scale for the glyph and, in the `text` form, for the word with it. Left off, the icon is `1em` of whatever it sits in, which is what an icon in a sentence wants.                             |
 
 Also accepts `HTMLAttributes<'span'>`.
 

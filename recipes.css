@@ -835,6 +835,10 @@ a.helia-chip--neutral:focus-visible {
 }
 
 .helia-card-list__marker {
+  /* The column aligns on the text baseline, and a numeral has to sit on it, so
+     the glyph does too rather than taking the drop an icon mid-sentence needs. */
+  --helia-icon-shift: baseline;
+
   color: var(--accent, var(--helia-product-accent));
   font-size: var(--helia-card-list-marker-size, var(--helia-text-small));
   font-variant-numeric: tabular-nums;

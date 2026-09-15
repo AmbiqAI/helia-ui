@@ -9,6 +9,10 @@
  * page that needs an icon inline, by name, the way MkDocs Material's
  * `:material-*:` shortcodes did. Nothing ships to the client — the SVG is a
  * string by the time the page is written.
+ *
+ * `text` is the second form: a glyph and the word it belongs to as one unit,
+ * so the space between them and the alignment of one on the other are the
+ * part's to set rather than the call site's.
  */
 import type { HTMLAttributes } from 'astro/types';
 import {
@@ -27,11 +31,23 @@ interface Props extends HTMLAttributes<'span'> {
   /**
    * Accessible name. Omit it for decoration next to text that already says the
    * same thing; supply it when the icon is the only thing carrying the meaning.
+   * `text` is already that name, so the two are not combined.
    */
   label?: string;
+  /**
+   * The word the glyph belongs to, drawn after it. It names the pair, so the
+   * glyph goes to the accessibility tree as decoration.
+   */
+  text?: string;
+  /**
+   * A step on the type scale for the glyph and, in the `text` form, for the
+   * word with it. Left off, the icon is `1em` of whatever it sits in, which is
+   * what an icon in a sentence wants.
+   */
+  size?: 'sm' | 'md' | 'lg';
 }
 
-const { name, label, class: className, ...rest } = Astro.props;
+const { name, label, text, size, class: className, ...rest } = Astro.props;
 
 const definition = findIconDefinition({ prefix: 'fas', iconName: name });
 if (!definition) {
@@ -40,27 +56,79 @@ if (!definition) {
   );
 }
 const markup = renderIcon(definition).html.join('');
+const sizing = size && `helia-icon--${size}`;
 ---
 
-<span
-  class:list={['helia-icon', className]}
-  {...label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': 'true' }}
-  {...rest}
-  set:html={markup}
-/>
+{
+  text === undefined ? (
+    <span
+      class:list={['helia-icon', sizing, className]}
+      {...(label
+        ? { role: 'img', 'aria-label': label }
+        : { 'aria-hidden': 'true' })}
+      {...rest}
+      set:html={markup}
+    />
+  ) : (
+    <span
+      class:list={['helia-icon', 'helia-icon--pair', sizing, className]}
+      {...rest}
+    >
+      <span class="helia-icon__glyph" aria-hidden="true" set:html={markup} />
+      <span class="helia-icon__text">{text}</span>
+    </span>
+  )
+}
 
 <style>
   /* style-lint: allow-file global -- the SVG arrives through set:html */
   .helia-icon {
+    display: inline-block;
+    /* Holds the glyph's size when the icon is an item in a row that has run
+       out of width. */
+    flex-shrink: 0;
+    /* Font Awesome's own inline metric, and the measured one: against 16px
+       body text it leaves the glyph half a pixel off the middle of the words
+       beside it, where the baseline the box would otherwise take leaves it two
+       and a half pixels high. `--helia-icon-shift` is for a column that aligns
+       on the baseline instead; `.helia-card-list__marker` is the one. */
+    vertical-align: var(--helia-icon-shift, -0.125em);
+  }
+
+  /* The pair is a control rather than a paragraph: its line box is the glyph's
+     own height, which is what centers the two on each other at every step. */
+  .helia-icon--pair {
+    align-items: center;
     display: inline-flex;
+    gap: var(--helia-space-2);
+    line-height: 1;
+  }
+
+  .helia-icon__glyph {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .helia-icon--sm {
+    font-size: var(--helia-text-small);
+  }
+
+  .helia-icon--md {
+    font-size: var(--helia-text-body);
+  }
+
+  .helia-icon--lg {
+    font-size: var(--helia-text-lead);
   }
 
   /* Sized and colored by the text it sits in, so an icon never needs a rule
-     of its own at the call site. */
+     of its own at the call site. Block, so the box is the glyph's square and
+     carries none of the descender space an inline replaced element would add
+     under it. */
   .helia-icon :global(svg) {
+    display: block;
     fill: currentColor;
     height: 1em;
-    vertical-align: -0.125em;
     width: 1em;
   }
 </style>
