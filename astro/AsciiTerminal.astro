@@ -9,7 +9,7 @@
  * plain-text form for the clipboard and for the typing animation, and it can
  * only do that if it knows where each line starts and what kind it is.
  *
- * The default form is inert and ships no behaviour. Setting `animated`, `copy`
+ * The default form is inert and ships no behavior. Setting `animated`, `copy`
  * or `replay` opts the page into the inline script.
  */
 export type AsciiTerminalLineKind =
@@ -61,7 +61,7 @@ const {
 } = Astro.props;
 
 /*
- * The whole behaviour layer is optional, and the default form -- a static
+ * The whole behavior layer is optional, and the default form -- a static
  * transcript with no controls -- has to cost nothing. A hoisted `<script>` is
  * bundled for every page that imports the component whether or not it renders,
  * so the only way to make the cost conditional is `is:inline`. The price is

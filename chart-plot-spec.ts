@@ -22,7 +22,7 @@ export type ChartLegend = 'auto' | 'none';
 export type ChartRecord = Record<string, unknown>;
 
 /**
- * The series palette, as custom properties rather than resolved colours: an
+ * The series palette, as custom properties rather than resolved colors: an
  * SVG that carries `var()` follows the theme toggle without being redrawn,
  * which is the only way a chart rendered at build can change with the theme.
  *
@@ -258,7 +258,7 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
  */
 const THEMED_ATTRIBUTES = ['fill', 'stroke', 'color'];
 
-/** Rewrites the `var()` colours Plot set as attributes into inline styles. */
+/** Rewrites the `var()` colors Plot set as attributes into inline styles. */
 export function inlineChartColors(root: Element): void {
   const elements = [root, ...Array.from(root.querySelectorAll('*'))];
   for (const element of elements) {
@@ -280,7 +280,7 @@ export function inlineChartColors(root: Element): void {
  * Names the figure for assistive technology, as one image.
  *
  * A screen reader reading out eleven axis ticks is reading noise, so the whole
- * SVG is a single labelled image and nothing inside it carries ARIA. Plot
+ * SVG is a single labeled image and nothing inside it carries ARIA. Plot
  * labels its mark and axis groups, which is a prohibited attribute on a `g`
  * with no role; the labels move to `data-plot-label`, where the stylesheet can
  * still find the gridlines and the accessibility tree cannot see them.

@@ -162,7 +162,7 @@ function readLicenseText(packageDir) {
   if (names.length === 0) return null;
   const text = names
     // Upstream texts arrive with either line ending, and the repository stores
-    // them normalised, so the generator normalises too or --check fails on a
+    // them normalized, so the generator normalizes too or --check fails on a
     // fresh clone.
     .map((name) =>
       readFileSync(join(packageDir, name), 'utf8')

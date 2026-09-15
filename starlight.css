@@ -35,7 +35,7 @@
 }
 
 /*
- * Expressive Code. The colours, the frame and the copy button are configured in
+ * Expressive Code. The colors, the frame and the copy button are configured in
  * the Starlight plugin; only the two things its settings cannot express are
  * here. Its own rules sit in `@layer starlight.components`, so these unlayered
  * declarations win without raising specificity.

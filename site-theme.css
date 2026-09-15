@@ -35,10 +35,10 @@
    * dial: --helia-product-accent
    * changes: The site's accent. One value, not a vocabulary: a site carrying
    *   several product accents sets this per subtree rather than adding tokens.
-   * values: Any colour, normally one of the `--helia-accent-*` hues rather
+   * values: Any color, normally one of the `--helia-accent-*` hues rather
    *   than a fresh one, so the palette stays the palette.
    * default: var(--helia-accent-slate)
-   * reads: `AsciiTerminal`, for the prompt colour. No card recipe draws an
+   * reads: `AsciiTerminal`, for the prompt color. No card recipe draws an
    *   accent edge, so elsewhere a site passes this into `Media` as `--accent`.
    */
   --helia-product-accent: var(--helia-accent-slate);
@@ -47,7 +47,7 @@
    * dial: --helia-accent-secondary
    * changes: The second accent, for a treatment that needs two: a gradient, a
    *   chart series, a hero band. Leave it equal to the first and nothing pairs.
-   * values: Any colour, on the same terms as the first accent.
+   * values: Any color, on the same terms as the first accent.
    * default: var(--helia-accent-slate)
    * reads: `Badge` tone `secondary`, `LinkCard`'s directional cue under the
    *   pointer, and `--chart-2` in `shadcn.css`, so the second series of a
@@ -107,8 +107,8 @@
    * changes: A hue mixed into every surface, and how much of it. The default
    *   mixes nothing, which is why the amount rather than the hue is what is
    *   zeroed.
-   * values: Any colour, and a percentage. Keep the amount in single figures:
-   *   this is a cast over the page, not a background colour.
+   * values: Any color, and a percentage. Keep the amount in single figures:
+   *   this is a cast over the page, not a background color.
    * default: transparent
    * default: 0%
    * reads: `--helia-surface-paper`, `--helia-surface-card` and

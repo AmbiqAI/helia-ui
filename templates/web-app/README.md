@@ -107,7 +107,7 @@ written on.
    too. The main thread has to stay free for the interface, and a sample clock
    that shares it drifts whenever React renders.
 2. **Transfer, do not copy.** The worker posts `Float32Array` chunks with the
-   buffer in the transfer list, so nothing is serialised.
+   buffer in the transfer list, so nothing is serialized.
 3. **Chunks, never samples.** `Source.onChunk` hands over a packet. A per-sample
    callback puts one JavaScript call on the main thread per sample, which is
    where the frame budget goes at the top of the rate range.

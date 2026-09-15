@@ -59,7 +59,7 @@
 
   /*
    * Starlight fallbacks. The package sheets read a handful of variables that
-   * Starlight's own props.css owns and this file does not map: the greyscale
+   * Starlight's own props.css owns and this file does not map: the grayscale
    * ramp, the inverted ink and the two font stacks. A Starlight page supplies
    * them; a plain app does not, and an unresolved var() drops the declaration
    * rather than falling back, so every read of one goes through
@@ -67,7 +67,7 @@
    *
    * The values are Starlight's own, restated, so the two paths compute the
    * same thing. They are fallbacks only: a Starlight site's own values win,
-   * including a site that customises the ramp.
+   * including a site that customizes the ramp.
    */
   --helia-sl-white: hsl(0, 0%, 100%);
   --helia-sl-gray-2: hsl(224, 6%, 77%);

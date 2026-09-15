@@ -7,7 +7,7 @@ import Callout from '@ambiqai/helia-ui/astro/Callout';
 
 A ` ```mermaid ` fence becomes an inline SVG at build time. The page ships no
 diagram runtime, the diagram is in the HTML before any script runs, and the
-colours come from the same tokens as the rest of the page, so a diagram follows
+colors come from the same tokens as the rest of the page, so a diagram follows
 the light and dark themes without a palette of its own.
 
 ## Turning it on
@@ -44,7 +44,7 @@ because it only means anything on a site that also runs the plugin.
   build needs one. CI gets it from Playwright. For a local build, point
   `PLAYWRIGHT_BROWSERS_PATH` at the cache Playwright already installed to. A
   missing browser fails the build with the executable path it looked for, which
-  is the behaviour to want: the alternative is a page that deploys with empty
+  is the behavior to want: the alternative is a page that deploys with empty
   figures.
 </Callout>
 
@@ -68,7 +68,7 @@ should survive a reader with JavaScript off, a printed page and a site search
 index.
 
 The island also cannot see the fence on its own. Starlight hands code fences to
-Expressive Code, which tokenises the source into hundreds of spans and leaves
+Expressive Code, which tokenizes the source into hundreds of spans and leaves
 the original text only in the copy button's `data-code` attribute. Reading a
 diagram back out of that means depending on an Expressive Code internal, so an
 island route needs a build-time pass anyway to get the fence out first.

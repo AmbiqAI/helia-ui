@@ -67,7 +67,7 @@ Issue references below are to `AmbiqAI/helia-ui`.
   `github-dark-high-contrast`, which keep GitHub's hue assignments but clear
   contrast on the package's card surface (#33).
 - The advisory tones gain `-ink` counterparts, one value per theme, so a status
-  colour set on text is chosen for the surface it sits on; the tones themselves
+  color set on text is chosen for the surface it sits on; the tones themselves
   are unchanged, because they are fills and strokes (#32).
 - Every transition and animation the package ships now writes the motion
   tokens, and `check:styles` fails a duration or easing literal in a package
@@ -154,7 +154,7 @@ Issue references below are to `AmbiqAI/helia-ui`.
   `--helia-radius-md` is `--helia-radius` after the multiplier and is what the
   recipes now read.
 - A `Gallery` page in the package docs carrying every variant, every
-  transition and the theme dials side by side, each labelled with the prop or
+  transition and the theme dials side by side, each labeled with the prop or
   class that produces it.
 
 ## What changed in 0.1.0-alpha.4
@@ -193,7 +193,7 @@ Issue references below are to `AmbiqAI/helia-ui`.
 
 Ambiq-authored source, with React parts derived from shadcn/ui (MIT) and
 carrying Ambiq modifications. The package ships source with no build step, so
-the published tree is the repository tree: there is no compiled artefact whose
+the published tree is the repository tree: there is no compiled artifact whose
 provenance differs from the source.
 
 `THIRD-PARTY-NOTICES.md` records the runtime dependency tree with license
@@ -206,4 +206,4 @@ regenerated from the package root rather than from a workspace that vendors it.
 ## Before publishing
 
 Set the version, record the publishing commit above, and regenerate the notices
-from the environment that builds the published artefact.
+from the environment that builds the published artifact.

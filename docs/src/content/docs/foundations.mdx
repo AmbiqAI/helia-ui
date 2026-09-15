@@ -14,7 +14,7 @@ import TypographyShowcase from '../../components/TypographyShowcase.astro';
 Every value a part draws with comes from a token, and every token belongs to
 one of four files. This page is the tour of them: what each scale is for, what
 each step looks like, and which page shows the token doing its job. The
-[colour reference](/helia-ui/foundations/tokens/) carries the values themselves,
+[color reference](/helia-ui/foundations/tokens/) carries the values themselves,
 generated from the token files, and the
 [site theme](/helia-ui/foundations/site-theme/) page lists the dials a site is
 free to move.
@@ -42,10 +42,10 @@ cascade layer a Tailwind entry declares. That is what keeps a token
 authoritative over whatever the Starlight Tailwind compat package wires up
 underneath.
 
-## Colour
+## Color
 
 Four surfaces and four inks, both sets swapped by the theme flip. Nothing in
-the package writes a colour literal outside the token files; everything else
+the package writes a color literal outside the token files; everything else
 resolves through these.
 
 <div className="token-swatches not-content">
@@ -102,7 +102,7 @@ resolves through these.
   </span>
 </div>
 
-The accent set is the package's whole colour vocabulary. There are no product
+The accent set is the package's whole color vocabulary. There are no product
 names in it: a consuming site maps its own subjects onto an accent in the
 composition that knows what they mean, and hands it to a part as `--accent`.
 
@@ -178,16 +178,16 @@ composition that knows what they mean, and hands it to a part as `--accent`.
   </figure>
 </div>
 
-Every colour token, its value in each theme, and the contrast each ink reaches
+Every color token, its value in each theme, and the contrast each ink reaches
 on the canvas and on the card are on the
-[colour reference](/helia-ui/foundations/tokens/). The accents are shown
+[color reference](/helia-ui/foundations/tokens/). The accents are shown
 carrying meaning on the [gallery](/helia-ui/gallery/#content-first).
 
 <Callout tone="note" title="Accent is a custom property, not a prop">
-  `Media` takes its colour as `style="--accent: var(--helia-accent-cyan)"`
-  rather than `accent="cyan"`. That is deliberate: a prop would be an
-  enumeration the package has to own, and owning it would mean owning what each
-  name is for. As a custom property the part never learns the vocabulary.
+  `Media` takes its color as `style="--accent: var(--helia-accent-cyan)"` rather
+  than `accent="cyan"`. That is deliberate: a prop would be an enumeration the
+  package has to own, and owning it would mean owning what each name is for. As
+  a custom property the part never learns the vocabulary.
 </Callout>
 
 ## Type
@@ -278,10 +278,10 @@ the reveal used at section scale.
 
 ## Status inks
 
-Advisory colour comes in pairs. The tone is the fill an icon, a rim, or an edge
+Advisory color comes in pairs. The tone is the fill an icon, a rim, or an edge
 takes, and the ink is the same meaning chosen as text: each ink clears 4.5:1
 against the raised surface of the theme it is declared in. Anything that sets a
-status colour on a word takes the ink, never the fill.
+status color on a word takes the ink, never the fill.
 
 <div className="token-ink-row not-content">
   <span style="color: var(--helia-tone-success-ink)">
@@ -299,7 +299,7 @@ status colour on a word takes the ink, never the fill.
 </div>
 
 The measured ratios are on the
-[colour reference](/helia-ui/foundations/tokens/#ink-on-surface), and
+[color reference](/helia-ui/foundations/tokens/#ink-on-surface), and
 [Callouts](/helia-ui/callouts/) shows each tone and its ink in the part they
 belong to.
 

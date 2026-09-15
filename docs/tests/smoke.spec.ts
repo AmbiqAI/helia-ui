@@ -10,7 +10,7 @@ const base = '/helia-ui';
 const routes = [
   { path: `${base}/`, heading: 'helia-ui' },
   { path: `${base}/foundations/`, heading: 'Foundations' },
-  { path: `${base}/foundations/tokens/`, heading: 'Colour tokens' },
+  { path: `${base}/foundations/tokens/`, heading: 'Color tokens' },
   { path: `${base}/foundations/site-theme/`, heading: 'Site theme' },
   {
     path: `${base}/foundations/typeface-candidates/`,
@@ -78,7 +78,7 @@ const accessibilityRoutes: { path: string; theme?: 'dark' }[] = [
     path: `${base}/code/`,
   },
   {
-    /* Syntax ink is the one page colour the package does not own -- it comes
+    /* Syntax ink is the one page color the package does not own -- it comes
        from the Shiki theme pair, drawn on the package's card rather than on
        the theme's own editor background -- so the code page is scanned in
        both themes. See AmbiqAI/helia-ui#33. */
@@ -99,7 +99,7 @@ for (const { path, theme } of accessibilityRoutes) {
     /*
      * Scanned as a reduced-motion visitor. The motion scale is 0 for them, so
      * `Reveal` never arms and nothing is part way through a fade while axe
-     * measures it — a contrast reading taken mid-transition is of a colour
+     * measures it — a contrast reading taken mid-transition is of a color
      * that exists for 320ms and belongs to no state the page settles in. It
      * is also the configuration with the widest audience, so it is the one
      * worth asserting.
@@ -119,7 +119,7 @@ for (const { path, theme } of accessibilityRoutes) {
       content: '.helia-media__form { display: none; }',
     });
     /*
-     * Set after load rather than through a colour-scheme emulation: Starlight
+     * Set after load rather than through a color-scheme emulation: Starlight
      * resolves the stored preference in a blocking head script and writes the
      * attribute itself, so anything set earlier is overwritten on navigation.
      */
@@ -238,7 +238,7 @@ test('a card overline stays out of the title', async ({ page }) => {
 
 /*
  * The two halves of the token tour, asserted where each one is generated or
- * drawn. The colour grid is written from `tokens.css`, so the primitive count
+ * drawn. The color grid is written from `tokens.css`, so the primitive count
  * is the proof that the generator read the file rather than an empty list; the
  * ramp is the proof that every named size has a specimen, which is the one
  * thing a reader cannot check by eye against a table.
@@ -595,11 +595,11 @@ test('the gallery charts are inline SVG in the served HTML', async ({
 });
 
 /*
- * The colours are custom properties rather than resolved hues, which is the
+ * The colors are custom properties rather than resolved hues, which is the
  * only reason a figure drawn at build can follow the theme toggle. Reading a
  * series stroke back in both themes is the assertion that they still are.
  */
-test('a build-time chart recolours with the theme', async ({ page }) => {
+test('a build-time chart recolors with the theme', async ({ page }) => {
   await page.goto(`${base}/gallery/`);
 
   const stroke = async () =>

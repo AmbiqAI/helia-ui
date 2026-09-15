@@ -9,7 +9,7 @@ import DataTable from '@ambiqai/helia-ui/astro/DataTable';
 
 Every MkDocs Material feature in use across the HELIA product docs has a
 counterpart here. This page is the mapping, one section per feature, so a
-conversion is mechanical rather than a judgement call each time.
+conversion is mechanical rather than a judgment call each time.
 
 Start from `templates/product-docs` in this package: it is a working Starlight
 site with the plugin, the Tailwind entry, the product accent and a Pages
@@ -141,7 +141,7 @@ fixed words.
 Starlight 0.41 does not take a custom `Aside` type. `Aside.astro` validates the
 prop against a fixed `['note', 'tip', 'caution', 'danger']` and throws an
 `AstroError` on anything else, and the remark directive that turns `:::note`
-into an `Aside` drops a name it does not recognise, so `:::success` renders as
+into an `Aside` drops a name it does not recognize, so `:::success` renders as
 nothing at all. A `success` skin in `starlight.css` would therefore have no
 element to attach to.
 
@@ -363,13 +363,13 @@ a missing value only shows up as an empty chart in a browser.
     ['data-chart-series', 'One key per series on each row of the data array'],
     ['series name', 'The label on that series’ ChartConfig entry'],
     ['data-chart-colors', 'A --chart-N token on that entry’s color'],
-    ['chart-init.js', 'Nothing. The island is the initialiser.'],
+    ['chart-init.js', 'Nothing. The island is the initializer.'],
   ]}
 />
 
 Three things are worth keeping straight. The parallel arrays become one array
 of rows, because Recharts takes a row per x value rather than a series per
-line. The per-trace hex colours become `--chart-1` through `--chart-5` from the
+line. The per-trace hex colors become `--chart-1` through `--chart-5` from the
 token set, so a chart follows the theme instead of carrying a palette of its
 own. And `chart-init.js` itself is deleted rather than ported.
 
@@ -440,7 +440,7 @@ React-components section hydrates, which is what the docs build asserts.
 
 Termynal becomes `AsciiTerminal`. A static transcript is the default and ships
 no JavaScript; `animated` types the command lines and reveals output by line,
-and honours `prefers-reduced-motion` by showing everything at once. See
+and honors `prefers-reduced-motion` by showing everything at once. See
 [Code](../code/) for the forms.
 
 ## Raw HTML

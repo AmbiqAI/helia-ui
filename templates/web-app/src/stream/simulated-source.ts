@@ -27,7 +27,7 @@ export class SimulatedSource implements Source {
   connect(sampleRate: number): Promise<void> {
     this.worker?.terminate();
 
-    // `new URL(..., import.meta.url)` is the form Vite recognises statically,
+    // `new URL(..., import.meta.url)` is the form Vite recognizes statically,
     // so the worker is emitted as its own chunk and the base path is applied.
     // A string specifier would be left alone and 404 under a Pages prefix.
     const worker = new Worker(new URL('./signal.worker.ts', import.meta.url), {

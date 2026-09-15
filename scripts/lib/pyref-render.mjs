@@ -228,7 +228,7 @@ export function collectModules(root) {
 /**
  * Render a griffe expression back to the Python source it came from.
  *
- * @param {unknown} expr A serialised `Expr*` node, a literal string, or null.
+ * @param {unknown} expr A serialized `Expr*` node, a literal string, or null.
  * @returns {string}
  */
 export function renderExpr(expr) {
@@ -442,7 +442,7 @@ const yamlString = (value) =>
   `"${String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\s+/g, ' ').trim()}"`;
 
 /** The first sentence of a docstring, for the frontmatter description. */
-export function summarise(node) {
+export function summarize(node) {
   const text = (node?.docstring?.parsed ?? []).find(
     (section) => section.kind === 'text',
   )?.value;
@@ -726,7 +726,7 @@ function renderAttributes(node, context, label = 'Attributes') {
       code(member.name),
       code(renderExpr(entry?.annotation ?? member.annotation)),
       resolveCrossRefs(
-        entry?.description ?? summariseValue(member) ?? '',
+        entry?.description ?? summarizeValue(member) ?? '',
         context,
       ),
       code(renderExpr(member.value)),
@@ -750,7 +750,7 @@ function renderAttributes(node, context, label = 'Attributes') {
   return `**${label}**\n\n${table(headers, trimmed)}`;
 }
 
-const summariseValue = (member) => {
+const summarizeValue = (member) => {
   const text = (member.docstring?.parsed ?? []).find((s) => s.kind === 'text');
   return typeof text?.value === 'string' ? text.value : '';
 };
@@ -826,7 +826,7 @@ export function renderModule(module, { index, options, order = 0 }) {
   };
 
   const title = module.parts.at(-1);
-  const description = summarise(module.node);
+  const description = summarize(module.node);
   const front = ['---', `title: ${yamlString(title)}`];
   if (description) front.push(`description: ${yamlString(description)}`);
   front.push('sidebar:', `  order: ${order}`, '---');

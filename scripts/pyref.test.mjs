@@ -2,7 +2,7 @@
 // Copyright (c) 2026, Ambiq
 /*
  * The renderer's contract against mkdocstrings, expressed as the smallest
- * griffe dumps that carry each behaviour: the Google sections, the class
+ * griffe dumps that carry each behavior: the Google sections, the class
  * merge, the filters, and the two cross-reference outcomes.
  *
  * The fixtures are hand-written rather than captured from a real dump so that

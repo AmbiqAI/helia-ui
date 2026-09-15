@@ -4,7 +4,7 @@ The shared HELIA design system: tokens, primitive recipes, the Astro and React
 component lanes, and the Starlight chrome overrides that Ambiq documentation
 sites render through.
 
-The package ships source. There is no build step and no compiled artefact: the
+The package ships source. There is no build step and no compiled artifact: the
 consuming site's bundler reads these files directly, so a consumer needs the
 same Tailwind and Starlight majors listed under `peerDependencies`.
 

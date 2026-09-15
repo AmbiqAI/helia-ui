@@ -8,7 +8,7 @@
  * variable below aliases a hub token, so tokens.css stays the single source of
  * truth and the theme flip comes for free: `--helia-*` already swaps under
  * `:root[data-theme='light']`, so no second `.dark` block is needed for the
- * colours.
+ * colors.
  *
  * The `dark:` variant that shadcn writes into its class strings still needs a
  * definition. `@astrojs/starlight-tailwind` already points it at Starlight's
@@ -17,7 +17,7 @@
  *
  * `@theme inline` is required, not cosmetic: it makes `bg-card` compile to
  * `var(--card)` instead of baking the value in, which is what lets the runtime
- * theme toggle move the colour.
+ * theme toggle move the color.
  *
  * See docs/design-system.md "React layer" for when to reach for these.
  */
@@ -44,15 +44,15 @@
 
   /*
    * shadcn's `accent` is its hover surface, not a brand accent. Keeping that
-   * name here would have made `--color-accent` two different colours: this
+   * name here would have made `--color-accent` two different colors: this
    * file is imported last, so its key beat the brand accent tailwind.css
-   * defines and `bg-accent` compiled to the hover grey. Renamed to `subtle`
+   * defines and `bg-accent` compiled to the hover gray. Renamed to `subtle`
    * so `accent` means the brand accent everywhere.
    *
    * It is the muted card surface rather than the nav chrome because that is
    * what `.helia-motion-surface` and the Astro button already hover to: a
    * React control and an Astro one sitting in the same row have to answer the
-   * pointer with the same colour.
+   * pointer with the same color.
    */
   --subtle: var(--helia-surface-card-muted);
   --subtle-foreground: var(--helia-ink-primary);
@@ -70,7 +70,7 @@
    * The chart ramp is the hub's accent set in the order the catalog reads
    * best. The second series is the site's second accent, which is the case the
    * dial was named for: a two-series chart is the commonest place a site has to
-   * pair two colours, and a site that leaves the dial alone gets the neutral
+   * pair two colors, and a site that leaves the dial alone gets the neutral
    * it defaults to rather than a hue it never chose.
    */
   --chart-1: var(--helia-accent-cyan);
@@ -218,21 +218,21 @@
   --ease-out: var(--helia-ease-out);
   --ease-in-out: var(--helia-ease-out);
 
-  /* A bare `transition-colors` is a colour change, which is the fast step. */
+  /* A bare `transition-colors` is a color change, which is the fast step. */
   --default-transition-duration: var(--helia-motion-fast);
   --default-transition-timing-function: var(--helia-ease-out);
 }
 
 /*
- * The default border colour. tailwind.css imports Tailwind's theme and
+ * The default border color. tailwind.css imports Tailwind's theme and
  * utilities but not its preflight, so a bare `border` -- which every generated
- * component writes -- sets a width and leaves the colour at the UA default of
+ * component writes -- sets a width and leaves the color at the UA default of
  * `currentColor`: a shadcn card arrives edged in ink while the Astro card
  * beside it carries the hairline. shadcn's own setup fixes this in a base
  * rule; this is that rule, written against the aliased token.
  *
  * `base` is the first layer in the order tailwind.css declares, so anything
- * that names a border colour of its own -- every recipe here does -- still
+ * that names a border color of its own -- every recipe here does -- still
  * wins, and the rule only reaches elements that never had one.
  */
 @layer base {

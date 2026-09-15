@@ -62,7 +62,7 @@
 
 /*
  * Background and border only. A transform here would move the element out from
- * under the pointer in a grid, and reflow neighbours that share its row.
+ * under the pointer in a grid, and reflow neighbors that share its row.
  * `--helia-hover-border` lets a tone that carries no edge at rest keep none on
  * hover, rather than growing one.
  */
@@ -117,7 +117,7 @@
 /*
  * `visibility` as well as `opacity`: content that has not arrived yet is not
  * content a screen reader should be reading either, and a contrast check run
- * over a section at opacity 0 measures a colour nobody will ever see. CSS
+ * over a section at opacity 0 measures a color nobody will ever see. CSS
  * transitions special-case visibility, so the return to `visible` takes effect
  * at the start of the fade rather than half way through it.
  */
@@ -187,7 +187,7 @@
 
 .helia-surface {
   background: var(--helia-surface-card);
-  /* Tinted variants (Callout) set the border colour without forking the recipe. */
+  /* Tinted variants (Callout) set the border color without forking the recipe. */
   border: 1px solid
     var(--helia-surface-border-color, var(--helia-surface-border));
   border-radius: var(--helia-radius-md);
@@ -980,8 +980,8 @@ a.helia-chip--neutral:focus-visible {
 }
 
 /*
- * The four forms are one colour seen four ways. Rotating the hue of the given
- * accent rather than naming brand colours is what keeps the artwork tied to the
+ * The four forms are one color seen four ways. Rotating the hue of the given
+ * accent rather than naming brand colors is what keeps the artwork tied to the
  * card it sits in: two cards with different accents read as different cards,
  * and no brand token is hidden inside the component.
  *
@@ -1195,7 +1195,7 @@ a.helia-chip--neutral:focus-visible {
  * The gap the three card layouts share, so a page that sets a density on one
  * of them is setting the same step on all three. It is the spacing scale
  * rather than `--helia-card-pad`: this is the distance between cards, and a
- * card closing its own padding up has not moved its neighbours.
+ * card closing its own padding up has not moved its neighbors.
  */
 .helia-layout--compact {
   --helia-layout-gap: var(--helia-space-3);
@@ -1530,7 +1530,7 @@ a.helia-chip--neutral:focus-visible {
 /*
  * The figure was laid out at one width and is shown at another, so it scales.
  * Plot's own `:where()` rule says the same thing at zero specificity; this one
- * is here so the behaviour does not depend on a rule the library could stop
+ * is here so the behavior does not depend on a rule the library could stop
  * emitting.
  */
 .helia-chart__plot svg {

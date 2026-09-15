@@ -30,7 +30,7 @@
 
 @layer base, starlight, theme, components, utilities;
 
-/* style-lint: allow-file color -- the gray ramp below is the one value the compat package reads that cannot be a var() without closing a cycle; allow-file rather than SHELL_FILES so only the colour rule is relaxed and the suppression is counted */
+/* style-lint: allow-file color -- the gray ramp below is the one value the compat package reads that cannot be a var() without closing a cycle; allow-file rather than SHELL_FILES so only the color rule is relaxed and the suppression is counted */
 
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities) source(none);
@@ -43,7 +43,7 @@
  * The literals are Starlight's own palette from
  * node_modules/@astrojs/starlight/style/props.css, restated so the round trip
  * lands where it started. Steps 50 and 950 are removed rather than invented;
- * Starlight defines nine greys and these are those nine.
+ * Starlight defines nine grays and these are those nine.
  */
 @theme {
   --color-gray-*: initial;
@@ -86,7 +86,7 @@
   --color-ink-secondary: var(--helia-ink-secondary);
   --color-ink-muted: var(--helia-ink-muted);
   /*
-   * `surface-` prefixed on purpose. A colour key called `card` would have
+   * `surface-` prefixed on purpose. A color key called `card` would have
    * emitted `.text-card`, which TextCard.astro already uses as its own class
    * name, and the emitted `color` would have applied to it — our rule there
    * only sets min-height, so there was nothing to win the property back with.

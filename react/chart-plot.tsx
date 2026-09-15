@@ -87,7 +87,7 @@ export function ChartPlot({
   }, []);
 
   React.useEffect(() => {
-    /* The palette is `var()`, so a theme flip recolours the figure without
+    /* The palette is `var()`, so a theme flip recolors the figure without
        help. The rebuild is for the rest of the theme: a scope may carry its
        own face, and Plot sizes its margins from the ticks it measured in the
        face it was built with. */

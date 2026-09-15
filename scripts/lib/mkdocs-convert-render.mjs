@@ -169,7 +169,7 @@ function rewriteTarget(target, ctx) {
 
 /*
  * A root-relative link meant the site root, which under a base path is no
- * longer `/`. MkDocs had no base to honour; Astro serves the whole tree below
+ * longer `/`. MkDocs had no base to honor; Astro serves the whole tree below
  * one, so the link has to carry it or it leaves the site.
  */
 function applyBase(target, ctx) {
@@ -851,7 +851,7 @@ const titleCase = (s) =>
  * nesting, pages become `slug` entries, and the site root is the empty slug.
  * Slugs carry no base path — Starlight applies the site's.
  *
- * @param titles path-to-title map for the nav entries MkDocs labelled from the
+ * @param titles path-to-title map for the nav entries MkDocs labeled from the
  *               page's own H1 rather than from the nav.
  */
 export function buildSidebar(nav, titles = {}) {

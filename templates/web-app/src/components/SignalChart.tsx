@@ -12,13 +12,13 @@ import { WINDOW_SECONDS, type StreamPoint } from '../stream/use-stream';
 /*
  * `var(--chart-1)` is the package's ramp, aliased to the hub accents in
  * shadcn.css, so the trace follows the theme flip without this file knowing a
- * colour.
+ * color.
  */
 const chartConfig = {
   signal: { label: 'PPG', color: 'var(--chart-1)' },
 } satisfies ChartConfig;
 
-/* The simulated waveform is a normalised pulse; a real one needs the ADC range. */
+/* The simulated waveform is a normalized pulse; a real one needs the ADC range. */
 const Y_DOMAIN: [number, number] = [-2, 2];
 
 interface SignalChartProps {

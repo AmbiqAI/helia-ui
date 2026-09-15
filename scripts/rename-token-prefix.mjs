@@ -113,7 +113,7 @@ const RULES = tokensOnly ? TOKEN_RULES : [...TOKEN_RULES, ...CLASS_RULES];
 /*
  * shadcn calls its hover surface `accent`, which collides with the brand
  * accent over `--color-accent`: shadcn.css is imported last, so its key won
- * and `bg-accent` meant "hover grey". Renaming shadcn's pair to `subtle`
+ * and `bg-accent` meant "hover gray". Renaming shadcn's pair to `subtle`
  * leaves `accent` meaning the brand accent everywhere.
  *
  * Scoped to the generated components: src/styles/shadcn.css is hand-authored,

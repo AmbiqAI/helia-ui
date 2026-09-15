@@ -135,7 +135,7 @@ const inlineSvgUrl = (svg: string) =>
 
 /*
  * Painted as a mask, so only the artwork's alpha reaches the page; the stroke
- * colour below is inert. Same outline as the icon buttons in the Astro parts.
+ * color below is inert. Same outline as the icon buttons in the Astro parts.
  */
 const COPY_ICON = inlineSvgUrl(
   [
@@ -150,7 +150,7 @@ const COPY_ICON = inlineSvgUrl(
  * The package surface restated in Expressive Code's vocabulary. Two settings
  * are deliberately absent. `codeBackground` stays whatever the Shiki theme
  * declares, because Expressive Code runs contrast maths against it and a
- * custom property cannot be parsed as a colour; the background the rendered
+ * custom property cannot be parsed as a color; the background the rendered
  * `pre` actually paints is `frames.editorBackground`, which is where the token
  * goes instead. `codeForeground` stays with the theme for the same reason, and
  * because the unhighlighted ink should match the highlighted ink around it.
@@ -171,7 +171,7 @@ const CODE_STYLE_OVERRIDES: CodeStyleOverrides = {
 };
 
 /*
- * A highlight is emphasis, not a colour: the syntax theme's own marker blue
+ * A highlight is emphasis, not a color: the syntax theme's own marker blue
  * competes with the code it is drawing attention to. A wash of the page ink
  * reads on either theme and leaves the accent to mean one thing.
  */
@@ -183,10 +183,10 @@ const CODE_MARKER_OVERRIDES: NonNullable<CodeStyleOverrides['textMarkers']> = {
 };
 
 /*
- * The frame. The three window dots and the coloured tab brim are both dropped:
+ * The frame. The three window dots and the colored tab brim are both dropped:
  * the package's frames carry a plain bar, and a tinted edge on a panel is ruled
  * out by the surface hierarchy in docs/design-system.md. With the tab and the
- * bar sharing one colour and no indicator line, the editor frame reads as the
+ * bar sharing one color and no indicator line, the editor frame reads as the
  * flat toolbar the parts draw rather than as a VS Code tab.
  */
 const CODE_FRAME_OVERRIDES: NonNullable<CodeStyleOverrides['frames']> = {
@@ -203,7 +203,7 @@ const CODE_FRAME_OVERRIDES: NonNullable<CodeStyleOverrides['frames']> = {
    * The tab is the first thing drawn in the tab bar, so its inline-start
    * corner sits exactly on the frame's. Squaring it left that corner painted
    * outside the frame's curve; matching `borderRadius` keeps it inside, and
-   * the tab still reads flat because it shares the bar's colour.
+   * the tab still reads flat because it shares the bar's color.
    */
   editorTabBorderRadius: 'var(--helia-radius-md)',
   frameBoxShadowCssValue: 'none',
@@ -237,7 +237,7 @@ function mergeExpressiveCode(site: ExpressiveCodeOptions) {
   return {
     themes: CODE_THEMES,
     /*
-     * Starlight's own UI colours are applied as theme-level overrides, which
+     * Starlight's own UI colors are applied as theme-level overrides, which
      * outrank config-level ones, so leaving this on would silently discard the
      * frame settings above. The tokens replace it rather than sit under it.
      */

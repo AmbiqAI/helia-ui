@@ -108,7 +108,7 @@ shadcn to get a class name.
 
 **Stylesheets** (`./tokens.css` and the rest) carry the vocabulary both lanes
 compile against, plus the Tailwind `@theme` mapping so utilities and parts use
-one spacing and colour scale. `@theme inline` keeps a generated utility
+one spacing and color scale. `@theme inline` keeps a generated utility
 referencing the token directly rather than a value snapshotted at `:root`,
 which is what lets utilities follow the theme toggle.
 
@@ -149,7 +149,7 @@ a length, so the value resolves through the same scale as every utility.
 
 React context does not cross Astro's MDX component boundary. Astro gives each
 component in an `.mdx` file its own React root and passes children through as
-serialised HTML, so a compound component assembled in a page throws at build
+serialized HTML, so a compound component assembled in a page throws at build
 with `` `TabsTrigger` must be used within `Tabs` ``. That covers Tabs, Dialog,
 Sheet, Select, Combobox, Accordion, Command, Popover, DropdownMenu, and most of
 the library.

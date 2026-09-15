@@ -14,7 +14,7 @@
  * does emit the baked style -- its selectors carry an id and would otherwise
  * outrank everything here.
  *
- * Colours come from the semantic layer, so a diagram follows the light and dark
+ * Colors come from the semantic layer, so a diagram follows the light and dark
  * themes with no second palette and no client JS.
  */
 

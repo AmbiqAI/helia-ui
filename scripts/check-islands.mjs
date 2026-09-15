@@ -6,7 +6,7 @@
  *
  * 1. React context does not cross Astro's MDX component boundary. Astro gives
  *    each component in an `.mdx` file its own React root and passes children
- *    through as serialised HTML, so a compound shadcn component assembled in a
+ *    through as serialized HTML, so a compound shadcn component assembled in a
  *    page -- Tabs, Dialog, Select, Accordion, Command, Popover, DropdownMenu --
  *    throws at build with "must be used within". The rule is therefore that
  *    `.mdx` and `.astro` never import the React components, by package

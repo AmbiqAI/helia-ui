@@ -406,7 +406,7 @@ test('converting the same page twice gives the same output and the same tallies'
     assert.equal(v, afterOne[k] * 2, k);
 });
 
-test('a site base is normalised to one leading and no trailing slash', () => {
+test('a site base is normalized to one leading and no trailing slash', () => {
   assert.equal(normaliseBase('/helia-aot/'), '/helia-aot');
   assert.equal(normaliseBase('helia-aot'), '/helia-aot');
   assert.equal(normaliseBase('/'), '');

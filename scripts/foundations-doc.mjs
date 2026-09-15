@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
 /*
- * Generates the colour reference from the token files themselves.
+ * Generates the color reference from the token files themselves.
  *
  *   node scripts/foundations-doc.mjs           write the page
  *   node scripts/foundations-doc.mjs --check   fail if the page is out of date
  *
- * A colour token's name is in `tokens.css` or `semantic.css`, its value is
+ * A color token's name is in `tokens.css` or `semantic.css`, its value is
  * there twice -- once per theme -- and the contrast it reaches on a surface
  * follows from both. Transcribing any of that onto a page produces a second
  * copy that is wrong the first time a hue moves, so this reads the files and
@@ -15,13 +15,13 @@
  * changing is a failed build rather than a stale page.
  *
  * Values are resolved the way the cascade resolves them, so a token defined as
- * a `var()` chain or a `color-mix()` arrives as the colour a visitor sees.
+ * a `var()` chain or a `color-mix()` arrives as the color a visitor sees.
  * Inks that read a `--sl-color-*` variable land on the fallback `tokens.css`
- * declares, which restates Starlight's own value; a site that customises the
+ * declares, which restates Starlight's own value; a site that customizes the
  * Starlight ramp moves those inks and the ratios with them.
  *
- * Every `--helia-` token that resolves to a colour must land in a group. An
- * unclassified one fails rather than being dropped, so a new colour cannot be
+ * Every `--helia-` token that resolves to a color must land in a group. An
+ * unclassified one fails rather than being dropped, so a new color cannot be
  * added without deciding what it is for.
  */
 
@@ -195,7 +195,7 @@ function resolve(value, map, seen = new Set()) {
   return out.replace(/\s+/g, ' ').trim();
 }
 
-/* ------------------------------------------------------------------- colour */
+/* ------------------------------------------------------------------- color */
 
 function clamp(value, low, high) {
   return Math.min(high, Math.max(low, value));
@@ -211,7 +211,7 @@ function hueToChannel(p, q, t) {
   return p;
 }
 
-/** sRGB channels 0-255 and an alpha, or null when the value is not a colour. */
+/** sRGB channels 0-255 and an alpha, or null when the value is not a color. */
 function parseColor(value) {
   const text = value.trim();
   if (text === 'transparent') return { r: 0, g: 0, b: 0, a: 0 };
@@ -264,8 +264,8 @@ function parseColor(value) {
   const saturation = parseFloat(s) / 100;
   const lightness = parseFloat(l) / 100;
   if (saturation === 0) {
-    const grey = lightness * 255;
-    return { r: grey, g: grey, b: grey, a: alpha(a) };
+    const gray = lightness * 255;
+    return { r: gray, g: gray, b: gray, a: alpha(a) };
   }
   const q =
     lightness < 0.5
@@ -340,7 +340,7 @@ function hex({ r, g, b, a }) {
 }
 
 /**
- * The value as written wherever the file already writes a colour, so the page
+ * The value as written wherever the file already writes a color, so the page
  * reads like the declaration; a `var()` chain or a mix is rendered as the hex
  * it computes to, alpha included, since the alpha is half of what a shadow ink
  * is.
@@ -377,7 +377,7 @@ function contrast(ink, surface) {
 /* ----------------------------------------------------------- classification */
 
 /**
- * What each colour is for. The order is the order of the page, and the first
+ * What each color is for. The order is the order of the page, and the first
  * matching rule wins, so a name that reads two ways -- an accent that is also
  * an ink -- lands where it is used rather than where it sorts.
  */
@@ -386,7 +386,7 @@ const GROUPS = [
     id: 'primitives',
     title: 'Primitives',
     blurb:
-      'The shared layer in `tokens.css`. Every other colour resolves to one of these or sits beside them, and the theme flip moves them rather than moving what reads them.',
+      'The shared layer in `tokens.css`. Every other color resolves to one of these or sits beside them, and the theme flip moves them rather than moving what reads them.',
     matches: (name, file) => file === 'tokens.css',
   },
   {
@@ -401,21 +401,21 @@ const GROUPS = [
     id: 'inks',
     title: 'Inks',
     blurb:
-      'Text colour by role rather than by hue. Primary carries titles and values, secondary carries description, muted carries metadata.',
+      'Text color by role rather than by hue. Primary carries titles and values, secondary carries description, muted carries metadata.',
     matches: (name) => /^--helia-ink-/.test(name),
   },
   {
     id: 'status',
     title: 'Status inks',
     blurb:
-      'The advisory meanings chosen as text. Anything that sets a status colour on a word takes one of these; the fills below are for an icon, a rim, or an edge.',
+      'The advisory meanings chosen as text. Anything that sets a status color on a word takes one of these; the fills below are for an icon, a rim, or an edge.',
     matches: (name) => /^--helia-tone-[\w-]+-ink$/.test(name),
   },
   {
     id: 'accents',
     title: 'Accents',
     blurb:
-      'The whole colour vocabulary a part is handed. A part never learns a subject name: a composition maps its own subjects onto an accent and passes it as `--accent`.',
+      'The whole color vocabulary a part is handed. A part never learns a subject name: a composition maps its own subjects onto an accent and passes it as `--accent`.',
     matches: (name) => /^--helia-(accent|product-accent|brand-)/.test(name),
   },
   {
@@ -429,14 +429,14 @@ const GROUPS = [
     id: 'charts',
     title: 'Chart palette',
     blurb:
-      'Six series colours off the accent scale, plus the gridline and the tick ink. The order is the order a chart uses them, so the first two are the pair that has to separate at a glance; a chart that needs a seventh hue is a chart that needs splitting.',
+      'Six series colors off the accent scale, plus the gridline and the tick ink. The order is the order a chart uses them, so the first two are the pair that has to separate at a glance; a chart that needs a seventh hue is a chart that needs splitting.',
     matches: (name) => /^--helia-chart-/.test(name),
   },
   {
     id: 'elevation',
     title: 'Shadow inks',
     blurb:
-      'The three shadow colours the elevation steps are built from. Each one is a black at a low alpha, so a shadow darkens whatever it falls on rather than tinting it.',
+      'The three shadow colors the elevation steps are built from. Each one is a black at a low alpha, so a shadow darkens whatever it falls on rather than tinting it.',
     matches: (name) => /^--helia-shadow-color/.test(name),
   },
   {
@@ -453,7 +453,7 @@ const GROUPS = [
 function gather() {
   const { order, origin, dark, light } = readThemes();
   const groups = new Map(GROUPS.map((group) => [group.id, []]));
-  const colours = new Map();
+  const colors = new Map();
 
   for (const name of order) {
     if (!name.startsWith('--helia-')) continue;
@@ -462,14 +462,14 @@ function gather() {
     const darkColor = toColor(rawDark);
     const lightColor = toColor(rawLight);
     if (!darkColor || !lightColor) continue;
-    /* A dial that names no colour of its own, such as the surface tint. */
+    /* A dial that names no color of its own, such as the surface tint. */
     if (darkColor.a === 0 && lightColor.a === 0) continue;
 
     const group = GROUPS.find((candidate) =>
       candidate.matches(name, origin.get(name)),
     );
     if (!group) {
-      failures.push(`${name}: resolves to a colour and belongs to no group.`);
+      failures.push(`${name}: resolves to a color and belongs to no group.`);
       continue;
     }
 
@@ -482,13 +482,13 @@ function gather() {
       darkColor,
     };
     groups.get(group.id).push(entry);
-    colours.set(name, entry);
+    colors.set(name, entry);
   }
 
-  return { groups, colours };
+  return { groups, colors };
 }
 
-function contrastRows(groups, colours) {
+function contrastRows(groups, colors) {
   const inks = [
     ...groups.get('inks').filter((ink) => !FIXED_BACKDROP_INKS.has(ink.name)),
     ...groups.get('status'),
@@ -497,9 +497,9 @@ function contrastRows(groups, colours) {
   return inks.map((ink) => ({
     name: ink.name,
     cells: CONTRAST_SURFACES.flatMap((surfaceName) => {
-      const surface = colours.get(surfaceName);
+      const surface = colors.get(surfaceName);
       if (!surface) {
-        failures.push(`${surfaceName}: no colour for the contrast table.`);
+        failures.push(`${surfaceName}: no color for the contrast table.`);
         return [];
       }
       return ['light', 'dark'].map((theme) => {
@@ -550,8 +550,8 @@ function section(group, entries) {
 function render({ groups, rows }) {
   const lines = [
     '---',
-    'title: Colour tokens',
-    'description: Every HELIA colour token with its value in both themes and the contrast each ink reaches on a surface.',
+    'title: Color tokens',
+    'description: Every HELIA color token with its value in both themes and the contrast each ink reaches on a surface.',
     '---',
     '',
     '{/* Generated by scripts/foundations-doc.mjs. Edit the token files, not this file. */}',
@@ -559,7 +559,7 @@ function render({ groups, rows }) {
     "import TokenSwatchGrid from '../../../components/TokenSwatchGrid.astro';",
     "import TokenContrast from '../../../components/TokenContrast.astro';",
     '',
-    'Every `--helia-` token that resolves to a colour, read out of `tokens.css`',
+    'Every `--helia-` token that resolves to a color, read out of `tokens.css`',
     'and `semantic.css`: the name, the value each theme gives it, and the ratio',
     'each ink reaches on the two grounds a page draws text on. A palette that',
     'moves without this page moving fails `validate`, so what is here is what the',
@@ -567,7 +567,7 @@ function render({ groups, rows }) {
     '',
     `The [overview](${DOCS_BASE}/foundations/) says what the layers are for and`,
     'shows the rest of the scales. A value written as a `var()` chain or a',
-    '`color-mix()` is resolved here to the colour it computes to, and an ink that',
+    '`color-mix()` is resolved here to the color it computes to, and an ink that',
     'reads a Starlight variable resolves through the fallback `tokens.css`',
     "declares, which restates Starlight's own value.",
     '',
@@ -595,13 +595,13 @@ function render({ groups, rows }) {
 
 /* --------------------------------------------------------------------- main */
 
-const { groups, colours } = gather();
-const rows = contrastRows(groups, colours);
+const { groups, colors } = gather();
+const rows = contrastRows(groups, colors);
 
 if (failures.length > 0) {
   for (const failure of failures) console.error(failure);
   console.error(
-    `\n${failures.length} colour token problem${failures.length === 1 ? '' : 's'}.`,
+    `\n${failures.length} color token problem${failures.length === 1 ? '' : 's'}.`,
   );
   process.exit(1);
 }
@@ -637,12 +637,12 @@ if (process.argv.includes('--check')) {
     process.exit(1);
   }
   console.log(
-    `foundations-doc: ${total} colour tokens, ${rows.length} inks, reference up to date.`,
+    `foundations-doc: ${total} color tokens, ${rows.length} inks, reference up to date.`,
   );
 } else {
   mkdirSync(dirname(OUT_PATH), { recursive: true });
   writeFileSync(OUT_PATH, output);
   console.log(
-    `foundations-doc: ${total} colour tokens, ${rows.length} inks written to ${OUT_PATH}.`,
+    `foundations-doc: ${total} color tokens, ${rows.length} inks written to ${OUT_PATH}.`,
   );
 }
