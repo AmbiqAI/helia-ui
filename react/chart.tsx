@@ -11,6 +11,19 @@ import type { TooltipValueType } from 'recharts';
 const THEMES = { light: '', dark: '.dark' } as const;
 
 const INITIAL_DIMENSION = { width: 320, height: 200 } as const;
+
+/*
+ * Recharts draws nothing at all while the container it measures is zero, and
+ * it only measures again when that container changes size, so a chart that
+ * mounts into an unlaid-out frame can stay empty. The shape is written on the
+ * element rather than left to a utility class, and the container Recharts
+ * observes carries a floor of its own, so the first measure is a size whatever
+ * else has or has not arrived. The floor is not put on the frame: an explicit
+ * min-height would take away the frame's automatic minimum, which is what lets
+ * a chart whose axis labels need more room than the ratio gives push it open.
+ */
+const CHART_ASPECT = 'var(--chart-aspect, 16 / 9)';
+const CHART_MIN_HEIGHT = 'var(--chart-min-height, 10rem)';
 type TooltipNameType = number | string;
 
 export type ChartConfig = Record<
@@ -46,6 +59,7 @@ function ChartContainer({
   children,
   config,
   initialDimension = INITIAL_DIMENSION,
+  style,
   ...props
 }: React.ComponentProps<'div'> & {
   config: ChartConfig;
@@ -66,14 +80,16 @@ function ChartContainer({
         data-slot="chart"
         data-chart={chartId}
         className={cn(
-          "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
+          "flex justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
           className,
         )}
+        style={{ aspectRatio: CHART_ASPECT, ...style }}
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer
           initialDimension={initialDimension}
+          minHeight={CHART_MIN_HEIGHT}
         >
           {children}
         </RechartsPrimitive.ResponsiveContainer>

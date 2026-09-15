@@ -216,8 +216,17 @@ test('every chart card draws a sized chart', async ({ page }) => {
   /* One of the charts on this page is a `client:visible` island, so it has to
      be looked at before it can be measured. */
   const total = await charts.count();
+  expect(total).toBeGreaterThan(0);
   for (let index = 0; index < total; index += 1) {
     await charts.nth(index).scrollIntoViewIfNeeded();
+  }
+
+  /* The surface is drawn by the island and not by the page, so it is waited
+     for rather than counted: a loaded runner hydrates long after `load`. */
+  for (let index = 0; index < total; index += 1) {
+    await expect(charts.nth(index).locator('svg').first()).toBeAttached({
+      timeout: 15_000,
+    });
   }
 
   const measure = () =>
@@ -230,10 +239,10 @@ test('every chart card draws a sized chart', async ({ page }) => {
 
   /* Polled because the frame is measured by a resize observer after paint. */
   await expect
-    .poll(async () => (await measure()).filter((height) => height <= 0).length)
-    .toBe(0);
-
-  expect((await measure()).length).toBeGreaterThan(0);
+    .poll(async () => (await measure()).filter((height) => height <= 0), {
+      timeout: 15_000,
+    })
+    .toEqual([]);
 });
 
 /*

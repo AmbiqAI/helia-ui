@@ -85,6 +85,16 @@
   --chart-4: var(--helia-accent-orange);
   --chart-5: var(--helia-accent-pink);
 
+  /*
+   * The chart frame is the card's shape, not the drawing's. Recharts measures
+   * its own container after mount and draws no surface while that measure is
+   * zero, so the shape sits on the frame and the floor on the box Recharts
+   * measures, and a chart that mounts before the page is laid out still has a
+   * size to draw at.
+   */
+  --chart-aspect: 16 / 9;
+  --chart-min-height: 10rem;
+
   /* Sheet and command reuse the site chrome rather than a second frame. */
   --sidebar: var(--sl-color-bg-sidebar);
   --sidebar-foreground: var(--helia-ink-primary);
