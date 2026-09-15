@@ -7,13 +7,187 @@ required facts in the package root next to LICENSE and NOTICE.
 | Field             | Value                                                                       |
 | ----------------- | --------------------------------------------------------------------------- |
 | Package           | `@ambiqai/helia-ui`                                                         |
-| Version           | 0.1.0-alpha.6                                                               |
-| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.6`.         |
+| Version           | 0.1.0-alpha.7                                                               |
+| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.7`.         |
 | License           | BSD-3-Clause (`LICENSE`)                                                    |
 | Licensing tier    | Tier 1, ADR-0005                                                            |
 | Source repository | https://github.com/AmbiqAI/helia-ui                                         |
 | Source path       | Repository root, mirrored from `packages/helia-ui` in `helia-developer-hub` |
 | Source commit     | Recorded at tag time.                                                       |
+
+## What changed in 0.1.0-alpha.7
+
+This range starts at the tree tagged `v0.1.0-alpha.6` and is the Gate 1 catalog
+build-out: the package ships 44 parts under `./astro/*`, against 28 in
+0.1.0-alpha.6. Three props are renamed with no alias, so a consumer moving off
+0.1.0-alpha.6 edits call sites: `overline` is `eyebrow` on
+`CardHeader` and `LinkCard`, slot and all; `scale` on `BigNumber` is `step`;
+and `externalUrl` on `MediaEmbed` is `href`.
+
+Issue references below are to `AmbiqAI/helia-ui`.
+
+### Added
+
+- `Band`, `CardGrid`, `Masonry` and `Mosaic`, the parts that arrange a page
+  rather than fill one: one density hook between them, and `CardGrid` is the
+  `Reveal` itself under `stagger`, because the cascade runs on a reveal's
+  direct children (#44, #36).
+- `Chart` and `ChartGroup` draw with Observable Plot at build time and ship the
+  result as inline SVG, so a page of charts carries no chart JavaScript (#45).
+- A categorical chart palette: `--helia-chart-1` through `-6` stand on their
+  own values instead of aliasing the advisory tones, and every step clears 3:1
+  against the card surface it is drawn on (#49).
+- `ChartInteractive` on Apache ECharts, taking the same data contract as the
+  Plot parts and adding zoom, tooltip, brush and an `onSelect` callback;
+  `echarts` joins as an optional peer (#50).
+- `BigNumber` and `Sparkline`: the figure with no card around it, on tabular
+  figures so a row lines up on the digit, and one series through the same
+  Plot-at-build path `Chart` takes (#55).
+- `IconTile`, `IconRow` and `SplitPanel`, with the tile and the card header's
+  disc on one recipe so a tile lines up with a disc (#25 to #27).
+- A Foundations page that walks the token system, with the color reference
+  generated from the tokens themselves in both themes, contrast computed rather
+  than transcribed, and checked as `check:foundations` (#43).
+- `reference-model.ts`, the one shape every extractor produces, and five parts
+  that render it: `RefSymbol`, `RefParams`, `RefSection`, `RefMembers` and
+  `RefNav` (#59).
+- `helia-ui-doxyref` and `helia-ui-tsref` beside `helia-ui-pyref`, so C, C++,
+  TypeScript and Python references go through one model and one renderer rather
+  than four designs that drift (#59).
+- A reference run publishes what its pages are a view of: `reference.json`
+  whole and per module, plus `llms.txt` and `llms-full.txt`, sorted and without
+  a timestamp so it diffs (#59).
+- Search and agent discoverability from the Starlight plugin: Open Graph,
+  JSON-LD and a markdown rendition per page, and `llms.txt`, `llms-full.txt`,
+  `content-index.json` and a `robots.txt` site-wide, read back off the built
+  output by `check:discoverability` (#62).
+- `--helia-tracking-caps` and `--helia-tracking-wordmark`, the two tracking
+  steps that are roles rather than sizes, read by the eyebrow, the badge, the
+  timeline label, the table head and the section eyebrow (#34).
+- `LinkCard` forwards an `icon` slot and a `meta` prop through to `CardHeader`
+  (#46).
+- `check:peers`, which walks each page's chunk graph and fails when two chunks
+  in one closure carry a peer's marker, or when the two lockfiles disagree on a
+  peer's version (#54).
+- `check:spelling`, which scans markdown, MDX, Astro, TypeScript, CSS and
+  `.mjs` for the British forms as whole words, in both validate chains (#37).
+- `check:styles` covers `line-height`, `letter-spacing`, `z-index`, `opacity`
+  and the four offsets as well as motion, and `semantic.css` gains three layer
+  steps and two opacity steps, since stacking and fade had no scale to point at
+  (#60).
+- The card family tables in the design system document are generated from the
+  same reading the parts reference uses, and `check:astro-props` fails the
+  build when they drift (#60).
+- `SectionHeader` takes `titleAs`, a `class` and the rest props of a
+  `<header>`, so a section that is not the page's second level can say so and a
+  layout can reach the element (#60).
+- `BadgeTone`, exported from `Badge`: the one advisory tone vocabulary, which
+  `StatCard` and `BigNumber` take as well (#60).
+
+### Changed
+
+- The package docs describe what an option is and what it is for, in the
+  present tense, rather than what it replaced (#37).
+- The prose a reader meets is on the American forms throughout: content,
+  comments, JSDoc, UI strings, sidebar labels and the strings the generators
+  write. Identifiers, custom property names, routes and file names are
+  untouched, so no link or import moves (#37).
+- `SectionHeader` and the carousel's next control draw their arrow through
+  `.helia-motion-cue`, so the package no longer depends on a rule a consuming
+  site's own stylesheet defines (#35).
+- One chart lane: `--chart-1` through `--chart-5` in the shadcn bridge alias
+  `--helia-chart-1` through `--helia-chart-5`, so Recharts, Plot and ECharts
+  draw the same series in the same color on one page, and the second accent
+  feeds no chart (#60).
+- `engines` on the package is `node >=24`, `npm >=11`, matching the monorepo
+  root and the docs app: nothing has been exercised on the older pair, and the
+  README, the guidance and the package `.npmrc` said otherwise (#60).
+- `SectionHeader` draws its label with the `Eyebrow` part instead of a copy of
+  it, so the label takes the muted ink and the label step the other three
+  titled parts take, rather than the accent and the caption step (#60).
+- The label above a title is `eyebrow` on every part that takes one:
+  `CardHeader` and `LinkCard` rename `overline`, and `CardHeader`'s named slot
+  renames with it. There is no alias; the primitive is the `Eyebrow` part, and
+  a vocabulary with two words for it is two words to look up (#60).
+- `scale` on `BigNumber` is `step`. The values and the default are unchanged.
+  It names an absolute rung of the type ladder, which is what the part's own
+  `--helia-big-number-step` hook already called it, where `scale` on
+  `CardHeader` is a two-position switch off that card's own title step (#60).
+- `deltaTone` on `BigNumber` is the `BadgeTone` union `StatCard` already took.
+  `positive` and `negative` are gone: they map onto `success` and `danger`, and
+  the other five tones now reach the unframed figure too (#60).
+- `externalUrl` on `MediaEmbed` is `href`, the name every other link prop in
+  the package takes (#60).
+- `EditorialBand` composes the `.helia-band` recipe for its geometry and
+  rhythm, so the two kinds of band on one page sit on the same measure and the
+  same vertical step. Its ground, its treatment queries and its bleed cap are
+  unchanged (#60).
+- `EditorialBand` drops the `subtle` tone. It painted the same ground as
+  `paper` and was a second name for it (#60).
+- `titleAs` on `IconRow` drops `p`, so every part that titles itself takes `h2`
+  to `h4` (#60).
+- The list reset in the restated preflight names the generated parts that are a
+  list rather than reaching `[data-slot] *`; the control reset still takes the
+  subtree (#60).
+- The caution ink takes a value per theme, `#a85c1f` on light and `#cd7b33` on
+  dark, and the docs now fail on any contrast row below 4.5 rather than
+  publishing the number and leaving a reader to notice it (#47).
+- The docs app's optional peers take the package's ranges rather than exact
+  pins, so the package tree and the site tree resolve one copy of each browser
+  peer (#54).
+
+### Fixed
+
+- The code frame's title tab painted its inline-start corner outside the
+  frame's curve, because the tab is the frame header's first child and nothing
+  clips it. The tab now takes the frame radius (#41).
+- The band reserved its inline gutter on the painted tones only, so a plain
+  hero and a painted one started their content on different lines. Geometry now
+  sits on the band unconditionally and the treatments change the ground alone
+  (#42).
+- `Band` and `EditorialBand` carried their ground past the main pane, so on a
+  page with a table of contents the muted and contrast grounds painted across
+  that column. Both cap the carry with `--helia-band-bleed-end`, which the
+  Starlight layout zeroes once the contents column is reserved (#51).
+- Seven defects on the React layer, six of them one root cause: `tailwind.css`
+  loads Tailwind's theme and utilities but not its preflight, so the UA's own
+  widget styling showed through wherever a generated class string was silent.
+  The preflight's form-control and list resets are restated in the bridge,
+  scoped to `[data-slot]` (#52).
+- The hover surface stands on its own `--helia-surface-hover` token and
+  `--popover` on the card surface, so a select row highlights under the pointer
+  instead of resolving to the ground it is drawn on (#52).
+- The Recharts cards rendered empty: the island mounted only after an
+  `IntersectionObserver` fired, and the frame took its shape from a utility
+  class, so a chart that mounted before the sheet applied measured zero. The
+  chart mounts immediately and the frame carries `--chart-aspect` and
+  `--chart-min-height` on the element (#53).
+- Standalone, the docs site and the package resolved two copies of `recharts`
+  and `lucide-react`, so a provider from one copy faced a consumer from the
+  other and the frame came up empty with no error (#53, #54).
+- A page sheet carrying its rhythm on `* + *` exempts the first child of the
+  DOM, so the margin it left on the rest sat against a column break and started
+  the middle and right masonry columns lower than the left (#56).
+- The inline icon was an inline-flex box carrying its vertical-align on the
+  SVG, where the property has no effect on a flex item, so at 16px body text
+  the glyph's center sat 2.5px above the center of the words beside it. The box
+  is inline-block with the offset on the box, and `text` draws a glyph and its
+  word as one unit with a token gap (#57).
+- `CardList`, `Band` and `EditorialBand` emitted a modifier class for the
+  default value of `marker` and `tone`, which no sheet defined (#60).
+- The row of figures sets `--helia-big-number-gap` rather than writing `gap` at
+  the same weight as the part's own rule (#60).
+- `components.json` pointed `utils` at `@/react/utils`, an alias that resolves
+  only inside this package, so `shadcn add` wrote an import no consumer could
+  resolve. It is rewritten to the `cn` peer, and `check:shadcn-align` fails a
+  rewrite that matches nothing (#60).
+- `react/chart.tsx` named `.dark` as the dark selector, which nothing in this
+  package sets, so a Recharts series kept its light color through a theme flip;
+  `react/chart-interactive.tsx` read two custom properties that do not exist
+  (#60).
+- The exports map omitted `./chart-plot-spec` and `./chart-echarts-theme`, both
+  already shipped in `files`, so neither was reachable from outside the package
+  (#60).
 
 ## What changed in 0.1.0-alpha.6
 
@@ -37,10 +211,9 @@ Issue references below are to `AmbiqAI/helia-ui`.
 - Tracking tokens for the display, page, section and heading steps (#16).
 - Roboto Variable ships with the package as the default sans, self-hosted and
   preloaded, with the system stack as fallback (#16).
-- `--helia-hero-treatment` and `--helia-accent-secondary` are wired rather than
-  named only: the first decides the ground `EditorialBand` paints, the second
-  is the `Badge` `secondary` tone, the link-card pointer cue and `--chart-2` in
-  the shadcn bridge (#23).
+- `--helia-hero-treatment` and `--helia-accent-secondary` are wired rather
+  than named only: the first decides the ground `EditorialBand` paints, the
+  second is the `Badge` `secondary` tone and the link-card pointer cue (#23).
 - Theme scopes: the composed tokens are declared on `[data-helia-theme]` and
   `.helia-theme-scope` as well as `:root`, so a wrapper can re-theme a subtree
   (#23).
@@ -57,11 +230,6 @@ Issue references below are to `AmbiqAI/helia-ui`.
   with the button pair's radius and height asserted on every docs run (#20).
 - Source for every gallery example, in an expandable panel beside it (#18).
 - A typeface comparison page in the package docs (#16).
-- `SectionHeader` takes `titleAs`, a `class` and the rest props of a
-  `<header>`, so a section that is not the page's second level can say so and a
-  layout can reach the element (#60).
-- `BadgeTone`, exported from `Badge`: the one advisory tone vocabulary, which
-  `StatCard` and `BigNumber` now take as well (#60).
 
 ### Changed
 
@@ -91,44 +259,16 @@ Issue references below are to `AmbiqAI/helia-ui`.
   from a git tag reads that manifest in their own tree (#22).
 - The optional peers and `typescript` are declared where the package's own
   checks need them, since npm 11 does not materialise optional peers (#22).
-- `SectionHeader` draws its label with the `Eyebrow` part instead of a copy of
-  it, so the label takes the muted ink and the label step the other three
-  titled parts take, rather than the accent and the caption step (#60).
-- `EditorialBand` composes the `.helia-band` recipe for its geometry and
-  rhythm, so the two kinds of band on one page sit on the same measure and the
-  same vertical step. Its ground, its treatment queries and its bleed cap are
-  unchanged (#60).
-- The row of figures sets `--helia-big-number-gap` rather than writing `gap` at
-  the same weight as the part's own rule (#60).
-- `CardList`, `Band` and `EditorialBand` no longer emit a modifier class for
-  the default value of `marker` and `tone`, which no sheet defined (#60).
-
-### Fixed
-
-- `AsciiTerminal` success and warning lines failed contrast on light paper, at
-  3.20:1 and 2.77:1 against the 4.5:1 axe asks for (#32).
-- The theme dials moved nothing, because every composed token sat on `:root`:
-  the gallery's square, round and tinted knobs rendered three identical cards
-  (#23).
-- Tailwind read `display: grid;` inside a part's `<style>` block as a scanned
-  candidate, shipping the bare display utilities to every visitor (#8).
-- `astro preview` daemonised under agent environments and held a per-project
-  lock, so smoke runs hung (#2).
-- The restated preflight in `shadcn.css` took the markers and the indent off
-  every list an author slotted into a card, a dialog or a tab panel. The list
-  reset now names the generated parts that are a list; the control reset still
-  takes the subtree (#60).
-
-### Breaking
-
 - `--helia-hero-treatment` takes `plain`, `gradient` or `tinted`; the `band`
   and `artwork` values are gone, and the dial now draws `EditorialBand` rather
   than being a name a site reads for itself (#23).
 - `CodeBlock` wraps Starlight's `Code` instead of rendering through Shiki
   directly, so it requires the `heliaStarlight` plugin to be installed. Its
   props are unchanged (#17).
-- `--chart-2` in the shadcn bridge now defaults to slate, following
-  `--helia-accent-secondary`, rather than standing on its own value (#23).
+- `--chart-2` in the shadcn bridge follows `--helia-accent-secondary` rather
+  than standing on its own value (#23). 0.1.0-alpha.7 takes this back: the
+  bridge's chart set aliases the package's, and the second accent feeds no
+  chart (#49, #60).
 - `Badge` gains a `secondary` tone, which is a new value in the `tone` union
   (#23).
 - `Button` gains a `danger` variant, which is a new value in the `variant`
@@ -146,26 +286,18 @@ Issue references below are to `AmbiqAI/helia-ui`.
   (#5, #19).
 - `engines` on the package is `node >=22.12.0`, `npm >=10`, a floor rather than
   a pin; the monorepo root and the docs app require node 24 and npm 11 (#22).
-- The label above a title is `eyebrow` on every part that takes one:
-  `CardHeader` and `LinkCard` rename `overline`, and `CardHeader`'s named slot
-  renames with it. There is no alias; the primitive is the `Eyebrow` part, and
-  a vocabulary with two words for it is two words to look up (#60).
-- `deltaTone` on `BigNumber` is the `BadgeTone` union `StatCard` already took.
-  `positive` and `negative` are gone: they map onto `success` and `danger`,
-  and the other five tones now reach the unframed figure too (#60).
-- `scale` on `BigNumber` is `step`. The values and the default are unchanged.
-  It names an absolute rung of the type ladder, which is what the part's own
-  `--helia-big-number-step` hook already called it, where `scale` on
-  `CardHeader` is a two-position switch off that card's own title step; one
-  name for the two read as one dial whose default inverted (#60).
-- `externalUrl` on `MediaEmbed` is `href`, the name every other link prop in
-  the package takes (#60).
-- `EditorialBand` drops the `subtle` tone. It painted the same ground as
-  `paper` and was a second name for it (#60).
-- `titleAs` on `IconRow` drops `p`, so every part that titles itself takes `h2`
-  to `h4`. A row in a long index is a heading in that index, and a part that
-  can leave the outline while its neighbors cannot is a choice made in the
-  wrong place (#60).
+
+### Fixed
+
+- `AsciiTerminal` success and warning lines failed contrast on light paper, at
+  3.20:1 and 2.77:1 against the 4.5:1 axe asks for (#32).
+- The theme dials moved nothing, because every composed token sat on `:root`:
+  the gallery's square, round and tinted knobs rendered three identical cards
+  (#23).
+- Tailwind read `display: grid;` inside a part's `<style>` block as a scanned
+  candidate, shipping the bare display utilities to every visitor (#8).
+- `astro preview` daemonised under agent environments and held a per-project
+  lock, so smoke runs hung (#2).
 
 ## What changed in 0.1.0-alpha.5
 
