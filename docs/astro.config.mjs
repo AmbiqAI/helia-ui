@@ -162,5 +162,30 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
+    /*
+     * The package is linked, not installed, so a peer it imports resolves in
+     * its own tree and a peer this site imports resolves here: two copies of
+     * the same library in one bundle. A React part composed across that seam
+     * then holds a provider from one copy and a consumer from the other, and
+     * the consumer reads the default instead of the provided value: no error,
+     * just an empty frame, which is how a chart came to draw nothing. Every
+     * peer that ships to the browser is pinned to this site's copy, the way
+     * @astrojs/react already pins react and react-dom.
+     * See AmbiqAI/helia-ui#53.
+     */
+    resolve: {
+      dedupe: [
+        '@tanstack/react-table',
+        'class-variance-authority',
+        'cmdk',
+        'cn',
+        'lucide-react',
+        'radix-ui',
+        'react',
+        'react-dom',
+        'recharts',
+        'sonner',
+      ],
+    },
   },
 });
