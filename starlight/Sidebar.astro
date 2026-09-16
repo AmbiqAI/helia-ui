@@ -27,6 +27,7 @@ import Default from '@astrojs/starlight/components/Sidebar.astro';
 import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
 import config from 'virtual:helia-ui/starlight-config';
 
+import { hubLabelParts } from './header-hub';
 import { matchSection } from './sections';
 
 /*
@@ -41,6 +42,14 @@ const section = matchSection(
 );
 
 const sectionNav = Astro.locals.heliaSectionNav;
+
+/*
+ * The Dev Hub link lives at the end of the bar, which below 62rem is this
+ * pane. It is the same link rather than a second definition of one: the bar
+ * hides its copy at the width this one appears at.
+ */
+const hub = config.header?.hub;
+const hubParts = hub ? hubLabelParts(hub.label) : [];
 ---
 
 {
@@ -78,3 +87,20 @@ const sectionNav = Astro.locals.heliaSectionNav;
 
   <Default {...Astro.props}><slot /></Default>
 </div>
+
+{
+  hub && (
+    <a class="helia-sidebar-hub" href={hub.href} data-helia-hub-link>
+      {hubParts.map((part) =>
+        part.accent ? (
+          <span class="helia-sidebar-hub__name">{part.text}</span>
+        ) : (
+          part.text
+        ),
+      )}
+      <svg viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M6 3.5h6.5V10M12.5 3.5 7 9M12 9.5v3h-9v-9h3" />
+      </svg>
+    </a>
+  )
+}

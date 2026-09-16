@@ -76,6 +76,8 @@ export default defineConfig({
                 href: 'https://github.com/AmbiqAI/helia-developer-hub',
               },
             ],
+            /* The Pages address until the hub has a domain of its own. */
+            hub: { href: 'https://ambiqai.github.io/helia-developer-hub/' },
           },
           /*
            * The fixture for the `sections` option, and the reason it is a

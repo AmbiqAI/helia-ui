@@ -15,6 +15,7 @@
 import type { AstroIntegration } from 'astro';
 import type { HookParameters, StarlightPlugin } from '@astrojs/starlight/types';
 import type { HeliaSectionLink } from './sections';
+import { resolveHub, type HeliaHeaderHub } from './header-hub';
 import {
   discoverabilityIntegration,
   resolveDiscoverability,
@@ -26,6 +27,7 @@ export type { HeliaDiscoverabilityOptions } from './discoverability';
 export { heliaFrontmatterSchema } from './schema';
 export type { HeliaFrontmatter } from './schema';
 export type { HeliaSectionLink } from './sections';
+export type { HeliaHeaderHub } from './header-hub';
 
 type StarlightConfigInput = HookParameters<'config:setup'>['config'];
 
@@ -75,6 +77,11 @@ export interface HeliaHeaderOptions {
   title?: string;
   /** The sections beside the name. */
   links?: HeliaHeaderLink[];
+  /**
+   * A link out to the HELIA Dev Hub, so a product site reads as one of a
+   * family rather than as a site on its own. Unset, the bar carries none.
+   */
+  hub?: HeliaHeaderHub;
   /** Starlight's search trigger. Default `true`. */
   search?: boolean;
   /** The package theme menu. Default `true`, and off with `shell.themeSelect`. */
@@ -201,6 +208,8 @@ export interface HeliaStarlightConfig {
     links: HeliaHeaderLink[];
     search: boolean;
     themeToggle: boolean;
+    /** `null` when the site named no Dev Hub link. */
+    hub: { label: string; href: string } | null;
   } | null;
   /**
    * The sections, without their entries: the bar and the Sidebar override need
@@ -538,10 +547,15 @@ export function heliaStarlight(
           ),
         ];
 
-        if (sections.length > 0) {
+        /* The override draws the narrow-width menu, which is where the Dev Hub
+           link goes once the bar it sits in has collapsed. */
+        if (sections.length > 0 || header?.hub) {
           if (!('Sidebar' in components)) {
             components.Sidebar = '@ambiqai/helia-ui/starlight/Sidebar.astro';
           }
+        }
+
+        if (sections.length > 0) {
           addRouteMiddleware({
             entrypoint:
               '@ambiqai/helia-ui/starlight/sections-route-middleware.ts',
@@ -597,6 +611,7 @@ export function heliaStarlight(
                      it back through the header. */
                   themeToggle:
                     (header.themeToggle ?? true) && shell.themeSelect !== false,
+                  hub: resolveHub(header.hub),
                 }
               : null,
             sections: sectionLinks,

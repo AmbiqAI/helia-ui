@@ -43,6 +43,7 @@ starlight({
 | `header`                   | `object`                             | unset      | Installs the `Header` override: the site name as text at the top-left, the links, search, and the theme menu. Unset, Starlight's own header stands.                                                           |
 | `header.title`             | `string`                             | site title | The name at the top-left. It links to the site root.                                                                                                                                                          |
 | `header.links`             | `{ label, href, match? }[]`          | `[]`       | The sections beside the name, or the `sections` list when there is one and this is unset. A link is current when the path starts with its `href`, longest prefix first; `match` is the prefix to use instead. |
+| `header.hub`               | `{ label?, href }`                   | unset      | A link back to the HELIA Dev Hub at the end of the bar, in the menu below `62rem`. `label` defaults to `Part of HELIA Dev Hub`, with the word HELIA in the product accent.                                    |
 | `header.search`            | `boolean`                            | `true`     | Starlight's search trigger.                                                                                                                                                                                   |
 | `header.themeToggle`       | `boolean`                            | `true`     | The package theme menu. Off anyway when `shell.themeSelect` is `false`.                                                                                                                                       |
 | `sections`                 | `{ label, href, match?, sidebar }[]` | `[]`       | The site's sections, as one definition the top bar and the left sidebar both read. See [Sections](#sections).                                                                                                 |
@@ -83,6 +84,24 @@ on the pages under it; `match` names a different prefix for a section whose
 pages do not live under its link. A link to the site root is current on the
 root alone, and where two links both match, the longer prefix is the one that
 lights, so only ever one of them does.
+
+`header.hub` puts a link back to the HELIA Dev Hub at the end of the bar, so a
+product site reads as one of a family rather than as a site on its own:
+
+```js
+heliaStarlight({
+  header: {
+    title: 'heliaCORE',
+    hub: { href: 'https://ambiqai.github.io/helia-developer-hub/' },
+  },
+});
+```
+
+It is muted text with the word HELIA in the product accent and an
+external-link glyph after it. `label` replaces the wording, which defaults to
+`Part of HELIA Dev Hub`; a label that does not say HELIA carries the accent
+whole. Below `62rem` the bar has no room for it and the menu button's pane
+carries it instead, at the end.
 
 Search and the theme menu sit at the end of the bar, and either can be dropped
 with `header.search: false` or `header.themeToggle: false`. What Starlight
