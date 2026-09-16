@@ -30,30 +30,31 @@ starlight({
 
 ## Options
 
-| Option                     | Type                        | Default    | Effect                                                                                                                                              |
-| -------------------------- | --------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `styles`                   | `boolean`                   | `true`     | Splices the four package stylesheets into `customCss`. `false` leaves `customCss` untouched, and the site loads them itself.                        |
-| `accent`                   | product id                  | undefined  | The product identity color, as `data-helia-accent` on the document element. See [Product accent](#product-accent).                                  |
-| `shell.themeSelect`        | `boolean`                   | `true`     | Installs the `ThemeSelect` override: the theme menu with its three choices.                                                                         |
-| `shell.mobileMenuToggle`   | `boolean`                   | `true`     | Installs the `MobileMenuToggle` override.                                                                                                           |
-| `shell.footer`             | `boolean`                   | `true`     | Installs the `Footer` override, which renders the brand row and the pagination.                                                                     |
-| `footer.links`             | `{ label, href }[]`         | `[]`       | Navigation shown on the right of the footer's brand row.                                                                                            |
-| `footer.tagline`           | `string`                    | undefined  | One line printed under the logo.                                                                                                                    |
-| `footer.logo`              | `'ambiq' \| false`          | `'ambiq'`  | `false` drops the brand lockup and renders the tagline on its own.                                                                                  |
-| `header`                   | `object`                    | unset      | Installs the `Header` override: the site name as text at the top-left, the links, search, and the theme menu. Unset, Starlight's own header stands. |
-| `header.title`             | `string`                    | site title | The name at the top-left. It links to the site root.                                                                                                |
-| `header.links`             | `{ label, href, match? }[]` | `[]`       | The sections beside the name. A link is current when the path starts with its `href`; `match` is the prefix to use instead.                         |
-| `header.search`            | `boolean`                   | `true`     | Starlight's search trigger.                                                                                                                         |
-| `header.themeToggle`       | `boolean`                   | `true`     | The package theme menu. Off anyway when `shell.themeSelect` is `false`.                                                                             |
-| `sidebar`                  | `'docs' \| 'always'`        | `'docs'`   | `'always'` keeps the left sidebar on every page at desktop widths, a `template: splash` landing page included.                                      |
-| `shell.head`               | `boolean`                   | `true`     | Installs the `Head` override: the brand font preload and the per-page discoverability tags.                                                         |
-| `shell.pageTitle`          | `boolean`                   | `true`     | Installs the `PageTitle` override, which reads `helia.pageTitle`. See [A page that opens with a hero](#a-page-that-opens-with-a-hero).              |
-| `code`                     | `boolean`                   | `true`     | Themes Expressive Code onto the package surface. `false` leaves Starlight's code frame alone.                                                       |
-| `discoverability`          | `object \| false`           | `{}`       | Search-engine and agent metadata. `false` switches the lot off; see [Discoverability](/helia-ui/starlight-plugin/discoverability/).                 |
-| `discoverability.ogImage`  | `boolean`                   | `true`     | Per-page Open Graph card at `<route>/og.svg`, with the `og:image` and `twitter:image` tags that point at it.                                        |
-| `discoverability.jsonLd`   | `boolean`                   | `true`     | `WebSite` and `Organization` on the home page, `TechArticle` elsewhere, and a `BreadcrumbList` from the sidebar path.                               |
-| `discoverability.markdown` | `boolean`                   | `true`     | `<route>/index.md` renditions and the `alternate` link that points at them.                                                                         |
-| `discoverability.llms`     | `boolean`                   | `true`     | `llms.txt`, `llms-full.txt`, and `content-index.json` at the site root.                                                                             |
+| Option                     | Type                                 | Default    | Effect                                                                                                                                                                                                        |
+| -------------------------- | ------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `styles`                   | `boolean`                            | `true`     | Splices the four package stylesheets into `customCss`. `false` leaves `customCss` untouched, and the site loads them itself.                                                                                  |
+| `accent`                   | product id                           | undefined  | The product identity color, as `data-helia-accent` on the document element. See [Product accent](#product-accent).                                                                                            |
+| `shell.themeSelect`        | `boolean`                            | `true`     | Installs the `ThemeSelect` override: the theme menu with its three choices.                                                                                                                                   |
+| `shell.mobileMenuToggle`   | `boolean`                            | `true`     | Installs the `MobileMenuToggle` override.                                                                                                                                                                     |
+| `shell.footer`             | `boolean`                            | `true`     | Installs the `Footer` override, which renders the brand row and the pagination.                                                                                                                               |
+| `footer.links`             | `{ label, href }[]`                  | `[]`       | Navigation shown on the right of the footer's brand row.                                                                                                                                                      |
+| `footer.tagline`           | `string`                             | undefined  | One line printed under the logo.                                                                                                                                                                              |
+| `footer.logo`              | `'ambiq' \| false`                   | `'ambiq'`  | `false` drops the brand lockup and renders the tagline on its own.                                                                                                                                            |
+| `header`                   | `object`                             | unset      | Installs the `Header` override: the site name as text at the top-left, the links, search, and the theme menu. Unset, Starlight's own header stands.                                                           |
+| `header.title`             | `string`                             | site title | The name at the top-left. It links to the site root.                                                                                                                                                          |
+| `header.links`             | `{ label, href, match? }[]`          | `[]`       | The sections beside the name, or the `sections` list when there is one and this is unset. A link is current when the path starts with its `href`, longest prefix first; `match` is the prefix to use instead. |
+| `header.search`            | `boolean`                            | `true`     | Starlight's search trigger.                                                                                                                                                                                   |
+| `header.themeToggle`       | `boolean`                            | `true`     | The package theme menu. Off anyway when `shell.themeSelect` is `false`.                                                                                                                                       |
+| `sections`                 | `{ label, href, match?, sidebar }[]` | `[]`       | The site's sections, as one definition the top bar and the left sidebar both read. See [Sections](#sections).                                                                                                 |
+| `sidebar`                  | `'docs' \| 'always'`                 | `'docs'`   | `'always'` keeps the left sidebar on every page at desktop widths, a `template: splash` landing page included.                                                                                                |
+| `shell.head`               | `boolean`                            | `true`     | Installs the `Head` override: the brand font preload and the per-page discoverability tags.                                                                                                                   |
+| `shell.pageTitle`          | `boolean`                            | `true`     | Installs the `PageTitle` override, which reads `helia.pageTitle`. See [A page that opens with a hero](#a-page-that-opens-with-a-hero).                                                                        |
+| `code`                     | `boolean`                            | `true`     | Themes Expressive Code onto the package surface. `false` leaves Starlight's code frame alone.                                                                                                                 |
+| `discoverability`          | `object \| false`                    | `{}`       | Search-engine and agent metadata. `false` switches the lot off; see [Discoverability](/helia-ui/starlight-plugin/discoverability/).                                                                           |
+| `discoverability.ogImage`  | `boolean`                            | `true`     | Per-page Open Graph card at `<route>/og.svg`, with the `og:image` and `twitter:image` tags that point at it.                                                                                                  |
+| `discoverability.jsonLd`   | `boolean`                            | `true`     | `WebSite` and `Organization` on the home page, `TechArticle` elsewhere, and a `BreadcrumbList` from the sidebar path.                                                                                         |
+| `discoverability.markdown` | `boolean`                            | `true`     | `<route>/index.md` renditions and the `alternate` link that points at them.                                                                                                                                   |
+| `discoverability.llms`     | `boolean`                            | `true`     | `llms.txt`, `llms-full.txt`, and `content-index.json` at the site root.                                                                                                                                       |
 
 ## The product top bar
 
@@ -79,7 +80,8 @@ site's `base` on the front, since the plugin does not prefix it for you. A link
 is current when the page's path starts with its `href`, so a section stays lit
 on the pages under it; `match` names a different prefix for a section whose
 pages do not live under its link. A link to the site root is current on the
-root alone.
+root alone, and where two links both match, the longer prefix is the one that
+lights, so only ever one of them does.
 
 Search and the theme menu sit at the end of the bar, and either can be dropped
 with `header.search: false` or `header.themeToggle: false`. What Starlight
@@ -92,6 +94,112 @@ point to it, because the plugin's `MobileMenuToggle` override takes Starlight's
 own button off the frame. It opens the pane through Starlight's own menu state,
 so the overlay and the scroll lock behind it are one thing at every width. This
 site sets the option, so the bar at the top of this page is the one it installs.
+
+## Sections
+
+A product site is read one part at a time. `sections` is the option that says
+so: the top bar lists the site's sections, and a page inside one gets a left
+sidebar of that section's pages under the section's name. Both come from the
+one list, so the bar and the pane cannot drift apart.
+
+```js
+heliaStarlight({
+  header: { title: 'heliaCORE' },
+  sections: [
+    {
+      label: 'Getting started',
+      href: '/heliaCORE/getting-started/',
+      sidebar: [
+        { label: 'Choose your path', slug: 'getting-started' },
+        { label: 'CMake', slug: 'getting-started/cmake' },
+        { label: 'Zephyr', slug: 'getting-started/zephyr' },
+      ],
+    },
+    {
+      label: 'Architecture',
+      href: '/heliaCORE/architecture/',
+      sidebar: [{ autogenerate: { directory: 'architecture' } }],
+    },
+  ],
+});
+```
+
+A section is a `label`, an `href` written with the site's `base` on the front
+the way a bar link is, an optional `match` for a section whose pages do not
+live under its `href`, and a `sidebar` of Starlight's own entries: links,
+slugs, groups, `autogenerate` directories, badges. They are Starlight's
+entries, not a copy of them, because the plugin hands them back to Starlight
+as sidebar config; nothing about them is resolved here.
+
+- **The bar.** `header.links` is derived from the sections when the site does
+  not write its own. A site whose bar carries something that is not a section,
+  a link out to GitHub for instance, writes `header.links` and keeps both.
+- **The pane.** The section's entries become the whole sidebar, with the
+  section's name above them as a heading rather than as an entry. The group the
+  entries were declared under is not drawn: it is the heading.
+- **The landing page.** Give the Home section the site's base as its `href`. A
+  base prefix would otherwise match every page on the site, so a section at the
+  base is current on the landing page alone. With `sidebar: 'always'` the
+  landing page keeps the pane, which is where Home's own short list goes.
+- **Which section a page is in.** The longest matching prefix wins, so a
+  section nested under another one takes its own pages. A page under no section
+  keeps the sidebar the site declared in `sidebar`, or the whole navigation if
+  it declared none.
+
+[The sections demo](/helia-ui/starlight-plugin/sections/) is three sections
+wired up this way. It is a fixture rather than this site's own navigation: this
+site's bar links out to GitHub and leaves several groups off the bar, and
+sections only work as navigation when every part of the site is one.
+
+### Generated reference pages
+
+Generated pages sit at most one level under their group. The trap is the shape
+a generator's own fragment usually arrives in, a group wrapping an
+`autogenerate`:
+
+```js
+/* Two levels: Reference > Generated C API > Convolution > conv page. */
+{
+  label: 'Reference',
+  href: '/heliaCORE/reference/',
+  sidebar: [
+    { label: 'Generated C API', items: [{ autogenerate: { directory: 'reference/api' } }] },
+  ],
+}
+```
+
+Inside a section there is no need for the wrapper, because the section itself
+is the heading the entries sit under. Declare one entry per group instead and
+the groups are the top level of the pane, with module pages one level under
+them:
+
+```js
+/* The generator's directory names, one group each. */
+const GROUPS = [
+  ['Activation', 'activation'],
+  ['Basic math', 'basicmath'],
+  /* ...one row per group the generator emits. */
+];
+
+{
+  label: 'Reference',
+  href: '/heliaCORE/reference/',
+  sidebar: [
+    { label: 'C API index', slug: 'reference' },
+    ...GROUPS.map(([label, directory]) => ({
+      label,
+      collapsed: true,
+      items: [{ autogenerate: { directory: `reference/api/${directory}` } }],
+    })),
+    { label: 'API generation notes', slug: 'reference/generation' },
+  ],
+}
+```
+
+A generator that emits a sidebar fragment of its own splices in the same way:
+the fragment has to be the list of groups, not a single group containing them.
+If it hands you the wrapped shape, spread its `items` rather than the entry
+itself.
 
 ## Keeping the sidebar on a landing page
 

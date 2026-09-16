@@ -20,23 +20,23 @@
 import Search from '@astrojs/starlight/components/Search.astro';
 import config from 'virtual:helia-ui/starlight-config';
 
+import { matchSection } from './sections';
 import ThemeMenu from './ThemeMenu.astro';
 
 const header = config.header;
 const { hasSidebar, siteTitleHref } = Astro.locals.starlightRoute;
-const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
-const path = Astro.url.pathname.replace(/\/?$/, '/');
 
 /*
- * A prefix rather than an equality, so a section stays current on every page
- * under it, and `match` for a link whose pages do not live under its href. A
- * link to the site root is the exception: every path on the site starts with
- * the base, so a prefix there would be current everywhere.
+ * A prefix rather than an equality, so a link stays current on every page
+ * under it, and `match` for a link whose pages do not live under its href. The
+ * rule is the one the `sections` option scopes the sidebar by, so the lit link
+ * and the pane below it always name the same section.
  */
-function isCurrent(target: string) {
-  const prefix = target.replace(/\/?$/, '/');
-  return prefix === base ? path === base : path.startsWith(prefix);
-}
+const current = matchSection(
+  header?.links ?? [],
+  Astro.url.pathname,
+  import.meta.env.BASE_URL,
+);
 ---
 
 {
@@ -66,9 +66,7 @@ function isCurrent(target: string) {
           {header.links.map((link) => (
             <a
               href={link.href}
-              aria-current={
-                isCurrent(link.match ?? link.href) ? 'page' : undefined
-              }
+              aria-current={link === current ? 'page' : undefined}
             >
               {link.label}
             </a>

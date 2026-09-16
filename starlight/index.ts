@@ -14,6 +14,7 @@
 
 import type { AstroIntegration } from 'astro';
 import type { HookParameters, StarlightPlugin } from '@astrojs/starlight/types';
+import type { HeliaSectionLink } from './sections';
 import {
   discoverabilityIntegration,
   resolveDiscoverability,
@@ -24,8 +25,18 @@ import {
 export type { HeliaDiscoverabilityOptions } from './discoverability';
 export { heliaFrontmatterSchema } from './schema';
 export type { HeliaFrontmatter } from './schema';
+export type { HeliaSectionLink } from './sections';
 
 type StarlightConfigInput = HookParameters<'config:setup'>['config'];
+
+/**
+ * One entry of Starlight's own `sidebar` config: a link, a group, a slug, or
+ * an `autogenerate` directory. Taken off the config the hook is handed rather
+ * than imported, because Starlight's exports map does not carry the type.
+ */
+export type HeliaSidebarItem = NonNullable<
+  StarlightConfigInput['sidebar']
+>[number];
 
 /** Starlight's Expressive Code options, minus the `false` opt-out. */
 type ExpressiveCodeOptions = Exclude<
@@ -68,6 +79,11 @@ export interface HeliaHeaderOptions {
   search?: boolean;
   /** The package theme menu. Default `true`, and off with `shell.themeSelect`. */
   themeToggle?: boolean;
+}
+
+export interface HeliaSection extends HeliaSectionLink {
+  /** The section's pages, in Starlight's own `sidebar` vocabulary. */
+  sidebar: HeliaSidebarItem[];
 }
 
 /**
@@ -138,6 +154,18 @@ export interface HeliaStarlightOptions {
    */
   header?: HeliaHeaderOptions;
   /**
+   * The site's sections, as one definition the top bar and the left sidebar
+   * both read: the bar lists them, and a page inside one gets a sidebar of
+   * that section's pages under the section's name. `header.links` is derived
+   * from this list unless the site writes its own.
+   *
+   * The entries are Starlight's, and they are resolved by Starlight: the
+   * plugin appends one top-level group per section to the site's `sidebar`
+   * config, so `autogenerate`, slugs, badges, and labels behave as they do
+   * anywhere else. A page in no section keeps the sidebar the site declared.
+   */
+  sections?: HeliaSection[];
+  /**
    * `'always'` keeps the left sidebar on every page, a landing page under
    * `template: splash` included, which is what a product site wants. `'docs'`
    * is Starlight's own behavior. Default `'docs'`.
@@ -167,6 +195,12 @@ export interface HeliaStarlightConfig {
     search: boolean;
     themeToggle: boolean;
   } | null;
+  /**
+   * The sections, without their entries: the bar and the Sidebar override need
+   * to know which section a path is in, and the entries themselves travel
+   * through Starlight's own sidebar. Empty when the site named no sections.
+   */
+  sections: HeliaSectionLink[];
   /** The site's own title and description, which a component override cannot read. */
   site: {
     title: string;
@@ -420,6 +454,7 @@ export function heliaStarlight(
     shell = {},
     footer,
     header,
+    sections = [],
     sidebar = 'docs',
     accent,
   } = options;
@@ -470,6 +505,33 @@ export function heliaStarlight(
           });
         }
 
+        /*
+         * The section groups go on the end of the site's own sidebar, which is
+         * the arrangement the route middleware reads back: Starlight resolves
+         * every entry, and the middleware picks a resolved group rather than
+         * building entries itself. A site that declared no sidebar of its own
+         * gets the sections as its whole navigation.
+         */
+        const siteSidebar = config.sidebar ?? [];
+        const sectionSidebar = [
+          ...siteSidebar,
+          ...sections.map((section) => ({
+            label: section.label,
+            collapsed: false,
+            items: section.sidebar,
+          })),
+        ];
+
+        if (sections.length > 0) {
+          if (!('Sidebar' in components)) {
+            components.Sidebar = '@ambiqai/helia-ui/starlight/Sidebar.astro';
+          }
+          addRouteMiddleware({
+            entrypoint:
+              '@ambiqai/helia-ui/starlight/sections-route-middleware.ts',
+          });
+        }
+
         const expressiveCode =
           code && config.expressiveCode !== false
             ? mergeExpressiveCode(
@@ -484,7 +546,20 @@ export function heliaStarlight(
           description: config.description,
         };
 
-        updateConfig({ customCss, components, expressiveCode });
+        const sectionLinks: HeliaSectionLink[] = sections.map(
+          ({ label, href, match }) => ({
+            label,
+            href,
+            ...(match === undefined ? {} : { match }),
+          }),
+        );
+
+        updateConfig({
+          customCss,
+          components,
+          expressiveCode,
+          ...(sections.length > 0 ? { sidebar: sectionSidebar } : {}),
+        });
         addIntegration(
           configModule({
             accent,
@@ -496,7 +571,10 @@ export function heliaStarlight(
             header: header
               ? {
                   title: header.title ?? site.title,
-                  links: header.links ?? [],
+                  /* One nav definition: the bar lists the sections unless the
+                     site states a bar of its own, which it does when the bar
+                     carries something that is not a section. */
+                  links: header.links ?? sectionLinks,
                   search: header.search ?? true,
                   /* A site that took the theme menu off the shell does not get
                      it back through the header. */
@@ -504,6 +582,7 @@ export function heliaStarlight(
                     (header.themeToggle ?? true) && shell.themeSelect !== false,
                 }
               : null,
+            sections: sectionLinks,
             site,
             discoverability,
           }),
@@ -524,7 +603,7 @@ export function heliaStarlight(
             discoverabilityIntegration({
               resolved: discoverability,
               site,
-              sidebar: (config.sidebar ?? []) as never,
+              sidebar: sectionSidebar as never,
             }),
           );
         }

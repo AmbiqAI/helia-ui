@@ -425,6 +425,21 @@
 }
 
 /*
+ * The section name above a sidebar the `sections` option scoped. It is the
+ * pane's title rather than an entry in it, so it carries the eyebrow treatment
+ * the parts use for a label above a list: small, tracked, and quiet enough
+ * that the links under it stay the thing being read.
+ */
+.helia-sidebar-heading {
+  color: var(--helia-ink-muted);
+  font-size: var(--helia-text-label);
+  font-weight: var(--helia-weight-bold);
+  letter-spacing: var(--helia-tracking-caps);
+  margin: 0 0 var(--helia-space-3);
+  text-transform: uppercase;
+}
+
+/*
  * The table-of-contents pane carries the page ground the way the left pane
  * does. Starlight leaves it transparent, which makes it a hole: anything the
  * main pane paints wider than itself shows through the column.

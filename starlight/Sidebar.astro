@@ -1,0 +1,44 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/*
+ * The section name above the sidebar, when the site named its navigation with
+ * the `sections` option. The route middleware has already cut the sidebar down
+ * to the section's own pages, and a pane of links with no name on it does not
+ * say which part of the site they belong to.
+ *
+ * A heading rather than a first entry: it is not a destination, and it is a
+ * landmark the pane's links sit under. Starlight's own sidebar renders below
+ * it untouched, so the persister, the mobile footer, and every entry keep
+ * whatever Starlight does with them.
+ *
+ * The section is matched here rather than passed from the middleware, which
+ * has no field on the route it could put it in; both sides read the same list
+ * through the same matcher.
+ *
+ * Starlight's component by its own path rather than through
+ * `virtual:starlight/components/Sidebar`: that module resolves to whichever
+ * component is installed under the name, which here is this one, and a
+ * component that renders itself renders until the stack runs out.
+ */
+import Default from '@astrojs/starlight/components/Sidebar.astro';
+import config from 'virtual:helia-ui/starlight-config';
+
+import { matchSection } from './sections';
+
+const section = matchSection(
+  config.sections,
+  Astro.url.pathname,
+  import.meta.env.BASE_URL,
+);
+---
+
+{
+  section && (
+    <p class="helia-sidebar-heading" data-helia-sidebar-heading>
+      {section.label}
+    </p>
+  )
+}
+
+<Default {...Astro.props}><slot /></Default>

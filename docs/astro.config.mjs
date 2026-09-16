@@ -77,6 +77,60 @@ export default defineConfig({
               },
             ],
           },
+          /*
+           * The fixture for the `sections` option, and the reason it is a
+           * fixture rather than this site's own navigation: a section-scoped
+           * sidebar only works when every part of the site is a section, and
+           * this site's bar carries a link to GitHub and leaves several
+           * groups -- Astro parts, Reference, Templates -- off the bar
+           * entirely. Adopting sections here would strand those pages.
+           *
+           * Under `starlight-plugin/` on purpose, so the bar's own
+           * Starlight-plugin link is the section the fixture pages sit in and
+           * the top bar has something to mark. Every page outside the fixture
+           * keeps this site's full sidebar, which is the option's fallback
+           * doing its job.
+           */
+          sections: [
+            {
+              label: 'Demo home',
+              href: `${basePath}starlight-plugin/sections/`,
+              sidebar: [
+                { label: 'Sections demo', slug: 'starlight-plugin/sections' },
+                {
+                  label: 'Why sections',
+                  slug: 'starlight-plugin/sections/why',
+                },
+              ],
+            },
+            {
+              label: 'Demo guide',
+              href: `${basePath}starlight-plugin/sections/guide/`,
+              sidebar: [
+                {
+                  label: 'First steps',
+                  slug: 'starlight-plugin/sections/guide/first-steps',
+                },
+                {
+                  label: 'Next steps',
+                  slug: 'starlight-plugin/sections/guide/next-steps',
+                },
+              ],
+            },
+            {
+              label: 'Demo reference',
+              href: `${basePath}starlight-plugin/sections/reference/`,
+              /* The generated shape: a directory, listed one level under the
+                 section rather than under a group inside it. */
+              sidebar: [
+                {
+                  autogenerate: {
+                    directory: 'starlight-plugin/sections/reference',
+                  },
+                },
+              ],
+            },
+          ],
           footer: {
             links: [
               { label: 'Overview', href: basePath },
