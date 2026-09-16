@@ -65,6 +65,86 @@
 }
 
 /*
+ * Code on an inked surface. These surfaces are pinned dark in both themes and
+ * invert the page ink to match, but Expressive Code declares its colors on
+ * `:root` from whichever theme the page is in, so on a light page the block
+ * kept a paper frame under ink that had already flipped -- white on white; see
+ * AmbiqAI/helia-ui#91. The frame is restated here rather than in the plugin
+ * because a custom property that reads another one is substituted where it is
+ * declared, so the tokens the plugin writes have already resolved against the
+ * page theme by the time the surface is reached. The surfaces below are one
+ * step off the inked ground, in the direction the dark theme's own card sits
+ * from the dark canvas.
+ */
+.helia-hero--contrast .expressive-code,
+.helia-band--contrast .expressive-code,
+.helia-card--media-background .expressive-code {
+  --helia-surface-card: color-mix(
+    in srgb,
+    var(--helia-paper-white) 6%,
+    var(--helia-ink-black)
+  );
+  --helia-surface-card-muted: color-mix(
+    in srgb,
+    var(--helia-paper-white) 11%,
+    var(--helia-ink-black)
+  );
+  --helia-surface-border: color-mix(
+    in srgb,
+    var(--helia-paper-white) 16%,
+    transparent
+  );
+
+  --ec-brdCol: var(--helia-surface-border);
+  --ec-codeBg: var(--helia-surface-card);
+  --ec-codeFg: var(--helia-ink-primary);
+  --ec-codeSelBg: var(--helia-ink-primary);
+  --ec-frm-edActTabBg: var(--helia-surface-card-muted);
+  --ec-frm-edBg: var(--helia-surface-card);
+  --ec-frm-edTabBarBg: var(--helia-surface-card-muted);
+  --ec-frm-edTabBarBrdBtmCol: var(--helia-surface-border);
+  --ec-frm-edTabBarBrdCol: var(--helia-surface-border);
+  --ec-frm-tooltipSuccessFg: var(--helia-surface-card);
+  --ec-frm-trmBg: var(--helia-surface-card);
+  --ec-frm-trmTtbBg: var(--helia-surface-card-muted);
+  --ec-frm-trmTtbBrdBtmCol: var(--helia-surface-border);
+  --ec-gtrBrdCol: var(--helia-surface-border);
+  --ec-gtrFg: var(--helia-ink-muted);
+  --ec-gtrHlFg: var(--helia-ink-secondary);
+  --ec-sbThumbCol: var(--helia-surface-border);
+  --ec-sbThumbHoverCol: var(--helia-ink-muted);
+  --ec-uiSelBg: color-mix(in srgb, var(--helia-ink-primary) 20%, transparent);
+  --ec-uiSelFg: var(--helia-ink-primary);
+}
+
+/*
+ * The syntax ink. Expressive Code writes every token's color for both themes
+ * onto the span as `--0` and `--1`, indexed by the order the themes are
+ * configured in, and picks between them with a `:root[data-theme]` rule. The
+ * dark theme is first, so reading index zero here is the same switch made for
+ * the one subtree the page theme does not decide. Unlayered, so it outranks
+ * that rule in `@layer starlight.components` without matching its specificity.
+ */
+.helia-hero--contrast
+  .expressive-code
+  .ec-line
+  :where(span[style^='--']:not([class])),
+.helia-band--contrast
+  .expressive-code
+  .ec-line
+  :where(span[style^='--']:not([class])),
+.helia-card--media-background
+  .expressive-code
+  .ec-line
+  :where(span[style^='--']:not([class])) {
+  background-color: var(--0bg, transparent);
+  color: var(--0, inherit);
+  font-style: var(--0fs, inherit);
+  font-weight: var(--0fw, inherit);
+  text-decoration: var(--0td, inherit);
+}
+
+/*
  * Line numbers without `@expressive-code/plugin-line-numbers`: the core
  * stylesheet already lays a gutter column out on every line, so a counter is
  * enough to fill it. `CodeBlock` adds the class for its `lineNumbers` prop.
