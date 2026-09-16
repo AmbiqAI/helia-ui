@@ -198,6 +198,23 @@
   width: 100%;
 }
 
+/*
+ * `helia: { pageTitle: false }` leaves a bare `_top` anchor where Starlight's
+ * heading was, so the skip link and the table of contents keep a target at the
+ * top of the content. The panel around it collapses to nothing rather than
+ * drawing an empty band above the page, and the panel after it drops the
+ * hairline it would otherwise rule against nothing. A draft or fallback notice
+ * shares that panel, and a panel that still has one keeps its box.
+ */
+.content-panel:has(> .sl-container > .helia-page-title-anchor:only-child) {
+  padding-block: 0;
+}
+
+.content-panel:has(> .sl-container > .helia-page-title-anchor:only-child)
+  + .content-panel {
+  border-top: 0;
+}
+
 .sl-markdown-content section + section {
   margin-top: calc(var(--helia-space-6) * 2);
 }

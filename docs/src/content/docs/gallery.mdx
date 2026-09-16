@@ -2351,6 +2351,11 @@ wrap it in `<em>` and the hero draws it in `--helia-product-accent` with the
 slant taken off. The side column renders only when `aside` or `media` has
 something in it, and below 62rem it stacks under the lede.
 
+In MDX the headline goes in a `<Fragment>` on one line, with a blank line
+between it and every slotted child. Bare text on its own line is flow content,
+so MDX wraps it in a paragraph inside the heading and pulls the line after it
+into the same paragraph, which costs the first action its slot.
+
 `data-helia-accent` is set on the example itself to show one product's color on
 a page that carries none. A product site sets it once, through the Starlight
 plugin's `accent` option, and writes no CSS.
@@ -2371,10 +2376,14 @@ so the card's own surface tokens do not reach it.
       badge="Preview"
       summary="A kernel layer with tuned operators, package delivery, and integration paths for the toolchains a firmware build already uses."
     >
-      Kernel <em>acceleration</em> for the edge.
+      <Fragment>Kernel <em>acceleration</em> for the edge.</Fragment>
+
       <Button slot="actions" href="/helia-ui/">Getting started</Button>
+
       <Button slot="actions" href="/helia-ui/gallery/" variant="secondary">Why</Button>
+
       <Button slot="actions" href="/helia-ui/reference/" variant="secondary">API</Button>
+
       <CardGrid slot="aside" columns={2}>
         <StatCard label="Operators">200+</StatCard>
         <StatCard label="Op types">53</StatCard>
@@ -2388,8 +2397,11 @@ so the card's own surface tokens do not reach it.
         code={'npm install @example/kernels'}
       />
     </Hero>
-  `}
+
+`}
+
 >
+
   <Hero
     variant="contrast"
     titleAs="h3"
@@ -2398,16 +2410,20 @@ so the card's own surface tokens do not reach it.
     badge="Preview"
     summary="A kernel layer with tuned operators, package delivery, and integration paths for the toolchains a firmware build already uses."
   >
-    Kernel <em>acceleration</em> for the edge.
+    <Fragment>Kernel <em>acceleration</em> for the edge.</Fragment>
+
     <Button slot="actions" href="/helia-ui/">
       Getting started
     </Button>
+
     <Button slot="actions" href="/helia-ui/gallery/" variant="secondary">
       Why
     </Button>
+
     <Button slot="actions" href="/helia-ui/reference/" variant="secondary">
       API
     </Button>
+
     <CardGrid slot="aside" columns={2}>
       <StatCard label="Operators">200+</StatCard>
       <StatCard label="Op types">53</StatCard>
@@ -2420,38 +2436,53 @@ so the card's own surface tokens do not reach it.
       label="Install"
       code={'npm install @example/kernels'}
     />
+
   </Hero>
 </Example>
 
 With no side column and no ground, the same part is the lede on its own
-measure: a section opener rather than a front door.
+measure: a section opener rather than a front door. The lede here is the
+`summary` slot rather than the prop, which is what a claim carrying bold or
+inline code needs; the slot wins wherever both are set.
 
 <Example
-  title="<Hero eyebrow summary>"
+  title='<Hero eyebrow> with the summary slot'
   code={`
-    <Hero
-      titleAs="h3"
-      eyebrow="Design system"
-      summary="Every part on this page is composed from the same tokens, so a site adopts the theme rather than a stylesheet."
-    >
-      Parts, not <em>pages</em>.
+    <Hero titleAs="h3" eyebrow="Design system">
+      <Fragment>Parts, not <em>pages</em>.</Fragment>
+
+      <Fragment slot="summary">
+        Every part on this page is composed from the same tokens, so a site
+        adopts **the theme** rather than a stylesheet: the recipes live in
+        \`recipes.css\` and the site writes none of them.
+      </Fragment>
+
       <Button slot="actions" href="/helia-ui/foundations/">Foundations</Button>
+
       <Button slot="actions" href="/helia-ui/cards/" variant="secondary">Cards</Button>
     </Hero>
-  `}
+
+`}
+
 >
-  <Hero
-    titleAs="h3"
-    eyebrow="Design system"
-    summary="Every part on this page is composed from the same tokens, so a site adopts the theme rather than a stylesheet."
-  >
-    Parts, not <em>pages</em>.
+
+  <Hero titleAs="h3" eyebrow="Design system">
+    <Fragment>Parts, not <em>pages</em>.</Fragment>
+
+    <Fragment slot="summary">
+      Every part on this page is composed from the same tokens, so a site adopts
+      **the theme** rather than a stylesheet: the recipes live in `recipes.css`
+      and the site writes none of them.
+    </Fragment>
+
     <Button slot="actions" href="/helia-ui/foundations/">
       Foundations
     </Button>
+
     <Button slot="actions" href="/helia-ui/cards/" variant="secondary">
       Cards
     </Button>
+
   </Hero>
 </Example>
 

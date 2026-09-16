@@ -28,12 +28,19 @@ export function dedent(source: string): string {
 }
 
 /**
+ * Not a part, though it is spelled like one: `Fragment` is how MDX keeps a
+ * headline or a lede phrasing instead of wrapping it in a paragraph, and it
+ * renders nothing of its own for the suite to find on the stage.
+ */
+const GROUPING_TAGS = new Set(['Fragment']);
+
+/**
  * The component tags the source opens, deduplicated and in document order. A
  * capital initial is what separates a part from an HTML element in MDX.
  */
 export function exampleTags(source: string): string[] {
-  const names = [...source.matchAll(/<([A-Z][A-Za-z0-9]*)/g)].map(
-    (match) => match[1],
-  );
+  const names = [...source.matchAll(/<([A-Z][A-Za-z0-9]*)/g)]
+    .map((match) => match[1])
+    .filter((name) => !GROUPING_TAGS.has(name));
   return [...new Set(names)];
 }

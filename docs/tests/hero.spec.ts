@@ -61,6 +61,44 @@ test('the emphasized word is drawn in the product accent', async ({ page }) => {
   }
 });
 
+test('the summary slot carries markup the prop could not', async ({ page }) => {
+  await page.goto(gallery);
+
+  const summary = page.locator(`${plain} .helia-hero__summary`);
+  await expect(summary).toHaveCount(1);
+  await expect(summary.locator('strong')).toBeVisible();
+  await expect(summary.locator('code')).toBeVisible();
+
+  /* The prop still renders the sentence it was given, as a paragraph. */
+  const propSummary = page.locator(`${contrast} p.helia-hero__summary`);
+  await expect(propSummary).toHaveCount(1);
+  await expect(propSummary.locator('strong')).toHaveCount(0);
+});
+
+/*
+ * The MDX trap the examples are written around: a headline that is bare text
+ * takes the line after it into its own paragraph, and the action inside that
+ * paragraph is no longer a child Astro can read a `slot` off.
+ */
+test('every action is in the actions row rather than the headline', async ({
+  page,
+}) => {
+  await page.goto(gallery);
+
+  for (const [selector, count] of [
+    [contrast, 3],
+    [plain, 2],
+  ] as const) {
+    const hero = page.locator(selector);
+    await expect(hero.locator('.helia-hero__headline a')).toHaveCount(0);
+    await expect(hero.locator('.helia-hero__headline p')).toHaveCount(0);
+    await expect(hero.locator('.helia-hero__actions > a')).toHaveCount(count);
+    await expect(
+      hero.locator('.helia-hero__actions > a').first(),
+    ).toBeVisible();
+  }
+});
+
 test('the side column stacks under the lede on a narrow viewport', async ({
   page,
 }) => {

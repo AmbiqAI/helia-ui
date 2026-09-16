@@ -11,6 +11,22 @@
  * so the emphasis is the color. Break the line where the emphasis needs it --
  * a headline at this size is composed, not wrapped.
  *
+ * In MDX that headline has one safe shape. Bare text on its own line is flow
+ * content, so MDX wraps it in a paragraph inside the heading and merges the
+ * lines after it into the same paragraph, which costs the first action its
+ * slot. Put the headline in a `<Fragment>` on one line, and leave a blank line
+ * between every slotted child:
+ *
+ *     <Hero eyebrow="Kernel library">
+ *       <Fragment>Kernel <em>acceleration</em> for Ambiq AI.</Fragment>
+ *
+ *       <Button slot="actions" href="/start/">Start</Button>
+ *     </Hero>
+ *
+ * The lede is either the `summary` prop or the `summary` slot, and the slot
+ * wins when both are there. The prop is a string, so a lede that needs bold or
+ * inline code takes the slot, written inline the way the headline is.
+ *
  * `contrast` is the inked card a product landing opens on: pinned dark in both
  * themes like the contrast band, so the accent is the one color in the frame.
  * `plain` is the same layout with no ground, for a page that is already a
@@ -29,6 +45,7 @@
  * The recipe itself is `.helia-hero` in `recipes.css`.
  *
  * @slot default -- The headline. Wrap the word that takes the product accent in `<em>`.
+ * @slot summary -- The lede as markup rather than as the `summary` prop, for one that carries bold or inline code. It wins over the prop.
  * @slot actions -- The ways in, usually `Button`s. The `primary` one is drawn as the accent outline rather than the ink pill.
  * @slot aside -- A framed panel at the top of the side column: a grid of `StatCard`s, a short list of figures.
  * @slot media -- The rest of the side column: a `CodeBlock`, a diagram, artwork. Anything that owns its own frame fits.
@@ -42,7 +59,7 @@ interface Props extends HTMLAttributes<'section'> {
   variant?: 'plain' | 'contrast';
   /** The label above the headline, rendered in an `Eyebrow` with the accent dot. */
   eyebrow?: string;
-  /** The claim under the headline: one sentence, not a paragraph. */
+  /** The claim under the headline: one sentence, not a paragraph. The `summary` slot wins over it. */
   summary?: string;
   /** A short standing label under the headline, rendered as an accent `Badge`. */
   badge?: string;
@@ -65,6 +82,14 @@ const {
 
 const hasAside = Astro.slots.has('aside');
 const hasMedia = Astro.slots.has('media');
+const hasSummarySlot = Astro.slots.has('summary');
+/*
+ * A `div` for the slot, because MDX hands a lede written across several lines
+ * back as a paragraph, and a paragraph inside a paragraph is closed by the
+ * parser rather than nested: the lede would keep its words and lose its type.
+ * The prop is a string and stays the paragraph it reads as.
+ */
+const Summary = hasSummarySlot ? 'div' : 'p';
 ---
 
 <Element
@@ -86,7 +111,13 @@ const hasMedia = Astro.slots.has('media');
         </Badge>
       )
     }
-    {summary && <p class="helia-hero__summary">{summary}</p>}
+    {
+      (hasSummarySlot || summary) && (
+        <Summary class="helia-hero__summary">
+          {hasSummarySlot ? <slot name="summary" /> : summary}
+        </Summary>
+      )
+    }
     {
       Astro.slots.has('actions') && (
         <div class="helia-hero__actions">
