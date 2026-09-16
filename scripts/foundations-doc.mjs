@@ -416,7 +416,7 @@ const GROUPS = [
     title: 'Accents',
     blurb:
       'The whole color vocabulary a part is handed. A part never learns a subject name: a composition maps its own subjects onto an accent and passes it as `--accent`.',
-    matches: (name) => /^--helia-(accent|product-accent|brand-)/.test(name),
+    matches: (name) => /^--helia-(accent|product-|brand-)/.test(name),
   },
   {
     id: 'tones',

@@ -134,6 +134,7 @@ const EXAMPLES = {
   DataTable: { page: 'layout', label: 'Layout', anchor: 'data-table' },
   EditorialBand: { page: 'layout', label: 'Layout', anchor: 'editorial-band' },
   Eyebrow: { page: 'primitives', label: 'Primitives', anchor: 'eyebrow' },
+  Hero: { page: 'gallery', label: 'Gallery', anchor: 'hero' },
   Icon: { page: 'primitives', label: 'Primitives', anchor: 'icon' },
   IconRow: { page: 'gallery', label: 'Gallery', anchor: 'icon-rows' },
   IconTile: { page: 'gallery', label: 'Gallery', anchor: 'icon-tiles' },

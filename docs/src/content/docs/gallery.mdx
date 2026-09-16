@@ -21,11 +21,13 @@ import CardQuote from '@ambiqai/helia-ui/astro/CardQuote';
 import Chart from '@ambiqai/helia-ui/astro/Chart';
 import ChartGroup from '@ambiqai/helia-ui/astro/ChartGroup';
 import Chip from '@ambiqai/helia-ui/astro/Chip';
+import CodeBlock from '@ambiqai/helia-ui/astro/CodeBlock';
 import CodeTabs from '@ambiqai/helia-ui/astro/CodeTabs';
 import DataTable from '@ambiqai/helia-ui/astro/DataTable';
 import EditorialBand from '@ambiqai/helia-ui/astro/EditorialBand';
 import Example from '../../components/Example.astro';
 import Eyebrow from '@ambiqai/helia-ui/astro/Eyebrow';
+import Hero from '@ambiqai/helia-ui/astro/Hero';
 import Icon from '@ambiqai/helia-ui/astro/Icon';
 import IconRow from '@ambiqai/helia-ui/astro/IconRow';
 import IconTile from '@ambiqai/helia-ui/astro/IconTile';
@@ -2332,6 +2334,118 @@ code follows.
       ]}
     />
   </SplitPanel>
+</Example>
+
+## Hero
+
+The top of a landing page. The headline is the default slot rather than a prop,
+because the word that takes the product accent has to be marked in the markup:
+wrap it in `<em>` and the hero draws it in `--helia-product-accent` with the
+slant taken off. The side column renders only when `aside` or `media` has
+something in it, and below 62rem it stacks under the lede.
+
+`data-helia-accent` is set on the example itself to show one product's color on
+a page that carries none. A product site sets it once, through the Starlight
+plugin's `accent` option, and writes no CSS.
+
+The copy here is placeholder, not an approved product claim. The code frame in
+the side column follows the page theme rather than the card, the way one inside
+a contrast `Band` does: Expressive Code resolves its frame colors on `:root`,
+so the card's own surface tokens do not reach it.
+
+<Example
+  title='<Hero variant="contrast" eyebrow badge summary>'
+  code={`
+    <Hero
+      variant="contrast"
+      titleAs="h3"
+      data-helia-accent="helia-core"
+      eyebrow="Kernel library"
+      badge="Preview"
+      summary="A kernel layer with tuned operators, package delivery, and integration paths for the toolchains a firmware build already uses."
+    >
+      Kernel <em>acceleration</em> for the edge.
+      <Button slot="actions" href="/helia-ui/">Getting started</Button>
+      <Button slot="actions" href="/helia-ui/gallery/" variant="secondary">Why</Button>
+      <Button slot="actions" href="/helia-ui/reference/" variant="secondary">API</Button>
+      <CardGrid slot="aside" columns={2}>
+        <StatCard label="Operators">200+</StatCard>
+        <StatCard label="Op types">53</StatCard>
+        <StatCard label="Models">40+</StatCard>
+        <StatCard label="Paths">4</StatCard>
+      </CardGrid>
+      <CodeBlock
+        slot="media"
+        language="bash"
+        label="Install"
+        code={'npm install @example/kernels'}
+      />
+    </Hero>
+  `}
+>
+  <Hero
+    variant="contrast"
+    titleAs="h3"
+    data-helia-accent="helia-core"
+    eyebrow="Kernel library"
+    badge="Preview"
+    summary="A kernel layer with tuned operators, package delivery, and integration paths for the toolchains a firmware build already uses."
+  >
+    Kernel <em>acceleration</em> for the edge.
+    <Button slot="actions" href="/helia-ui/">
+      Getting started
+    </Button>
+    <Button slot="actions" href="/helia-ui/gallery/" variant="secondary">
+      Why
+    </Button>
+    <Button slot="actions" href="/helia-ui/reference/" variant="secondary">
+      API
+    </Button>
+    <CardGrid slot="aside" columns={2}>
+      <StatCard label="Operators">200+</StatCard>
+      <StatCard label="Op types">53</StatCard>
+      <StatCard label="Models">40+</StatCard>
+      <StatCard label="Paths">4</StatCard>
+    </CardGrid>
+    <CodeBlock
+      slot="media"
+      language="bash"
+      label="Install"
+      code={'npm install @example/kernels'}
+    />
+  </Hero>
+</Example>
+
+With no side column and no ground, the same part is the lede on its own
+measure: a section opener rather than a front door.
+
+<Example
+  title="<Hero eyebrow summary>"
+  code={`
+    <Hero
+      titleAs="h3"
+      eyebrow="Design system"
+      summary="Every part on this page is composed from the same tokens, so a site adopts the theme rather than a stylesheet."
+    >
+      Parts, not <em>pages</em>.
+      <Button slot="actions" href="/helia-ui/foundations/">Foundations</Button>
+      <Button slot="actions" href="/helia-ui/cards/" variant="secondary">Cards</Button>
+    </Hero>
+  `}
+>
+  <Hero
+    titleAs="h3"
+    eyebrow="Design system"
+    summary="Every part on this page is composed from the same tokens, so a site adopts the theme rather than a stylesheet."
+  >
+    Parts, not <em>pages</em>.
+    <Button slot="actions" href="/helia-ui/foundations/">
+      Foundations
+    </Button>
+    <Button slot="actions" href="/helia-ui/cards/" variant="secondary">
+      Cards
+    </Button>
+  </Hero>
 </Example>
 
 ## Reference
