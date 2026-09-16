@@ -13,8 +13,9 @@
  * reach, since neither is this component's own markup.
  *
  * The narrow-width button opens the same sidebar the package's empty
- * MobileMenuToggle takes off Starlight's frame: starlight.css carries the
- * `data-helia-sidebar-open` rules it drives.
+ * MobileMenuToggle takes off Starlight's frame, through Starlight's own menu
+ * state rather than a second one beside it: starlight.css carries the
+ * `data-mobile-menu-expanded` rules it drives.
  */
 import Search from '@astrojs/starlight/components/Search.astro';
 import config from 'virtual:helia-ui/starlight-config';
@@ -88,28 +89,57 @@ function isCurrent(target: string) {
 }
 
 <script>
-  const toggle = document.querySelector<HTMLButtonElement>(
-    '[data-helia-sidebar-toggle]',
-  );
-  const sidebar = document.querySelector<HTMLElement>('#starlight__sidebar');
-  const narrow = window.matchMedia('(max-width: 61.999rem)');
+  /*
+   * Starlight's own mobile menu state, driven from here rather than mirrored:
+   * the attribute it keys the overlay and the scroll lock on, `inert` on the
+   * frame behind the pane, and the button's `aria-expanded`. One state is what
+   * keeps the lock and the pane from disagreeing, and a lock held over a pane
+   * that never opened is what disagreement looks like.
+   * See AmbiqAI/helia-ui#88.
+   *
+   * The listeners are delegated and bound at module scope, which a document
+   * runs once: a view transition swaps the bar out from under them and they
+   * stay bound, and bound once.
+   */
+  const EXPANDED = 'data-mobile-menu-expanded';
 
-  const close = () => {
-    document.body.removeAttribute('data-helia-sidebar-open');
-    sidebar?.style.removeProperty('--sl-sidebar-visibility');
-    toggle?.setAttribute('aria-expanded', 'false');
+  const button = () =>
+    document.querySelector<HTMLButtonElement>('[data-helia-sidebar-toggle]');
+
+  const setExpanded = (expanded: boolean) => {
+    document.body.toggleAttribute(EXPANDED, expanded);
+    document
+      .querySelectorAll<HTMLElement>('.main-frame, .sl-skip-link')
+      .forEach((element) => element.toggleAttribute('inert', expanded));
+    button()?.setAttribute('aria-expanded', String(expanded));
   };
 
-  toggle?.addEventListener('click', () => {
-    const open = document.body.toggleAttribute('data-helia-sidebar-open');
-    if (open) sidebar?.style.setProperty('--sl-sidebar-visibility', 'visible');
-    else sidebar?.style.removeProperty('--sl-sidebar-visibility');
-    toggle.setAttribute('aria-expanded', String(open));
+  document.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+
+    if (target.closest('[data-helia-sidebar-toggle]')) {
+      setExpanded(!document.body.hasAttribute(EXPANDED));
+      return;
+    }
+
+    /* A link in the pane navigates under the overlay, so closing is what
+       leaves the page it goes to readable. */
+    if (target.closest('#starlight__sidebar a')) setExpanded(false);
   });
 
-  window.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') close();
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    if (!document.body.hasAttribute(EXPANDED)) return;
+    setExpanded(false);
+    button()?.focus();
   });
 
-  narrow.addEventListener('change', close);
+  /* Above the collapse point the pane is part of the page and the button is
+     gone, so an open overlay would have nothing left to close it. */
+  matchMedia('(min-width: 62rem)').addEventListener('change', () =>
+    setExpanded(false),
+  );
+
+  document.addEventListener('astro:after-swap', () => setExpanded(false));
 </script>

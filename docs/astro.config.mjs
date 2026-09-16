@@ -54,6 +54,29 @@ export default defineConfig({
              there to show what a product site gets from this option. Every
              other page already carries the sidebar. */
           sidebar: 'always',
+          /* The bar this site reads its own navigation from, and the only
+             place the option and its narrow-width sidebar button are driven
+             end to end. The bar stands in place of Starlight's header, which
+             is where the social row renders, so GitHub is a link here. */
+          header: {
+            links: [
+              { label: 'Foundations', href: `${basePath}foundations/` },
+              { label: 'Gallery', href: `${basePath}gallery/` },
+              {
+                label: 'Starlight plugin',
+                href: `${basePath}starlight-plugin/`,
+              },
+              {
+                label: 'React components',
+                href: `${basePath}react/inputs/`,
+                match: `${basePath}react/`,
+              },
+              {
+                label: 'GitHub',
+                href: 'https://github.com/AmbiqAI/helia-developer-hub',
+              },
+            ],
+          },
           footer: {
             links: [
               { label: 'Overview', href: basePath },
