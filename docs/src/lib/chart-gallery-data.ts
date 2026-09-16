@@ -118,3 +118,64 @@ export const weightSeries: WeightPoint[] = [
   { transferKb: 471, score: 79, template: 'Island' },
   { transferKb: 528, score: 76, template: 'Island' },
 ];
+
+/*
+ * A benchmark-shaped set: many categories with names too long to sit under a
+ * bar, three series, and a measure spanning more than a decade. It is the
+ * shape the orientation, scale, band order and annotation options were written
+ * for, so it is the shape the gallery shows them in.
+ *
+ * The routines are invented and so are the ratios. Nothing here is a
+ * measurement of anything, and no routine named below exists.
+ */
+
+export interface RoutinePoint {
+  /** Invented routine name, long enough to need a horizontal axis. */
+  routine: string;
+  /** Which code path ran it. */
+  path: string;
+  /** Times faster than the reference path. */
+  speedup: number;
+}
+
+const ROUTINES = [
+  'packing_rescale_s8',
+  'packing_rescale_s16',
+  'window_fold_s8',
+  'window_fold_s16',
+  'stride_gather_s8',
+  'stride_gather_s16',
+  'accumulate_wide_s8',
+  'accumulate_wide_s16',
+  'saturate_narrow_s8',
+  'saturate_narrow_s16',
+  'transpose_block_s8',
+  'transpose_block_s16',
+  'reduce_rows_s8',
+  'reduce_rows_s16',
+];
+
+const VECTOR_SPEEDUPS = [
+  11.8, 4.2, 9.4, 3.1, 6.7, 2.4, 12, 5.3, 8.1, 2.9, 7.4, 3.6, 10.2, 4.8,
+];
+
+const SCALAR_SPEEDUPS = [
+  1.6, 0.9, 2.1, 1.2, 1.8, 0.8, 2.4, 1.1, 1.9, 1.3, 2.2, 0.95, 1.7, 1.4,
+];
+
+/*
+ * Three series, written in the order the chart should read them rather than
+ * the order they sort in: the fastest path first and the baseline last.
+ */
+export const routineSpeedups: RoutinePoint[] = ROUTINES.flatMap(
+  (routine, index) => [
+    { routine, path: 'vector path', speedup: VECTOR_SPEEDUPS[index] },
+    { routine, path: 'scalar path', speedup: SCALAR_SPEEDUPS[index] },
+    { routine, path: 'reference', speedup: 1 },
+  ],
+);
+
+/** The same set with the reference spent as a rule rather than as a series. */
+export const routinePaths: RoutinePoint[] = routineSpeedups.filter(
+  (point) => point.path !== 'reference',
+);

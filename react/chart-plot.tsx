@@ -23,10 +23,14 @@ import {
   chartPlotOptions,
   inlineChartColors,
   labelChartSvg,
+  type ChartAxisTitles,
   type ChartDensity,
   type ChartKind,
   type ChartLegend,
+  type ChartOrientation,
   type ChartRecord,
+  type ChartReferenceLine,
+  type ChartScale,
 } from '../chart-plot-spec';
 
 export interface ChartPlotProps {
@@ -54,6 +58,18 @@ export interface ChartPlotProps {
   density?: ChartDensity;
   /** `auto` names the series when there is more than one; `none` never does. */
   legend?: ChartLegend;
+  /** Which way the bars run. `horizontal` puts the categories on the y axis. */
+  orientation?: ChartOrientation;
+  /** The measure's scale. Linear and anchored at zero when unset. */
+  scale?: ChartScale;
+  /** Axis titles, for the chart whose unit will not fit in the subtitle. */
+  axis?: ChartAxisTitles;
+  /** Writes each bar's value at its end, where the bands leave room for it. */
+  valueLabels?: boolean;
+  /** How a value is written, on a bar and on a titled or logarithmic axis. */
+  valueFormat?: (value: number) => string;
+  /** Rules across the measure: a baseline, a target, a budget. */
+  referenceLines?: readonly ChartReferenceLine[];
   className?: string;
 }
 
@@ -70,6 +86,12 @@ export function ChartPlot({
   width = CHART_WIDTH,
   density = 'default',
   legend = 'auto',
+  orientation = 'vertical',
+  scale,
+  axis,
+  valueLabels = false,
+  valueFormat,
+  referenceLines,
   className,
 }: ChartPlotProps) {
   const host = React.useRef<HTMLDivElement | null>(null);
@@ -114,6 +136,12 @@ export function ChartPlot({
         height,
         width: measured > 0 ? measured : width,
         density,
+        orientation,
+        scale,
+        axis,
+        valueLabels,
+        valueFormat,
+        referenceLines,
       }),
     );
     inlineChartColors(figure);
@@ -129,6 +157,12 @@ export function ChartPlot({
     height,
     width,
     density,
+    orientation,
+    scale,
+    axis,
+    valueLabels,
+    valueFormat,
+    referenceLines,
     measured,
     generation,
     title,

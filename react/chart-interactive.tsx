@@ -28,6 +28,7 @@ import {
   DataZoomComponent,
   GridComponent,
   LegendComponent,
+  MarkLineComponent,
   ToolboxComponent,
   TooltipComponent,
 } from 'echarts/components';
@@ -36,17 +37,26 @@ import { SVGRenderer } from 'echarts/renderers';
 import * as React from 'react';
 
 import {
+  chartCategoryMargin,
   chartLegendEntries,
   chartSeriesNames,
+  chartValueScale,
+  formatChartValue,
+  type ChartAxisTitles,
   type ChartKind,
   type ChartLegend,
+  type ChartOrientation,
   type ChartRecord,
+  type ChartReferenceLine,
+  type ChartScale,
+  type ChartValueScale,
 } from '../chart-plot-spec';
 import {
   chartEchartsPaletteKey,
   chartEchartsTheme,
   readChartEchartsPalette,
   HELIA_ECHARTS_THEME,
+  type ChartEchartsPalette,
 } from '../chart-echarts-theme';
 
 echarts.use([
@@ -60,6 +70,7 @@ echarts.use([
      and the option's `selected` map are the legend component's, and the HTML
      toggle goes through them. */
   LegendComponent,
+  MarkLineComponent,
   ToolboxComponent,
   TooltipComponent,
   SVGRenderer,
@@ -90,6 +101,20 @@ const ZOOM_SLIDER = {
 };
 const ZOOM_SLIDER_ROOM = 30;
 
+/* `containLabel` measures the ticks and not the axis name or a value written
+   past the end of a bar, so those two are the only room that has to be
+   reserved by hand. The category name clears the labels it sits beyond, which
+   is what the package's own margin arithmetic is for; the width it is asked
+   about is nominal, because the axis is measured by ECharts and only the name
+   is placed from here. */
+const AXIS_NAME_ROOM = 22;
+const VALUE_AXIS_NAME_GAP = 44;
+const VALUE_LABEL_ROOM = 34;
+const NOMINAL_WIDTH = 1000;
+
+/** The reference rule's dash, in the units ECharts takes. */
+const REFERENCE_DASH = [4, 3];
+
 export interface ChartInteractiveProps {
   /** The chart's heading. Also the accessible name of the plot area. */
   title: string;
@@ -111,6 +136,18 @@ export interface ChartInteractiveProps {
   height?: number;
   /** `auto` names the series when there is more than one; `none` never does. */
   legend?: ChartLegend;
+  /** Which way the bars run. `horizontal` puts the categories on the y axis. */
+  orientation?: ChartOrientation;
+  /** The measure's scale. A `log` axis over a value at or below zero is drawn linear, and the console says so. */
+  scale?: ChartScale;
+  /** Axis titles, for the chart whose unit will not fit in the subtitle. */
+  axis?: ChartAxisTitles;
+  /** Writes each bar's value at its end. Overlapping labels are dropped. */
+  valueLabels?: boolean;
+  /** How a value is written, on a bar and on a titled or logarithmic axis. */
+  valueFormat?: (value: number) => string;
+  /** Rules across the measure: a baseline, a target, a budget. */
+  referenceLines?: readonly ChartReferenceLine[];
   /** Whether the reader can move the view, and with what. */
   zoom?: ChartZoom;
   /** Whether hovering a mark reports its value. */
@@ -221,6 +258,13 @@ function buildOption({
   tooltip,
   brush,
   animate,
+  orientation,
+  value,
+  axis,
+  valueLabels,
+  valueFormat,
+  referenceLines,
+  ink,
 }: {
   kind: ChartKind;
   plotted: Plotted;
@@ -229,15 +273,86 @@ function buildOption({
   tooltip: boolean;
   brush: boolean;
   animate: boolean;
+  orientation: ChartOrientation;
+  value: ChartValueScale;
+  axis: ChartAxisTitles | undefined;
+  valueLabels: boolean;
+  valueFormat: ((value: number) => string) | undefined;
+  referenceLines: readonly ChartReferenceLine[];
+  ink: string;
 }): Option {
   const scatter = kind === 'scatter' || kind === 'dot';
   const type = scatter ? 'scatter' : kind === 'bar' ? 'bar' : 'line';
+  /* Only bars turn, the same rule the Plot lane follows. */
+  const horizontal = kind === 'bar' && orientation === 'horizontal';
+  const format = valueFormat ?? formatChartValue;
+  const barLabels = valueLabels && type === 'bar';
+
+  /* The value axis is the measure wherever the orientation put it. A scatter
+     has a measure on both axes and keeps the pair it always had. */
+  const measureAxis: Record<string, unknown> = {
+    type: value.type === 'log' ? 'log' : 'value',
+    scale: scatter,
+    ...(value.domain ? { min: value.domain[0], max: value.domain[1] } : {}),
+    ...(axis?.valueLabel
+      ? {
+          name: axis.valueLabel,
+          nameLocation: 'middle',
+          nameGap: horizontal ? AXIS_NAME_ROOM : VALUE_AXIS_NAME_GAP,
+        }
+      : {}),
+    ...(valueFormat || value.ticks
+      ? {
+          axisLabel: {
+            ...(valueFormat ? { formatter: (one: number) => format(one) } : {}),
+            /* The 1, 2, 5 ticks the spec chose, rather than the decades
+               ECharts would place on its own. */
+            ...(value.ticks ? { customValues: value.ticks } : {}),
+          },
+        }
+      : {}),
+    ...(value.ticks
+      ? {
+          axisTick: { customValues: value.ticks },
+          splitLine: { show: true, customValues: value.ticks },
+        }
+      : {}),
+  };
+
+  const bandAxis: Record<string, unknown> = {
+    type: 'category',
+    data: plotted.categories,
+    boundaryGap: kind === 'bar',
+    /* A y category axis counts up from the bottom, so the first row would read
+       last. Inverting it makes a horizontal chart run in data order, which is
+       the order the vertical one already runs in. */
+    ...(horizontal ? { inverse: true } : {}),
+    ...(axis?.categoryLabel
+      ? {
+          name: axis.categoryLabel,
+          nameLocation: 'middle',
+          nameGap: horizontal
+            ? chartCategoryMargin(plotted.categories, NOMINAL_WIDTH)
+            : AXIS_NAME_ROOM + AXIS_NAME_ROOM,
+        }
+      : {}),
+  };
+
+  /* Which axis title lands on which edge, and therefore which edge has to give
+     up the room for it. */
+  const belowName = horizontal ? axis?.valueLabel : axis?.categoryLabel;
+  const besideName = horizontal ? axis?.categoryLabel : axis?.valueLabel;
 
   const option: Record<string, unknown> = {
     animation: animate,
     grid: {
       ...GRID,
-      bottom: zoom === 'slider' ? ZOOM_SLIDER_ROOM : GRID.bottom,
+      top: GRID.top + (barLabels && !horizontal ? AXIS_NAME_ROOM : 0),
+      right: GRID.right + (barLabels && horizontal ? VALUE_LABEL_ROOM : 0),
+      bottom:
+        (zoom === 'slider' ? ZOOM_SLIDER_ROOM : GRID.bottom) +
+        (belowName ? AXIS_NAME_ROOM : 0),
+      left: GRID.left + (besideName ? AXIS_NAME_ROOM : 0),
     },
     /* Drawn off, selected from. The HTML legend above the plot is the one the
        reader sees; this is only where the selection lives. */
@@ -248,26 +363,63 @@ function buildOption({
         plotted.names.map((name) => [name, !hidden.includes(name)]),
       ),
     },
-    xAxis: scatter
-      ? { type: 'value', scale: true }
-      : {
-          type: 'category',
-          data: plotted.categories,
-          boundaryGap: kind === 'bar',
-        },
+    xAxis: scatter || horizontal ? measureAxis : bandAxis,
     /* A scatter has a measure on both axes, so the vertical one is free to
        start away from zero; a bar read against a floating baseline lies. */
-    yAxis: { type: 'value', scale: scatter },
-    series: plotted.names.map((name, index) => ({
-      name,
-      type,
-      data: plotted.values[index],
-      ...(kind === 'area' ? { areaStyle: {} } : {}),
-      ...(scatter ? { symbolSize: 9 } : {}),
-      ...(type === 'line'
-        ? { emphasis: { lineStyle: { width: 3 } } }
-        : { emphasis: { itemStyle: { opacity: 0.8 } } }),
-    })),
+    yAxis: scatter || !horizontal ? measureAxis : bandAxis,
+    series: [
+      ...plotted.names.map((name, index) => ({
+        name,
+        type,
+        data: plotted.values[index],
+        ...(kind === 'area' ? { areaStyle: {} } : {}),
+        ...(scatter ? { symbolSize: 9 } : {}),
+        ...(barLabels
+          ? {
+              label: {
+                show: true,
+                position: horizontal ? 'right' : 'top',
+                color: ink,
+                formatter: (point: { value: number | null }) =>
+                  point.value === null ? '' : format(Number(point.value)),
+              },
+              /* ECharts drops the labels that would collide; the Plot lane has
+                 to decide the same thing from the band arithmetic, because a
+                 static figure has nothing to measure at. */
+              labelLayout: { hideOverlap: true },
+            }
+          : {}),
+        ...(type === 'line'
+          ? { emphasis: { lineStyle: { width: 3 } } }
+          : { emphasis: { itemStyle: { opacity: 0.8 } } }),
+      })),
+      /* The rules ride a series of their own rather than the first one, which
+         the reader can switch off. */
+      ...(referenceLines.length > 0
+        ? [
+            {
+              type: 'line' as const,
+              silent: true,
+              data: [],
+              legendHoverLink: false,
+              markLine: {
+                symbol: 'none',
+                silent: true,
+                lineStyle: { color: ink, type: REFERENCE_DASH },
+                data: referenceLines.map((line) => ({
+                  [horizontal ? 'xAxis' : 'yAxis']: line.value,
+                  label: {
+                    show: Boolean(line.label),
+                    formatter: line.label ?? '',
+                    color: ink,
+                    position: horizontal ? 'end' : 'insideEndTop',
+                  },
+                })),
+              },
+            },
+          ]
+        : []),
+    ],
   };
 
   if (tooltip) {
@@ -309,12 +461,13 @@ function buildOption({
    theme flip has to redo it. */
 let registeredPalette: string | null = null;
 
-function registerTheme(node: Element): void {
+function registerTheme(node: Element): ChartEchartsPalette {
   const palette = readChartEchartsPalette(node);
   const key = chartEchartsPaletteKey(palette);
-  if (key === registeredPalette) return;
+  if (key === registeredPalette) return palette;
   echarts.registerTheme(HELIA_ECHARTS_THEME, chartEchartsTheme(palette));
   registeredPalette = key;
+  return palette;
 }
 
 function prefersReducedMotion(): boolean {
@@ -333,6 +486,12 @@ export function ChartInteractive({
   series,
   height,
   legend = 'auto',
+  orientation = 'vertical',
+  scale,
+  axis,
+  valueLabels = false,
+  valueFormat,
+  referenceLines,
   zoom = 'none',
   tooltip = true,
   brush = false,
@@ -345,6 +504,9 @@ export function ChartInteractive({
   const [chart, setChart] = React.useState<echarts.ECharts | null>(null);
   const [hidden, setHidden] = React.useState<readonly string[]>([]);
   const [generation, setGeneration] = React.useState(0);
+  const [palette, setPalette] = React.useState<ChartEchartsPalette | null>(
+    null,
+  );
 
   React.useEffect(() => {
     /* The palette is read, not deferred to `var()`, so a theme flip has to
@@ -372,7 +534,7 @@ export function ChartInteractive({
         echarts.use([CanvasRenderer]);
       }
       if (!live || !host.current) return;
-      registerTheme(host.current);
+      setPalette(registerTheme(host.current));
       instance = echarts.init(host.current, HELIA_ECHARTS_THEME, { renderer });
       setChart(instance);
     })();
@@ -397,6 +559,15 @@ export function ChartInteractive({
     [kind, data, x, y, series],
   );
 
+  const value = React.useMemo(
+    () => chartValueScale(data, y, scale, kind === 'bar' || kind === 'area'),
+    [data, y, scale, kind],
+  );
+
+  React.useEffect(() => {
+    if (value.warning) console.warn(value.warning);
+  }, [value]);
+
   const option = React.useMemo(
     () =>
       buildOption({
@@ -407,8 +578,30 @@ export function ChartInteractive({
         tooltip,
         brush,
         animate: animate && !prefersReducedMotion(),
+        orientation,
+        value,
+        axis,
+        valueLabels,
+        valueFormat,
+        referenceLines: referenceLines ?? [],
+        ink: palette?.ink ?? 'currentColor',
       }),
-    [kind, plotted, hidden, zoom, tooltip, brush, animate],
+    [
+      kind,
+      plotted,
+      hidden,
+      zoom,
+      tooltip,
+      brush,
+      animate,
+      orientation,
+      value,
+      axis,
+      valueLabels,
+      valueFormat,
+      referenceLines,
+      palette,
+    ],
   );
 
   React.useEffect(() => {

@@ -12,7 +12,8 @@
  *
  * The title, the subtitle, the legend and the caption are this part's HTML, not
  * Plot's SVG: they are page type and belong on the package type scale. The
- * subtitle is where "Y against X" goes, which is why no axis is titled.
+ * subtitle is where "Y against X" goes, so an axis is titled only where the
+ * unit will not fit in that sentence -- a ratio, a log axis -- through `axis`.
  *
  * The chart carries no frame of its own. Put it in a `Card` where the page
  * wants one.
@@ -30,10 +31,14 @@ import {
   chartPlotOptions,
   inlineChartColors,
   labelChartSvg,
+  type ChartAxisTitles,
   type ChartDensity,
   type ChartKind,
   type ChartLegend,
+  type ChartOrientation,
   type ChartRecord,
+  type ChartReferenceLine,
+  type ChartScale,
 } from '../chart-plot-spec';
 
 interface Props extends HTMLAttributes<'figure'> {
@@ -61,6 +66,18 @@ interface Props extends HTMLAttributes<'figure'> {
   density?: ChartDensity;
   /** `auto` names the series when there is more than one; `none` never does. */
   legend?: ChartLegend;
+  /** Which way the bars run. `horizontal` puts the categories on the y axis and takes the left margin from the longest label. */
+  orientation?: ChartOrientation;
+  /** The measure's scale. A `log` axis over a value at or below zero is drawn linear, and the build says so. */
+  scale?: ChartScale;
+  /** Axis titles, for the chart whose unit will not fit in the subtitle. */
+  axis?: ChartAxisTitles;
+  /** Writes each bar's value at its end, where the bands leave room for it. */
+  valueLabels?: boolean;
+  /** How a value is written, on a bar and on a titled or logarithmic axis. */
+  valueFormat?: (value: number) => string;
+  /** Rules across the measure: a baseline, a target, a budget. */
+  referenceLines?: readonly ChartReferenceLine[];
 }
 
 const {
@@ -76,6 +93,12 @@ const {
   width = CHART_WIDTH,
   density = 'default',
   legend = 'auto',
+  orientation = 'vertical',
+  scale,
+  axis,
+  valueLabels = false,
+  valueFormat,
+  referenceLines,
   class: className,
   ...rest
 } = Astro.props;
@@ -92,6 +115,12 @@ const figure = Plot.plot(
     height,
     width,
     density,
+    orientation,
+    scale,
+    axis,
+    valueLabels,
+    valueFormat,
+    referenceLines,
     document: document as unknown as Document,
   }),
 );

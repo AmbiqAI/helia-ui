@@ -17,6 +17,40 @@ import * as Plot from '@observablehq/plot';
 export type ChartKind = 'line' | 'area' | 'bar' | 'scatter' | 'dot';
 export type ChartDensity = 'default' | 'compact' | 'comfortable';
 export type ChartLegend = 'auto' | 'none';
+export type ChartOrientation = 'vertical' | 'horizontal';
+export type ChartScaleType = 'linear' | 'log';
+
+/**
+ * The value axis: the measure, wherever the orientation has put it.
+ *
+ * `min` and `max` are the reader's, not the data's. Given neither, a linear
+ * axis is still anchored at zero and nicely rounded, because a bar read
+ * against a floating baseline lies.
+ */
+export interface ChartScale {
+  type: ChartScaleType;
+  min?: number;
+  max?: number;
+}
+
+/**
+ * Axis titles, for the chart whose subtitle cannot carry the unit -- a ratio,
+ * a log axis, anything the reader has to know the units of to read a tick.
+ * Left unset, no axis is titled and the subtitle does the work.
+ */
+export interface ChartAxisTitles {
+  /** Titles the measure. */
+  valueLabel?: string;
+  /** Titles the categories. */
+  categoryLabel?: string;
+}
+
+/** A rule drawn across the plot at one value on the measure. */
+export interface ChartReferenceLine {
+  value: number;
+  /** Named once, in the first band, rather than once per group. */
+  label?: string;
+}
 
 /** One row of the chart's data. Keys are the `x`, `y` and `series` props. */
 export type ChartRecord = Record<string, unknown>;
@@ -71,6 +105,30 @@ const FRAME = {
 const STROKE_WIDTH = 2;
 const AREA_FILL_OPACITY = 0.16;
 
+/*
+ * Plot lays out at font-size 10 and the stylesheet sets the tick type from
+ * `--helia-text-label`, which is larger. Every measurement taken here -- the
+ * left margin a category label needs, the room a value label wants -- is taken
+ * at the drawn size rather than Plot's, so a label that fits by this arithmetic
+ * fits on the page.
+ */
+const TICK_FONT_SIZE = 11;
+const TICK_CHAR_WIDTH = 6.6;
+/** Gap between the longest category label and the plot area. */
+const CATEGORY_LABEL_GAP = 12;
+/** The share of the width the category labels may take before they are cut. */
+const CATEGORY_MARGIN_SHARE = 0.45;
+/** Room an axis title needs beyond the ticks. */
+const AXIS_TITLE_ROOM = 16;
+/** Room a value label needs past the end of its bar. */
+const VALUE_LABEL_GAP = 6;
+/** Beyond this many, log ticks are thinned to the decades. */
+const MAX_LOG_TICKS = 10;
+/** The 1, 2, 5 sequence a log axis is read in. */
+const LOG_STEPS = [1, 2, 5];
+
+const REFERENCE_DASH = '4 3';
+
 export interface ChartSpec {
   kind: ChartKind;
   data: readonly ChartRecord[];
@@ -83,6 +141,18 @@ export interface ChartSpec {
   height: number;
   width: number;
   density: ChartDensity;
+  /** Which way the bars run. `horizontal` puts the categories on the y axis. */
+  orientation?: ChartOrientation;
+  /** The measure's scale. Linear and anchored at zero when unset. */
+  scale?: ChartScale;
+  /** Axis titles. Untitled when unset. */
+  axis?: ChartAxisTitles;
+  /** Writes each bar's value at its end, where the bands leave room for it. */
+  valueLabels?: boolean;
+  /** How a value is written, on a bar and on a titled or logarithmic axis. */
+  valueFormat?: (value: number) => string;
+  /** Rules across the measure: a baseline, a target, a budget. */
+  referenceLines?: readonly ChartReferenceLine[];
   /** The DOM Plot builds against. Omitted in the browser, where there is one. */
   document?: Document;
 }
@@ -139,24 +209,266 @@ function seriesRange(count: number): string[] {
 }
 
 /**
- * The Plot options for a spec. Axes carry ticks and no titles: the subtitle
- * says what is plotted against what, so an axis title would be the same
- * sentence written twice, once in Plot's type and once in ours.
+ * How a number is written when the spec does not say: enough decimals to tell
+ * two neighboring values apart, and none that are only zeros.
+ */
+export function formatChartValue(value: number): string {
+  const size = Math.abs(value);
+  const digits = size >= 100 ? 0 : size >= 10 ? 1 : 2;
+  const written = value.toFixed(digits);
+  return written.includes('.') ? written.replace(/\.?0+$/, '') : written;
+}
+
+/** The finite values of `key`, in data order. */
+function measures(data: readonly ChartRecord[], key: string): number[] {
+  const found: number[] = [];
+  for (const row of data) {
+    const value = Number(row[key]);
+    if (Number.isFinite(value)) found.push(value);
+  }
+  return found;
+}
+
+/* Floating point makes 5e-2 a number with a tail, and a tick labeled
+   0.05000000000000001 is worse than any rounding this could hide. */
+function exact(value: number): number {
+  return Number(value.toPrecision(12));
+}
+
+/** The 1, 2 or 5 step at or below `value`, or at or above it. */
+function logStep(value: number, direction: 'down' | 'up'): number {
+  const decade = Math.pow(10, Math.floor(Math.log10(value)));
+  const position = value / decade;
+  if (direction === 'down') {
+    const step = [...LOG_STEPS].reverse().find((one) => one <= position + 1e-9);
+    return exact((step ?? 1) * decade);
+  }
+  const step = LOG_STEPS.find((one) => one >= position - 1e-9);
+  return exact((step ?? 10) * decade);
+}
+
+/**
+ * The ticks a log axis is read at: 1, 2 and 5 in every decade it spans, thinned
+ * to the decades alone once there are more of them than a reader will follow.
+ */
+export function chartLogTicks(min: number, max: number): number[] {
+  if (!(min > 0) || !(max > min)) return [];
+  const first = Math.floor(Math.log10(min));
+  const last = Math.ceil(Math.log10(max));
+  const ticks: number[] = [];
+  for (let decade = first; decade <= last; decade += 1) {
+    for (const step of LOG_STEPS) {
+      const tick = exact(step * Math.pow(10, decade));
+      if (tick >= min * (1 - 1e-9) && tick <= max * (1 + 1e-9))
+        ticks.push(tick);
+    }
+  }
+  if (ticks.length <= MAX_LOG_TICKS) return ticks;
+  return ticks.filter((tick) => {
+    const decade = Math.log10(tick);
+    return Math.abs(decade - Math.round(decade)) < 1e-9;
+  });
+}
+
+/** A value scale resolved against the data: what Plot and ECharts both need. */
+export interface ChartValueScale {
+  type: ChartScaleType;
+  /** Set when the reader or the scale type fixed an end of the axis. */
+  domain?: [number, number];
+  /** The tick values, when the scale type chose them. */
+  ticks?: number[];
+  /** Why a log axis was refused, for the build log. Set only on a fallback. */
+  warning?: string;
+}
+
+/**
+ * Resolves the value axis.
+ *
+ * A log scale cannot draw a zero and has no sign, so data that reaches either
+ * is drawn linear instead and the caller is told why. Refusing to draw at all
+ * would lose a chart over an axis option, and drawing a log axis over a series
+ * with a zero in it silently drops the row.
+ */
+export function chartValueScale(
+  data: readonly ChartRecord[],
+  key: string,
+  scale: ChartScale | undefined,
+  zeroBaseline: boolean,
+): ChartValueScale {
+  const values = measures(data, key);
+  const low = values.length > 0 ? Math.min(...values) : 0;
+  const high = values.length > 0 ? Math.max(...values) : 1;
+
+  const linear = (warning?: string): ChartValueScale => {
+    if (scale?.min === undefined && scale?.max === undefined) {
+      return { type: 'linear', ...(warning ? { warning } : {}) };
+    }
+    const floor = scale.min ?? (zeroBaseline ? Math.min(0, low) : low);
+    return {
+      type: 'linear',
+      domain: [floor, scale.max ?? high],
+      ...(warning ? { warning } : {}),
+    };
+  };
+
+  if (scale?.type !== 'log') return linear();
+
+  const nonPositive = values.some((value) => value <= 0);
+  const floor = scale.min ?? (low > 0 ? logStep(low, 'down') : 0);
+  if (nonPositive || !(floor > 0)) {
+    return linear(
+      `chart: a logarithmic ${key} axis needs every value above zero; drawing it linear instead.`,
+    );
+  }
+  const ceiling = scale.max ?? logStep(high, 'up');
+  return {
+    type: 'log',
+    domain: [floor, ceiling],
+    ticks: chartLogTicks(floor, ceiling),
+  };
+}
+
+/**
+ * The left margin a horizontal chart's category labels need, from the longest
+ * of them. Capped: one runaway label should cost the plot area some of its
+ * width, not most of it.
+ */
+export function chartCategoryMargin(
+  labels: readonly string[],
+  width: number,
+): number {
+  const longest = labels.reduce(
+    (most, label) => Math.max(most, label.length),
+    0,
+  );
+  const wanted = Math.ceil(longest * TICK_CHAR_WIDTH) + CATEGORY_LABEL_GAP;
+  return Math.min(wanted, Math.floor(width * CATEGORY_MARGIN_SHARE));
+}
+
+/**
+ * Whether the bands are big enough to write a value in.
+ *
+ * A vertical bar's label is limited by the band's width and a horizontal one's
+ * by its height, which is why the two are asked different questions. Labels
+ * that do not fit are dropped as a set rather than individually: half a chart
+ * labeled reads as a chart with missing data.
+ */
+export function chartValueLabelsFit({
+  horizontal,
+  bands,
+  extent,
+  longest,
+}: {
+  horizontal: boolean;
+  /** Bars across the measure: categories times series. */
+  bands: number;
+  /** The plot area along the band direction, in pixels. */
+  extent: number;
+  /** Characters in the longest written value. */
+  longest: number;
+}): boolean {
+  if (bands <= 0) return false;
+  const band = extent / bands;
+  return horizontal
+    ? band >= TICK_FONT_SIZE + 2
+    : band >= longest * TICK_CHAR_WIDTH + 4;
+}
+
+/**
+ * The Plot options for a spec. An axis carries ticks and, unless `axis` says
+ * otherwise, no title: the subtitle says what is plotted against what, so an
+ * axis title is usually the same sentence written twice, once in Plot's type
+ * and once in ours. A ratio or a log axis is the exception, which is what
+ * `axis` is for.
+ *
+ * `x`, `y` and `series` stay the keys they always were. `orientation` moves the
+ * drawing, not the data contract: a horizontal bar chart still names its
+ * categories with `x` and its measure with `y`.
  */
 export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
-  const { kind, data, x, y, series, height, width, density } = spec;
+  const {
+    kind,
+    data,
+    x,
+    y,
+    series,
+    height,
+    width,
+    density,
+    orientation = 'vertical',
+    scale,
+    axis,
+    valueLabels = false,
+    valueFormat,
+    referenceLines = [],
+  } = spec;
   const frame = FRAME[density];
   const names = chartSeriesNames(data, series);
   const rows = data as ChartRecord[];
+  const bars = kind === 'bar';
+  /* Only bars turn: a line or an area plots a measure against a run, and a run
+     that reads bottom to top is a chart nobody asked for. */
+  const horizontal = bars && orientation === 'horizontal';
+  const grouped = bars && Boolean(series);
+  const bands = categories(rows, x);
+  const format = valueFormat ?? formatChartValue;
+
+  const value = chartValueScale(rows, y, scale, bars || kind === 'area');
+  /* The build log is where this belongs: the page still draws, and the author
+     is the only one who can decide whether linear was acceptable. */
+  if (value.warning) console.warn(value.warning);
+  const baseline = value.domain ? value.domain[0] : 0;
+  /* A bar on a log axis has no zero to stand on, and one on a raised linear
+     floor would be drawn from a baseline that is not on the chart. Both start
+     at the bottom of the axis instead. */
+  const anchored = bars && baseline !== 0;
+
+  const written = measures(rows, y).map((one) => format(one));
+  const longest = written.reduce((most, one) => Math.max(most, one.length), 0);
+
+  const marginLeft = horizontal
+    ? chartCategoryMargin(bands, width)
+    : frame.left;
+  let marginTop = frame.top;
+  let marginRight = frame.right;
+  let marginBottom = frame.bottom;
+  if (axis?.valueLabel) {
+    if (horizontal) marginBottom += AXIS_TITLE_ROOM;
+    else marginTop += AXIS_TITLE_ROOM;
+  }
+  if (axis?.categoryLabel) {
+    if (horizontal) marginTop += AXIS_TITLE_ROOM;
+    else marginBottom += AXIS_TITLE_ROOM;
+  }
+  if (valueLabels && bars) {
+    if (horizontal) {
+      marginRight += Math.ceil(longest * TICK_CHAR_WIDTH) + VALUE_LABEL_GAP;
+    } else {
+      marginTop += TICK_FONT_SIZE;
+    }
+  }
+
+  const showValues =
+    valueLabels &&
+    bars &&
+    chartValueLabelsFit({
+      horizontal,
+      bands: bands.length * Math.max(names.length, 1),
+      extent: horizontal
+        ? height - marginTop - marginBottom
+        : width - marginLeft - marginRight,
+      longest,
+    });
 
   /* Gridlines run across the measure, because that is the direction a reader
      compares in. Only a scatter has a measure on both axes, so only a scatter
      gets the second set. */
+  const grid = { stroke: CHART_GRID, strokeOpacity: 1 };
   const marks: Plot.Markish[] = [
-    Plot.gridY({ stroke: CHART_GRID, strokeOpacity: 1 }),
+    horizontal ? Plot.gridX(grid) : Plot.gridY(grid),
   ];
   if (kind === 'scatter') {
-    marks.push(Plot.gridX({ stroke: CHART_GRID, strokeOpacity: 1 }));
+    marks.push(Plot.gridX(grid));
   }
 
   const single = CHART_SERIES_COLORS[0];
@@ -191,18 +503,52 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
     );
   } else if (kind === 'bar') {
     /* Grouped bars are a facet per category with the series inside it, which
-       is what puts the category labels under the group rather than under every
-       bar in it. Without a series there is nothing to group and the band is
-       the category itself. */
+       is what puts the category labels beside the group rather than beside
+       every bar in it. Without a series there is nothing to group and the band
+       is the category itself. */
+    const band = series ?? x;
+    const facet = series ? x : undefined;
     marks.push(
-      Plot.barY(rows, {
-        x: series ?? x,
-        y,
-        fx: series ? x : undefined,
-        fill: series ?? single,
-      }),
-      Plot.ruleY([0], { stroke: CHART_GRID }),
+      horizontal
+        ? Plot.barX(rows, {
+            y: band,
+            fy: facet,
+            ...(anchored ? { x1: baseline, x2: y } : { x: y }),
+            fill: series ?? single,
+          })
+        : Plot.barY(rows, {
+            x: band,
+            fx: facet,
+            ...(anchored ? { y1: baseline, y2: y } : { y }),
+            fill: series ?? single,
+          }),
+      horizontal
+        ? Plot.ruleX([baseline], { stroke: CHART_GRID })
+        : Plot.ruleY([baseline], { stroke: CHART_GRID }),
     );
+    if (showValues) {
+      marks.push(
+        horizontal
+          ? Plot.text(rows, {
+              y: band,
+              fy: facet,
+              x: y,
+              text: (row: ChartRecord) => format(Number(row[y])),
+              textAnchor: 'start',
+              dx: VALUE_LABEL_GAP / 2,
+              fill: CHART_INK,
+            })
+          : Plot.text(rows, {
+              x: band,
+              fx: facet,
+              y,
+              text: (row: ChartRecord) => format(Number(row[y])),
+              lineAnchor: 'bottom',
+              dy: -VALUE_LABEL_GAP / 2,
+              fill: CHART_INK,
+            }),
+      );
+    }
   } else {
     marks.push(
       Plot.dot(rows, {
@@ -215,16 +561,76 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
     );
   }
 
-  const grouped = kind === 'bar' && Boolean(series);
+  if (referenceLines.length > 0) {
+    const rule = horizontal ? Plot.ruleX : Plot.ruleY;
+    marks.push(
+      rule(
+        referenceLines.map((line) => line.value),
+        { stroke: CHART_INK, strokeDasharray: REFERENCE_DASH },
+      ),
+    );
+    /* The rule repeats across the facets, because a faceted mark has to; the
+       label does not, so it is given the first category and written once. */
+    const labeled = referenceLines.filter((line) => line.label);
+    if (labeled.length > 0) {
+      const placed = labeled.map((line) => ({
+        value: line.value,
+        label: line.label,
+        [x]: bands[0],
+      }));
+      marks.push(
+        horizontal
+          ? Plot.text(placed, {
+              x: 'value',
+              fy: grouped ? x : undefined,
+              text: 'label',
+              frameAnchor: 'top',
+              textAnchor: 'start',
+              dx: 3,
+              dy: 2,
+              fill: CHART_INK,
+            })
+          : Plot.text(placed, {
+              y: 'value',
+              fx: grouped ? x : undefined,
+              text: 'label',
+              frameAnchor: 'left',
+              textAnchor: 'start',
+              lineAnchor: 'bottom',
+              dx: 3,
+              dy: -3,
+              fill: CHART_INK,
+            }),
+      );
+    }
+  }
+
+  /* The inner band takes its domain from the series list rather than from the
+     sort Plot would apply, so the bars in a group run in the order the legend
+     names them. See AmbiqAI/helia-ui#82. */
+  const innerBand = { axis: null, domain: names };
+  const categoryScale = {
+    label: axis?.categoryLabel ?? null,
+    labelArrow: 'none' as const,
+    ...(bars ? { domain: bands } : {}),
+  };
+  const valueScale = {
+    label: axis?.valueLabel ?? null,
+    labelArrow: 'none' as const,
+    ...(value.type === 'log' ? { type: 'log' as const } : {}),
+    ...(value.domain ? { domain: value.domain } : { nice: true }),
+    ticks: value.ticks ?? frame.ticks,
+    ...(valueFormat ? { tickFormat: valueFormat } : {}),
+  };
 
   return {
     document: spec.document,
     width,
     height,
-    marginTop: frame.top,
-    marginRight: frame.right,
-    marginBottom: frame.bottom,
-    marginLeft: frame.left,
+    marginTop,
+    marginRight,
+    marginBottom,
+    marginLeft,
     /* A stable class rather than the hash Plot derives from the style: two
        charts drawn the same way should produce the same markup, so a build is
        reproducible and a diff of the output is readable. */
@@ -234,14 +640,10 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
       color: CHART_INK,
       fontFamily: 'var(--helia-font-sans)',
     },
-    x: grouped
-      ? { axis: null }
-      : {
-          label: null,
-          ...(kind === 'bar' ? { domain: categories(rows, x) } : {}),
-        },
-    fx: grouped ? { label: null, domain: categories(rows, x) } : undefined,
-    y: { label: null, ticks: frame.ticks, nice: true },
+    x: horizontal ? valueScale : grouped ? innerBand : categoryScale,
+    fx: !horizontal && grouped ? categoryScale : undefined,
+    y: horizontal ? (grouped ? innerBand : categoryScale) : valueScale,
+    fy: horizontal && grouped ? categoryScale : undefined,
     color: series
       ? { domain: names, range: seriesRange(names.length) }
       : undefined,

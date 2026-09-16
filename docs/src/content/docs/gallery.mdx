@@ -52,6 +52,8 @@ import Timeline from '@ambiqai/helia-ui/astro/Timeline';
 import {
   buildSeries,
   pagesSeries,
+  routinePaths,
+  routineSpeedups,
   trafficSeries,
   weightSeries,
 } from '../../lib/chart-gallery-data';
@@ -2104,6 +2106,184 @@ here is a measurement of any part.
     series="template"
     width={900}
     height={280}
+  />
+</Example>
+
+### Long names, wide ranges, and a baseline
+
+A chart with more categories than a row of bars can name, and a measure that
+spans more than a decade, needs four options the defaults do not give it. The
+set below is invented — the routines do not exist and neither do the ratios —
+but it is shaped like the one the options were written for: fourteen long
+names, three series, and speedups from under one to twelve.
+
+`orientation="horizontal"` puts the categories on the vertical axis and takes
+the left margin from the longest label, so a name is never cut. The data
+contract does not move with the drawing: `x` still names the categories and `y`
+still names the measure.
+
+<Example
+  title='orientation="horizontal"'
+  code={`
+    <Chart
+      title="Speedup by routine"
+      subtitle="Times faster than the reference path, by code path"
+      caption="Invented routines and invented ratios."
+      kind="bar"
+      data={routineSpeedups}
+      x="routine"
+      y="speedup"
+      series="path"
+      orientation="horizontal"
+      width={900}
+      height={620}
+    />
+  `}
+>
+  <Chart
+    title="Speedup by routine"
+    subtitle="Times faster than the reference path, by code path"
+    caption="Invented routines and invented ratios."
+    kind="bar"
+    data={routineSpeedups}
+    x="routine"
+    y="speedup"
+    series="path"
+    orientation="horizontal"
+    width={900}
+    height={620}
+  />
+</Example>
+
+`scale` moves the measure. A log axis ticks at 1, 2 and 5 through each decade
+it spans and rounds its own ends to that sequence unless `min` and `max` say
+otherwise, which is what stops a set with one twelve-times result in it from
+drawing every other bar as a stub. A log axis cannot draw a zero or a negative
+number: given one, the chart is drawn linear and the build log says why.
+
+<Example
+  title='scale={{ type: "log", min: 0.5 }}'
+  code={`
+    <Chart
+      title="Speedup by routine, logarithmic"
+      subtitle="Times faster than the reference path, by code path"
+      kind="bar"
+      data={routineSpeedups}
+      x="routine"
+      y="speedup"
+      series="path"
+      orientation="horizontal"
+      scale={{ type: 'log', min: 0.5 }}
+      valueFormat={(value) => \`\${value}x\`}
+      width={900}
+      height={620}
+    />
+  `}
+>
+  <Chart
+    title="Speedup by routine, logarithmic"
+    subtitle="Times faster than the reference path, by code path"
+    kind="bar"
+    data={routineSpeedups}
+    x="routine"
+    y="speedup"
+    series="path"
+    orientation="horizontal"
+    scale={{ type: 'log', min: 0.5 }}
+    valueFormat={(value) => `${value}x`}
+    width={900}
+    height={620}
+  />
+</Example>
+
+Inside a group the bars run in the order the rows first name the series, not in
+the order those names sort in, and the legend lists them in that same order. The
+series here are written fastest first — `vector path`, `scalar path`,
+`reference` — which is not alphabetical, so the two orders agreeing is the
+assertion rather than a coincidence.
+
+<Example
+  title="Group order is series order"
+  code={`
+    <Chart
+      title="Speedup by routine, compact"
+      subtitle="Times faster than the reference path, by code path"
+      kind="bar"
+      data={routineSpeedups}
+      x="routine"
+      y="speedup"
+      series="path"
+      orientation="horizontal"
+      density="compact"
+      width={900}
+      height={520}
+    />
+  `}
+>
+  <Chart
+    title="Speedup by routine, compact"
+    subtitle="Times faster than the reference path, by code path"
+    kind="bar"
+    data={routineSpeedups}
+    x="routine"
+    y="speedup"
+    series="path"
+    orientation="horizontal"
+    density="compact"
+    width={900}
+    height={520}
+  />
+</Example>
+
+`axis` titles an axis the subtitle cannot carry the unit for, `valueLabels`
+writes each bar's value at its end, and `referenceLines` draws a rule across
+the measure. A constant baseline belongs on the rule rather than in a third
+series: it costs a palette color, a legend entry and a third of the bars to
+draw a line. Value labels are dropped as a set when the bands are too small to
+hold them, so a chart that shows them at one height stops showing them at
+another rather than overprinting.
+
+<Example
+  title="axis, valueLabels and referenceLines"
+  code={`
+    <Chart
+      title="Speedup against the reference path"
+      subtitle="Two code paths, fourteen routines"
+      kind="bar"
+      data={routinePaths}
+      x="routine"
+      y="speedup"
+      series="path"
+      orientation="horizontal"
+      scale={{ type: 'log', min: 0.5 }}
+      axis={{ valueLabel: 'Times faster than reference', categoryLabel: 'Routine' }}
+      valueLabels
+      valueFormat={(value) => \`\${value}x\`}
+      referenceLines={[{ value: 1, label: 'reference' }]}
+      width={900}
+      height={480}
+    />
+  `}
+>
+  <Chart
+    title="Speedup against the reference path"
+    subtitle="Two code paths, fourteen routines"
+    kind="bar"
+    data={routinePaths}
+    x="routine"
+    y="speedup"
+    series="path"
+    orientation="horizontal"
+    scale={{ type: 'log', min: 0.5 }}
+    axis={{
+      valueLabel: 'Times faster than reference',
+      categoryLabel: 'Routine',
+    }}
+    valueLabels
+    valueFormat={(value) => `${value}x`}
+    referenceLines={[{ value: 1, label: 'reference' }]}
+    width={900}
+    height={480}
   />
 </Example>
 
