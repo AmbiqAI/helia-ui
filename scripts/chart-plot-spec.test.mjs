@@ -16,6 +16,7 @@ import { test } from 'node:test';
 
 import {
   chartCategoryMargin,
+  chartLegendEntries,
   chartLogTicks,
   chartPlotOptions,
   chartValueScale,
@@ -163,4 +164,25 @@ test('a value is written with enough decimals to tell two apart', () => {
   assert.equal(formatChartValue(12.25), '12.3');
   assert.equal(formatChartValue(1), '1');
   assert.equal(formatChartValue(1200), '1200');
+});
+
+test('the bars in a group run in series order, not sorted order', () => {
+  const options = chartPlotOptions({ ...base });
+  assert.deepEqual(options.x.domain, PATHS);
+  assert.deepEqual(options.color.domain, PATHS);
+  assert.notDeepEqual(PATHS, [...PATHS].sort());
+});
+
+test('the legend names the series in the same order as the bands', () => {
+  const options = chartPlotOptions({ ...base });
+  const entries = chartLegendEntries(
+    { data: rows, series: 'path' },
+    'auto',
+  ).map((entry) => entry.label);
+  assert.deepEqual(entries, options.x.domain);
+});
+
+test('a horizontal group takes the same band order', () => {
+  const options = chartPlotOptions({ ...base, orientation: 'horizontal' });
+  assert.deepEqual(options.y.domain, PATHS);
 });

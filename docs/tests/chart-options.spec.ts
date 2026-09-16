@@ -66,3 +66,29 @@ test('a log axis ticks at 1, 2 and 5 through each decade', async ({ page }) => {
     '20x',
   ]);
 });
+
+test('the bars run in the order the legend names them', async ({ page }) => {
+  await page.goto(gallery);
+  const figure = chart(page, 'Speedup by routine, compact');
+  const legend = await figure
+    .locator('.helia-chart__legend li')
+    .allInnerTexts();
+  expect(legend.map((one) => one.trim())).toEqual([
+    'vector path',
+    'scalar path',
+    'reference',
+  ]);
+
+  /* The first bar of the first group is the first series, which is the check
+     the legend order alone cannot make: both are read from the same list, and
+     only the drawing says whether Plot sorted the band behind our back. */
+  const swatch = await figure
+    .locator('.helia-chart__swatch')
+    .first()
+    .evaluate((node) => getComputedStyle(node).backgroundColor);
+  const bar = await figure
+    .locator('svg g[data-plot-label="bar"] rect')
+    .first()
+    .evaluate((node) => getComputedStyle(node).fill);
+  expect(bar).toBe(swatch);
+});

@@ -768,10 +768,11 @@ test('the ECharts legend toggles a series off', async ({ page }) => {
 /*
  * The whole claim of the Astro chart part is that the SVG is in the response.
  * A chart that only appears once the page has run is a chart that got there
- * some other way, so this reads the served HTML rather than the DOM: nine
- * figures across the seven examples, six standing alone and three in the group.
+ * some other way, so this reads the served HTML rather than the DOM: ten
+ * figures across the eight examples, seven standing alone and three in the
+ * group.
  */
-const GALLERY_CHARTS = 9;
+const GALLERY_CHARTS = 10;
 
 test('the gallery charts are inline SVG in the served HTML', async ({
   page,

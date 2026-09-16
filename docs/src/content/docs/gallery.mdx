@@ -2194,6 +2194,45 @@ number: given one, the chart is drawn linear and the build log says why.
   />
 </Example>
 
+Inside a group the bars run in the order the rows first name the series, not in
+the order those names sort in, and the legend lists them in that same order. The
+series here are written fastest first — `vector path`, `scalar path`,
+`reference` — which is not alphabetical, so the two orders agreeing is the
+assertion rather than a coincidence.
+
+<Example
+  title="Group order is series order"
+  code={`
+    <Chart
+      title="Speedup by routine, compact"
+      subtitle="Times faster than the reference path, by code path"
+      kind="bar"
+      data={routineSpeedups}
+      x="routine"
+      y="speedup"
+      series="path"
+      orientation="horizontal"
+      density="compact"
+      width={900}
+      height={520}
+    />
+  `}
+>
+  <Chart
+    title="Speedup by routine, compact"
+    subtitle="Times faster than the reference path, by code path"
+    kind="bar"
+    data={routineSpeedups}
+    x="routine"
+    y="speedup"
+    series="path"
+    orientation="horizontal"
+    density="compact"
+    width={900}
+    height={520}
+  />
+</Example>
+
 ### Three across
 
 `ChartGroup` gives the charts equal columns, so three drawn at the same `width`

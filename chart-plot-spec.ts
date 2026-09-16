@@ -437,7 +437,10 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
     );
   }
 
-  const innerBand = { axis: null };
+  /* The inner band takes its domain from the series list rather than from the
+     sort Plot would apply, so the bars in a group run in the order the legend
+     names them. See AmbiqAI/helia-ui#82. */
+  const innerBand = { axis: null, domain: names };
   const categoryScale = {
     label: null,
     ...(bars ? { domain: bands } : {}),
