@@ -38,10 +38,14 @@ import * as React from 'react';
 import {
   chartLegendEntries,
   chartSeriesNames,
+  chartValueScale,
+  formatChartValue,
   type ChartKind,
   type ChartLegend,
   type ChartOrientation,
   type ChartRecord,
+  type ChartScale,
+  type ChartValueScale,
 } from '../chart-plot-spec';
 import {
   chartEchartsPaletteKey,
@@ -114,6 +118,10 @@ export interface ChartInteractiveProps {
   legend?: ChartLegend;
   /** Which way the bars run. `horizontal` puts the categories on the y axis. */
   orientation?: ChartOrientation;
+  /** The measure's scale. A `log` axis over a value at or below zero is drawn linear, and the console says so. */
+  scale?: ChartScale;
+  /** How a value is written, on a titled or logarithmic axis. */
+  valueFormat?: (value: number) => string;
   /** Whether the reader can move the view, and with what. */
   zoom?: ChartZoom;
   /** Whether hovering a mark reports its value. */
@@ -225,6 +233,8 @@ function buildOption({
   brush,
   animate,
   orientation,
+  value,
+  valueFormat,
 }: {
   kind: ChartKind;
   plotted: Plotted;
@@ -234,16 +244,39 @@ function buildOption({
   brush: boolean;
   animate: boolean;
   orientation: ChartOrientation;
+  value: ChartValueScale;
+  valueFormat: ((value: number) => string) | undefined;
 }): Option {
   const scatter = kind === 'scatter' || kind === 'dot';
   const type = scatter ? 'scatter' : kind === 'bar' ? 'bar' : 'line';
   /* Only bars turn, the same rule the Plot lane follows. */
   const horizontal = kind === 'bar' && orientation === 'horizontal';
+  const format = valueFormat ?? formatChartValue;
 
   /* The value axis is the measure wherever the orientation put it. A scatter
      has a measure on both axes and keeps the pair it always had. */
-  const measureAxis = { type: 'value', scale: scatter };
-  const bandAxis = {
+  const measureAxis: Record<string, unknown> = {
+    type: value.type === 'log' ? 'log' : 'value',
+    scale: scatter,
+    ...(value.domain ? { min: value.domain[0], max: value.domain[1] } : {}),
+    ...(valueFormat || value.ticks
+      ? {
+          axisLabel: {
+            ...(valueFormat ? { formatter: (one: number) => format(one) } : {}),
+            /* The 1, 2, 5 ticks the spec chose, rather than the decades
+               ECharts would place on its own. */
+            ...(value.ticks ? { customValues: value.ticks } : {}),
+          },
+        }
+      : {}),
+    ...(value.ticks
+      ? {
+          axisTick: { customValues: value.ticks },
+          splitLine: { show: true, customValues: value.ticks },
+        }
+      : {}),
+  };
+  const bandAxis: Record<string, unknown> = {
     type: 'category',
     data: plotted.categories,
     boundaryGap: kind === 'bar',
@@ -348,6 +381,8 @@ export function ChartInteractive({
   height,
   legend = 'auto',
   orientation = 'vertical',
+  scale,
+  valueFormat,
   zoom = 'none',
   tooltip = true,
   brush = false,
@@ -412,6 +447,15 @@ export function ChartInteractive({
     [kind, data, x, y, series],
   );
 
+  const value = React.useMemo(
+    () => chartValueScale(data, y, scale, kind === 'bar' || kind === 'area'),
+    [data, y, scale, kind],
+  );
+
+  React.useEffect(() => {
+    if (value.warning) console.warn(value.warning);
+  }, [value]);
+
   const option = React.useMemo(
     () =>
       buildOption({
@@ -423,8 +467,21 @@ export function ChartInteractive({
         brush,
         animate: animate && !prefersReducedMotion(),
         orientation,
+        value,
+        valueFormat,
       }),
-    [kind, plotted, hidden, zoom, tooltip, brush, animate, orientation],
+    [
+      kind,
+      plotted,
+      hidden,
+      zoom,
+      tooltip,
+      brush,
+      animate,
+      orientation,
+      value,
+      valueFormat,
+    ],
   );
 
   React.useEffect(() => {

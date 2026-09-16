@@ -35,6 +35,7 @@ import {
   type ChartLegend,
   type ChartOrientation,
   type ChartRecord,
+  type ChartScale,
 } from '../chart-plot-spec';
 
 interface Props extends HTMLAttributes<'figure'> {
@@ -64,6 +65,10 @@ interface Props extends HTMLAttributes<'figure'> {
   legend?: ChartLegend;
   /** Which way the bars run. `horizontal` puts the categories on the y axis and takes the left margin from the longest label. */
   orientation?: ChartOrientation;
+  /** The measure's scale. A `log` axis over a value at or below zero is drawn linear, and the build says so. */
+  scale?: ChartScale;
+  /** How a value is written, on a titled or logarithmic axis. */
+  valueFormat?: (value: number) => string;
 }
 
 const {
@@ -80,6 +85,8 @@ const {
   density = 'default',
   legend = 'auto',
   orientation = 'vertical',
+  scale,
+  valueFormat,
   class: className,
   ...rest
 } = Astro.props;
@@ -97,6 +104,8 @@ const figure = Plot.plot(
     width,
     density,
     orientation,
+    scale,
+    valueFormat,
     document: document as unknown as Document,
   }),
 );

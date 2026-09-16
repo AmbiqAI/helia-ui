@@ -2153,6 +2153,47 @@ names, three series, and speedups from under one to twelve.
   />
 </Example>
 
+`scale` moves the measure. A log axis ticks at 1, 2 and 5 through each decade
+it spans and rounds its own ends to that sequence unless `min` and `max` say
+otherwise, which is what stops a set with one twelve-times result in it from
+drawing every other bar as a stub. A log axis cannot draw a zero or a negative
+number: given one, the chart is drawn linear and the build log says why.
+
+<Example
+  title='scale={{ type: "log", min: 0.5 }}'
+  code={`
+    <Chart
+      title="Speedup by routine, logarithmic"
+      subtitle="Times faster than the reference path, by code path"
+      kind="bar"
+      data={routineSpeedups}
+      x="routine"
+      y="speedup"
+      series="path"
+      orientation="horizontal"
+      scale={{ type: 'log', min: 0.5 }}
+      valueFormat={(value) => \`\${value}x\`}
+      width={900}
+      height={620}
+    />
+  `}
+>
+  <Chart
+    title="Speedup by routine, logarithmic"
+    subtitle="Times faster than the reference path, by code path"
+    kind="bar"
+    data={routineSpeedups}
+    x="routine"
+    y="speedup"
+    series="path"
+    orientation="horizontal"
+    scale={{ type: 'log', min: 0.5 }}
+    valueFormat={(value) => `${value}x`}
+    width={900}
+    height={620}
+  />
+</Example>
+
 ### Three across
 
 `ChartGroup` gives the charts equal columns, so three drawn at the same `width`

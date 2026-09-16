@@ -28,6 +28,7 @@ import {
   type ChartLegend,
   type ChartOrientation,
   type ChartRecord,
+  type ChartScale,
 } from '../chart-plot-spec';
 
 export interface ChartPlotProps {
@@ -57,6 +58,10 @@ export interface ChartPlotProps {
   legend?: ChartLegend;
   /** Which way the bars run. `horizontal` puts the categories on the y axis. */
   orientation?: ChartOrientation;
+  /** The measure's scale. Linear and anchored at zero when unset. */
+  scale?: ChartScale;
+  /** How a value is written, on a titled or logarithmic axis. */
+  valueFormat?: (value: number) => string;
   className?: string;
 }
 
@@ -74,6 +79,8 @@ export function ChartPlot({
   density = 'default',
   legend = 'auto',
   orientation = 'vertical',
+  scale,
+  valueFormat,
   className,
 }: ChartPlotProps) {
   const host = React.useRef<HTMLDivElement | null>(null);
@@ -119,6 +126,8 @@ export function ChartPlot({
         width: measured > 0 ? measured : width,
         density,
         orientation,
+        scale,
+        valueFormat,
       }),
     );
     inlineChartColors(figure);
@@ -135,6 +144,8 @@ export function ChartPlot({
     width,
     density,
     orientation,
+    scale,
+    valueFormat,
     measured,
     generation,
     title,

@@ -14,7 +14,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { chartCategoryMargin, chartPlotOptions } from '../chart-plot-spec.ts';
+import {
+  chartCategoryMargin,
+  chartLogTicks,
+  chartPlotOptions,
+  chartValueScale,
+  formatChartValue,
+} from '../chart-plot-spec.ts';
 
 const KERNELS = [
   'packing_rescale_s8',
@@ -91,4 +97,70 @@ test('orientation moves the bars only', () => {
   assert.deepEqual(options.fx, undefined);
   assert.deepEqual(options.fy, undefined);
   assert.equal(options.x.label, null);
+});
+
+test('log ticks run 1, 2 and 5 through each decade', () => {
+  assert.deepEqual(chartLogTicks(0.5, 16), [0.5, 1, 2, 5, 10]);
+  assert.deepEqual(chartLogTicks(1, 20), [1, 2, 5, 10, 20]);
+});
+
+test('log ticks thin to the decades when there are too many', () => {
+  assert.deepEqual(chartLogTicks(1, 100000), [1, 10, 100, 1000, 10000, 100000]);
+});
+
+test('a log scale rounds its own ends to the tick sequence', () => {
+  const scale = chartValueScale(rows, 'speedup', { type: 'log' }, true);
+  assert.equal(scale.type, 'log');
+  assert.deepEqual(scale.domain, [0.5, 20]);
+  assert.deepEqual(scale.ticks, [0.5, 1, 2, 5, 10, 20]);
+  assert.equal(scale.warning, undefined);
+});
+
+test('the reader can fix either end of a log axis', () => {
+  const scale = chartValueScale(
+    rows,
+    'speedup',
+    { type: 'log', min: 0.8, max: 16 },
+    true,
+  );
+  assert.deepEqual(scale.domain, [0.8, 16]);
+  assert.deepEqual(scale.ticks, [1, 2, 5, 10]);
+});
+
+test('a log axis over a zero is drawn linear and says why', () => {
+  const zeroed = [
+    { kernel: 'a', speedup: 0 },
+    { kernel: 'b', speedup: 4 },
+  ];
+  const scale = chartValueScale(zeroed, 'speedup', { type: 'log' }, true);
+  assert.equal(scale.type, 'linear');
+  assert.match(scale.warning, /above zero/);
+});
+
+test('a log axis over a negative value is drawn linear', () => {
+  const signed = [
+    { kernel: 'a', speedup: -2 },
+    { kernel: 'b', speedup: 4 },
+  ];
+  assert.equal(
+    chartValueScale(signed, 'speedup', { type: 'log' }, true).type,
+    'linear',
+  );
+});
+
+test('a raised floor anchors the bars on it rather than on zero', () => {
+  const options = chartPlotOptions({
+    ...base,
+    scale: { type: 'log', min: 0.5, max: 16 },
+  });
+  assert.equal(options.y.type, 'log');
+  assert.deepEqual(options.y.domain, [0.5, 16]);
+  assert.deepEqual(options.y.ticks, [0.5, 1, 2, 5, 10]);
+});
+
+test('a value is written with enough decimals to tell two apart', () => {
+  assert.equal(formatChartValue(0.82), '0.82');
+  assert.equal(formatChartValue(12.25), '12.3');
+  assert.equal(formatChartValue(1), '1');
+  assert.equal(formatChartValue(1200), '1200');
 });

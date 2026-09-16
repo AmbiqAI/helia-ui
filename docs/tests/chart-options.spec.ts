@@ -52,3 +52,17 @@ test('a horizontal chart cuts no category label', async ({ page }) => {
     ).toBeLessThanOrEqual(box.x + box.width + 0.5);
   }
 });
+
+test('a log axis ticks at 1, 2 and 5 through each decade', async ({ page }) => {
+  await page.goto(gallery);
+  const figure = chart(page, 'Speedup by routine, logarithmic');
+  const labels = await ticks(figure, 'x-axis tick label').allTextContents();
+  expect(labels.map((one) => one.trim())).toEqual([
+    '0.5x',
+    '1x',
+    '2x',
+    '5x',
+    '10x',
+    '20x',
+  ]);
+});

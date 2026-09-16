@@ -18,6 +18,20 @@ export type ChartKind = 'line' | 'area' | 'bar' | 'scatter' | 'dot';
 export type ChartDensity = 'default' | 'compact' | 'comfortable';
 export type ChartLegend = 'auto' | 'none';
 export type ChartOrientation = 'vertical' | 'horizontal';
+export type ChartScaleType = 'linear' | 'log';
+
+/**
+ * The value axis: the measure, wherever the orientation has put it.
+ *
+ * `min` and `max` are the reader's, not the data's. Given neither, a linear
+ * axis is still anchored at zero and nicely rounded, because a bar read
+ * against a floating baseline lies.
+ */
+export interface ChartScale {
+  type: ChartScaleType;
+  min?: number;
+  max?: number;
+}
 
 /** One row of the chart's data. Keys are the `x`, `y` and `series` props. */
 export type ChartRecord = Record<string, unknown>;
@@ -83,6 +97,10 @@ const TICK_CHAR_WIDTH = 6.6;
 const CATEGORY_LABEL_GAP = 12;
 /** The share of the width the category labels may take before they are cut. */
 const CATEGORY_MARGIN_SHARE = 0.45;
+/** Beyond this many, log ticks are thinned to the decades. */
+const MAX_LOG_TICKS = 10;
+/** The 1, 2, 5 sequence a log axis is read in. */
+const LOG_STEPS = [1, 2, 5];
 
 export interface ChartSpec {
   kind: ChartKind;
@@ -98,6 +116,10 @@ export interface ChartSpec {
   density: ChartDensity;
   /** Which way the bars run. `horizontal` puts the categories on the y axis. */
   orientation?: ChartOrientation;
+  /** The measure's scale. Linear and anchored at zero when unset. */
+  scale?: ChartScale;
+  /** How a value is written, on a titled or logarithmic axis. */
+  valueFormat?: (value: number) => string;
   /** The DOM Plot builds against. Omitted in the browser, where there is one. */
   document?: Document;
 }
@@ -154,6 +176,126 @@ function seriesRange(count: number): string[] {
 }
 
 /**
+ * How a number is written when the spec does not say: enough decimals to tell
+ * two neighboring values apart, and none that are only zeros.
+ */
+export function formatChartValue(value: number): string {
+  const size = Math.abs(value);
+  const digits = size >= 100 ? 0 : size >= 10 ? 1 : 2;
+  const written = value.toFixed(digits);
+  return written.includes('.') ? written.replace(/\.?0+$/, '') : written;
+}
+
+/** The finite values of `key`, in data order. */
+function measures(data: readonly ChartRecord[], key: string): number[] {
+  const found: number[] = [];
+  for (const row of data) {
+    const value = Number(row[key]);
+    if (Number.isFinite(value)) found.push(value);
+  }
+  return found;
+}
+
+/* Floating point makes 5e-2 a number with a tail, and a tick labeled
+   0.05000000000000001 is worse than any rounding this could hide. */
+function exact(value: number): number {
+  return Number(value.toPrecision(12));
+}
+
+/** The 1, 2 or 5 step at or below `value`, or at or above it. */
+function logStep(value: number, direction: 'down' | 'up'): number {
+  const decade = Math.pow(10, Math.floor(Math.log10(value)));
+  const position = value / decade;
+  if (direction === 'down') {
+    const step = [...LOG_STEPS].reverse().find((one) => one <= position + 1e-9);
+    return exact((step ?? 1) * decade);
+  }
+  const step = LOG_STEPS.find((one) => one >= position - 1e-9);
+  return exact((step ?? 10) * decade);
+}
+
+/**
+ * The ticks a log axis is read at: 1, 2 and 5 in every decade it spans, thinned
+ * to the decades alone once there are more of them than a reader will follow.
+ */
+export function chartLogTicks(min: number, max: number): number[] {
+  if (!(min > 0) || !(max > min)) return [];
+  const first = Math.floor(Math.log10(min));
+  const last = Math.ceil(Math.log10(max));
+  const ticks: number[] = [];
+  for (let decade = first; decade <= last; decade += 1) {
+    for (const step of LOG_STEPS) {
+      const tick = exact(step * Math.pow(10, decade));
+      if (tick >= min * (1 - 1e-9) && tick <= max * (1 + 1e-9))
+        ticks.push(tick);
+    }
+  }
+  if (ticks.length <= MAX_LOG_TICKS) return ticks;
+  return ticks.filter((tick) => {
+    const decade = Math.log10(tick);
+    return Math.abs(decade - Math.round(decade)) < 1e-9;
+  });
+}
+
+/** A value scale resolved against the data: what Plot and ECharts both need. */
+export interface ChartValueScale {
+  type: ChartScaleType;
+  /** Set when the reader or the scale type fixed an end of the axis. */
+  domain?: [number, number];
+  /** The tick values, when the scale type chose them. */
+  ticks?: number[];
+  /** Why a log axis was refused, for the build log. Set only on a fallback. */
+  warning?: string;
+}
+
+/**
+ * Resolves the value axis.
+ *
+ * A log scale cannot draw a zero and has no sign, so data that reaches either
+ * is drawn linear instead and the caller is told why. Refusing to draw at all
+ * would lose a chart over an axis option, and drawing a log axis over a series
+ * with a zero in it silently drops the row.
+ */
+export function chartValueScale(
+  data: readonly ChartRecord[],
+  key: string,
+  scale: ChartScale | undefined,
+  zeroBaseline: boolean,
+): ChartValueScale {
+  const values = measures(data, key);
+  const low = values.length > 0 ? Math.min(...values) : 0;
+  const high = values.length > 0 ? Math.max(...values) : 1;
+
+  const linear = (warning?: string): ChartValueScale => {
+    if (scale?.min === undefined && scale?.max === undefined) {
+      return { type: 'linear', ...(warning ? { warning } : {}) };
+    }
+    const floor = scale.min ?? (zeroBaseline ? Math.min(0, low) : low);
+    return {
+      type: 'linear',
+      domain: [floor, scale.max ?? high],
+      ...(warning ? { warning } : {}),
+    };
+  };
+
+  if (scale?.type !== 'log') return linear();
+
+  const nonPositive = values.some((value) => value <= 0);
+  const floor = scale.min ?? (low > 0 ? logStep(low, 'down') : 0);
+  if (nonPositive || !(floor > 0)) {
+    return linear(
+      `chart: a logarithmic ${key} axis needs every value above zero; drawing it linear instead.`,
+    );
+  }
+  const ceiling = scale.max ?? logStep(high, 'up');
+  return {
+    type: 'log',
+    domain: [floor, ceiling],
+    ticks: chartLogTicks(floor, ceiling),
+  };
+}
+
+/**
  * The left margin a horizontal chart's category labels need, from the longest
  * of them. Capped: one runaway label should cost the plot area some of its
  * width, not most of it.
@@ -190,6 +332,8 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
     width,
     density,
     orientation = 'vertical',
+    scale,
+    valueFormat,
   } = spec;
   const frame = FRAME[density];
   const names = chartSeriesNames(data, series);
@@ -200,6 +344,17 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
   const horizontal = bars && orientation === 'horizontal';
   const grouped = bars && Boolean(series);
   const bands = categories(rows, x);
+
+  const value = chartValueScale(rows, y, scale, bars || kind === 'area');
+  /* The build log is where this belongs: the page still draws, and the author
+     is the only one who can decide whether linear was acceptable. */
+  if (value.warning) console.warn(value.warning);
+  const baseline = value.domain ? value.domain[0] : 0;
+  /* A bar on a log axis has no zero to stand on, and one on a raised linear
+     floor would be drawn from a baseline that is not on the chart. Both start
+     at the bottom of the axis instead. */
+  const anchored = bars && baseline !== 0;
+
   const marginLeft = horizontal
     ? chartCategoryMargin(bands, width)
     : frame.left;
@@ -254,11 +409,21 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
     const facet = series ? x : undefined;
     marks.push(
       horizontal
-        ? Plot.barX(rows, { y: band, fy: facet, x: y, fill: series ?? single })
-        : Plot.barY(rows, { x: band, fx: facet, y, fill: series ?? single }),
+        ? Plot.barX(rows, {
+            y: band,
+            fy: facet,
+            ...(anchored ? { x1: baseline, x2: y } : { x: y }),
+            fill: series ?? single,
+          })
+        : Plot.barY(rows, {
+            x: band,
+            fx: facet,
+            ...(anchored ? { y1: baseline, y2: y } : { y }),
+            fill: series ?? single,
+          }),
       horizontal
-        ? Plot.ruleX([0], { stroke: CHART_GRID })
-        : Plot.ruleY([0], { stroke: CHART_GRID }),
+        ? Plot.ruleX([baseline], { stroke: CHART_GRID })
+        : Plot.ruleY([baseline], { stroke: CHART_GRID }),
     );
   } else {
     marks.push(
@@ -277,7 +442,13 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
     label: null,
     ...(bars ? { domain: bands } : {}),
   };
-  const valueScale = { label: null, ticks: frame.ticks, nice: true };
+  const valueScale = {
+    label: null,
+    ...(value.type === 'log' ? { type: 'log' as const } : {}),
+    ...(value.domain ? { domain: value.domain } : { nice: true }),
+    ticks: value.ticks ?? frame.ticks,
+    ...(valueFormat ? { tickFormat: valueFormat } : {}),
+  };
 
   return {
     document: spec.document,
