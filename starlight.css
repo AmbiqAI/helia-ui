@@ -440,6 +440,41 @@
 }
 
 /*
+ * The two lists the `sections` pane holds, one per width: the section's own
+ * pages above 62rem, where the top bar carries the sections, and every section
+ * below it, where the bar's links are gone and this pane is the only way to
+ * them. One is drawn at a time, so the pane never reads as two navigations.
+ *
+ * The wrapper around Starlight's own list is `display: contents`, so the pane
+ * stays the flex column Starlight lays out and the mobile footer at the foot
+ * of it keeps its place. Hiding that list rather than the wrapper is what
+ * leaves the footer showing on a narrow screen.
+ */
+.helia-sidebar-sections,
+.helia-sidebar-marker {
+  display: none;
+}
+
+.helia-sidebar-scoped {
+  display: contents;
+}
+
+@media (width < 62rem) {
+  .helia-sidebar-sections {
+    display: block;
+  }
+
+  [data-helia-sidebar-sections]
+    ~ [data-helia-sidebar-scoped]
+    > [data-helia-sidebar-heading],
+  [data-helia-sidebar-sections]
+    ~ [data-helia-sidebar-scoped]
+    sl-sidebar-state-persist {
+    display: none;
+  }
+}
+
+/*
  * The table-of-contents pane carries the page ground the way the left pane
  * does. Starlight leaves it transparent, which makes it a hole: anything the
  * main pane paints wider than itself shows through the column.

@@ -81,9 +81,16 @@ export interface HeliaHeaderOptions {
   themeToggle?: boolean;
 }
 
-export interface HeliaSection extends HeliaSectionLink {
-  /** The section's pages, in Starlight's own `sidebar` vocabulary. */
-  sidebar: HeliaSidebarItem[];
+/* `sidebar` is restated rather than inherited: the bar's copy of a section
+   only has to know whether there is a pane, and this one carries it. */
+export interface HeliaSection extends Omit<HeliaSectionLink, 'sidebar'> {
+  /**
+   * The section's pages, in Starlight's own `sidebar` vocabulary. `false` for
+   * a section with no pages of its own -- a product landing page is the case
+   * it exists for -- which leaves its routes the full width of the frame and
+   * overrides `sidebar: 'always'` there.
+   */
+  sidebar: HeliaSidebarItem[] | false;
 }
 
 /**
@@ -513,13 +520,22 @@ export function heliaStarlight(
          * gets the sections as its whole navigation.
          */
         const siteSidebar = config.sidebar ?? [];
+        /* A section that declared no pages contributes no group, so the route
+           middleware lines the appended groups up against the sections that
+           have one rather than against all of them. */
         const sectionSidebar = [
           ...siteSidebar,
-          ...sections.map((section) => ({
-            label: section.label,
-            collapsed: false,
-            items: section.sidebar,
-          })),
+          ...sections.flatMap((section) =>
+            section.sidebar === false
+              ? []
+              : [
+                  {
+                    label: section.label,
+                    collapsed: false,
+                    items: section.sidebar,
+                  },
+                ],
+          ),
         ];
 
         if (sections.length > 0) {
@@ -547,10 +563,11 @@ export function heliaStarlight(
         };
 
         const sectionLinks: HeliaSectionLink[] = sections.map(
-          ({ label, href, match }) => ({
+          ({ label, href, match, sidebar: entries }) => ({
             label,
             href,
             ...(match === undefined ? {} : { match }),
+            ...(entries === false ? { sidebar: false as const } : {}),
           }),
         );
 

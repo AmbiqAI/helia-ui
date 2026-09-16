@@ -93,15 +93,12 @@ export default defineConfig({
            */
           sections: [
             {
+              /* The shape a product site's Home section has: no pages of its
+                 own, so the landing page is read at the full width of the
+                 frame and the sections are reached from the bar above it. */
               label: 'Demo home',
               href: `${basePath}starlight-plugin/sections/`,
-              sidebar: [
-                { label: 'Sections demo', slug: 'starlight-plugin/sections' },
-                {
-                  label: 'Why sections',
-                  slug: 'starlight-plugin/sections/why',
-                },
-              ],
+              sidebar: false,
             },
             {
               label: 'Demo guide',

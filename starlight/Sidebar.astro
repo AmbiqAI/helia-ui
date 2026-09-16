@@ -2,43 +2,79 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
 /*
- * The section name above the sidebar, when the site named its navigation with
- * the `sections` option. The route middleware has already cut the sidebar down
- * to the section's own pages, and a pane of links with no name on it does not
- * say which part of the site they belong to.
+ * The pane, when the site named its navigation with the `sections` option. It
+ * carries two lists, one per width, because the two widths are asking
+ * different questions.
  *
- * A heading rather than a first entry: it is not a destination, and it is a
- * landmark the pane's links sit under. Starlight's own sidebar renders below
- * it untouched, so the persister, the mobile footer, and every entry keep
- * whatever Starlight does with them.
+ * Wide: the section's own pages, under the section's name. The route
+ * middleware has already cut the sidebar down to them, and a pane of links
+ * with no name on it does not say which part of the site they belong to. A
+ * heading rather than a first entry: it is not a destination, and it is a
+ * landmark the pane's links sit under.
  *
- * The section is matched here rather than passed from the middleware, which
- * has no field on the route it could put it in; both sides read the same list
- * through the same matcher.
+ * Narrow: every section, each expandable to its pages. The top bar's section
+ * links are gone below that width, so the button that opens this pane is the
+ * only way to the rest of the site, and a pane of one section's pages would be
+ * a dead end. Starlight's own sublist renders it, so a group, a badge and the
+ * current page look the same here as in the pane beside it.
  *
- * Starlight's component by its own path rather than through
+ * Starlight's components by their own paths rather than through
  * `virtual:starlight/components/Sidebar`: that module resolves to whichever
  * component is installed under the name, which here is this one, and a
  * component that renders itself renders until the stack runs out.
  */
 import Default from '@astrojs/starlight/components/Sidebar.astro';
+import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
 import config from 'virtual:helia-ui/starlight-config';
 
 import { matchSection } from './sections';
 
+/*
+ * The section is matched here rather than passed from the middleware, which
+ * has no field on the route it could put it in; both sides read the same list
+ * through the same matcher.
+ */
 const section = matchSection(
   config.sections,
   Astro.url.pathname,
   import.meta.env.BASE_URL,
 );
+
+const sectionNav = Astro.locals.heliaSectionNav;
 ---
 
 {
-  section && (
-    <p class="helia-sidebar-heading" data-helia-sidebar-heading>
-      {section.label}
-    </p>
+  sectionNav && sectionNav.length > 0 && (
+    <div class="helia-sidebar-sections" data-helia-sidebar-sections>
+      <SidebarSublist sublist={sectionNav} />
+    </div>
   )
 }
 
-<Default {...Astro.props}><slot /></Default>
+{
+  /*
+   * A section with no pages of its own takes the pane's column back at every
+   * width the pane has one. The marker is what `starlight.css` keys that on,
+   * and it is read off the document with `:has()` because the widths belong to
+   * the frame rather than to the pane.
+   */
+  section?.sidebar === false && (
+    <span
+      class="helia-sidebar-marker"
+      data-helia-sidebar-layout="mobile-only"
+      aria-hidden="true"
+    />
+  )
+}
+
+<div class="helia-sidebar-scoped" data-helia-sidebar-scoped>
+  {
+    section && (
+      <p class="helia-sidebar-heading" data-helia-sidebar-heading>
+        {section.label}
+      </p>
+    )
+  }
+
+  <Default {...Astro.props}><slot /></Default>
+</div>

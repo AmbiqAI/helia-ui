@@ -46,7 +46,8 @@ starlight({
 | `header.search`            | `boolean`                            | `true`     | Starlight's search trigger.                                                                                                                                                                                   |
 | `header.themeToggle`       | `boolean`                            | `true`     | The package theme menu. Off anyway when `shell.themeSelect` is `false`.                                                                                                                                       |
 | `sections`                 | `{ label, href, match?, sidebar }[]` | `[]`       | The site's sections, as one definition the top bar and the left sidebar both read. See [Sections](#sections).                                                                                                 |
-| `sidebar`                  | `'docs' \| 'always'`                 | `'docs'`   | `'always'` keeps the left sidebar on every page at desktop widths, a `template: splash` landing page included.                                                                                                |
+| `sections[].sidebar`       | `entries \| false`                   | required   | The section's pages, in Starlight's own sidebar vocabulary. `false` is a section with no pane and no column on its routes. See [Sections](#sections).                                                         |
+| `sidebar`                  | `'docs' \| 'always'`                 | `'docs'`   | `'always'` keeps the left sidebar on every page at desktop widths, a `template: splash` landing page included. A section that declared `sidebar: false` is not one of them.                                   |
 | `shell.head`               | `boolean`                            | `true`     | Installs the `Head` override: the brand font preload and the per-page discoverability tags.                                                                                                                   |
 | `shell.pageTitle`          | `boolean`                            | `true`     | Installs the `PageTitle` override, which reads `helia.pageTitle`. See [A page that opens with a hero](#a-page-that-opens-with-a-hero).                                                                        |
 | `code`                     | `boolean`                            | `true`     | Themes Expressive Code onto the package surface. `false` leaves Starlight's code frame alone.                                                                                                                 |
@@ -89,11 +90,14 @@ draws there by default and this bar does not is the social icon row: a site
 that wants those links keeps them by naming them in `links`.
 
 Below `62rem` the links give way to a button that opens the left sidebar, which
-is where a narrow screen reads the navigation from. The button is the one entry
-point to it, because the plugin's `MobileMenuToggle` override takes Starlight's
-own button off the frame. It opens the pane through Starlight's own menu state,
-so the overlay and the scroll lock behind it are one thing at every width. This
-site sets the option, so the bar at the top of this page is the one it installs.
+is where a narrow screen reads the navigation from. On a site with `sections`
+the pane the button opens is the list of sections rather than the current
+section's pages, because the bar the sections were in is what the button
+replaced. The button is the one entry point to it, because the plugin's
+`MobileMenuToggle` override takes Starlight's own button off the frame. It
+opens the pane through Starlight's own menu state, so the overlay and the
+scroll lock behind it are one thing at every width. This site sets the option,
+so the bar at the top of this page is the one it installs.
 
 ## Sections
 
@@ -106,6 +110,7 @@ one list, so the bar and the pane cannot drift apart.
 heliaStarlight({
   header: { title: 'heliaCORE' },
   sections: [
+    { label: 'Home', href: '/heliaCORE/', sidebar: false },
     {
       label: 'Getting started',
       href: '/heliaCORE/getting-started/',
@@ -127,7 +132,8 @@ heliaStarlight({
 A section is a `label`, an `href` written with the site's `base` on the front
 the way a bar link is, an optional `match` for a section whose pages do not
 live under its `href`, and a `sidebar` of Starlight's own entries: links,
-slugs, groups, `autogenerate` directories, badges. They are Starlight's
+slugs, groups, `autogenerate` directories, badges, or `false` for a section
+with no pages of its own. They are Starlight's
 entries, not a copy of them, because the plugin hands them back to Starlight
 as sidebar config; nothing about them is resolved here.
 
@@ -139,8 +145,18 @@ as sidebar config; nothing about them is resolved here.
   entries were declared under is not drawn: it is the heading.
 - **The landing page.** Give the Home section the site's base as its `href`. A
   base prefix would otherwise match every page on the site, so a section at the
-  base is current on the landing page alone. With `sidebar: 'always'` the
-  landing page keeps the pane, which is where Home's own short list goes.
+  base is current on the landing page alone. A landing page has the bar above
+  it and the page itself to navigate from, so give Home `sidebar: false` and it
+  is read at the full width of the frame.
+- **A section with no pane.** `sidebar: false` in place of the entries is a
+  section with no pages of its own: no pane on its routes and no column
+  reserved for one, whatever `sidebar: 'always'` says, since that option is
+  about a template rather than about a section. The section still lists in the
+  bar and in the narrow-width menu, as a link rather than an expandable item.
+- **Narrow screens.** The bar's sections give way to the menu button below
+  `62rem`, so the pane it opens is every section, each one expandable to its
+  pages, with the current section open. The section-scoped pane is the
+  wide-screen one; the two are never drawn at once.
 - **Which section a page is in.** The longest matching prefix wins, so a
   section nested under another one takes its own pages. A page under no section
   keeps the sidebar the site declared in `sidebar`, or the whole navigation if
@@ -213,6 +229,10 @@ off-canvas there, as it is on a documentation page.
 ```js
 heliaStarlight({ sidebar: 'always' });
 ```
+
+A site with `sections` says the same thing per section instead: a section that
+declared `sidebar: false` has no pane on its routes, and this option does not
+put one back there.
 
 The plugin does this with a route middleware rather than a component override.
 Starlight decides a page has no sidebar from its template, and one flag on the
