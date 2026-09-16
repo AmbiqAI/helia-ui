@@ -78,6 +78,8 @@ badges, icons and type.
 | `./tailwind.css`           | The Tailwind v4 entry: layer order and the `@theme` mapping, with no Starlight dependency                |
 | `./starlight-tailwind.css` | `./tailwind.css` with `@astrojs/starlight-tailwind` in front; the entry a Starlight site imports         |
 | `./shadcn.css`             | The shadcn variable bridge, imported by `./tailwind.css`                                                 |
+| `./reference-model`        | The one shape an API reference takes, with its guard                                                     |
+| `./ref-index-model`        | The index rows a reference projects onto, with `buildRefIndex`                                           |
 | `./astro/*`                | The publishable Astro parts, one file per part                                                           |
 | `./react/*`                | The React components, one file per component                                                             |
 | `./starlight`              | The Starlight plugin: component overrides and the theme's own configuration                              |

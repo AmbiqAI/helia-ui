@@ -760,6 +760,34 @@ Also accepts `HTMLAttributes<'div'>`.
 
 [See it rendered on Gallery](/helia-ui/gallery/#mosaic)
 
+## RefIndex
+
+**Use it for:** A searchable, filterable index of every symbol in a generated reference.
+
+```ts
+import RefIndex from '@ambiqai/helia-ui/astro/RefIndex';
+```
+
+| Prop               | Type                       | Default            | Description                                                                                                          |
+| ------------------ | -------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `reference` (req.) | `ReferenceModel`           | --                 | The parsed `reference.json`, imported by the page.                                                                   |
+| `label`            | `string`                   | `'Symbol index'`   | The table's caption and the accessible name of the search box.                                                       |
+| `base`             | `string`                   | `'/'`              | Site base path, so a row's link resolves. Pass the same value the reference was rendered with.                       |
+| `routePrefix`      | `string`                   | `'reference/api'`  | Where the generated pages live under the content root.                                                               |
+| `groups`           | `readonly RefIndexGroup[]` | --                 | The symbol families, in the order they are offered. Without them every row is ungrouped and no group filter appears. |
+| `ungrouped`        | `string`                   | `'Other'`          | What a symbol no group matches is called.                                                                            |
+| `kinds`            | `readonly SymbolKind[]`    | --                 | Which kinds to index. An empty array indexes every kind.                                                             |
+| `includeMembers`   | `boolean`                  | `false`            | Whether struct fields and enum values get rows of their own.                                                         |
+| `overlay`          | `RefIndexOverlay`          | --                 | The kernel manifest: facet values and contract fields, keyed by symbol name.                                         |
+| `facetLabels`      | `Record<string, string>`   | --                 | Facet labels by facet id, for a vocabulary the defaults do not cover.                                                |
+| `placeholder`      | `string`                   | `'Filter by name'` | Placeholder for the search box.                                                                                      |
+| `height`           | `string`                   | `'32rem'`          | Height of the scroll frame the rows sit in, as a CSS length. Filtering moves nothing below it.                       |
+| `class`            | `string`                   | --                 | Forwarded to the island's root element.                                                                              |
+
+**Slots** -- none.
+
+[See it rendered on Data display](/helia-ui/react/data-display/#symbol-index)
+
 ## RefMembers
 
 **Use it for:** The index of what is on a reference page: every symbol, its kind, and a sentence, each one an anchor.

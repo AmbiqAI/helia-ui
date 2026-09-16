@@ -11,7 +11,10 @@
  *    throws at build with "must be used within". The rule is therefore that
  *    `.mdx` and `.astro` never import the React components, by package
  *    specifier or by path: every interactive use is an island in
- *    src/components/islands. See docs/spike-shadcn.md, corner case 5b.
+ *    src/components/islands. See docs/spike-shadcn.md, corner case 5b. The one
+ *    exception is a part under the package's astro/ that mounts a whole
+ *    component as a leaf island -- a `client:` directive and no children -- for
+ *    which see `mountsLeafIsland` below.
  *
  * 2. packages/helia-ui/react is the `/react` export of the package, and
  *    src/components/islands is what composes it. Neither may reach into
@@ -27,6 +30,7 @@ import process from 'node:process';
 import { ROOT, WORKSPACE, isUnder, pkg } from './lib/scope.mjs';
 
 const UI_DIR = pkg('react');
+const PARTS_DIR = pkg('astro');
 /* The hub's own islands, and the data they must not reach for, are in scope
  * only when the hub is the scan root. */
 const ISLAND_DIR = WORKSPACE ? 'src/components/islands' : null;
@@ -127,6 +131,70 @@ function reachesUi(rel, specifier) {
   return target !== null && isUnder(target, UI_DIR);
 }
 
+/*
+ * The one exception, and the shape of it: a part under the package's astro/
+ * that mounts a whole React component as a leaf island.
+ *
+ * What the rule above protects is composition across the boundary. Astro gives
+ * each component in an `.mdx` file its own React root and serializes the
+ * children, so a compound component assembled in a page loses its context. A
+ * part that renders one component with a `client:` directive and no children
+ * hands Astro a single root with props and nothing to serialize -- that is
+ * what an island is, and the part is its wrapper, which is how a page gets a
+ * filtered index by writing one tag. Children, or a use without the directive,
+ * is the failure the rule exists for and still fails.
+ */
+const bindingsOf = (source, specifier) => {
+  const pattern = new RegExp(
+    `\\bimport\\s+([^;]*?)\\s+from\\s*['"]${specifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`,
+  );
+  const match = pattern.exec(source);
+  if (!match) return [];
+  return match[1]
+    .replace(/[{}]/g, ' ')
+    .split(',')
+    .map((part) =>
+      part
+        .trim()
+        .split(/\s+as\s+/)
+        .pop()
+        .trim(),
+    )
+    .filter((name) => /^[A-Za-z_$][\w$]*$/.test(name));
+};
+
+/** The text of the tag that opens at `start`, brace-aware so a prop may hold an object. */
+function tagText(source, start) {
+  let depth = 0;
+  let quote = null;
+  for (let index = start; index < source.length; index += 1) {
+    const char = source[index];
+    if (quote) {
+      if (char === quote) quote = null;
+      continue;
+    }
+    if (char === '"' || char === "'" || char === '`') quote = char;
+    else if (char === '{') depth += 1;
+    else if (char === '}') depth -= 1;
+    else if (char === '>' && depth === 0) return source.slice(start, index);
+  }
+  return null;
+}
+
+function mountsLeafIsland(source, specifier) {
+  const names = bindingsOf(source, specifier);
+  if (names.length === 0) return false;
+  return names.every((name) => {
+    const opens = [...source.matchAll(new RegExp(`<${name}(?![\\w$])`, 'g'))];
+    if (opens.length === 0) return false;
+    if (new RegExp(`</${name}\\s*>`).test(source)) return false;
+    return opens.every((open) => {
+      const text = tagText(source, open.index);
+      return text !== null && text.includes('client:') && text.endsWith('/');
+    });
+  });
+}
+
 /* Rule 1: no page assembles the React layer inline. */
 const pages = [
   ...(WORKSPACE
@@ -149,6 +217,8 @@ for (const rel of pages) {
   const source = rel.endsWith('.mdx') ? stripFences(raw) : raw;
   for (const { specifier, line } of specifiers(source)) {
     if (reachesUi(rel, specifier)) {
+      if (isUnder(rel, PARTS_DIR) && mountsLeafIsland(source, specifier))
+        continue;
       failures.push(
         `${rel}:${line} island: imports ${specifier}. React context does not cross the MDX boundary; ` +
           `compose it in an island under ${home}/ and import that instead.`,
