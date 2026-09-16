@@ -350,3 +350,72 @@ test('llms-full.txt is the C reference as Markdown, signatures and all', () => {
   assert.match(full, /Available since 0\.2\./);
   assert.match(full, /\*\*Deprecated\.\*\* Use helia_model_invoke\(\)/);
 });
+
+/* -------------------------------------------------------------------------
+ * Grouped headers, whose module names are the author's own spelling
+ * ---------------------------------------------------------------------- */
+
+const GROUPS = join(
+  dirname(fileURLToPath(import.meta.url)),
+  'fixtures/doxygen-groups/xml',
+);
+
+const grouped = renderReference(
+  extractModel(await readDoxygenXml(GROUPS), {}, { schema: 'urn:test:schema' })
+    .model,
+  { base: '/helia-core/', routePrefix: 'reference/api' },
+);
+
+/** Every slug the sidebar fragment carries, at any depth. */
+const sidebarSlugs = (entry) =>
+  entry.items
+    ? entry.items.flatMap(sidebarSlugs)
+    : entry.slug
+      ? [entry.slug]
+      : [];
+
+/** Every site URL an artifact points at. */
+const linkedUrls = (contents) =>
+  [...contents.matchAll(/\]\((\/[^)\s]+)\)/g)].map((match) => match[1]);
+
+test('a mixed-case group is routed the way Starlight slugs it', () => {
+  const page = grouped.pages.find((entry) => entry.route.includes('/nnconv/'));
+  assert.equal(page.path, 'helia-groups/nnconv/index.mdx');
+  assert.equal(page.route, '/helia-core/reference/api/helia-groups/nnconv/');
+  assert.equal(page.artifact, 'reference/api/helia-groups/nnconv.json');
+  /* The name the author wrote is still the module's identity; only the route
+   * is slugged. */
+  assert.equal(
+    grouped.pages.some((entry) => entry.path.includes('NNConv')),
+    false,
+  );
+});
+
+test('every emitted URL and path is lowercase', () => {
+  const emitted = [
+    ...grouped.pages.flatMap((page) => [page.path, page.route, page.artifact]),
+    ...grouped.artifacts.map((artifact) => artifact.path),
+    ...grouped.artifacts
+      .filter((artifact) => artifact.path.endsWith('.txt'))
+      .flatMap((artifact) => linkedUrls(artifact.contents)),
+    ...grouped.nav.flatMap(function hrefs(item) {
+      return [item.href, ...(item.items ?? []).flatMap(hrefs)];
+    }),
+    ...sidebarSlugs(grouped.sidebar),
+  ];
+  for (const value of emitted) assert.equal(value, value.toLowerCase(), value);
+});
+
+test('a page URL is the page the generator wrote, on a case-sensitive host', () => {
+  for (const page of grouped.pages) {
+    const onDisk = page.path.replace(/index\.mdx$/, '');
+    assert.equal(page.route, `/helia-core/reference/api/${onDisk}`);
+  }
+  const llms = grouped.artifacts.find((artifact) =>
+    artifact.path.endsWith('llms.txt'),
+  ).contents;
+  const served = new Set(grouped.pages.map((page) => page.route));
+  for (const url of linkedUrls(llms)) {
+    if (url.endsWith('/')) assert.equal(served.has(url), true, url);
+  }
+});

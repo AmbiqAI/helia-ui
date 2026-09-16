@@ -73,6 +73,32 @@ export function normalizeBase(base) {
 
 const segmentsOf = (modulePath) => modulePath.split('.');
 
+/*
+ * The characters github-slugger drops: the ASCII punctuation either side of
+ * `-` and `_`, the control range, and the Unicode spaces. Everything an
+ * identifier can hold is in here; the emoji ranges the library also strips are
+ * not, because a module path that carries one has a worse problem than its
+ * route.
+ */
+const SLUG_STRIP =
+  /[\0-\x1F!-,.\/:-@\[-\^`\{-~\x7F-\x9F\xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]/g;
+
+/**
+ * One route segment, spelled the way the site will serve it.
+ *
+ * Starlight routes a page by the content id Astro derives from its file path,
+ * which is github-slugger's `slug()` over each segment: lowercased, with that
+ * punctuation removed and spaces hyphenated. A generator that emits the module
+ * name as written instead links to a route nobody serves, and on a
+ * case-insensitive filesystem the pages directory and the artifact directory
+ * collide. The rule is inlined rather than imported because these scripts run
+ * in a product repository's CI with nothing installed but this package.
+ */
+export const slugSegment = (text) =>
+  String(text).toLowerCase().replace(SLUG_STRIP, '').replace(/ /g, '-');
+
+const routeSegments = (modulePath) => segmentsOf(modulePath).map(slugSegment);
+
 const joinUrl = (base, tail) => `${base.replace(/\/$/, '')}/${tail}`;
 
 /** Every module of a model, parents before children, as the pages are ordered. */
@@ -98,7 +124,7 @@ export function flattenSymbols(module) {
 }
 
 const routes = (modulePath, options) => {
-  const parts = segmentsOf(modulePath);
+  const parts = routeSegments(modulePath);
   return {
     /** Page route, for a link from another page. */
     page: joinUrl(options.base, `${options.routePrefix}/${parts.join('/')}/`),
@@ -620,7 +646,7 @@ export function renderLlmsFull(model, { index, options }) {
  */
 export function buildSidebar(model, options) {
   const slug = (modulePath) =>
-    `${options.routePrefix}/${segmentsOf(modulePath).join('/')}`;
+    `${options.routePrefix}/${routeSegments(modulePath).join('/')}`;
 
   const group = (module) => {
     const children = module.submodules ?? [];
@@ -680,6 +706,22 @@ export function renderReference(model, options = {}) {
   const index = buildIndex(model, resolved);
   const modules = flatten(model);
   const warnings = [];
+
+  /* Two module paths that differ only in case or punctuation are one route
+   * once slugged, and the second page would overwrite the first with no sign
+   * of it in the output. */
+  const claimed = new Map();
+  for (const module of modules) {
+    const { page } = routes(module.path, resolved);
+    const taken = claimed.get(page);
+    if (taken !== undefined) {
+      throw new ReferenceRenderError(
+        `${taken} and ${module.path} are the same route once slugged (${page}). ` +
+          'Rename one of them.',
+      );
+    }
+    claimed.set(page, module.path);
+  }
 
   const orders = new Map();
   const pages = modules.map((module) => {

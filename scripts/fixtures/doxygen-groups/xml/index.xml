@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.17.0" xml:lang="en-US">
+  <compound refid="helia__groups_8h" kind="file"><name>helia_groups.h</name>
+    <member refid="group___n_n_conv_1ga90fb18518e86b104c181e2eabec90164" kind="function"><name>arm_nn_conv_s8</name></member>
+    <member refid="group___gather_1ga333946e019a8c42e156e850b6d2b5b7a" kind="function"><name>arm_nn_gather_s8</name></member>
+  </compound>
+  <compound refid="group___n_n_conv" kind="group"><name>NNConv</name>
+    <member refid="group___n_n_conv_1ga90fb18518e86b104c181e2eabec90164" kind="function"><name>arm_nn_conv_s8</name></member>
+  </compound>
+  <compound refid="group___gather" kind="group"><name>Gather</name>
+    <member refid="group___gather_1ga333946e019a8c42e156e850b6d2b5b7a" kind="function"><name>arm_nn_gather_s8</name></member>
+  </compound>
+  <compound refid="dir_68267d1309a1af8e8297ef4c3efbcdba" kind="dir"><name>src</name>
+  </compound>
+</doxygenindex>

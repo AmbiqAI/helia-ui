@@ -19,6 +19,7 @@ import {
   buildSidebar,
   canonicalJson,
   renderReference,
+  slugSegment,
 } from './lib/reference-render.mjs';
 import { validateReferenceModel } from '../reference-model.ts';
 
@@ -319,5 +320,54 @@ test('a model the renderer cannot render fails naming what is missing', () => {
   assert.throws(
     () => renderReference({ modules: [] }, options),
     /The model has no modules/,
+  );
+});
+
+test('a route segment is slugged the way Starlight slugs a content id', () => {
+  assert.equal(slugSegment('NNConv'), 'nnconv');
+  assert.equal(slugSegment('arm_nn_conv_s8'), 'arm_nn_conv_s8');
+  assert.equal(slugSegment('Fully Connected'), 'fully-connected');
+  assert.equal(slugSegment('Basic Math (int8)'), 'basic-math-int8');
+});
+
+test('a mixed-case module path keeps its name and loses its case in the route', () => {
+  const mixed = structuredClone(model);
+  mixed.modules[0].submodules[0].path = 'pkg.NNConv';
+  mixed.modules[0].submodules[0].name = 'NNConv';
+  mixed.modules[0].description = 'See [NNConv][pkg.NNConv].';
+  const { pages, artifacts, sidebar, nav } = renderReference(mixed, options);
+
+  assert.equal(pages[1].path, 'pkg/nnconv/index.mdx');
+  assert.equal(pages[1].route, '/site/reference/api/pkg/nnconv/');
+  assert.match(pages[1].mdx, /^---\ntitle: "NNConv"/);
+  assert.match(
+    pages[0].mdx,
+    /\[NNConv\]\(\/site\/reference\/api\/pkg\/nnconv\/\)/,
+  );
+  assert.equal(
+    artifacts.some((artifact) => artifact.path.includes('NNConv')),
+    false,
+  );
+  assert.equal(sidebar.items[1].slug, 'reference/api/pkg/nnconv');
+  assert.equal(nav[0].items[0].href, '/site/reference/api/pkg/nnconv/');
+  const llms = artifacts.find((artifact) =>
+    artifact.path.endsWith('llms.txt'),
+  ).contents;
+  assert.match(
+    llms,
+    /\[pkg\.NNConv\]\(\/site\/reference\/api\/pkg\/nnconv\/\)/,
+  );
+});
+
+test('two module paths that slug to one route fail rather than overwrite', () => {
+  const clashing = structuredClone(model);
+  clashing.modules[0].submodules.push({
+    ...clashing.modules[0].submodules[0],
+    path: 'pkg.Core',
+    name: 'Core',
+  });
+  assert.throws(
+    () => renderReference(clashing, options),
+    /pkg\.core and pkg\.Core are the same route once slugged/,
   );
 });

@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="helia__groups_8h" kind="file" language="C++">
+    <compoundname>helia_groups.h</compoundname>
+    <includes local="no">stddef.h</includes>
+    <incdepgraph>
+      <node id="1">
+        <label>src/helia_groups.h</label>
+        <link refid="helia__groups_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>stddef.h</label>
+      </node>
+    </incdepgraph>
+    <sectiondef kind="func">
+      <member refid="group___n_n_conv_1ga90fb18518e86b104c181e2eabec90164" kind="function"><name>arm_nn_conv_s8</name></member>
+      <member refid="group___gather_1ga333946e019a8c42e156e850b6d2b5b7a" kind="function"><name>arm_nn_gather_s8</name></member>
+    </sectiondef>
+    <briefdescription>
+<para>Grouped kernels, named the way a C library names them. </para>
+    </briefdescription>
+    <detaileddescription>
+<para>The fixture behind the route-casing and description-fallback assertions. One group is named in mixed case, so its page proves the generator spells a route the way Starlight serves it. The other carries no brief, so its page proves the generator still emits a description. </para>
+    </detaileddescription>
+    <location file="src/helia_groups.h"/>
+  </compounddef>
+</doxygen>

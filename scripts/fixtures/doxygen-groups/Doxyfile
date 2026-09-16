@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026, Ambiq
+#
+# The grouped fixture: module pages that come from @defgroup rather than from a
+# header. Regenerate with `doxygen Doxyfile` from this directory.
+
+PROJECT_NAME           = helia-groups
+INPUT                  = src
+FILE_PATTERNS          = *.h
+OPTIMIZE_OUTPUT_FOR_C  = YES
+EXTRACT_ALL            = YES
+GENERATE_XML           = YES
+XML_PROGRAMLISTING     = NO
+GENERATE_HTML          = NO
+GENERATE_LATEX         = NO
+QUIET                  = YES
+WARN_IF_UNDOCUMENTED   = NO
