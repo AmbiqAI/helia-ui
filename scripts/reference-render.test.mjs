@@ -371,3 +371,44 @@ test('two module paths that slug to one route fail rather than overwrite', () =>
     /pkg\.core and pkg\.Core are the same route once slugged/,
   );
 });
+
+test('a module with no summary still gets a description, in its own language', () => {
+  const bare = structuredClone(model);
+  bare.modules[0].summary = '';
+  bare.modules[0].submodules[0].summary = '';
+
+  const descriptions = (language) => {
+    const typed = { ...structuredClone(bare), language };
+    return renderReference(typed, options).pages.map(
+      (page) => /^description: "(.*)"$/m.exec(page.mdx)[1],
+    );
+  };
+
+  assert.deepEqual(descriptions('python'), [
+    'Classes and functions in pkg.',
+    'Classes and functions in core.',
+  ]);
+  assert.equal(descriptions('c')[1], 'Functions, types and macros in core.');
+  assert.equal(descriptions('cpp')[1], 'Functions, types and classes in core.');
+  assert.equal(
+    descriptions('typescript')[1],
+    'Exported types and functions in core.',
+  );
+});
+
+test('a summary is still the description when the source has one', () => {
+  const { pages } = render();
+  assert.match(pages[0].mdx, /^description: "The package\."$/m);
+  assert.match(pages[1].mdx, /^description: "The core\."$/m);
+});
+
+test('a module name that trails into its members is not punctuated twice', () => {
+  const titled = structuredClone(model);
+  titled.modules[0].submodules[0].summary = '';
+  titled.modules[0].submodules[0].name = 'Gather Functions:';
+  const { pages } = renderReference(titled, options);
+  assert.match(
+    pages[1].mdx,
+    /^description: "Classes and functions in Gather Functions\."$/m,
+  );
+});

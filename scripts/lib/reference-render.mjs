@@ -276,6 +276,36 @@ function metaDescription(summary) {
     : plain;
 }
 
+/*
+ * What a module page says about itself when its source says nothing.
+ *
+ * A page with no `description` has no search result and no line an agent can
+ * read, and the plugin's discoverability check fails the build over it. A
+ * library that groups its headers without briefing each group is the common
+ * case, so the page gets a mechanical sentence naming what is on it rather
+ * than the reference getting blocked.
+ */
+const DESCRIPTION_FALLBACK = {
+  python: (name) => `Classes and functions in ${name}.`,
+  c: (name) => `Functions, types and macros in ${name}.`,
+  cpp: (name) => `Functions, types and classes in ${name}.`,
+  typescript: (name) => `Exported types and functions in ${name}.`,
+  rust: (name) => `Items in ${name}.`,
+};
+
+const genericFallback = (name) => `Functions and types in ${name}.`;
+
+/** A module's `description` frontmatter: its summary, or the fallback. */
+function moduleDescription(module, language) {
+  const summary = metaDescription(module.summary);
+  if (summary) return summary;
+  const phrase = DESCRIPTION_FALLBACK[language] ?? genericFallback;
+  /* A group title often ends in punctuation that led into the members below
+   * it, and the sentence this goes into supplies its own. */
+  const name = String(module.name || module.path).replace(/[\s:;,.]+$/, '');
+  return phrase(name);
+}
+
 /** Description prose, cross-references resolved and MDX-safe. */
 function prose(text, context, level) {
   if (!text) return '';
@@ -427,7 +457,10 @@ const memberItems = (module) =>
  *
  * @returns {{ path: string, route: string, mdx: string, anchors: string[], warnings: string[] }}
  */
-export function renderModulePage(module, { index, options, order = 0 }) {
+export function renderModulePage(
+  module,
+  { index, options, order = 0, language },
+) {
   const warnings = [];
   const context = {
     index,
@@ -437,10 +470,14 @@ export function renderModulePage(module, { index, options, order = 0 }) {
   };
   const { page, json, file, artifact } = routes(module.path, options);
 
-  const front = ['---', `title: ${yamlString(module.name)}`];
-  const description = metaDescription(module.summary);
-  if (description) front.push(`description: ${yamlString(description)}`);
-  front.push('sidebar:', `  order: ${order}`, '---');
+  const front = [
+    '---',
+    `title: ${yamlString(module.name)}`,
+    `description: ${yamlString(moduleDescription(module, language))}`,
+    'sidebar:',
+    `  order: ${order}`,
+    '---',
+  ];
 
   const blocks = [front.join('\n')];
   blocks.push(
@@ -732,6 +769,7 @@ export function renderReference(model, options = {}) {
       index,
       options: resolved,
       order,
+      language: model.language,
     });
     warnings.push(...page.warnings);
     return page;

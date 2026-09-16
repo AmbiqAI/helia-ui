@@ -419,3 +419,17 @@ test('a page URL is the page the generator wrote, on a case-sensitive host', () 
     if (url.endsWith('/')) assert.equal(served.has(url), true, url);
   }
 });
+
+test('a group with no brief still carries a description frontmatter', () => {
+  for (const page of grouped.pages) {
+    assert.match(page.mdx, /^description: "\S[^\n]*"$/m, page.path);
+  }
+  const gather = grouped.pages.find((page) => page.path.includes('gather'));
+  assert.match(
+    gather.mdx,
+    /^description: "Functions, types and macros in Gather\."$/m,
+  );
+  /* The group that does brief itself keeps its own words. */
+  const conv = grouped.pages.find((page) => page.path.includes('nnconv'));
+  assert.match(conv.mdx, /^description: "Convolution kernels\."$/m);
+});
