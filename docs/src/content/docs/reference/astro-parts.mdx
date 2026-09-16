@@ -549,6 +549,34 @@ Also accepts `HTMLAttributes<'p'>`.
 
 [See it rendered on Primitives](/helia-ui/primitives/#eyebrow)
 
+## Hero
+
+**Use it for:** The top of a landing page: what the thing is, in one headline, with the ways in under it and the evidence beside it.
+
+```ts
+import Hero from '@ambiqai/helia-ui/astro/Hero';
+```
+
+| Prop      | Type                    | Default     | Description                                                                               |
+| --------- | ----------------------- | ----------- | ----------------------------------------------------------------------------------------- |
+| `variant` | `'plain' \| 'contrast'` | `'plain'`   | The ground. `contrast` is the inked card, `plain` the same layout with nothing behind it. |
+| `eyebrow` | `string`                | --          | The label above the headline, rendered in an `Eyebrow` with the accent dot.               |
+| `summary` | `string`                | --          | The claim under the headline: one sentence, not a paragraph.                              |
+| `badge`   | `string`                | --          | A short standing label under the headline, rendered as an accent `Badge`.                 |
+| `titleAs` | `'h1' \| 'h2'`          | `'h1'`      | Heading level for the headline. A page's own hero is the `h1`; a section hero is not.     |
+| `as`      | `'section' \| 'div'`    | `'section'` | Element to render. A hero that opens the page should stay a `section`.                    |
+
+Also accepts `HTMLAttributes<'section'>`.
+
+**Slots**
+
+- `default` -- The headline. Wrap the word that takes the product accent in `<em>`.
+- `actions` -- The ways in, usually `Button`s. The `primary` one is drawn as the accent outline rather than the ink pill.
+- `aside` -- A framed panel at the top of the side column: a grid of `StatCard`s, a short list of figures.
+- `media` -- The rest of the side column: a `CodeBlock`, a diagram, artwork. Anything that owns its own frame fits.
+
+[See it rendered on Gallery](/helia-ui/gallery/#hero)
+
 ## Icon
 
 **Use it for:** A named icon from Font Awesome's free solid set, resolved at build time.

@@ -47,10 +47,14 @@ const PART_ROOTS: Record<string, string> = {
   Chart: '.helia-chart',
   ChartGroup: '.helia-chart-group',
   Chip: '.helia-chip',
+  /* Expressive Code owns the frame, so the part's root is the wrapper it emits
+     rather than a class of the package's own. */
+  CodeBlock: '.expressive-code',
   CodeTabs: 'helia-code-tabs',
   DataTable: 'helia-data-table',
   EditorialBand: '.editorial-band',
   Eyebrow: '.helia-eyebrow',
+  Hero: '.helia-hero',
   Icon: '.helia-icon',
   IconRow: '.helia-icon-row',
   IconTile: '.helia-icon-tile',

@@ -1,0 +1,114 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * The top of a landing page: what the thing is, in one headline, with the ways
+ * in under it and the evidence beside it.
+ *
+ * The headline is the default slot rather than a prop because the word that
+ * carries the product accent has to be marked in the markup. Wrap it in `<em>`:
+ * the hero draws that word in `--helia-product-accent` and takes the slant off,
+ * so the emphasis is the color. Break the line where the emphasis needs it --
+ * a headline at this size is composed, not wrapped.
+ *
+ * `contrast` is the inked card a product landing opens on: pinned dark in both
+ * themes like the contrast band, so the accent is the one color in the frame.
+ * `plain` is the same layout with no ground, for a page that is already a
+ * section of the site rather than its front door.
+ *
+ * The side column renders only when something is in it, which is what makes one
+ * part serve both: with `aside` and `media` empty the hero is the lede on its
+ * own measure. Below 62rem the column stacks under the lede, because a panel
+ * of figures beside a headline at phone width is two half-readable things.
+ *
+ * The headline step is `--helia-hero-headline`. A hero with a side column takes
+ * the page step, because the fluid hero step is sized against the viewport and
+ * runs out of column mid-word next to a panel; a hero that owns the full page
+ * width raises the hook back to `--helia-text-hero`.
+ *
+ * The recipe itself is `.helia-hero` in `recipes.css`.
+ *
+ * @slot default -- The headline. Wrap the word that takes the product accent in `<em>`.
+ * @slot actions -- The ways in, usually `Button`s. The `primary` one is drawn as the accent outline rather than the ink pill.
+ * @slot aside -- A framed panel at the top of the side column: a grid of `StatCard`s, a short list of figures.
+ * @slot media -- The rest of the side column: a `CodeBlock`, a diagram, artwork. Anything that owns its own frame fits.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import Badge from './Badge.astro';
+import Eyebrow from './Eyebrow.astro';
+
+interface Props extends HTMLAttributes<'section'> {
+  /** The ground. `contrast` is the inked card, `plain` the same layout with nothing behind it. */
+  variant?: 'plain' | 'contrast';
+  /** The label above the headline, rendered in an `Eyebrow` with the accent dot. */
+  eyebrow?: string;
+  /** The claim under the headline: one sentence, not a paragraph. */
+  summary?: string;
+  /** A short standing label under the headline, rendered as an accent `Badge`. */
+  badge?: string;
+  /** Heading level for the headline. A page's own hero is the `h1`; a section hero is not. */
+  titleAs?: 'h1' | 'h2';
+  /** Element to render. A hero that opens the page should stay a `section`. */
+  as?: 'section' | 'div';
+}
+
+const {
+  variant = 'plain',
+  eyebrow,
+  summary,
+  badge,
+  titleAs: Title = 'h1',
+  as: Element = 'section',
+  class: className,
+  ...rest
+} = Astro.props;
+
+const hasAside = Astro.slots.has('aside');
+const hasMedia = Astro.slots.has('media');
+---
+
+<Element
+  class:list={[
+    'helia-hero',
+    'not-content',
+    variant !== 'plain' && `helia-hero--${variant}`,
+    className,
+  ]}
+  {...rest}
+>
+  <div class="helia-hero__lede">
+    {eyebrow && <Eyebrow class="helia-hero__eyebrow">{eyebrow}</Eyebrow>}
+    <Title class="helia-hero__headline"><slot /></Title>
+    {
+      badge && (
+        <Badge class="helia-hero__badge" tone="accent" size="md">
+          {badge}
+        </Badge>
+      )
+    }
+    {summary && <p class="helia-hero__summary">{summary}</p>}
+    {
+      Astro.slots.has('actions') && (
+        <div class="helia-hero__actions">
+          <slot name="actions" />
+        </div>
+      )
+    }
+  </div>
+  {
+    (hasAside || hasMedia) && (
+      <div class="helia-hero__side">
+        {hasAside && (
+          <div class="helia-hero__aside">
+            <slot name="aside" />
+          </div>
+        )}
+        {hasMedia && (
+          <div class="helia-hero__media">
+            <slot name="media" />
+          </div>
+        )}
+      </div>
+    )
+  }
+</Element>

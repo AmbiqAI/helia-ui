@@ -1884,3 +1884,202 @@ a.helia-chip--neutral:focus-visible {
     --helia-chart-group-columns: 1;
   }
 }
+
+/*
+ * The hero: the top of a landing page. One layout with two grounds, because a
+ * product front door and a section opener differ in weight rather than in what
+ * they hold -- an eyebrow, a headline with one word in the product's color, a
+ * standing label, a claim, the ways in, and the evidence beside them.
+ *
+ * The side column is the part that earns the grid. It renders only when it has
+ * been given something, so the same part is the lede on its own measure for a
+ * page with no figures to show, and it stacks under the lede below 62rem: a
+ * panel of numbers beside a headline at phone width is two half-readable
+ * things.
+ */
+.helia-hero {
+  align-items: center;
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+}
+
+@media (width >= 62rem) {
+  .helia-hero:has(.helia-hero__side) {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  }
+}
+
+.helia-hero__lede {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helia-space-3);
+  min-width: 0;
+}
+
+/*
+ * The dot says nothing the label says. It is the mark that separates the
+ * hero's eyebrow from the metadata rows further down the page, and it is the
+ * first place the accent appears -- which is what makes the accent word below
+ * it read as the same voice rather than as a highlight.
+ */
+.helia-hero__eyebrow {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--helia-space-2);
+}
+
+.helia-hero__eyebrow::before {
+  background: var(--helia-product-accent);
+  border-radius: 50%;
+  content: '';
+  height: 0.4rem;
+  width: 0.4rem;
+}
+
+/*
+ * The page's one loud moment. The size is a hook because the step depends on
+ * the room, and only the page knows how much of it the hero has: the fluid
+ * hero step is sized against the viewport, and a headline that keeps it while
+ * sharing the row with a panel runs out of column mid-word. A hero with a side
+ * column therefore drops a step, and a site whose hero owns the full page
+ * width raises `--helia-hero-headline` back.
+ *
+ * The measure is in characters so the composed break survives the fluid size.
+ */
+.helia-hero__headline {
+  color: var(--helia-ink-primary);
+  font-size: var(--helia-hero-headline, var(--helia-text-page));
+  font-weight: var(--helia-weight-bold);
+  letter-spacing: var(--helia-tracking-display);
+  line-height: var(--helia-leading-tight);
+  margin: 0;
+  max-width: 18ch;
+}
+
+.helia-hero:not(:has(.helia-hero__side)) {
+  --helia-hero-headline: var(--helia-text-hero);
+}
+
+/* Emphasis as color, not as slant: at display size an italic is a different
+   typeface rather than a stressed word. */
+.helia-hero__headline em {
+  color: var(--helia-product-accent);
+  font-style: normal;
+}
+
+/* The one standing label on the page, and the second place the accent appears.
+   A rim and a wash rather than a fill: a solid accent pill beside display type
+   is a second headline. */
+.helia-hero__badge {
+  align-self: start;
+  background: color-mix(in srgb, var(--helia-product-accent) 12%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--helia-product-accent) 50%,
+    transparent
+  );
+  color: var(--helia-product-accent);
+}
+
+.helia-hero__summary {
+  color: var(--helia-ink-secondary);
+  font-size: var(--helia-text-lead);
+  line-height: var(--helia-leading-body);
+  margin: 0;
+  max-width: 44rem;
+  text-wrap: pretty;
+}
+
+.helia-hero__actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helia-space-2);
+  margin-block-start: var(--helia-space-2);
+}
+
+/*
+ * The primary action is outlined in the accent rather than filled with the page
+ * ink. On the inked card the ink pill is the brightest thing in the frame and
+ * takes the eye off the headline; on either ground the accent is the one place
+ * the product gets to say its own name, and an outline says it without
+ * competing with the display type above it.
+ */
+.helia-hero__actions .helia-button--primary {
+  background: transparent;
+  border-color: var(--helia-product-accent);
+  color: var(--helia-product-accent);
+}
+
+.helia-hero__actions .helia-button--primary:hover,
+.helia-hero__actions .helia-button--primary:focus-visible {
+  background: color-mix(in srgb, var(--helia-product-accent) 14%, transparent);
+}
+
+.helia-hero__side {
+  align-content: center;
+  display: grid;
+  gap: var(--helia-space-3);
+  min-width: 0;
+}
+
+/* The panel the figures sit in. Whatever follows it takes no frame of its own,
+   because a code block or a diagram already owns one. */
+.helia-hero__aside {
+  background: var(--helia-surface-card);
+  border: 1px solid var(--helia-surface-border);
+  border-radius: var(--helia-radius-lg);
+  padding: var(--helia-space-4);
+}
+
+.helia-hero__media {
+  min-width: 0;
+}
+
+/*
+ * The inked card. Pinned dark in both themes, like the contrast band and the
+ * background-media card: a front door that lightens with the theme is a front
+ * door that only reads half the time.
+ *
+ * The accent is re-derived rather than inherited. A custom property is
+ * substituted at the element that declares it, so the value reaching this card
+ * from the theme scope is already the light theme's -- mixed toward ink, which
+ * on this ground is the color disappearing. Restating the mix against paper is
+ * what keeps the product's color legible across the flip.
+ */
+.helia-hero--contrast {
+  --helia-ink-adaptive: var(--helia-paper-white);
+  --helia-ink-primary: var(--helia-paper-white);
+  --helia-ink-secondary: color-mix(
+    in srgb,
+    var(--helia-paper-white) 82%,
+    transparent
+  );
+  --helia-ink-muted: color-mix(
+    in srgb,
+    var(--helia-paper-white) 66%,
+    transparent
+  );
+  --helia-product-accent-mix: 76%;
+  --helia-product-accent: color-mix(
+    in oklab,
+    var(--helia-product-accent-source) var(--helia-product-accent-mix),
+    var(--helia-ink-adaptive)
+  );
+  --helia-surface-card: color-mix(
+    in srgb,
+    var(--helia-paper-white) 7%,
+    var(--helia-ink-black)
+  );
+  --helia-surface-card-muted: var(--helia-surface-card);
+  --helia-surface-border: color-mix(
+    in srgb,
+    var(--helia-paper-white) 14%,
+    transparent
+  );
+
+  background: var(--helia-ink-black);
+  border-radius: var(--helia-radius-lg);
+  color: var(--helia-paper-white);
+  padding: clamp(1.5rem, 5vw, 4rem);
+}
