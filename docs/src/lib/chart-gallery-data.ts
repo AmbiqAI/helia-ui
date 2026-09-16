@@ -122,8 +122,8 @@ export const weightSeries: WeightPoint[] = [
 /*
  * A benchmark-shaped set: many categories with names too long to sit under a
  * bar, three series, and a measure spanning more than a decade. It is the
- * shape the orientation option was written for, so it is the shape the gallery
- * shows it in.
+ * shape the orientation, scale, band order and annotation options were written
+ * for, so it is the shape the gallery shows them in.
  *
  * The routines are invented and so are the ratios. Nothing here is a
  * measurement of anything, and no routine named below exists.
@@ -173,4 +173,9 @@ export const routineSpeedups: RoutinePoint[] = ROUTINES.flatMap(
     { routine, path: 'scalar path', speedup: SCALAR_SPEEDUPS[index] },
     { routine, path: 'reference', speedup: 1 },
   ],
+);
+
+/** The same set with the reference spent as a rule rather than as a series. */
+export const routinePaths: RoutinePoint[] = routineSpeedups.filter(
+  (point) => point.path !== 'reference',
 );

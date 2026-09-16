@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
 /*
- * The chart options that only a drawing can answer for, starting with whether
- * a category label survived the margin it was given.
+ * The chart options that only a drawing can answer for: whether a category
+ * label survived the margin it was given, what a log axis actually ticked at,
+ * whether the bars run in the order the legend claims, and whether the
+ * reference rule is on the chart.
  *
  * The unit tests assert the arithmetic that produced these; this asserts the
  * page. A margin computed from a label's length is a guess about type metrics
@@ -91,4 +93,29 @@ test('the bars run in the order the legend names them', async ({ page }) => {
     .first()
     .evaluate((node) => getComputedStyle(node).fill);
   expect(bar).toBe(swatch);
+});
+
+test('a reference rule is drawn, named once, and labeled bars', async ({
+  page,
+}) => {
+  await page.goto(gallery);
+  const figure = chart(page, 'Speedup against the reference path');
+
+  const rules = figure.locator('svg g[stroke-dasharray]');
+  expect(await rules.count()).toBeGreaterThan(0);
+
+  const named = figure.locator('svg text', { hasText: /^reference$/ });
+  await expect(named).toHaveCount(1);
+
+  const axisTitles = await figure
+    .locator('svg g[data-plot-label$="-axis label"] text')
+    .allTextContents();
+  expect(axisTitles.join(' ')).toContain('Times faster than reference');
+  expect(axisTitles.join(' ')).toContain('Routine');
+
+  /* Twenty-eight bars, each with its value written past its end. */
+  const values = figure.locator('svg g[data-plot-label="text"] text', {
+    hasText: /x$/,
+  });
+  expect(await values.count()).toBeGreaterThanOrEqual(28);
 });

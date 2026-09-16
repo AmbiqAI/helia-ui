@@ -2,8 +2,8 @@
 // Copyright (c) 2026, Ambiq
 /*
  * The chart spec's arithmetic, asserted on the options rather than on a
- * drawing: which axis the categories landed on, and how much room their labels
- * were given.
+ * drawing: which axis the categories landed on, what a log axis ticks at, and
+ * the order the bars run in inside a group.
  *
  * The fixture is shaped like the benchmark chart the options were written for
  * -- many categories with long names, three series, ratios spanning more than
@@ -19,6 +19,7 @@ import {
   chartLegendEntries,
   chartLogTicks,
   chartPlotOptions,
+  chartValueLabelsFit,
   chartValueScale,
   formatChartValue,
 } from '../chart-plot-spec.ts';
@@ -40,7 +41,8 @@ const KERNELS = [
   'reduce_rows_s16',
 ];
 
-/* Deliberately not alphabetical: the series order is the author's. */
+/* Deliberately not alphabetical: the series order is the author's and the
+   chart has to keep it. */
 const PATHS = ['vector path', 'scalar path', 'baseline'];
 
 const rows = KERNELS.flatMap((kernel, index) =>
@@ -149,23 +151,6 @@ test('a log axis over a negative value is drawn linear', () => {
   );
 });
 
-test('a raised floor anchors the bars on it rather than on zero', () => {
-  const options = chartPlotOptions({
-    ...base,
-    scale: { type: 'log', min: 0.5, max: 16 },
-  });
-  assert.equal(options.y.type, 'log');
-  assert.deepEqual(options.y.domain, [0.5, 16]);
-  assert.deepEqual(options.y.ticks, [0.5, 1, 2, 5, 10]);
-});
-
-test('a value is written with enough decimals to tell two apart', () => {
-  assert.equal(formatChartValue(0.82), '0.82');
-  assert.equal(formatChartValue(12.25), '12.3');
-  assert.equal(formatChartValue(1), '1');
-  assert.equal(formatChartValue(1200), '1200');
-});
-
 test('the bars in a group run in series order, not sorted order', () => {
   const options = chartPlotOptions({ ...base });
   assert.deepEqual(options.x.domain, PATHS);
@@ -185,4 +170,67 @@ test('the legend names the series in the same order as the bands', () => {
 test('a horizontal group takes the same band order', () => {
   const options = chartPlotOptions({ ...base, orientation: 'horizontal' });
   assert.deepEqual(options.y.domain, PATHS);
+});
+
+test('an axis title is set only where one was asked for', () => {
+  const plain = chartPlotOptions({ ...base });
+  assert.equal(plain.y.label, null);
+  assert.equal(plain.fx.label, null);
+
+  const titled = chartPlotOptions({
+    ...base,
+    axis: { valueLabel: 'Speedup', categoryLabel: 'Routine' },
+  });
+  assert.equal(titled.y.label, 'Speedup');
+  assert.equal(titled.fx.label, 'Routine');
+  /* The titles are drawn outside the plot area, so the margins have to pay. */
+  assert.ok(titled.marginTop > plain.marginTop);
+  assert.ok(titled.marginBottom > plain.marginBottom);
+});
+
+test('a raised floor anchors the bars on it rather than on zero', () => {
+  const options = chartPlotOptions({
+    ...base,
+    scale: { type: 'log', min: 0.5, max: 16 },
+  });
+  assert.equal(options.y.type, 'log');
+  assert.deepEqual(options.y.domain, [0.5, 16]);
+  assert.deepEqual(options.y.ticks, [0.5, 1, 2, 5, 10]);
+});
+
+test('value labels are dropped when the bands cannot hold them', () => {
+  assert.equal(
+    chartValueLabelsFit({
+      horizontal: true,
+      bands: 42,
+      extent: 350,
+      longest: 4,
+    }),
+    false,
+  );
+  assert.equal(
+    chartValueLabelsFit({
+      horizontal: true,
+      bands: 28,
+      extent: 480,
+      longest: 4,
+    }),
+    true,
+  );
+  assert.equal(
+    chartValueLabelsFit({
+      horizontal: false,
+      bands: 42,
+      extent: 846,
+      longest: 4,
+    }),
+    false,
+  );
+});
+
+test('a value is written with enough decimals to tell two apart', () => {
+  assert.equal(formatChartValue(0.82), '0.82');
+  assert.equal(formatChartValue(12.25), '12.3');
+  assert.equal(formatChartValue(1), '1');
+  assert.equal(formatChartValue(1200), '1200');
 });

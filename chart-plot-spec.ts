@@ -33,6 +33,25 @@ export interface ChartScale {
   max?: number;
 }
 
+/**
+ * Axis titles, for the chart whose subtitle cannot carry the unit -- a ratio,
+ * a log axis, anything the reader has to know the units of to read a tick.
+ * Left unset, no axis is titled and the subtitle does the work.
+ */
+export interface ChartAxisTitles {
+  /** Titles the measure. */
+  valueLabel?: string;
+  /** Titles the categories. */
+  categoryLabel?: string;
+}
+
+/** A rule drawn across the plot at one value on the measure. */
+export interface ChartReferenceLine {
+  value: number;
+  /** Named once, in the first band, rather than once per group. */
+  label?: string;
+}
+
 /** One row of the chart's data. Keys are the `x`, `y` and `series` props. */
 export type ChartRecord = Record<string, unknown>;
 
@@ -88,19 +107,27 @@ const AREA_FILL_OPACITY = 0.16;
 
 /*
  * Plot lays out at font-size 10 and the stylesheet sets the tick type from
- * `--helia-text-label`, which is larger. The left margin a category label needs
- * is measured at the drawn size rather than Plot's, so a label that fits by
- * this arithmetic fits on the page.
+ * `--helia-text-label`, which is larger. Every measurement taken here -- the
+ * left margin a category label needs, the room a value label wants -- is taken
+ * at the drawn size rather than Plot's, so a label that fits by this arithmetic
+ * fits on the page.
  */
+const TICK_FONT_SIZE = 11;
 const TICK_CHAR_WIDTH = 6.6;
 /** Gap between the longest category label and the plot area. */
 const CATEGORY_LABEL_GAP = 12;
 /** The share of the width the category labels may take before they are cut. */
 const CATEGORY_MARGIN_SHARE = 0.45;
+/** Room an axis title needs beyond the ticks. */
+const AXIS_TITLE_ROOM = 16;
+/** Room a value label needs past the end of its bar. */
+const VALUE_LABEL_GAP = 6;
 /** Beyond this many, log ticks are thinned to the decades. */
 const MAX_LOG_TICKS = 10;
 /** The 1, 2, 5 sequence a log axis is read in. */
 const LOG_STEPS = [1, 2, 5];
+
+const REFERENCE_DASH = '4 3';
 
 export interface ChartSpec {
   kind: ChartKind;
@@ -118,8 +145,14 @@ export interface ChartSpec {
   orientation?: ChartOrientation;
   /** The measure's scale. Linear and anchored at zero when unset. */
   scale?: ChartScale;
-  /** How a value is written, on a titled or logarithmic axis. */
+  /** Axis titles. Untitled when unset. */
+  axis?: ChartAxisTitles;
+  /** Writes each bar's value at its end, where the bands leave room for it. */
+  valueLabels?: boolean;
+  /** How a value is written, on a bar and on a titled or logarithmic axis. */
   valueFormat?: (value: number) => string;
+  /** Rules across the measure: a baseline, a target, a budget. */
+  referenceLines?: readonly ChartReferenceLine[];
   /** The DOM Plot builds against. Omitted in the browser, where there is one. */
   document?: Document;
 }
@@ -313,9 +346,40 @@ export function chartCategoryMargin(
 }
 
 /**
- * The Plot options for a spec. Axes carry ticks and no titles: the subtitle
- * says what is plotted against what, so an axis title would be the same
- * sentence written twice, once in Plot's type and once in ours.
+ * Whether the bands are big enough to write a value in.
+ *
+ * A vertical bar's label is limited by the band's width and a horizontal one's
+ * by its height, which is why the two are asked different questions. Labels
+ * that do not fit are dropped as a set rather than individually: half a chart
+ * labeled reads as a chart with missing data.
+ */
+export function chartValueLabelsFit({
+  horizontal,
+  bands,
+  extent,
+  longest,
+}: {
+  horizontal: boolean;
+  /** Bars across the measure: categories times series. */
+  bands: number;
+  /** The plot area along the band direction, in pixels. */
+  extent: number;
+  /** Characters in the longest written value. */
+  longest: number;
+}): boolean {
+  if (bands <= 0) return false;
+  const band = extent / bands;
+  return horizontal
+    ? band >= TICK_FONT_SIZE + 2
+    : band >= longest * TICK_CHAR_WIDTH + 4;
+}
+
+/**
+ * The Plot options for a spec. An axis carries ticks and, unless `axis` says
+ * otherwise, no title: the subtitle says what is plotted against what, so an
+ * axis title is usually the same sentence written twice, once in Plot's type
+ * and once in ours. A ratio or a log axis is the exception, which is what
+ * `axis` is for.
  *
  * `x`, `y` and `series` stay the keys they always were. `orientation` moves the
  * drawing, not the data contract: a horizontal bar chart still names its
@@ -333,7 +397,10 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
     density,
     orientation = 'vertical',
     scale,
+    axis,
+    valueLabels = false,
     valueFormat,
+    referenceLines = [],
   } = spec;
   const frame = FRAME[density];
   const names = chartSeriesNames(data, series);
@@ -344,6 +411,7 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
   const horizontal = bars && orientation === 'horizontal';
   const grouped = bars && Boolean(series);
   const bands = categories(rows, x);
+  const format = valueFormat ?? formatChartValue;
 
   const value = chartValueScale(rows, y, scale, bars || kind === 'area');
   /* The build log is where this belongs: the page still draws, and the author
@@ -355,9 +423,42 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
      at the bottom of the axis instead. */
   const anchored = bars && baseline !== 0;
 
+  const written = measures(rows, y).map((one) => format(one));
+  const longest = written.reduce((most, one) => Math.max(most, one.length), 0);
+
   const marginLeft = horizontal
     ? chartCategoryMargin(bands, width)
     : frame.left;
+  let marginTop = frame.top;
+  let marginRight = frame.right;
+  let marginBottom = frame.bottom;
+  if (axis?.valueLabel) {
+    if (horizontal) marginBottom += AXIS_TITLE_ROOM;
+    else marginTop += AXIS_TITLE_ROOM;
+  }
+  if (axis?.categoryLabel) {
+    if (horizontal) marginTop += AXIS_TITLE_ROOM;
+    else marginBottom += AXIS_TITLE_ROOM;
+  }
+  if (valueLabels && bars) {
+    if (horizontal) {
+      marginRight += Math.ceil(longest * TICK_CHAR_WIDTH) + VALUE_LABEL_GAP;
+    } else {
+      marginTop += TICK_FONT_SIZE;
+    }
+  }
+
+  const showValues =
+    valueLabels &&
+    bars &&
+    chartValueLabelsFit({
+      horizontal,
+      bands: bands.length * Math.max(names.length, 1),
+      extent: horizontal
+        ? height - marginTop - marginBottom
+        : width - marginLeft - marginRight,
+      longest,
+    });
 
   /* Gridlines run across the measure, because that is the direction a reader
      compares in. Only a scatter has a measure on both axes, so only a scatter
@@ -425,6 +526,29 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
         ? Plot.ruleX([baseline], { stroke: CHART_GRID })
         : Plot.ruleY([baseline], { stroke: CHART_GRID }),
     );
+    if (showValues) {
+      marks.push(
+        horizontal
+          ? Plot.text(rows, {
+              y: band,
+              fy: facet,
+              x: y,
+              text: (row: ChartRecord) => format(Number(row[y])),
+              textAnchor: 'start',
+              dx: VALUE_LABEL_GAP / 2,
+              fill: CHART_INK,
+            })
+          : Plot.text(rows, {
+              x: band,
+              fx: facet,
+              y,
+              text: (row: ChartRecord) => format(Number(row[y])),
+              lineAnchor: 'bottom',
+              dy: -VALUE_LABEL_GAP / 2,
+              fill: CHART_INK,
+            }),
+      );
+    }
   } else {
     marks.push(
       Plot.dot(rows, {
@@ -437,16 +561,62 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
     );
   }
 
+  if (referenceLines.length > 0) {
+    const rule = horizontal ? Plot.ruleX : Plot.ruleY;
+    marks.push(
+      rule(
+        referenceLines.map((line) => line.value),
+        { stroke: CHART_INK, strokeDasharray: REFERENCE_DASH },
+      ),
+    );
+    /* The rule repeats across the facets, because a faceted mark has to; the
+       label does not, so it is given the first category and written once. */
+    const labeled = referenceLines.filter((line) => line.label);
+    if (labeled.length > 0) {
+      const placed = labeled.map((line) => ({
+        value: line.value,
+        label: line.label,
+        [x]: bands[0],
+      }));
+      marks.push(
+        horizontal
+          ? Plot.text(placed, {
+              x: 'value',
+              fy: grouped ? x : undefined,
+              text: 'label',
+              frameAnchor: 'top',
+              textAnchor: 'start',
+              dx: 3,
+              dy: 2,
+              fill: CHART_INK,
+            })
+          : Plot.text(placed, {
+              y: 'value',
+              fx: grouped ? x : undefined,
+              text: 'label',
+              frameAnchor: 'left',
+              textAnchor: 'start',
+              lineAnchor: 'bottom',
+              dx: 3,
+              dy: -3,
+              fill: CHART_INK,
+            }),
+      );
+    }
+  }
+
   /* The inner band takes its domain from the series list rather than from the
      sort Plot would apply, so the bars in a group run in the order the legend
      names them. See AmbiqAI/helia-ui#82. */
   const innerBand = { axis: null, domain: names };
   const categoryScale = {
-    label: null,
+    label: axis?.categoryLabel ?? null,
+    labelArrow: 'none' as const,
     ...(bars ? { domain: bands } : {}),
   };
   const valueScale = {
-    label: null,
+    label: axis?.valueLabel ?? null,
+    labelArrow: 'none' as const,
     ...(value.type === 'log' ? { type: 'log' as const } : {}),
     ...(value.domain ? { domain: value.domain } : { nice: true }),
     ticks: value.ticks ?? frame.ticks,
@@ -457,9 +627,9 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
     document: spec.document,
     width,
     height,
-    marginTop: frame.top,
-    marginRight: frame.right,
-    marginBottom: frame.bottom,
+    marginTop,
+    marginRight,
+    marginBottom,
     marginLeft,
     /* A stable class rather than the hash Plot derives from the style: two
        charts drawn the same way should produce the same markup, so a build is

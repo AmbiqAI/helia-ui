@@ -52,6 +52,7 @@ import Timeline from '@ambiqai/helia-ui/astro/Timeline';
 import {
   buildSeries,
   pagesSeries,
+  routinePaths,
   routineSpeedups,
   trafficSeries,
   weightSeries,
@@ -2108,17 +2109,18 @@ here is a measurement of any part.
   />
 </Example>
 
-### Long names
+### Long names, wide ranges, and a baseline
 
-A chart with more categories than a row of bars can name needs the categories
-on the vertical axis. `orientation="horizontal"` puts them there and takes the
-left margin from the longest label, so a name is never cut. The data contract
-does not move with the drawing: `x` still names the categories and `y` still
-names the measure.
-
-The set below is invented — the routines do not exist and neither do the ratios
-— but it is shaped like the one the option was written for: fourteen long
+A chart with more categories than a row of bars can name, and a measure that
+spans more than a decade, needs four options the defaults do not give it. The
+set below is invented — the routines do not exist and neither do the ratios —
+but it is shaped like the one the options were written for: fourteen long
 names, three series, and speedups from under one to twelve.
+
+`orientation="horizontal"` puts the categories on the vertical axis and takes
+the left margin from the longest label, so a name is never cut. The data
+contract does not move with the drawing: `x` still names the categories and `y`
+still names the measure.
 
 <Example
   title='orientation="horizontal"'
@@ -2230,6 +2232,58 @@ assertion rather than a coincidence.
     density="compact"
     width={900}
     height={520}
+  />
+</Example>
+
+`axis` titles an axis the subtitle cannot carry the unit for, `valueLabels`
+writes each bar's value at its end, and `referenceLines` draws a rule across
+the measure. A constant baseline belongs on the rule rather than in a third
+series: it costs a palette color, a legend entry and a third of the bars to
+draw a line. Value labels are dropped as a set when the bands are too small to
+hold them, so a chart that shows them at one height stops showing them at
+another rather than overprinting.
+
+<Example
+  title="axis, valueLabels and referenceLines"
+  code={`
+    <Chart
+      title="Speedup against the reference path"
+      subtitle="Two code paths, fourteen routines"
+      kind="bar"
+      data={routinePaths}
+      x="routine"
+      y="speedup"
+      series="path"
+      orientation="horizontal"
+      scale={{ type: 'log', min: 0.5 }}
+      axis={{ valueLabel: 'Times faster than reference', categoryLabel: 'Routine' }}
+      valueLabels
+      valueFormat={(value) => \`\${value}x\`}
+      referenceLines={[{ value: 1, label: 'reference' }]}
+      width={900}
+      height={480}
+    />
+  `}
+>
+  <Chart
+    title="Speedup against the reference path"
+    subtitle="Two code paths, fourteen routines"
+    kind="bar"
+    data={routinePaths}
+    x="routine"
+    y="speedup"
+    series="path"
+    orientation="horizontal"
+    scale={{ type: 'log', min: 0.5 }}
+    axis={{
+      valueLabel: 'Times faster than reference',
+      categoryLabel: 'Routine',
+    }}
+    valueLabels
+    valueFormat={(value) => `${value}x`}
+    referenceLines={[{ value: 1, label: 'reference' }]}
+    width={900}
+    height={480}
   />
 </Example>
 

@@ -23,11 +23,13 @@ import {
   chartPlotOptions,
   inlineChartColors,
   labelChartSvg,
+  type ChartAxisTitles,
   type ChartDensity,
   type ChartKind,
   type ChartLegend,
   type ChartOrientation,
   type ChartRecord,
+  type ChartReferenceLine,
   type ChartScale,
 } from '../chart-plot-spec';
 
@@ -60,8 +62,14 @@ export interface ChartPlotProps {
   orientation?: ChartOrientation;
   /** The measure's scale. Linear and anchored at zero when unset. */
   scale?: ChartScale;
-  /** How a value is written, on a titled or logarithmic axis. */
+  /** Axis titles, for the chart whose unit will not fit in the subtitle. */
+  axis?: ChartAxisTitles;
+  /** Writes each bar's value at its end, where the bands leave room for it. */
+  valueLabels?: boolean;
+  /** How a value is written, on a bar and on a titled or logarithmic axis. */
   valueFormat?: (value: number) => string;
+  /** Rules across the measure: a baseline, a target, a budget. */
+  referenceLines?: readonly ChartReferenceLine[];
   className?: string;
 }
 
@@ -80,7 +88,10 @@ export function ChartPlot({
   legend = 'auto',
   orientation = 'vertical',
   scale,
+  axis,
+  valueLabels = false,
   valueFormat,
+  referenceLines,
   className,
 }: ChartPlotProps) {
   const host = React.useRef<HTMLDivElement | null>(null);
@@ -127,7 +138,10 @@ export function ChartPlot({
         density,
         orientation,
         scale,
+        axis,
+        valueLabels,
         valueFormat,
+        referenceLines,
       }),
     );
     inlineChartColors(figure);
@@ -145,7 +159,10 @@ export function ChartPlot({
     density,
     orientation,
     scale,
+    axis,
+    valueLabels,
     valueFormat,
+    referenceLines,
     measured,
     generation,
     title,
