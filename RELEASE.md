@@ -7,13 +7,71 @@ required facts in the package root next to LICENSE and NOTICE.
 | Field             | Value                                                                       |
 | ----------------- | --------------------------------------------------------------------------- |
 | Package           | `@ambiqai/helia-ui`                                                         |
-| Version           | 0.1.0-alpha.10                                                              |
-| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.10`.        |
+| Version           | 0.1.0-alpha.11                                                              |
+| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.11`.        |
 | License           | BSD-3-Clause (`LICENSE`)                                                    |
 | Licensing tier    | Tier 1, ADR-0005                                                            |
 | Source repository | https://github.com/AmbiqAI/helia-ui                                         |
 | Source path       | Repository root, mirrored from `packages/helia-ui` in `helia-developer-hub` |
 | Source commit     | Recorded at tag time.                                                       |
+
+## What changed in 0.1.0-alpha.11
+
+The fourth release out of the heliaCORE reference migration: the parts that make
+an accent cheap to spend in small amounts, the line that links a product site
+back to the Dev Hub, and a section whose landing page is read from the bar above
+it rather than from a pane beside it.
+
+Issue references below are to `AmbiqAI/helia-ui`.
+
+### Added
+
+- `Stack`, the chain of labeled layers a product page opens with, one of them
+  the page's own, folding to two columns below 62rem; and `Bars`, the comparison
+  a heading needs and a chart is too heavy for, labeled tracks against one scale
+  with an axis under them and every row text as well as a bar. Alongside them
+  `Card` and `LinkCard` take `tone="ink"`, the ground the contrast hero uses,
+  pinned dark in both themes with the inks and the accent re-derived against it,
+  so a tile dropped into a light page does not carry a light-page accent onto a
+  dark ground and the edge goes with the fill rather than becoming a brim; code
+  frames on it join the on-dark scope the band and the background-media card
+  share. `BigNumber` takes `accent`, which colors the unit and nothing else. The
+  design system document states the accent budget, how much of each a page may
+  spend, since a page that puts its accent only in the hero reads as a colored
+  banner over a gray document and one that puts it everywhere has no accent at
+  all (#99).
+- `header.hub`, one line at the end of the product bar: muted text with the
+  family's name in the product accent and a glyph that says the link leaves the
+  site, so the product sites read as one family rather than as sites standing
+  alone. Below the collapse point the bar has no room for it and the menu
+  carries it at the end, which is where the sections go (#98).
+- `sidebar: false` on an entry of the `sections` list, for the section whose
+  landing page is read from the bar: no pane on its routes and no column
+  reserved for one, whatever `sidebar: 'always'` says about the template. Below
+  the bar's collapse point the sections have nowhere else to be, so the menu
+  button's pane becomes the list of every section, each expandable to its pages
+  with the current one open; the wide-screen pane stays the current section
+  alone (#97).
+
+### Changed
+
+- The product accent's unaccented fallback is mixed one step further toward the
+  ink the theme adapts to in the navigation bar. The accent is mixed for a
+  card's ground at body sizes, and at the bar's size on the canvas the slate an
+  unaccented site falls back to does not clear AA in the dark theme (#98).
+- A `Stack` marks its accented layer with a rule along its block start and a
+  tint of the accent behind it. Both are a colored edge on a surface, which is
+  open for the owner's ruling (#100).
+
+### Fixed
+
+- A card header draws its mark, its metadata line and its actions only when it
+  is given content for them. Astro binds a slot name where the caller is
+  compiled rather than where its branch runs, so a `LinkCard` with no icon left
+  `Astro.slots.has('icon')` true and the header drew an empty tonal disc above
+  the eyebrow, and the same pattern on `meta` left an empty metadata line.
+  `CardHeader` renders each optional region once and treats whitespace as
+  absent, which fixes every caller rather than the one part (#101).
 
 ## What changed in 0.1.0-alpha.10
 
