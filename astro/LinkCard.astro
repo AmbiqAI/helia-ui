@@ -60,22 +60,15 @@ const {
 } = Astro.props;
 
 const hasLine = Astro.slots.has('default');
-const hasIcon = Astro.slots.has('icon');
 ---
 
 <Card interactive class:list={['helia-link-card', className]} {...rest}>
   <CardHeader titleAs={titleAs} href={href} eyebrow={eyebrow}>
-    {
-      hasIcon && (
-        <Fragment slot="icon">
-          <slot name="icon" />
-        </Fragment>
-      )
-    }
+    <slot name="icon" slot="icon" />
     <span class="title"
       >{title}<span class="helia-motion-cue" aria-hidden="true">→</span></span
     >
-    {meta && <Fragment slot="meta">{meta}</Fragment>}
+    <Fragment slot="meta">{meta}</Fragment>
   </CardHeader>
   {
     hasLine && (

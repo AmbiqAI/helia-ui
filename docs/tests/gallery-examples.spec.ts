@@ -189,6 +189,37 @@ test('an icon row is one anchor around its tile and its title', async ({
 });
 
 /*
+ * The LinkCard row is the fixture for a part that is handed a region and a part
+ * that is not: a caller wrapping a slot in a condition still registers the slot
+ * name at compile time, which once left every card without an icon drawing an
+ * empty tonal disc and every card without meta an empty line under the title.
+ * See AmbiqAI/helia-ui#101.
+ */
+test('a link card draws a mark and a meta line only when given them', async ({
+  page,
+}) => {
+  await page.goto(gallery);
+
+  const stage = (title: string) =>
+    page
+      .locator('.example')
+      .filter({ has: page.locator('.example__title', { hasText: title }) })
+      .locator('[data-example-stage] .helia-link-card');
+
+  const plain = stage('<LinkCard href title>');
+  await expect(plain).toHaveCount(1);
+  await expect(plain.locator('.helia-card-mark')).toHaveCount(0);
+  await expect(plain.locator('.helia-card-header__meta')).toHaveCount(0);
+
+  const both = stage('<Icon slot="icon"> and meta');
+  await expect(both).toHaveCount(1);
+  await expect(both.locator('.helia-card-mark--icon svg')).toHaveCount(1);
+  await expect(both.locator('.helia-card-header__meta')).toHaveText(
+    'Astro parts · React parts',
+  );
+});
+
+/*
  * The Reference section is the claim that one model renders the same reference
  * for every language. Three symbols, three languages, one table: if the C entry
  * loses a column the section has stopped making its point.

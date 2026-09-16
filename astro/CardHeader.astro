@@ -23,6 +23,9 @@
  * the same disc, so a row mixing the two lines up; a header handed both keeps
  * the icon, because two marks in one corner is neither.
  *
+ * A region whose slot renders to nothing is left out, so a caller passing one
+ * of them behind a condition leaves no empty disc or metadata line.
+ *
  * @slot default -- The title text. Omit it and no heading is rendered.
  * @slot icon -- A glyph for the tonal disc before the title, usually an `Icon`.
  * @slot eyebrow -- The label above the title, for markup `eyebrow` cannot carry.
@@ -64,11 +67,26 @@ const {
   ...rest
 } = Astro.props;
 
+/*
+ * Astro binds a slot name where the caller is compiled, not where its branch
+ * runs, so a caller that wraps a slot in a condition registers the name either
+ * way and `has` is true for a region with nothing in it. The optional regions
+ * are rendered once here and whitespace counts as absent, which is what keeps
+ * a card given no icon from drawing an empty disc.
+ * See AmbiqAI/helia-ui#101.
+ */
+const rendered = async (name: string) =>
+  Astro.slots.has(name) ? await Astro.slots.render(name) : '';
+
+const icon = await rendered('icon');
+const meta = await rendered('meta');
+const action = await rendered('action');
+
 const hasTitle = Astro.slots.has('default');
 const hasEyebrow = eyebrow !== undefined || Astro.slots.has('eyebrow');
-const hasMeta = Astro.slots.has('meta');
-const hasAction = Astro.slots.has('action');
-const hasIcon = Astro.slots.has('icon');
+const hasMeta = meta.trim() !== '';
+const hasAction = action.trim() !== '';
+const hasIcon = icon.trim() !== '';
 const hasStep = !hasIcon && step !== undefined;
 ---
 
@@ -84,7 +102,7 @@ const hasStep = !hasIcon && step !== undefined;
   {
     hasIcon && (
       <span class="helia-card-mark helia-card-mark--icon">
-        <slot name="icon" />
+        <Fragment set:html={icon} />
       </span>
     )
   }
@@ -114,7 +132,7 @@ const hasStep = !hasIcon && step !== undefined;
     {
       hasMeta && (
         <div class="helia-card-header__meta">
-          <slot name="meta" />
+          <Fragment set:html={meta} />
         </div>
       )
     }
@@ -122,7 +140,7 @@ const hasStep = !hasIcon && step !== undefined;
   {
     hasAction && (
       <div class="helia-card-header__action">
-        <slot name="action" />
+        <Fragment set:html={action} />
       </div>
     )
   }
