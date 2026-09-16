@@ -187,3 +187,25 @@ test.describe('with no contents column', () => {
     );
   });
 });
+
+test.describe('at a narrow viewport', () => {
+  /* The width the band was found touching the viewport edge at, in
+     AmbiqAI/helia-ui#86. The band has bled past the frame and the frame is the
+     viewport, so the inner is the only thing left holding the margin. */
+  test.use({ viewport: { width: 720, height: 960 } });
+
+  test('band content keeps the reading margin at the viewport edge', async ({
+    page,
+  }) => {
+    await page.goto(gallery);
+
+    const inners = await page.locator('.helia-band__inner').all();
+    expect(inners.length).toBeGreaterThan(0);
+
+    for (const [index, inner] of inners.entries()) {
+      await inner.scrollIntoViewIfNeeded();
+      const first = (await inner.locator('> *').first().boundingBox())!;
+      expect(first.x, `band inner ${index}`).toBeGreaterThanOrEqual(16);
+    }
+  });
+});

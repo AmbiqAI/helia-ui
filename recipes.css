@@ -1454,6 +1454,14 @@ a.helia-chip--neutral:focus-visible {
  * scrollbar and buys a horizontal scroll on every page that has one.
  */
 .helia-band {
+  /*
+   * What the band gave away on each side to escape the frame, handed to the
+   * inner so the text keeps the reading margin once the band reaches the
+   * viewport edge. The ground variants below pad the band itself and take it
+   * back, so the margin is never counted twice.
+   */
+  --helia-band-inset: var(--sl-content-pad-x, var(--helia-space-6));
+
   box-sizing: border-box;
   margin-inline: calc(
     50% - 50cqw - var(--sl-content-pad-x, var(--helia-space-6))
@@ -1491,6 +1499,8 @@ a.helia-chip--neutral:focus-visible {
 .helia-band--muted,
 .helia-band--contrast,
 .helia-band--tinted {
+  --helia-band-inset: 0px;
+
   background: var(--helia-band-ground);
   box-shadow: 0 0 0 100vmax var(--helia-band-ground);
   clip-path: inset(
@@ -1548,9 +1558,17 @@ a.helia-chip--neutral:focus-visible {
   color: var(--helia-paper-white);
 }
 
+/*
+ * The measure plus the inset, so the readable width is the same at every
+ * ground: the padding sits outside the cap rather than eating into it, and a
+ * band wide enough to reach the cap puts its text on exactly the line the
+ * prose above it uses.
+ */
 .helia-band__inner {
+  box-sizing: border-box;
   margin-inline: auto;
-  max-width: var(--sl-content-width);
+  max-width: calc(var(--sl-content-width) + 2 * var(--helia-band-inset, 0px));
+  padding-inline: var(--helia-band-inset, 0);
 }
 
 .helia-band__header {
