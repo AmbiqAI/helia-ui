@@ -338,6 +338,70 @@
   margin-inline-start: auto;
 }
 
+/*
+ * The Dev Hub link at the end of the bar. It names a place the reader is not,
+ * so it is quiet: label weight, muted ink, and the family's name in the
+ * product accent, which is the one word doing the work. The glyph says the
+ * link leaves this site.
+ */
+.helia-site-header__hub,
+.helia-sidebar-hub {
+  align-items: center;
+  color: var(--sl-color-gray-2);
+  display: flex;
+  font-size: var(--helia-text-small);
+  gap: var(--helia-space-2);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.helia-site-header__hub:hover,
+.helia-site-header__hub:focus-visible,
+.helia-sidebar-hub:hover,
+.helia-sidebar-hub:focus-visible {
+  color: var(--sl-color-white);
+}
+
+/*
+ * The accent is mixed for a card's ground and for body sizes; the bar's ground
+ * is the canvas and this line is the small step, where the slate an unaccented
+ * site falls back to reads at 3.8:1 in the dark theme. One step further toward
+ * the ink the theme adapts to -- paper on the dark canvas, ink on light -- is
+ * what clears AA without taking the word off the product's hue.
+ */
+.helia-site-header__hub-name,
+.helia-sidebar-hub__name {
+  color: color-mix(
+    in oklab,
+    var(--helia-product-accent) 80%,
+    var(--helia-ink-adaptive)
+  );
+  font-weight: var(--helia-weight-semibold);
+}
+
+.helia-site-header__hub svg,
+.helia-sidebar-hub svg {
+  fill: none;
+  height: 0.85rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.4;
+  width: 0.85rem;
+}
+
+/* One link, two places: the bar above the collapse point, the menu below it. */
+.helia-sidebar-hub {
+  border-top: 1px solid var(--sl-color-gray-6);
+  padding-block: var(--helia-space-3);
+}
+
+@media (width >= 62rem) {
+  .helia-sidebar-hub {
+    display: none;
+  }
+}
+
 .helia-site-header__search {
   min-width: 0;
   width: min(17rem, 20vw);
@@ -372,7 +436,8 @@
     display: flex;
   }
 
-  .helia-site-header__nav {
+  .helia-site-header__nav,
+  .helia-site-header__hub {
     display: none;
   }
 }
@@ -442,6 +507,41 @@
   letter-spacing: var(--helia-tracking-caps);
   margin: 0 0 var(--helia-space-3);
   text-transform: uppercase;
+}
+
+/*
+ * The two lists the `sections` pane holds, one per width: the section's own
+ * pages above 62rem, where the top bar carries the sections, and every section
+ * below it, where the bar's links are gone and this pane is the only way to
+ * them. One is drawn at a time, so the pane never reads as two navigations.
+ *
+ * The wrapper around Starlight's own list is `display: contents`, so the pane
+ * stays the flex column Starlight lays out and the mobile footer at the foot
+ * of it keeps its place. Hiding that list rather than the wrapper is what
+ * leaves the footer showing on a narrow screen.
+ */
+.helia-sidebar-sections,
+.helia-sidebar-marker {
+  display: none;
+}
+
+.helia-sidebar-scoped {
+  display: contents;
+}
+
+@media (width < 62rem) {
+  .helia-sidebar-sections {
+    display: block;
+  }
+
+  [data-helia-sidebar-sections]
+    ~ [data-helia-sidebar-scoped]
+    > [data-helia-sidebar-heading],
+  [data-helia-sidebar-sections]
+    ~ [data-helia-sidebar-scoped]
+    sl-sidebar-state-persist {
+    display: none;
+  }
 }
 
 /*

@@ -20,6 +20,7 @@
 import Search from '@astrojs/starlight/components/Search.astro';
 import config from 'virtual:helia-ui/starlight-config';
 
+import { hubLabelParts } from './header-hub';
 import { matchSection } from './sections';
 import ThemeMenu from './ThemeMenu.astro';
 
@@ -37,6 +38,8 @@ const current = matchSection(
   Astro.url.pathname,
   import.meta.env.BASE_URL,
 );
+
+const hubParts = header?.hub ? hubLabelParts(header.hub.label) : [];
 ---
 
 {
@@ -75,6 +78,24 @@ const current = matchSection(
       )}
 
       <div class="helia-site-header__actions">
+        {header.hub && (
+          <a
+            class="helia-site-header__hub"
+            href={header.hub.href}
+            data-helia-hub-link
+          >
+            {hubParts.map((part) =>
+              part.accent ? (
+                <span class="helia-site-header__hub-name">{part.text}</span>
+              ) : (
+                part.text
+              ),
+            )}
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M6 3.5h6.5V10M12.5 3.5 7 9M12 9.5v3h-9v-9h3" />
+            </svg>
+          </a>
+        )}
         {header.search && (
           <div class="helia-site-header__search">
             <Search />

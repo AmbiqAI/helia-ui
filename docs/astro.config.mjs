@@ -76,6 +76,8 @@ export default defineConfig({
                 href: 'https://github.com/AmbiqAI/helia-developer-hub',
               },
             ],
+            /* The Pages address until the hub has a domain of its own. */
+            hub: { href: 'https://ambiqai.github.io/helia-developer-hub/' },
           },
           /*
            * The fixture for the `sections` option, and the reason it is a
@@ -93,15 +95,12 @@ export default defineConfig({
            */
           sections: [
             {
+              /* The shape a product site's Home section has: no pages of its
+                 own, so the landing page is read at the full width of the
+                 frame and the sections are reached from the bar above it. */
               label: 'Demo home',
               href: `${basePath}starlight-plugin/sections/`,
-              sidebar: [
-                { label: 'Sections demo', slug: 'starlight-plugin/sections' },
-                {
-                  label: 'Why sections',
-                  slug: 'starlight-plugin/sections/why',
-                },
-              ],
+              sidebar: false,
             },
             {
               label: 'Demo guide',

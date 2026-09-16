@@ -17,6 +17,12 @@ export interface HeliaSectionLink {
    * live under its `href`. Defaults to the `href`.
    */
   match?: string;
+  /**
+   * `false` for a section that declared no pages: its routes carry no sidebar
+   * column, and it is one link rather than an expandable item in the
+   * narrow-width menu.
+   */
+  sidebar?: false;
 }
 
 /** A path and a prefix compare with the same trailing slash or not at all. */
