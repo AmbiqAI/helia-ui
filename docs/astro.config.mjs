@@ -50,6 +50,10 @@ export default defineConfig({
       ],
       plugins: [
         heliaStarlight({
+          /* This site has one landing page under `template: splash`, and it is
+             there to show what a product site gets from this option. Every
+             other page already carries the sidebar. */
+          sidebar: 'always',
           footer: {
             links: [
               { label: 'Overview', href: basePath },
@@ -103,6 +107,10 @@ export default defineConfig({
             {
               label: 'Discoverability',
               slug: 'starlight-plugin/discoverability',
+            },
+            {
+              label: 'Landing page example',
+              slug: 'starlight-plugin/landing-example',
             },
           ],
         },

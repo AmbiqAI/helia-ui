@@ -1,0 +1,27 @@
+---
+title: Landing page example
+description: A splash-template landing page that keeps the left sidebar, which is what the plugin's sidebar option does for a product site.
+template: splash
+hero:
+  title: Landing page example
+  tagline: A splash template with the navigation still beside it.
+---
+
+This page is `template: splash`, which is the template a product site uses for
+its landing page, and Starlight gives a splash page no sidebar. The site sets
+`sidebar: 'always'` on `heliaStarlight()`, so the navigation is still here at
+desktop widths and a reader who arrives on the landing page can see the rest of
+the site from it.
+
+Nothing on the page asks for that. The option is the site's, set once in
+`astro.config.mjs`, and every splash page it has behaves the same way.
+
+## What the option changes
+
+Starlight decides a page has no sidebar from its template, and one flag on the
+route carries the decision to the page shell, to the frame, and to the layout
+widths. The plugin sets the flag back rather than replacing either template, so
+the sidebar here is Starlight's own, with the site's own navigation in it.
+
+At narrow widths nothing changes: the sidebar is off-canvas here exactly as it
+is on every other page of the site, and whatever opens it there opens it here.

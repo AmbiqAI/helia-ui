@@ -4,6 +4,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 const gallery = '/helia-ui/gallery/';
 const layout = '/helia-ui/layout/';
+const landing = '/helia-ui/starlight-plugin/landing-example/';
 
 /* The wide layout the two arrangements below are written for. */
 test.use({ viewport: { width: 1280, height: 960 } });
@@ -185,6 +186,38 @@ test.describe('with no contents column', () => {
     expect(await isGround(viewport.width - 2), 'at the viewport edge').toBe(
       true,
     );
+  });
+});
+
+/* `sidebar: 'always'`, which this site sets. Starlight gives a splash page no
+   sidebar, so the landing page is the only one here that can answer whether
+   the option took: see AmbiqAI/helia-ui#85. */
+test('a splash landing keeps the sidebar beside the content', async ({
+  page,
+}) => {
+  await page.goto(landing);
+
+  await expect(page.locator('html')).toHaveAttribute('data-has-sidebar', '');
+
+  const sidebar = page.locator('#starlight__sidebar');
+  await expect(sidebar).toBeVisible();
+  await expect(sidebar.locator('a[href$="/gallery/"]')).toBeVisible();
+
+  const pane = (await sidebar.boundingBox())!;
+  const content = (await page.locator('.main-pane').boundingBox())!;
+  expect(pane.width).toBeGreaterThan(0);
+  expect(content.x).toBeGreaterThanOrEqual(pane.x + pane.width - 1);
+});
+
+test.describe('a splash landing on a narrow screen', () => {
+  test.use({ viewport: { width: 720, height: 960 } });
+
+  /* The option is a desktop one. Below Starlight's breakpoint the pane is
+     off-canvas on every page, and the landing page is no exception. */
+  test('leaves the sidebar off-canvas', async ({ page }) => {
+    await page.goto(landing);
+
+    await expect(page.locator('#starlight__sidebar')).toBeHidden();
   });
 });
 

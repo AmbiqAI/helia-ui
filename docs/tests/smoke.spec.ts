@@ -19,6 +19,10 @@ const routes = [
   { path: `${base}/gallery/`, heading: 'Gallery' },
   { path: `${base}/starlight-plugin/`, heading: 'Starlight plugin' },
   {
+    path: `${base}/starlight-plugin/landing-example/`,
+    heading: 'Landing page example',
+  },
+  {
     path: `${base}/migrating-from-mkdocs/`,
     heading: 'Migrating from MkDocs',
   },

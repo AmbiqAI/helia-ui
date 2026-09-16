@@ -44,6 +44,7 @@ starlight({
 | `header.links`             | `{ label, href, match? }[]` | `[]`       | The sections beside the name. A link is current when the path starts with its `href`; `match` is the prefix to use instead.                         |
 | `header.search`            | `boolean`                   | `true`     | Starlight's search trigger.                                                                                                                         |
 | `header.themeToggle`       | `boolean`                   | `true`     | The package theme menu. Off anyway when `shell.themeSelect` is `false`.                                                                             |
+| `sidebar`                  | `'docs' \| 'always'`        | `'docs'`   | `'always'` keeps the left sidebar on every page at desktop widths, a `template: splash` landing page included.                                      |
 | `shell.head`               | `boolean`                   | `true`     | Installs the `Head` override: the brand font preload and the per-page discoverability tags.                                                         |
 | `code`                     | `boolean`                   | `true`     | Themes Expressive Code onto the package surface. `false` leaves Starlight's code frame alone.                                                       |
 | `discoverability`          | `object \| false`           | `{}`       | Search-engine and agent metadata. `false` switches the lot off; see [Discoverability](/helia-ui/starlight-plugin/discoverability/).                 |
@@ -87,6 +88,27 @@ Below `62rem` the links give way to a button that opens the left sidebar, which
 is where a narrow screen reads the navigation from. The button is the one entry
 point to it, because the plugin's `MobileMenuToggle` override takes Starlight's
 own button off the frame.
+
+## Keeping the sidebar on a landing page
+
+Starlight gives a `template: splash` page no sidebar, which is right for a hub
+landing page and wrong for a product site: a reader who arrives on a product's
+landing page should be able to see the rest of the product from it. Set
+`sidebar: 'always'` and every page keeps the left sidebar at desktop widths,
+the landing page included. Narrow screens are untouched: the sidebar stays
+off-canvas there, as it is on a documentation page.
+
+```js
+heliaStarlight({ sidebar: 'always' });
+```
+
+The plugin does this with a route middleware rather than a component override.
+Starlight decides a page has no sidebar from its template, and one flag on the
+route carries that decision to the page shell, to the frame, and to the layout
+widths; the middleware sets the flag back, so the sidebar is Starlight's own
+and the widths follow it. This site sets the option, and
+[Landing page example](/helia-ui/starlight-plugin/landing-example/) is what it
+looks like.
 
 ## Stylesheet order is the contract
 

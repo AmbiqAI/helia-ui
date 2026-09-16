@@ -37,6 +37,7 @@ const ASTRO_LANE = [
   'gallery',
   'starlight-plugin',
   'starlight-plugin/discoverability',
+  'starlight-plugin/landing-example',
   'migrating-from-mkdocs',
   'python-api-reference',
   'primitives',

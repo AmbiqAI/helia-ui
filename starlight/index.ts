@@ -99,6 +99,12 @@ export interface HeliaStarlightOptions {
    */
   header?: HeliaHeaderOptions;
   /**
+   * `'always'` keeps the left sidebar on every page, a landing page under
+   * `template: splash` included, which is what a product site wants. `'docs'`
+   * is Starlight's own behavior. Default `'docs'`.
+   */
+  sidebar?: 'docs' | 'always';
+  /**
    * Search-engine and agent discoverability. Every part defaults to `true`;
    * `false` switches the lot off. Needs an absolute `site` in astro.config,
    * and the per-page tags need `shell.head` left installed.
@@ -372,13 +378,19 @@ export function heliaStarlight(
     shell = {},
     footer,
     header,
+    sidebar = 'docs',
   } = options;
   const discoverability = resolveDiscoverability(options.discoverability);
 
   return {
     name: '@ambiqai/helia-ui/starlight',
     hooks: {
-      'config:setup': ({ addIntegration, config, updateConfig }) => {
+      'config:setup': ({
+        addIntegration,
+        addRouteMiddleware,
+        config,
+        updateConfig,
+      }) => {
         const customCss = [...(config.customCss ?? [])];
         if (styles) {
           const missing = STYLESHEETS.filter(
@@ -400,6 +412,13 @@ export function heliaStarlight(
            for this one, since a header with nothing in it is not a header. */
         if (header && !('Header' in components)) {
           components.Header = '@ambiqai/helia-ui/starlight/Header.astro';
+        }
+
+        if (sidebar === 'always') {
+          addRouteMiddleware({
+            entrypoint:
+              '@ambiqai/helia-ui/starlight/sidebar-route-middleware.ts',
+          });
         }
 
         const expressiveCode =
