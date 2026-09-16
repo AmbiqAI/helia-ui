@@ -1,0 +1,33 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/*
+ * Starlight draws `<h1 id="_top">{title}</h1>` above the content of every page
+ * whose frontmatter carries no `hero`, whatever the template, so a page whose
+ * content opens with the `Hero` part shows its name twice and ships two `h1`s.
+ * `helia: { pageTitle: false }` drops the heading and leaves the anchor behind:
+ * `#_top` is what the skip link and the table of contents' overview entry
+ * point at, and it has to stay at the top of the content whichever heading
+ * follows it. The panel it sits in collapses through `.helia-page-title-anchor`
+ * in starlight.css.
+ *
+ * Every other page renders Starlight's own component rather than a copy of it,
+ * so the heading keeps whatever the version in use draws.
+ */
+import DefaultPageTitle from '@astrojs/starlight/components/PageTitle.astro';
+import type { HeliaFrontmatter } from './schema';
+
+/* Starlight's PAGE_TITLE_ID, which its export map does not reach. */
+const PAGE_TITLE_ID = '_top';
+
+const { entry } = Astro.locals.starlightRoute;
+const { helia } = entry.data as typeof entry.data & HeliaFrontmatter;
+---
+
+{
+  helia?.pageTitle === false ? (
+    <div id={PAGE_TITLE_ID} class="helia-page-title-anchor" tabindex="-1" />
+  ) : (
+    <DefaultPageTitle />
+  )
+}

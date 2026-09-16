@@ -22,6 +22,8 @@ import {
 } from './discoverability';
 
 export type { HeliaDiscoverabilityOptions } from './discoverability';
+export { heliaFrontmatterSchema } from './schema';
+export type { HeliaFrontmatter } from './schema';
 
 type StarlightConfigInput = HookParameters<'config:setup'>['config'];
 
@@ -97,6 +99,12 @@ export interface HeliaShellOptions {
   footer?: boolean;
   /** `false` drops the brand font preload and leaves Starlight's head alone. */
   head?: boolean;
+  /**
+   * Installs the `PageTitle` override, which honors
+   * `helia: { pageTitle: false }`. `false` leaves Starlight's heading on every
+   * page, frontmatter or no frontmatter.
+   */
+  pageTitle?: boolean;
 }
 
 export interface HeliaStarlightOptions {
@@ -187,6 +195,7 @@ const OVERRIDES = {
   mobileMenuToggle: ['MobileMenuToggle', 'MobileMenuToggle.astro'],
   footer: ['Footer', 'Footer.astro'],
   head: ['Head', 'Head.astro'],
+  pageTitle: ['PageTitle', 'PageTitle.astro'],
 } as const satisfies Record<keyof HeliaShellOptions, readonly [string, string]>;
 
 /*

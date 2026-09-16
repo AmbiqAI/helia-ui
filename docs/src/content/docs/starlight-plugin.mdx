@@ -47,6 +47,7 @@ starlight({
 | `header.themeToggle`       | `boolean`                   | `true`     | The package theme menu. Off anyway when `shell.themeSelect` is `false`.                                                                             |
 | `sidebar`                  | `'docs' \| 'always'`        | `'docs'`   | `'always'` keeps the left sidebar on every page at desktop widths, a `template: splash` landing page included.                                      |
 | `shell.head`               | `boolean`                   | `true`     | Installs the `Head` override: the brand font preload and the per-page discoverability tags.                                                         |
+| `shell.pageTitle`          | `boolean`                   | `true`     | Installs the `PageTitle` override, which reads `helia.pageTitle`. See [A page that opens with a hero](#a-page-that-opens-with-a-hero).              |
 | `code`                     | `boolean`                   | `true`     | Themes Expressive Code onto the package surface. `false` leaves Starlight's code frame alone.                                                       |
 | `discoverability`          | `object \| false`           | `{}`       | Search-engine and agent metadata. `false` switches the lot off; see [Discoverability](/helia-ui/starlight-plugin/discoverability/).                 |
 | `discoverability.ogImage`  | `boolean`                   | `true`     | Per-page Open Graph card at `<route>/og.svg`, with the `og:image` and `twitter:image` tags that point at it.                                        |
@@ -112,6 +113,61 @@ widths; the middleware sets the flag back, so the sidebar is Starlight's own
 and the widths follow it. This site sets the option, and
 [Landing page example](/helia-ui/starlight-plugin/landing-example/) is what it
 looks like.
+
+## A page that opens with a hero
+
+Starlight draws the page title above the content of every page whose
+frontmatter carries no `hero`, whatever the template. A page whose content
+opens with the `Hero` part therefore shows its name twice, with a band above
+the card, and ships two `h1`s. `helia: { pageTitle: false }` drops Starlight's
+heading and leaves the hero's as the page's only one.
+
+The field is not Starlight's, and a key its schema does not declare is stripped
+before a component can read it. Starlight has no hook for a plugin to extend
+that schema either, so the site names the fragment once in `content.config.ts`:
+
+```ts
+import { defineCollection } from 'astro:content';
+import { docsLoader } from '@astrojs/starlight/loaders';
+import { docsSchema } from '@astrojs/starlight/schema';
+import { heliaFrontmatterSchema } from '@ambiqai/helia-ui/starlight';
+
+export const collections = {
+  docs: defineCollection({
+    loader: docsLoader(),
+    schema: docsSchema({ extend: heliaFrontmatterSchema }),
+  }),
+};
+```
+
+The page then asks for it:
+
+```mdx
+---
+title: heliaCORE
+helia:
+  pageTitle: false
+---
+
+<Hero variant="contrast" eyebrow="Kernel library">
+  <Fragment>
+    Kernel <em>acceleration</em> for Ambiq AI.
+  </Fragment>
+</Hero>
+```
+
+The heading goes; a bare `_top` anchor stays in its place, because that is what
+the skip link and the overview entry in the table of contents point at, and the
+panel that held the title collapses so the hero is the first thing under the
+header. [Hero page example](/helia-ui/starlight-plugin/hero-page/) is the page
+this site builds from that frontmatter.
+
+<Callout tone="note" title="The page still needs a heading">
+  Suppressing the title removes the only `h1` Starlight gave the page, so the
+  hero has to keep its own: `Hero` renders an `h1` by default, and
+  `titleAs="h2"` belongs on a section hero further down the page rather than on
+  the one at the top. Leave the frontmatter field off and nothing changes.
+</Callout>
 
 ## Product accent
 

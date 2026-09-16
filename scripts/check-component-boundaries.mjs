@@ -109,9 +109,15 @@ const FONT_PACKAGES = Object.keys(manifest.dependencies ?? {}).filter((name) =>
   name.startsWith('@fontsource'),
 );
 
+/*
+ * `astro/zod` is the copy of zod Astro already bundles and Starlight's own
+ * schema is built from, so the frontmatter fragment the lane exports for
+ * `docsSchema({ extend })` adds no dependency to a consuming site.
+ */
 const PLUGIN_ALLOWED_PACKAGES = [
   ...ALLOWED_PACKAGES,
   'astro',
+  'astro/zod',
   ...FONT_PACKAGES,
 ];
 const PLUGIN_ALLOWED_PREFIXES = [

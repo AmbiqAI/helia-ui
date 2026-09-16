@@ -1,0 +1,50 @@
+---
+title: Hero page example
+description: A page whose content opens with the Hero part, with Starlight's own page title suppressed so the hero headline is the only h1 on the page.
+helia:
+  pageTitle: false
+---
+
+import Hero from '@ambiqai/helia-ui/astro/Hero';
+import Button from '@ambiqai/helia-ui/astro/Button';
+import CardGrid from '@ambiqai/helia-ui/astro/CardGrid';
+import StatCard from '@ambiqai/helia-ui/astro/StatCard';
+
+<Hero
+  variant="contrast"
+  data-helia-accent="helia-core"
+  eyebrow="Starlight plugin"
+  summary="Starlight draws the page title above the content of every page that has no hero frontmatter. This page asks it not to, so the headline below is the page's only h1."
+>
+  <Fragment>A page that opens with a <em>hero</em>.</Fragment>
+
+<Button slot="actions" href="/helia-ui/starlight-plugin/">
+  Adopting
+</Button>
+
+<Button slot="actions" href="/helia-ui/gallery/#hero" variant="secondary">
+  The part
+</Button>
+
+  <CardGrid slot="aside" columns={2}>
+    <StatCard label="Headings on the page">1</StatCard>
+    <StatCard label="Skip link target">Kept</StatCard>
+  </CardGrid>
+</Hero>
+
+## What the frontmatter does
+
+`helia: { pageTitle: false }` is read by the `PageTitle` override the plugin
+installs. The heading goes; a bare `_top` anchor stays in its place, which is
+what the skip link at the top of the page and the overview entry in the table
+of contents point at. The panel that held the title collapses, so the hero is
+the first thing under the header rather than the second.
+
+Every other page of this site is untouched: leave the field off and Starlight's
+own heading renders exactly as it always did.
+
+## What the page still owes
+
+The hero headline is an `h1` by default, and it has to stay one here: the page
+needs a heading, and suppressing the title removes the one Starlight gave it. A
+section hero further down the same page takes `titleAs="h2"`.

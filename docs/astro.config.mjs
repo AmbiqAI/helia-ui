@@ -135,6 +135,7 @@ export default defineConfig({
               label: 'Landing page example',
               slug: 'starlight-plugin/landing-example',
             },
+            { label: 'Hero page example', slug: 'starlight-plugin/hero-page' },
           ],
         },
         {
