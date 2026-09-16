@@ -40,6 +40,7 @@ import {
   chartSeriesNames,
   type ChartKind,
   type ChartLegend,
+  type ChartOrientation,
   type ChartRecord,
 } from '../chart-plot-spec';
 import {
@@ -111,6 +112,8 @@ export interface ChartInteractiveProps {
   height?: number;
   /** `auto` names the series when there is more than one; `none` never does. */
   legend?: ChartLegend;
+  /** Which way the bars run. `horizontal` puts the categories on the y axis. */
+  orientation?: ChartOrientation;
   /** Whether the reader can move the view, and with what. */
   zoom?: ChartZoom;
   /** Whether hovering a mark reports its value. */
@@ -221,6 +224,7 @@ function buildOption({
   tooltip,
   brush,
   animate,
+  orientation,
 }: {
   kind: ChartKind;
   plotted: Plotted;
@@ -229,9 +233,25 @@ function buildOption({
   tooltip: boolean;
   brush: boolean;
   animate: boolean;
+  orientation: ChartOrientation;
 }): Option {
   const scatter = kind === 'scatter' || kind === 'dot';
   const type = scatter ? 'scatter' : kind === 'bar' ? 'bar' : 'line';
+  /* Only bars turn, the same rule the Plot lane follows. */
+  const horizontal = kind === 'bar' && orientation === 'horizontal';
+
+  /* The value axis is the measure wherever the orientation put it. A scatter
+     has a measure on both axes and keeps the pair it always had. */
+  const measureAxis = { type: 'value', scale: scatter };
+  const bandAxis = {
+    type: 'category',
+    data: plotted.categories,
+    boundaryGap: kind === 'bar',
+    /* A y category axis counts up from the bottom, so the first row would read
+       last. Inverting it makes a horizontal chart run in data order, which is
+       the order the vertical one already runs in. */
+    ...(horizontal ? { inverse: true } : {}),
+  };
 
   const option: Record<string, unknown> = {
     animation: animate,
@@ -248,16 +268,10 @@ function buildOption({
         plotted.names.map((name) => [name, !hidden.includes(name)]),
       ),
     },
-    xAxis: scatter
-      ? { type: 'value', scale: true }
-      : {
-          type: 'category',
-          data: plotted.categories,
-          boundaryGap: kind === 'bar',
-        },
+    xAxis: scatter || horizontal ? measureAxis : bandAxis,
     /* A scatter has a measure on both axes, so the vertical one is free to
        start away from zero; a bar read against a floating baseline lies. */
-    yAxis: { type: 'value', scale: scatter },
+    yAxis: scatter || !horizontal ? measureAxis : bandAxis,
     series: plotted.names.map((name, index) => ({
       name,
       type,
@@ -333,6 +347,7 @@ export function ChartInteractive({
   series,
   height,
   legend = 'auto',
+  orientation = 'vertical',
   zoom = 'none',
   tooltip = true,
   brush = false,
@@ -407,8 +422,9 @@ export function ChartInteractive({
         tooltip,
         brush,
         animate: animate && !prefersReducedMotion(),
+        orientation,
       }),
-    [kind, plotted, hidden, zoom, tooltip, brush, animate],
+    [kind, plotted, hidden, zoom, tooltip, brush, animate, orientation],
   );
 
   React.useEffect(() => {

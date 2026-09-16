@@ -33,6 +33,7 @@ import {
   type ChartDensity,
   type ChartKind,
   type ChartLegend,
+  type ChartOrientation,
   type ChartRecord,
 } from '../chart-plot-spec';
 
@@ -61,6 +62,8 @@ interface Props extends HTMLAttributes<'figure'> {
   density?: ChartDensity;
   /** `auto` names the series when there is more than one; `none` never does. */
   legend?: ChartLegend;
+  /** Which way the bars run. `horizontal` puts the categories on the y axis and takes the left margin from the longest label. */
+  orientation?: ChartOrientation;
 }
 
 const {
@@ -76,6 +79,7 @@ const {
   width = CHART_WIDTH,
   density = 'default',
   legend = 'auto',
+  orientation = 'vertical',
   class: className,
   ...rest
 } = Astro.props;
@@ -92,6 +96,7 @@ const figure = Plot.plot(
     height,
     width,
     density,
+    orientation,
     document: document as unknown as Document,
   }),
 );

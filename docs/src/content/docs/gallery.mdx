@@ -52,6 +52,7 @@ import Timeline from '@ambiqai/helia-ui/astro/Timeline';
 import {
   buildSeries,
   pagesSeries,
+  routineSpeedups,
   trafficSeries,
   weightSeries,
 } from '../../lib/chart-gallery-data';
@@ -2104,6 +2105,51 @@ here is a measurement of any part.
     series="template"
     width={900}
     height={280}
+  />
+</Example>
+
+### Long names
+
+A chart with more categories than a row of bars can name needs the categories
+on the vertical axis. `orientation="horizontal"` puts them there and takes the
+left margin from the longest label, so a name is never cut. The data contract
+does not move with the drawing: `x` still names the categories and `y` still
+names the measure.
+
+The set below is invented — the routines do not exist and neither do the ratios
+— but it is shaped like the one the option was written for: fourteen long
+names, three series, and speedups from under one to twelve.
+
+<Example
+  title='orientation="horizontal"'
+  code={`
+    <Chart
+      title="Speedup by routine"
+      subtitle="Times faster than the reference path, by code path"
+      caption="Invented routines and invented ratios."
+      kind="bar"
+      data={routineSpeedups}
+      x="routine"
+      y="speedup"
+      series="path"
+      orientation="horizontal"
+      width={900}
+      height={620}
+    />
+  `}
+>
+  <Chart
+    title="Speedup by routine"
+    subtitle="Times faster than the reference path, by code path"
+    caption="Invented routines and invented ratios."
+    kind="bar"
+    data={routineSpeedups}
+    x="routine"
+    y="speedup"
+    series="path"
+    orientation="horizontal"
+    width={900}
+    height={620}
   />
 </Example>
 

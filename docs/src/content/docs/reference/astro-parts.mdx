@@ -390,6 +390,7 @@ import Chart from '@ambiqai/helia-ui/astro/Chart';
 | `width`        | `number`                 | `CHART_WIDTH`  | The width, in pixels, Plot lays the chart out at. The SVG then scales to its container and keeps that aspect ratio, so pick a width near the one it is shown at. |
 | `density`      | `ChartDensity`           | `'default'`    | Moves the margins and the tick count.                                                                                                                            |
 | `legend`       | `ChartLegend`            | `'auto'`       | `auto` names the series when there is more than one; `none` never does.                                                                                          |
+| `orientation`  | `ChartOrientation`       | `'vertical'`   | Which way the bars run. `horizontal` puts the categories on the y axis and takes the left margin from the longest label.                                         |
 
 Also accepts `HTMLAttributes<'figure'>`.
 

@@ -17,6 +17,7 @@ import * as Plot from '@observablehq/plot';
 export type ChartKind = 'line' | 'area' | 'bar' | 'scatter' | 'dot';
 export type ChartDensity = 'default' | 'compact' | 'comfortable';
 export type ChartLegend = 'auto' | 'none';
+export type ChartOrientation = 'vertical' | 'horizontal';
 
 /** One row of the chart's data. Keys are the `x`, `y` and `series` props. */
 export type ChartRecord = Record<string, unknown>;
@@ -71,6 +72,18 @@ const FRAME = {
 const STROKE_WIDTH = 2;
 const AREA_FILL_OPACITY = 0.16;
 
+/*
+ * Plot lays out at font-size 10 and the stylesheet sets the tick type from
+ * `--helia-text-label`, which is larger. The left margin a category label needs
+ * is measured at the drawn size rather than Plot's, so a label that fits by
+ * this arithmetic fits on the page.
+ */
+const TICK_CHAR_WIDTH = 6.6;
+/** Gap between the longest category label and the plot area. */
+const CATEGORY_LABEL_GAP = 12;
+/** The share of the width the category labels may take before they are cut. */
+const CATEGORY_MARGIN_SHARE = 0.45;
+
 export interface ChartSpec {
   kind: ChartKind;
   data: readonly ChartRecord[];
@@ -83,6 +96,8 @@ export interface ChartSpec {
   height: number;
   width: number;
   density: ChartDensity;
+  /** Which way the bars run. `horizontal` puts the categories on the y axis. */
+  orientation?: ChartOrientation;
   /** The DOM Plot builds against. Omitted in the browser, where there is one. */
   document?: Document;
 }
@@ -139,24 +154,65 @@ function seriesRange(count: number): string[] {
 }
 
 /**
+ * The left margin a horizontal chart's category labels need, from the longest
+ * of them. Capped: one runaway label should cost the plot area some of its
+ * width, not most of it.
+ */
+export function chartCategoryMargin(
+  labels: readonly string[],
+  width: number,
+): number {
+  const longest = labels.reduce(
+    (most, label) => Math.max(most, label.length),
+    0,
+  );
+  const wanted = Math.ceil(longest * TICK_CHAR_WIDTH) + CATEGORY_LABEL_GAP;
+  return Math.min(wanted, Math.floor(width * CATEGORY_MARGIN_SHARE));
+}
+
+/**
  * The Plot options for a spec. Axes carry ticks and no titles: the subtitle
  * says what is plotted against what, so an axis title would be the same
  * sentence written twice, once in Plot's type and once in ours.
+ *
+ * `x`, `y` and `series` stay the keys they always were. `orientation` moves the
+ * drawing, not the data contract: a horizontal bar chart still names its
+ * categories with `x` and its measure with `y`.
  */
 export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
-  const { kind, data, x, y, series, height, width, density } = spec;
+  const {
+    kind,
+    data,
+    x,
+    y,
+    series,
+    height,
+    width,
+    density,
+    orientation = 'vertical',
+  } = spec;
   const frame = FRAME[density];
   const names = chartSeriesNames(data, series);
   const rows = data as ChartRecord[];
+  const bars = kind === 'bar';
+  /* Only bars turn: a line or an area plots a measure against a run, and a run
+     that reads bottom to top is a chart nobody asked for. */
+  const horizontal = bars && orientation === 'horizontal';
+  const grouped = bars && Boolean(series);
+  const bands = categories(rows, x);
+  const marginLeft = horizontal
+    ? chartCategoryMargin(bands, width)
+    : frame.left;
 
   /* Gridlines run across the measure, because that is the direction a reader
      compares in. Only a scatter has a measure on both axes, so only a scatter
      gets the second set. */
+  const grid = { stroke: CHART_GRID, strokeOpacity: 1 };
   const marks: Plot.Markish[] = [
-    Plot.gridY({ stroke: CHART_GRID, strokeOpacity: 1 }),
+    horizontal ? Plot.gridX(grid) : Plot.gridY(grid),
   ];
   if (kind === 'scatter') {
-    marks.push(Plot.gridX({ stroke: CHART_GRID, strokeOpacity: 1 }));
+    marks.push(Plot.gridX(grid));
   }
 
   const single = CHART_SERIES_COLORS[0];
@@ -191,17 +247,18 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
     );
   } else if (kind === 'bar') {
     /* Grouped bars are a facet per category with the series inside it, which
-       is what puts the category labels under the group rather than under every
-       bar in it. Without a series there is nothing to group and the band is
-       the category itself. */
+       is what puts the category labels beside the group rather than beside
+       every bar in it. Without a series there is nothing to group and the band
+       is the category itself. */
+    const band = series ?? x;
+    const facet = series ? x : undefined;
     marks.push(
-      Plot.barY(rows, {
-        x: series ?? x,
-        y,
-        fx: series ? x : undefined,
-        fill: series ?? single,
-      }),
-      Plot.ruleY([0], { stroke: CHART_GRID }),
+      horizontal
+        ? Plot.barX(rows, { y: band, fy: facet, x: y, fill: series ?? single })
+        : Plot.barY(rows, { x: band, fx: facet, y, fill: series ?? single }),
+      horizontal
+        ? Plot.ruleX([0], { stroke: CHART_GRID })
+        : Plot.ruleY([0], { stroke: CHART_GRID }),
     );
   } else {
     marks.push(
@@ -215,7 +272,12 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
     );
   }
 
-  const grouped = kind === 'bar' && Boolean(series);
+  const innerBand = { axis: null };
+  const categoryScale = {
+    label: null,
+    ...(bars ? { domain: bands } : {}),
+  };
+  const valueScale = { label: null, ticks: frame.ticks, nice: true };
 
   return {
     document: spec.document,
@@ -224,7 +286,7 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
     marginTop: frame.top,
     marginRight: frame.right,
     marginBottom: frame.bottom,
-    marginLeft: frame.left,
+    marginLeft,
     /* A stable class rather than the hash Plot derives from the style: two
        charts drawn the same way should produce the same markup, so a build is
        reproducible and a diff of the output is readable. */
@@ -234,14 +296,10 @@ export function chartPlotOptions(spec: ChartSpec): Plot.PlotOptions {
       color: CHART_INK,
       fontFamily: 'var(--helia-font-sans)',
     },
-    x: grouped
-      ? { axis: null }
-      : {
-          label: null,
-          ...(kind === 'bar' ? { domain: categories(rows, x) } : {}),
-        },
-    fx: grouped ? { label: null, domain: categories(rows, x) } : undefined,
-    y: { label: null, ticks: frame.ticks, nice: true },
+    x: horizontal ? valueScale : grouped ? innerBand : categoryScale,
+    fx: !horizontal && grouped ? categoryScale : undefined,
+    y: horizontal ? (grouped ? innerBand : categoryScale) : valueScale,
+    fy: horizontal && grouped ? categoryScale : undefined,
     color: series
       ? { domain: names, range: seriesRange(names.length) }
       : undefined,
