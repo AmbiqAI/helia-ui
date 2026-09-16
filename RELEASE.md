@@ -7,13 +7,82 @@ required facts in the package root next to LICENSE and NOTICE.
 | Field             | Value                                                                       |
 | ----------------- | --------------------------------------------------------------------------- |
 | Package           | `@ambiqai/helia-ui`                                                         |
-| Version           | 0.1.0-alpha.8                                                               |
-| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.8`.         |
+| Version           | 0.1.0-alpha.9                                                               |
+| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.9`.         |
 | License           | BSD-3-Clause (`LICENSE`)                                                    |
 | Licensing tier    | Tier 1, ADR-0005                                                            |
 | Source repository | https://github.com/AmbiqAI/helia-ui                                         |
 | Source path       | Repository root, mirrored from `packages/helia-ui` in `helia-developer-hub` |
 | Source commit     | Recorded at tag time.                                                       |
+
+## What changed in 0.1.0-alpha.9
+
+The second release out of the heliaCORE reference migration, and the one that
+gives a product site its front door: a hero, an identity color the site sets
+from the plugin rather than from a stylesheet, and the top bar, sidebar and
+page title a landing page needs.
+
+Issue references below are to `AmbiqAI/helia-ui`.
+
+### Added
+
+- `Hero`, in a `plain` and a `contrast` ground, the latter pinned dark in both
+  themes. The headline is the default slot rather than a prop, so the word that
+  carries the product accent is marked in the markup with `<em>`, and a
+  `summary` slot takes a lede that needs bold or inline code (#68, #90).
+- The plugin option `accent: '<product-id>'`. The per-product source colors move
+  out of the hub's stylesheet into the package's semantic layer, where the
+  accent is derived by mixing toward `--helia-ink-adaptive` at
+  `--helia-product-accent-mix`, so only the amount moves with the theme; an
+  unknown id fails the build. heliaCORE's source is a warm gold, `#a8762b`
+  against the hub's former `#a36421`, dark enough to clear 4.5:1 on light paper
+  and light enough to clear it on the dark canvas after the mix. The hub keeps
+  its `product-*` classes and reads the package's tokens and mix dial through
+  them, so its derivation is no longer a second copy (#69).
+- The plugin option `header`, the product top bar: the site name as text at the
+  left, its sections beside it, search and the theme menu at the end. A link is
+  current by path prefix, `match` names a different prefix, a link to the site
+  root is current on the root alone, and below 62rem the links give way to the
+  button that opens the sidebar (#84).
+- The plugin option `sidebar: 'always'`, which keeps the sidebar on a splash
+  landing page. A route middleware sets the route's own flag, so the page shell,
+  the frame and the layout widths all follow it and neither template is forked
+  (#85).
+- The plugin option `shell.pageTitle` and the `heliaFrontmatterSchema` fragment
+  a site extends `docsSchema` with, so a page whose content opens with a `Hero`
+  sets `helia: { pageTitle: false }` and drops Starlight's own heading instead
+  of naming itself twice and shipping two h1s. The heading gives way to a bare
+  `_top` anchor, which is what the skip link and the table of contents point at
+  (#89).
+
+### Changed
+
+- Starlight's previous/next pagination is one compact row rather than two
+  bordered cards the width of the column: links at the outer edges, an eyebrow
+  over a body-sized title, the arrow on the title's line, and a stack under the
+  narrow breakpoint. The rules are complete rather than corrective, so a site
+  rendering its own `Pagination` gets the same look (#87).
+- A `Band` inner carries the content pad as padding, with the cap raised by the
+  same amount, so text keeps the reading margin once the reading frame is the
+  viewport and the measure is unchanged where the band is wide enough to reach
+  it (#86).
+- The docs site adopts `header` and `sidebar: 'always'`, which makes it the
+  fixture for both: its social link moves into the bar's own links, and it
+  carries a splash landing page.
+
+### Fixed
+
+- The header's menu button drives Starlight's own menu state, setting
+  `data-mobile-menu-expanded` where Starlight's button sets it, so a click
+  between 50rem and 62rem opens the pane instead of locking the page against a
+  pane of no width. The listeners are delegated and bound once per document, so
+  a view transition leaves them bound (#88).
+- A fenced code block inside a surface the package pins dark renders dark. One
+  unlayered scope restates the frame, the code surface and the syntax token
+  index from the dark theme, and pins the editor tab title, the terminal title
+  bar and the inline buttons to the same inverted ink, since Expressive Code
+  colors that chrome from its own settings rather than from `codeForeground`
+  (#91).
 
 ## What changed in 0.1.0-alpha.8
 
