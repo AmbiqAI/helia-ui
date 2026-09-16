@@ -194,6 +194,13 @@ const {
     padding-bottom: 0;
   }
 
+  /* The three columns are placed by the grid above, so a page sheet that steps
+     non-first siblings apart would drop the rail and the items below their own
+     label. See AmbiqAI/helia-ui#94. */
+  .timeline-group > * {
+    margin-block-start: 0;
+  }
+
   .timeline-label {
     color: var(--sl-color-white);
     font-size: var(--helia-text-body);

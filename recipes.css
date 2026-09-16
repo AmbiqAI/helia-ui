@@ -1586,6 +1586,23 @@ a.helia-chip--neutral:focus-visible {
 }
 
 /*
+ * The gap is the only vertical spacing an item of these layouts gets. A page
+ * sheet that carries its rhythm on adjacent siblings reaches them anyway --
+ * Starlight gives every non-first child of its markdown container a step --
+ * and since the first item of a row is exempt from that rule and no other is,
+ * the set lands a step out of line with itself. The declaration is unlayered,
+ * so it wins over a page sheet that layers its rhythm whatever the specificity
+ * on either side, and it stays off the items' own margins below the block
+ * start. See AmbiqAI/helia-ui#94, and #56 for the column-break case.
+ */
+.helia-card-grid > *,
+.helia-chart-group > *,
+.helia-masonry > *,
+.helia-mosaic > * {
+  margin-block-start: 0;
+}
+
+/*
  * The card grid. `auto` fits whatever the minimum allows, which is the right
  * answer for a set whose length the page does not know; the named counts are
  * for a set the page has composed, and they step down at the two breakpoints
@@ -1656,14 +1673,8 @@ a.helia-chip--neutral:focus-visible {
 
 .helia-masonry > * {
   break-inside: avoid;
-  /*
-   * The gap below is the only vertical margin an item is allowed. A page sheet
-   * that puts its rhythm on `* + *` exempts the first child of the DOM, which
-   * is the first item of the first column and of no other: left in place, that
-   * step sits against a column break, and an engine that keeps a margin there
-   * starts every later column lower than the first. See AmbiqAI/helia-ui#56.
-   */
-  margin-block-start: 0;
+  /* Columns have no row gap to give, so the step between items is a margin
+     here rather than the container's `gap`. */
   margin-block-end: var(--helia-layout-gap, var(--helia-space-4));
 }
 

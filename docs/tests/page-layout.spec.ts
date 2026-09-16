@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 const gallery = '/helia-ui/gallery/';
 const layout = '/helia-ui/layout/';
 const landing = '/helia-ui/starlight-plugin/landing-example/';
+const timeline = '/helia-ui/timeline/';
 
 /* The wide layout the two arrangements below are written for. */
 test.use({ viewport: { width: 1280, height: 960 } });
@@ -99,6 +100,86 @@ test('the mosaic feature takes two columns and two rows', async ({ page }) => {
      a feature from a supporting card that merely ran long. */
   expect(feature.width).toBeGreaterThan(support.width * 1.8);
   expect(feature.height).toBeGreaterThan(support.height * 1.8);
+});
+
+/* The part as a page that never heard of `not-content` has it: in the markdown
+   flow, in front of the rhythm Starlight puts on adjacent siblings. Every
+   example on this page sits inside a stage that carries the class, so the
+   ancestors have to lose it too or the rule under test is never asked. */
+async function inMarkdownFlow(part: Locator) {
+  await part.evaluate((element) => {
+    for (
+      let node: HTMLElement | null = element;
+      node;
+      node = node.parentElement
+    ) {
+      node.classList.remove('not-content');
+    }
+  });
+}
+
+const tops = async (part: Locator) =>
+  Promise.all(
+    (await part.locator('> *').all()).map(
+      async (item) => (await item.boundingBox())!.y,
+    ),
+  );
+
+/* The row is the claim a grid makes, and the page rhythm breaks it by exempting
+   the first item and stepping every other one down: see AmbiqAI/helia-ui#94. */
+test('a grid row starts on one line in the markdown flow', async ({ page }) => {
+  await page.goto(gallery);
+
+  const grid = page.locator('[data-example-stage] .helia-card-grid').first();
+  await inMarkdownFlow(grid);
+
+  const row = await tops(grid);
+  expect(row.length).toBeGreaterThan(2);
+  expect(Math.max(...row) - Math.min(...row)).toBeLessThanOrEqual(1);
+});
+
+test('the mosaic feature starts on the line beside it', async ({ page }) => {
+  await page.goto(gallery);
+
+  const mosaic = page.locator('[data-example-stage] .helia-mosaic').first();
+  await inMarkdownFlow(mosaic);
+
+  /* The feature takes the first two columns of the first two rows, so the
+     second item is the one sharing its line. */
+  const [feature, beside] = await tops(mosaic);
+  expect(Math.abs(feature - beside)).toBeLessThanOrEqual(1);
+});
+
+/* Columns break where the content says, so the tops of a masonry legitimately
+   differ and the margin is the only thing to read. */
+test('the masonry keeps its columns level in the markdown flow', async ({
+  page,
+}) => {
+  await page.goto(gallery);
+
+  const masonry = page.locator('[data-example-stage] .helia-masonry').first();
+  await inMarkdownFlow(masonry);
+
+  const margins = await masonry.evaluate((element) =>
+    [...element.children].map(
+      (child) => getComputedStyle(child).marginBlockStart,
+    ),
+  );
+  expect(margins.length).toBeGreaterThan(2);
+  expect(margins.filter((margin) => margin !== '0px')).toEqual([]);
+});
+
+/* The timeline is on its page in the markdown flow rather than on a stage, so
+   it needs nothing stripped: its label, rail and items are placed by one grid
+   and the page rhythm drops the last two below the first. */
+test('the timeline label starts level with its own items', async ({ page }) => {
+  await page.goto(timeline);
+
+  const group = page.locator('.timeline-group').first();
+  const [label, rail, items] = await tops(group);
+
+  expect(Math.abs(rail - label)).toBeLessThanOrEqual(1);
+  expect(Math.abs(items - label)).toBeLessThanOrEqual(1);
 });
 
 /* The paint, not the box: the ground a band carries past its own edge is a
