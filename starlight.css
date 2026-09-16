@@ -274,14 +274,27 @@
   }
 }
 
+/*
+ * The pane as an overlay, and the page under it held still. Starlight draws
+ * both itself, but only under its own sidebar breakpoint: 50rem, the `md:`
+ * width in its utility sheet, above which its own menu button is hidden and
+ * `[data-mobile-menu-expanded]` stops locking the page. The package leaves
+ * `--sl-sidebar-width` at zero until 62rem, so between the two widths the
+ * overlay and the lock are this sheet's to draw, on the state Starlight names
+ * rather than a second one beside it.
+ * `data-helia-sidebar-open` is that state under the name a site's own header
+ * sets. See AmbiqAI/helia-ui#88.
+ */
 @media (width < 62rem) {
+  body[data-mobile-menu-expanded],
   body[data-helia-sidebar-open] {
     overflow: hidden;
   }
 
+  body[data-mobile-menu-expanded] .sidebar-pane,
   body[data-helia-sidebar-open] .sidebar-pane {
-    display: block !important;
-    visibility: visible !important;
+    --sl-sidebar-visibility: visible;
+    width: 100%;
   }
 }
 
