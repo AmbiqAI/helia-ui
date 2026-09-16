@@ -206,6 +206,38 @@
   --helia-product-accent: var(--helia-accent-slate);
   --helia-accent-secondary: var(--helia-accent-slate);
 
+  /*
+   * The identity color of each product, taken from its approved artwork. A
+   * site names one through the Starlight plugin's `accent` option and the
+   * `[data-helia-accent]` rules below resolve it onto
+   * `--helia-product-accent`; a page that carries several -- a catalog --
+   * puts the attribute on each subtree instead. The palette lives here rather
+   * than in a site stylesheet so a product site needs no CSS of its own to
+   * have an identity color.
+   */
+  --helia-product-helia-aot: #2b75bf;
+  --helia-product-helia-core: #a8762b;
+  --helia-product-helia-dsp: #a133bc;
+  --helia-product-helia-edge: #a3162a;
+  --helia-product-helia-ml: #4c12a1;
+  --helia-product-helia-profiler: #16914a;
+  --helia-product-helia-rt: #009ca0;
+  --helia-product-kit-compression: #4caf50;
+  --helia-product-kit-physio: #046aaf;
+  --helia-product-kit-sleep: #f737c9;
+
+  /* The accent an unmapped `data-helia-accent` falls back to. */
+  --helia-product-accent-source: var(--helia-accent-slate);
+
+  /*
+   * How much of the source survives the mix toward `--helia-ink-adaptive`.
+   * An artwork color is picked against print, not against a canvas, so it is
+   * pulled toward the ground the theme is not: on the dark canvas toward
+   * paper, on light paper toward ink. Only the amount moves with the theme,
+   * which is what lets the derivation below have one form for both.
+   */
+  --helia-product-accent-mix: 76%;
+
   /* Read by `EditorialBand`; defined here so the contract is one file. */
   --helia-hero-treatment: plain;
 
@@ -469,6 +501,69 @@
   --helia-tone-warning-ink: #8f5300;
   --helia-tone-critical-ink: #c0273a;
   --helia-tone-important-ink: #1f62c4;
+
+  /* Paper takes more of the source than the canvas does: the same mix that
+     clears AA on the canvas is a wash on white. */
+  --helia-product-accent-mix: 86%;
+}
+
+/*
+ * Product identity. The attribute is the scope: the Starlight plugin puts it
+ * on the document element from its `accent` option, and a page that shows
+ * several products puts it on each subtree. The derivation is separate from
+ * the mapping so a site that carries a color the package does not know can set
+ * `--helia-product-accent-source` under the attribute and get the same
+ * treatment.
+ */
+[data-helia-accent] {
+  --helia-product-accent: color-mix(
+    in oklab,
+    var(--helia-product-accent-source) var(--helia-product-accent-mix),
+    var(--helia-ink-adaptive)
+  );
+}
+
+[data-helia-accent='helia-aot'] {
+  --helia-product-accent-source: var(--helia-product-helia-aot);
+}
+
+[data-helia-accent='helia-core'] {
+  --helia-product-accent-source: var(--helia-product-helia-core);
+}
+
+[data-helia-accent='helia-dsp'],
+[data-helia-accent='kit-sound'] {
+  --helia-product-accent-source: var(--helia-product-helia-dsp);
+}
+
+[data-helia-accent='helia-edge'],
+[data-helia-accent='kit-heart'] {
+  --helia-product-accent-source: var(--helia-product-helia-edge);
+}
+
+[data-helia-accent='helia-ml'],
+[data-helia-accent='kit-vision'] {
+  --helia-product-accent-source: var(--helia-product-helia-ml);
+}
+
+[data-helia-accent='helia-profiler'] {
+  --helia-product-accent-source: var(--helia-product-helia-profiler);
+}
+
+[data-helia-accent='helia-rt'] {
+  --helia-product-accent-source: var(--helia-product-helia-rt);
+}
+
+[data-helia-accent='kit-compression'] {
+  --helia-product-accent-source: var(--helia-product-kit-compression);
+}
+
+[data-helia-accent='kit-physio'] {
+  --helia-product-accent-source: var(--helia-product-kit-physio);
+}
+
+[data-helia-accent='kit-sleep'] {
+  --helia-product-accent-source: var(--helia-product-kit-sleep);
 }
 
 /*

@@ -33,6 +33,7 @@ starlight({
 | Option                     | Type                | Default   | Effect                                                                                                                              |
 | -------------------------- | ------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `styles`                   | `boolean`           | `true`    | Splices the four package stylesheets into `customCss`. `false` leaves `customCss` untouched, and the site loads them itself.        |
+| `accent`                   | product id          | undefined | The product identity color, as `data-helia-accent` on the document element. See [Product accent](#product-accent).                  |
 | `shell.themeSelect`        | `boolean`           | `true`    | Installs the `ThemeSelect` override: the theme menu with its three choices.                                                         |
 | `shell.mobileMenuToggle`   | `boolean`           | `true`    | Installs the `MobileMenuToggle` override.                                                                                           |
 | `shell.footer`             | `boolean`           | `true`    | Installs the `Footer` override, which renders the brand row and the pagination.                                                     |
@@ -46,6 +47,35 @@ starlight({
 | `discoverability.jsonLd`   | `boolean`           | `true`    | `WebSite` and `Organization` on the home page, `TechArticle` elsewhere, and a `BreadcrumbList` from the sidebar path.               |
 | `discoverability.markdown` | `boolean`           | `true`    | `<route>/index.md` renditions and the `alternate` link that points at them.                                                         |
 | `discoverability.llms`     | `boolean`           | `true`    | `llms.txt`, `llms-full.txt`, and `content-index.json` at the site root.                                                             |
+
+## Product accent
+
+`--helia-product-accent` is the one color a site gets to call its own: the
+accent word in a `Hero`, an accent `Badge`, the outline on a primary action.
+Without an accent it resolves to slate, which is a site with no identity color
+rather than a site with a neutral one.
+
+`accent` names a product the package already holds a color for. The plugin puts
+that id on the document element as `data-helia-accent`, and `semantic.css`
+derives the accent from it, so the palette stays in the package and the site
+writes no CSS.
+
+```js
+heliaStarlight({ accent: 'helia-core' });
+```
+
+The ids are `helia-aot`, `helia-core`, `helia-dsp`, `helia-edge`, `helia-ml`,
+`helia-profiler`, `helia-rt`, `kit-compression`, `kit-heart`, `kit-physio`,
+`kit-sleep`, `kit-sound`, and `kit-vision`. Anything else fails the build rather
+than falling back quietly.
+
+<Callout tone="note" title="What the attribute costs">
+  The attribute is set from the inline script the `Head` override emits, which
+  is the only scope a component rendered inside `&lt;head&gt;` can reach. It
+  needs `shell.head` left installed, and with scripting off the accent stays
+  slate. A page that carries several products puts `data-helia-accent` on each
+  subtree itself; the derivation is the same.
+</Callout>
 
 ## Stylesheet order is the contract
 

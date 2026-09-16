@@ -47,6 +47,29 @@ export interface HeliaFooterOptions {
   logo?: 'ambiq' | false;
 }
 
+/**
+ * The product accents `semantic.css` maps onto `--helia-product-accent`. The
+ * list is here as well as there so a typo is a failed build rather than a site
+ * that silently falls back to slate.
+ */
+export const PRODUCT_ACCENTS = [
+  'helia-aot',
+  'helia-core',
+  'helia-dsp',
+  'helia-edge',
+  'helia-ml',
+  'helia-profiler',
+  'helia-rt',
+  'kit-compression',
+  'kit-heart',
+  'kit-physio',
+  'kit-sleep',
+  'kit-sound',
+  'kit-vision',
+] as const;
+
+export type HeliaProductAccent = (typeof PRODUCT_ACCENTS)[number];
+
 export interface HeliaShellOptions {
   themeSelect?: boolean;
   mobileMenuToggle?: boolean;
@@ -68,6 +91,14 @@ export interface HeliaStarlightOptions {
    * outright. A site that sets `expressiveCode: false` keeps it switched off.
    */
   code?: boolean;
+  /**
+   * The product whose identity color the site carries. The Head override puts
+   * it on the document element as `data-helia-accent`, which is what
+   * `semantic.css` resolves onto `--helia-product-accent`, so a site needs no
+   * stylesheet of its own to have an accent. Needs `shell.head` left
+   * installed; with scripting off the accent stays the default slate.
+   */
+  accent?: HeliaProductAccent;
   /** Per-component opt-out of the shell overrides. Each defaults to `true`. */
   shell?: HeliaShellOptions;
   footer?: HeliaFooterOptions;
@@ -81,6 +112,8 @@ export interface HeliaStarlightOptions {
 
 /** The shape the shell components read from `virtual:helia-ui/starlight-config`. */
 export interface HeliaStarlightConfig {
+  /** The `data-helia-accent` value the Head puts on the document element. */
+  accent: HeliaProductAccent | undefined;
   footer: {
     links: HeliaFooterLink[];
     tagline: string | undefined;
@@ -332,8 +365,14 @@ function configModule(config: HeliaStarlightConfig): AstroIntegration {
 export function heliaStarlight(
   options: HeliaStarlightOptions = {},
 ): StarlightPlugin {
-  const { styles = true, code = true, shell = {}, footer } = options;
+  const { styles = true, code = true, shell = {}, footer, accent } = options;
   const discoverability = resolveDiscoverability(options.discoverability);
+
+  if (accent !== undefined && !PRODUCT_ACCENTS.includes(accent)) {
+    throw new Error(
+      `@ambiqai/helia-ui/starlight: unknown accent '${accent}'. One of: ${PRODUCT_ACCENTS.join(', ')}.`,
+    );
+  }
 
   return {
     name: '@ambiqai/helia-ui/starlight',
@@ -373,6 +412,7 @@ export function heliaStarlight(
         updateConfig({ customCss, components, expressiveCode });
         addIntegration(
           configModule({
+            accent,
             footer: {
               links: footer?.links ?? [],
               tagline: footer?.tagline,

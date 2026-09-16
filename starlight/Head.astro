@@ -15,10 +15,30 @@
  */
 import Default from '@astrojs/starlight/components/Head.astro';
 import robotoLatin from '@fontsource-variable/roboto/files/roboto-latin-wght-normal.woff2?url';
+import config from 'virtual:helia-ui/starlight-config';
 import Discoverability from './Discoverability.astro';
+
+const { accent } = config;
 ---
 
 <Default />
+{
+  /*
+   * The product accent, set on the theme scope rather than written into a
+   * sheet: the palette stays in the package and the site names an id. It is an
+   * attribute on the document element because that is the only scope that
+   * covers the whole shell, and nothing rendered inside `<head>` can set one
+   * declaratively -- the same reason Starlight's own theme is applied from an
+   * inline script here. The script is unblocking and runs before the body
+   * parses, so no paint happens on the default accent.
+   */
+  accent && (
+    <script
+      is:inline
+      set:html={`document.documentElement.dataset.heliaAccent=${JSON.stringify(accent)}`}
+    />
+  )
+}
 <link
   rel="preload"
   href={robotoLatin}
