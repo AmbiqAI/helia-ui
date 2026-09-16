@@ -75,6 +75,11 @@
  * page theme by the time the surface is reached. The surfaces below are one
  * step off the inked ground, in the direction the dark theme's own card sits
  * from the dark canvas.
+ *
+ * The frame's own foregrounds -- the editor tab title, the terminal title bar
+ * and its dots, the inline copy button -- resolve from the theme's chrome
+ * colors rather than from `codeForeground`, so pinning the code ink alone left
+ * a page-theme title on a surface that had already flipped.
  */
 .helia-hero--contrast .expressive-code,
 .helia-band--contrast .expressive-code,
@@ -100,14 +105,18 @@
   --ec-codeFg: var(--helia-ink-primary);
   --ec-codeSelBg: var(--helia-ink-primary);
   --ec-frm-edActTabBg: var(--helia-surface-card-muted);
+  --ec-frm-edActTabFg: var(--helia-ink-primary);
   --ec-frm-edBg: var(--helia-surface-card);
   --ec-frm-edTabBarBg: var(--helia-surface-card-muted);
   --ec-frm-edTabBarBrdBtmCol: var(--helia-surface-border);
   --ec-frm-edTabBarBrdCol: var(--helia-surface-border);
+  --ec-frm-inlBtnFg: var(--helia-ink-primary);
   --ec-frm-tooltipSuccessFg: var(--helia-surface-card);
   --ec-frm-trmBg: var(--helia-surface-card);
   --ec-frm-trmTtbBg: var(--helia-surface-card-muted);
   --ec-frm-trmTtbBrdBtmCol: var(--helia-surface-border);
+  --ec-frm-trmTtbDotsFg: var(--helia-ink-muted);
+  --ec-frm-trmTtbFg: var(--helia-ink-primary);
   --ec-gtrBrdCol: var(--helia-surface-border);
   --ec-gtrFg: var(--helia-ink-muted);
   --ec-gtrHlFg: var(--helia-ink-secondary);

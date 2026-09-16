@@ -4,8 +4,9 @@
  * Code on the surfaces the package pins dark. Expressive Code declares its
  * colors on `:root`, so a block slotted into an inked band inherited the page
  * theme's light frame while the ink around it was already inverted; see
- * AmbiqAI/helia-ui#91. The assertion is made in light mode, which is the only
- * mode where the two can disagree.
+ * AmbiqAI/helia-ui#91. The syntax ink is asserted in light mode, which is the
+ * only mode where the two can disagree; the frame's own chrome is asserted in
+ * both, because the surfaces under it are pinned either way.
  */
 import { expect, test } from '@playwright/test';
 
@@ -100,3 +101,39 @@ test('a code block on an inked band stays dark on a light page', async ({
   expect(inks.length).toBeGreaterThan(1);
   for (const ink of inks) expect(ratio(ink, frame)).toBeGreaterThanOrEqual(4.5);
 });
+
+/*
+ * The frame's chrome rather than its code. A title sits on the tab bar, which
+ * Expressive Code colors from the theme's editor chrome and not from
+ * `codeForeground`, so pinning the code ink alone left the title resolving to
+ * the page theme over a surface that had already flipped.
+ */
+for (const theme of ['light', 'dark'] as const) {
+  test(`a frame title on an inked surface reads in ${theme} mode`, async ({
+    page,
+  }) => {
+    await page.goto(`${base}/gallery/`);
+    await page.evaluate((mode) => {
+      document.documentElement.dataset.theme = mode;
+    }, theme);
+
+    for (const surface of ['.helia-hero--contrast', '.helia-band--contrast']) {
+      const title = page
+        .locator(`${surface} .expressive-code .frame.has-title .title`)
+        .first();
+      await expect(title).toBeVisible();
+
+      /* The tab carries its own background, so the title is seen against it
+         rather than against the header's gradient. */
+      const measured = await title.evaluate((node) => {
+        const style = getComputedStyle(node);
+        return { ground: style.backgroundColor, ink: style.color };
+      });
+
+      /* The surface really is the inked one, so the ratio below means
+         something other than a frame that went back to paper. */
+      expect(luminance(measured.ground)).toBeLessThan(0.1);
+      expect(ratio(measured.ink, measured.ground)).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+}

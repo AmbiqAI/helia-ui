@@ -1970,7 +1970,7 @@ set of parts.
     the same reason.
   </p>
 
-```ts
+```ts title="band.ts"
 import { Band } from '@ambiqai/helia-ui/astro';
 ```
 
@@ -2361,9 +2361,8 @@ a page that carries none. A product site sets it once, through the Starlight
 plugin's `accent` option, and writes no CSS.
 
 The copy here is placeholder, not an approved product claim. The code frame in
-the side column follows the page theme rather than the card, the way one inside
-a contrast `Band` does: Expressive Code resolves its frame colors on `:root`,
-so the card's own surface tokens do not reach it.
+the side column holds the dark treatment on either page theme, the way one
+inside a contrast `Band` does, down to the frame's title and buttons.
 
 <Example
   title='<Hero variant="contrast" eyebrow badge summary>'
