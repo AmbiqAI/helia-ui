@@ -1,0 +1,200 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A chain of labeled layers read along the page: what sits above a thing, the
+ * thing itself, and what it runs on.
+ *
+ * It is a stack in the sense a product page means it -- the tooling over the
+ * kernels over the silicon -- not a vertical layout helper. Laying it across
+ * rather than down is what makes it a diagram: the layer the page is about is
+ * one cell in a row the reader takes in at once, and the paragraph that used
+ * to say the same thing goes away.
+ *
+ * Exactly one layer should carry `accent`. It is the page's own layer, and it
+ * is marked by the rule over it and the ground under it rather than by a
+ * heavier weight, because every other layer has to stay readable beside it.
+ * A second accented layer spends the page's whole accent budget on a diagram;
+ * see the budget in docs/design-system.md.
+ *
+ * The chips are labels, not navigation. A layer with somewhere to go is a
+ * `LinkCard`, and a row of them is a card grid.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import Chip from './Chip.astro';
+import Eyebrow from './Eyebrow.astro';
+
+export interface StackChip {
+  /** The pill's text. */
+  label: string;
+  /** Draws the pill in the product accent. At most one across the stack. */
+  accent?: boolean;
+}
+
+export interface StackLayer {
+  /** What the layer is, rendered as the eyebrow over its chips. */
+  label: string;
+  /** The pills in the layer, in display order. */
+  chips?: StackChip[];
+  /** Marks this layer as the page's own. At most one across the stack. */
+  accent?: boolean;
+}
+
+interface Props extends HTMLAttributes<'ol'> {
+  /** The layers, ordered from the top of the stack to the bottom. */
+  layers: StackLayer[];
+  /** Accessible name for the diagram. */
+  ariaLabel?: string;
+}
+
+const { layers, ariaLabel = 'Stack', class: className, ...rest } = Astro.props;
+---
+
+<ol
+  class:list={['helia-stack', 'not-content', className]}
+  aria-label={ariaLabel}
+  {...rest}
+>
+  {
+    layers.map((layer) => (
+      <li
+        class:list={[
+          'helia-stack__layer',
+          layer.accent && 'helia-stack__layer--accent',
+        ]}
+      >
+        <Eyebrow as="span">{layer.label}</Eyebrow>
+        {layer.chips && layer.chips.length > 0 && (
+          <span class="helia-stack__chips">
+            {layer.chips.map((chip) => (
+              <span
+                class:list={[
+                  'helia-stack__chip',
+                  chip.accent && 'helia-stack__chip--accent',
+                ]}
+              >
+                <Chip>{chip.label}</Chip>
+              </span>
+            ))}
+          </span>
+        )}
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  /*
+   * Auto columns rather than a count, so the diagram takes whatever number of
+   * layers it is handed without the page declaring it twice.
+   */
+  .helia-stack {
+    /*
+     * The accent as text. The rule over a layer and a pill's edge take the
+     * accent itself, which is a graphic object; anything set at the label step
+     * owes 4.5:1, and an accent picked to read as a mark on paper does not
+     * clear that on a ground tinted with the same accent. The mix is the one
+     * `Badge` pulls its advisory inks along, for the same reason.
+     */
+    --helia-stack-accent-ink: color-mix(
+      in oklab,
+      var(--helia-product-accent) 74%,
+      var(--helia-ink-primary)
+    );
+
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    list-style: none;
+    margin: 0;
+    min-width: 0;
+    padding: 0;
+  }
+
+  /* The gap is the only vertical spacing a layer gets, whatever the markdown
+     container around it hands its children. See AmbiqAI/helia-ui#94. */
+  .helia-stack > * {
+    margin-block-start: 0;
+  }
+
+  /*
+   * No gap between layers: the rules over them are what separates the chain,
+   * and a gap would read as four panels rather than one stack.
+   */
+  .helia-stack__layer {
+    border-block-start: 2px solid var(--helia-surface-border);
+    display: grid;
+    gap: var(--helia-space-2);
+    justify-items: start;
+    padding: var(--helia-space-4);
+    position: relative;
+  }
+
+  /*
+   * The step from one layer to the next. Decorative, so it is drawn rather
+   * than written, and its alternative text is empty: the order of the list
+   * already says what the arrow says.
+   */
+  .helia-stack__layer + .helia-stack__layer::before {
+    color: var(--helia-ink-muted);
+    content: '→' / '';
+    font-size: var(--helia-text-caption);
+    inset-block-start: var(--helia-space-5);
+    inset-inline-start: calc(-1 * var(--helia-space-2));
+    position: absolute;
+  }
+
+  /*
+   * The page's own layer: the rule over it, the ground under it, and the label
+   * reached through the muted ink it already resolves -- the only muted thing
+   * in the cell -- so the layer moves as one without a selector reaching
+   * across the boundary into `Eyebrow`.
+   */
+  .helia-stack__layer--accent {
+    --helia-ink-muted: var(--helia-stack-accent-ink);
+
+    background: color-mix(
+      in srgb,
+      var(--helia-product-accent) 8%,
+      var(--helia-surface-paper)
+    );
+    border-block-start-color: var(--helia-product-accent);
+    border-end-end-radius: var(--helia-radius-sm);
+    border-end-start-radius: var(--helia-radius-sm);
+  }
+
+  .helia-stack__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--helia-space-1);
+  }
+
+  /*
+   * The pill's own hooks, set on a wrapper the chip inherits them through, so
+   * the accent is a value handed to `Chip` rather than a rule written over it.
+   */
+  .helia-stack__chip {
+    display: contents;
+  }
+
+  .helia-stack__chip--accent {
+    --helia-chip-border: var(--helia-product-accent);
+    --helia-chip-ink: var(--helia-stack-accent-ink);
+  }
+
+  /*
+   * Two columns on a narrow screen. Four layers in a row on a phone is four
+   * columns of wrapped chips, and the chain stops being readable well before
+   * the text does.
+   */
+  @media (width < 62rem) {
+    .helia-stack {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .helia-stack__layer + .helia-stack__layer::before {
+      content: none;
+    }
+  }
+</style>

@@ -113,6 +113,36 @@ Also accepts `HTMLAttributes<'section'>`.
 
 [See it rendered on Gallery](/helia-ui/gallery/#band)
 
+## Bars
+
+**Use it for:** A few labeled bars against a shared scale, drawn as tracks rather than as a plot.
+
+```ts
+import Bars from '@ambiqai/helia-ui/astro/Bars';
+```
+
+| Prop          | Type       | Default                                     | Description                                                        |
+| ------------- | ---------- | ------------------------------------------- | ------------------------------------------------------------------ |
+| `rows` (req.) | `BarRow[]` | --                                          | The rows, in display order.                                        |
+| `max`         | `number`   | `Math.max(...rows.map((row) => row.value))` | The length a full track stands for. Defaults to the largest value. |
+| `ticks`       | `string[]` | --                                          | Labels along the axis, spread from its start to its end.           |
+| `caption`     | `string`   | --                                          | A note under the chart: provenance, units, a caveat.               |
+
+Also accepts `HTMLAttributes<'div'>`.
+
+**BarRow**
+
+| Prop           | Type      | Default | Description                                                       |
+| -------------- | --------- | ------- | ----------------------------------------------------------------- |
+| `label` (req.) | `string`  | --      | What the bar measures.                                            |
+| `value` (req.) | `number`  | --      | The bar's length, on the same scale as `max`.                     |
+| `display`      | `string`  | --      | The reading printed beside the bar. Defaults to `value`.          |
+| `accent`       | `boolean` | --      | Draws this bar in the product accent. At most one across the set. |
+
+**Slots** -- none.
+
+[See it rendered on Gallery](/helia-ui/gallery/#bars)
+
 ## BigNumber
 
 **Use it for:** One figure at the top of the type scale, with its label, its change, and room for a trend under it.
@@ -127,6 +157,7 @@ import BigNumber from '@ambiqai/helia-ui/astro/BigNumber';
 | `labelPosition` | `'above' \| 'below'`       | `'above'`   | Which end of the figure the label sits at.                                          |
 | `step`          | `'display' \| 'heading'`   | `'display'` | Which rung of the type ladder the figure is set at.                                 |
 | `unit`          | `string`                   | --          | What the figure is measured in, set beside it a step down.                          |
+| `accent`        | `boolean`                  | `false`     | Draws the unit glyph in the product accent. The figure stays ink.                   |
 | `delta`         | `string`                   | --          | The change beside the figure. Omit it and nothing renders.                          |
 | `direction`     | `'up' \| 'down' \| 'flat'` | `'flat'`    | Which way the change went. Draws the arrow; says nothing about whether it is good.  |
 | `deltaTone`     | `BadgeTone`                | `'neutral'` | Whether the change reads well or badly. The composition decides, not the direction. |
@@ -190,14 +221,14 @@ import Callout from '@ambiqai/helia-ui/astro/Callout';
 import Card from '@ambiqai/helia-ui/astro/Card';
 ```
 
-| Prop          | Type                                                                              | Default     | Description                                                                   |
-| ------------- | --------------------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------- |
-| `as`          | `Exclude<HTMLTag, 'a'>`                                                           | `'div'`     | Element to render. Never an anchor: the whole-card link is `CardHeader href`. |
-| `tone`        | `'card' \| 'muted' \| 'paper' \| 'outlined' \| 'filled' \| 'elevated' \| 'ghost'` | `'card'`    | What stands in for the card's edge and fill.                                  |
-| `media`       | `'top' \| 'side' \| 'background'`                                                 | `'top'`     | Where a slotted `CardMedia` sits. `side` stacks again below 42rem.            |
-| `density`     | `'default' \| 'compact' \| 'comfortable'`                                         | `'default'` | Moves the padding step the parts default to: 3, 4, or 5.                      |
-| `lift`        | `boolean`                                                                         | `false`     | Adds the hover lift. Pair it with `interactive` only when the card links.     |
-| `interactive` | `boolean`                                                                         | `false`     | Adds the shared hover background shift and the focus-visible ring.            |
+| Prop          | Type                                                                                          | Default     | Description                                                                   |
+| ------------- | --------------------------------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------- |
+| `as`          | `Exclude<HTMLTag, 'a'>`                                                                       | `'div'`     | Element to render. Never an anchor: the whole-card link is `CardHeader href`. |
+| `tone`        | `\| 'card' \| 'muted' \| 'paper' \| 'outlined' \| 'filled' \| 'elevated' \| 'ghost' \| 'ink'` | `'card'`    | What stands in for the card's edge and fill.                                  |
+| `media`       | `'top' \| 'side' \| 'background'`                                                             | `'top'`     | Where a slotted `CardMedia` sits. `side` stacks again below 42rem.            |
+| `density`     | `'default' \| 'compact' \| 'comfortable'`                                                     | `'default'` | Moves the padding step the parts default to: 3, 4, or 5.                      |
+| `lift`        | `boolean`                                                                                     | `false`     | Adds the hover lift. Pair it with `interactive` only when the card links.     |
+| `interactive` | `boolean`                                                                                     | `false`     | Adds the shared hover background shift and the focus-visible ring.            |
 
 Also accepts `HTMLAttributes<'div'>`.
 
@@ -662,16 +693,16 @@ Also accepts `HTMLAttributes<'span'>`.
 import LinkCard from '@ambiqai/helia-ui/astro/LinkCard';
 ```
 
-| Prop           | Type                                      | Default | Description                                                             |
-| -------------- | ----------------------------------------- | ------- | ----------------------------------------------------------------------- |
-| `href` (req.)  | `string`                                  | --      | Where the card goes.                                                    |
-| `title` (req.) | `string`                                  | --      | The link text, and the card's accessible name.                          |
-| `titleAs`      | `'h2' \| 'h3' \| 'h4'`                    | `'h3'`  | Heading level. Pick the one the page outline needs.                     |
-| `eyebrow`      | `string`                                  | --      | The label above the title.                                              |
-| `meta`         | `string`                                  | --      | One line of metadata under the title, such as a date or a source.       |
-| `tone`         | `CardTone`                                | --      | What stands in for the card's edge and fill. Passed straight to `Card`. |
-| `density`      | `'default' \| 'compact' \| 'comfortable'` | --      | Moves the padding step the parts default to. Passed straight to `Card`. |
-| `lift`         | `boolean`                                 | --      | Adds the hover lift. Passed straight to `Card`.                         |
+| Prop           | Type                                      | Default | Description                                                                                                  |
+| -------------- | ----------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------ |
+| `href` (req.)  | `string`                                  | --      | Where the card goes.                                                                                         |
+| `title` (req.) | `string`                                  | --      | The link text, and the card's accessible name.                                                               |
+| `titleAs`      | `'h2' \| 'h3' \| 'h4'`                    | `'h3'`  | Heading level. Pick the one the page outline needs.                                                          |
+| `eyebrow`      | `string`                                  | --      | The label above the title.                                                                                   |
+| `meta`         | `string`                                  | --      | One line of metadata under the title, such as a date or a source.                                            |
+| `tone`         | `CardTone`                                | --      | What stands in for the card's edge and fill. Passed straight to `Card`. `ink` takes the accent on the title. |
+| `density`      | `'default' \| 'compact' \| 'comfortable'` | --      | Moves the padding step the parts default to. Passed straight to `Card`.                                      |
+| `lift`         | `boolean`                                 | --      | Adds the hover lift. Passed straight to `Card`.                                                              |
 
 Also accepts `Omit<HTMLAttributes<'div'>, 'title'>`.
 
@@ -1046,6 +1077,33 @@ Also accepts `HTMLAttributes<'section'>`.
 - `code` -- The block beside the text: a `CodeBlock`, a `CodeTabs`, or anything that frames itself.
 
 [See it rendered on Gallery](/helia-ui/gallery/#split-panel)
+
+## Stack
+
+**Use it for:** A chain of labeled layers read along the page: what sits above a thing, the thing itself, and what it runs on.
+
+```ts
+import Stack from '@ambiqai/helia-ui/astro/Stack';
+```
+
+| Prop            | Type           | Default   | Description                                                  |
+| --------------- | -------------- | --------- | ------------------------------------------------------------ |
+| `layers` (req.) | `StackLayer[]` | --        | The layers, ordered from the top of the stack to the bottom. |
+| `ariaLabel`     | `string`       | `'Stack'` | Accessible name for the diagram.                             |
+
+Also accepts `HTMLAttributes<'ol'>`.
+
+**StackLayer**
+
+| Prop           | Type          | Default | Description                                                       |
+| -------------- | ------------- | ------- | ----------------------------------------------------------------- |
+| `label` (req.) | `string`      | --      | What the layer is, rendered as the eyebrow over its chips.        |
+| `chips`        | `StackChip[]` | --      | The pills in the layer, in display order.                         |
+| `accent`       | `boolean`     | --      | Marks this layer as the page's own. At most one across the stack. |
+
+**Slots** -- none.
+
+[See it rendered on Gallery](/helia-ui/gallery/#stack)
 
 ## StatCard
 

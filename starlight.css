@@ -83,6 +83,7 @@
  */
 .helia-hero--contrast .expressive-code,
 .helia-band--contrast .expressive-code,
+.helia-card--ink .expressive-code,
 .helia-card--media-background .expressive-code {
   --helia-surface-card: color-mix(
     in srgb,
@@ -139,6 +140,10 @@
   .ec-line
   :where(span[style^='--']:not([class])),
 .helia-band--contrast
+  .expressive-code
+  .ec-line
+  :where(span[style^='--']:not([class])),
+.helia-card--ink
   .expressive-code
   .ec-line
   :where(span[style^='--']:not([class])),

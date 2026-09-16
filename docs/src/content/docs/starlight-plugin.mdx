@@ -306,6 +306,41 @@ than falling back quietly.
   subtree itself; the derivation is the same.
 </Callout>
 
+### How much of it to spend
+
+Setting the accent is not the same as using it. The budget below is what a
+product site spends on a full landing page, and it is the same budget on every
+page of that site: enough that the color means "this one", little enough that
+it still can.
+
+| Moment               | What carries it                                  | How often                    |
+| -------------------- | ------------------------------------------------ | ---------------------------- |
+| The hub link         | The link out to the HELIA Dev Hub in the top bar | Once, in the chrome          |
+| The eyebrow dot      | `Hero`'s eyebrow on a contrast ground            | Once, in the hero            |
+| The accent word      | One or two words of the `Hero` headline          | Once, in the hero            |
+| The primary action   | `Button variant="primary"`, its outline only     | Once, in the hero            |
+| The page's own layer | `Stack` with `accent` on one layer               | Once, where a diagram sits   |
+| The leading bar      | `Bars` with `accent` on one row                  | Once per comparison          |
+| The unit glyph       | `BigNumber accent`, the × or the %               | Once per row of figures      |
+| The section link     | The link beside a section heading                | Once per section             |
+| Link hover           | Any link in prose, under the pointer             | Not counted: it is transient |
+
+The ink is scarcer: one inked field above the fold, which is usually
+`Hero variant="contrast"`, and at most one `Card` or `LinkCard` with
+`tone="ink"` per set below it. Two inked tiles in one mosaic read as a dark row
+with a hole in it.
+
+Off the budget entirely: card edges and brims, a colored fill behind body copy,
+persistent colored marks, and a second accent color on the same page. A page
+that really does carry two products scopes each subtree with
+`data-helia-accent` rather than introducing a color the plugin does not know
+about.
+
+Every part named above draws from `--helia-product-accent`, so all of it
+follows from the one `accent` option and the site still writes no CSS. The
+longer argument, and the mockup the budget was drawn from, are in the hub's
+design system document.
+
 ## Stylesheet order is the contract
 
 The four sheets the plugin injects are `tokens.css`, `semantic.css`,

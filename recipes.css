@@ -448,6 +448,67 @@ a.helia-chip--neutral:focus-visible {
   border-color: transparent;
 }
 
+/*
+ * The inked tile: one card in a set that is not paper. The ground is the same
+ * one the contrast hero and the inked band use, pinned dark in both themes,
+ * and the inks and the accent are re-derived against it -- an accent picked
+ * against paper carried onto a dark ground is the half of the theme that does
+ * not read. The edge goes with the fill rather than becoming a brim: the
+ * family draws no accent edge, so what marks this card is the ground it sits
+ * on and the one accent link it carries.
+ */
+.helia-card--ink {
+  --helia-hover-border: transparent;
+  --helia-ink-adaptive: var(--helia-paper-white);
+  --helia-ink-primary: var(--helia-paper-white);
+  --helia-ink-secondary: color-mix(
+    in srgb,
+    var(--helia-paper-white) 82%,
+    transparent
+  );
+  --helia-ink-muted: color-mix(
+    in srgb,
+    var(--helia-paper-white) 66%,
+    transparent
+  );
+  --helia-product-accent-mix: 76%;
+  --helia-product-accent: color-mix(
+    in oklab,
+    var(--helia-product-accent-source) var(--helia-product-accent-mix),
+    var(--helia-ink-adaptive)
+  );
+  --helia-surface-card: color-mix(
+    in srgb,
+    var(--helia-paper-white) 7%,
+    var(--helia-ink-black)
+  );
+  --helia-surface-card-muted: var(--helia-surface-card);
+  --helia-surface-border: color-mix(
+    in srgb,
+    var(--helia-paper-white) 14%,
+    transparent
+  );
+  --helia-surface-hover: color-mix(
+    in srgb,
+    var(--helia-paper-white) 8%,
+    var(--helia-ink-black)
+  );
+
+  background: var(--helia-ink-black);
+  border-color: transparent;
+  color: var(--helia-paper-white);
+}
+
+/*
+ * What the accent is spent on inside the tile: the link and the label over it.
+ * The scope above has already pulled the accent toward paper, so both read at
+ * the same weight here that the accent word reads at in a contrast hero.
+ */
+.helia-card--ink .helia-card-header__link,
+.helia-card--ink .helia-eyebrow {
+  color: var(--helia-product-accent);
+}
+
 /* Density. The hook is inherited, so it reaches whichever parts the card
    was handed without the card knowing which those are. */
 .helia-card--compact {

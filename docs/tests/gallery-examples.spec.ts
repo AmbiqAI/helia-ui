@@ -32,6 +32,7 @@ const PART_ROOTS: Record<string, string> = {
   AccordionGroup: '.accordion-group',
   AsciiTerminal: 'helia-ascii-terminal',
   Badge: '.helia-badge',
+  Bars: '.helia-bars',
   Band: '.helia-band',
   BigNumber: '.helia-big-number',
   Button: '.helia-button',
@@ -73,6 +74,7 @@ const PART_ROOTS: Record<string, string> = {
   ShowcaseCarousel: 'showcase-carousel',
   Sparkline: '.helia-sparkline',
   SplitPanel: '.helia-split-panel',
+  Stack: '.helia-stack',
   StatCard: '.helia-stat-card',
   Timeline: '.timeline',
 };

@@ -19,7 +19,9 @@
  * produce.
  *
  * A card never carries an accent edge or brim. Accent belongs to the media
- * artwork, a badge, an icon or the type.
+ * artwork, a badge, an icon or the type. `ink` is the one tone that is a
+ * field rather than a hint, which is why a set gets one of them: see the
+ * accent budget in docs/design-system.md.
  *
  * @slot default -- The card parts, in the order they should stack.
  */
@@ -28,10 +30,19 @@ import Surface from './Surface.astro';
 
 /**
  * `outlined` is the default hairline card and `filled` the muted fill; both
- * name what `card` and `muted` already did and stay as aliases of them.
+ * name what `card` and `muted` already did and stay as aliases of them. `ink`
+ * is the inked tile: a ground pinned dark in both themes, with the inks and
+ * the accent re-derived against it.
  */
 export type CardTone =
-  'card' | 'muted' | 'paper' | 'outlined' | 'filled' | 'elevated' | 'ghost';
+  | 'card'
+  | 'muted'
+  | 'paper'
+  | 'outlined'
+  | 'filled'
+  | 'elevated'
+  | 'ghost'
+  | 'ink';
 
 interface Props extends HTMLAttributes<'div'> {
   /** Element to render. Never an anchor: the whole-card link is `CardHeader href`. */
@@ -65,6 +76,7 @@ const SURFACE_TONE = {
   outlined: 'card',
   elevated: 'card',
   ghost: 'card',
+  ink: 'card',
   muted: 'muted',
   filled: 'muted',
   paper: 'paper',
@@ -73,6 +85,7 @@ const SURFACE_TONE = {
 const EDGE = {
   elevated: 'helia-card--elevated',
   ghost: 'helia-card--ghost',
+  ink: 'helia-card--ink',
 } as const;
 
 const DENSITY = {
@@ -80,7 +93,10 @@ const DENSITY = {
   comfortable: 'helia-card--comfortable',
 } as const;
 
-const edge = tone === 'elevated' || tone === 'ghost' ? EDGE[tone] : undefined;
+const edge =
+  tone === 'elevated' || tone === 'ghost' || tone === 'ink'
+    ? EDGE[tone]
+    : undefined;
 ---
 
 <Surface

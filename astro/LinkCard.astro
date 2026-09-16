@@ -13,6 +13,10 @@
  * The title is a prop rather than the child because the child is the line of
  * description, which is prose and wants the paragraph MDX gives it.
  *
+ * `tone="ink"` is the inked tile: the ground goes dark in both themes and the
+ * title, which is the link, takes the accent. One of them in a set, because
+ * that is the whole of what the accent budget allows a mosaic.
+ *
  * The mark and the metadata line are `CardHeader`'s, passed straight through:
  * a row of link cards that needs either one is the same card, not a
  * composition written out again beside it.
@@ -37,7 +41,7 @@ interface Props extends Omit<HTMLAttributes<'div'>, 'title'> {
   eyebrow?: string;
   /** One line of metadata under the title, such as a date or a source. */
   meta?: string;
-  /** What stands in for the card's edge and fill. Passed straight to `Card`. */
+  /** What stands in for the card's edge and fill. Passed straight to `Card`. `ink` takes the accent on the title. */
   tone?: CardTone;
   /** Moves the padding step the parts default to. Passed straight to `Card`. */
   density?: 'default' | 'compact' | 'comfortable';

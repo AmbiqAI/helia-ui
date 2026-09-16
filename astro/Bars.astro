@@ -1,0 +1,189 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A few labeled bars against a shared scale, drawn as tracks rather than as a
+ * plot.
+ *
+ * `Chart` is the part for data: it runs Plot at build, carries axes,
+ * gridlines and a legend, and is worth its weight the moment a series has
+ * more than a handful of points. Three readings beside a heading are not that.
+ * This is HTML and two custom properties, so a landing page can show the
+ * shape of a comparison without the page paying for a chart library it uses
+ * once.
+ *
+ * Every row is text as well as a bar: the label and the reading are rendered,
+ * not encoded in an image label, so the comparison is available to a reader
+ * who never sees the tracks. The axis is a hairline under the same column the
+ * tracks sit in, with optional ticks, and it is drawn whether or not there are
+ * ticks to put on it -- a bar with no baseline is a length with nothing to be
+ * a length against.
+ *
+ * At most one row should carry `accent`: it is the reading the section is
+ * about, and the rest are what it is being compared with.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+export interface BarRow {
+  /** What the bar measures. */
+  label: string;
+  /** The bar's length, on the same scale as `max`. */
+  value: number;
+  /** The reading printed beside the bar. Defaults to `value`. */
+  display?: string;
+  /** Draws this bar in the product accent. At most one across the set. */
+  accent?: boolean;
+}
+
+interface Props extends HTMLAttributes<'div'> {
+  /** The rows, in display order. */
+  rows: BarRow[];
+  /** The length a full track stands for. Defaults to the largest value. */
+  max?: number;
+  /** Labels along the axis, spread from its start to its end. */
+  ticks?: string[];
+  /** A note under the chart: provenance, units, a caveat. */
+  caption?: string;
+}
+
+const {
+  rows,
+  max = Math.max(...rows.map((row) => row.value)),
+  ticks,
+  caption,
+  class: className,
+  ...rest
+} = Astro.props;
+
+/* A track is a proportion of the scale, so a value past the scale is a scale
+   the caller got wrong rather than a bar that leaves the frame. */
+const share = (value: number) =>
+  max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0;
+---
+
+<div class:list={['helia-bars', 'not-content', className]} {...rest}>
+  <ol class="helia-bars__rows">
+    {
+      rows.map((row) => (
+        <li class="helia-bars__row">
+          <span class="helia-bars__label">{row.label}</span>
+          <span class="helia-bars__track">
+            <span
+              class:list={[
+                'helia-bars__fill',
+                row.accent && 'helia-bars__fill--accent',
+              ]}
+              style={`--helia-bars-share: ${share(row.value)}%`}
+            />
+          </span>
+          <span class="helia-bars__value">{row.display ?? row.value}</span>
+        </li>
+      ))
+    }
+  </ol>
+  <p class="helia-bars__axis" aria-hidden="true">
+    <span class="helia-bars__ticks">
+      {ticks?.map((tick) => <span>{tick}</span>)}
+    </span>
+  </p>
+  {caption && <p class="helia-bars__caption">{caption}</p>}
+</div>
+
+<style>
+  .helia-bars {
+    display: grid;
+    gap: var(--helia-space-2);
+    min-width: 0;
+  }
+
+  .helia-bars__rows {
+    display: grid;
+    gap: var(--helia-space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* The gap is the only vertical spacing a row gets, whatever the markdown
+     container around it hands its children. See AmbiqAI/helia-ui#94. */
+  .helia-bars > *,
+  .helia-bars__rows > * {
+    margin-block-start: 0;
+  }
+
+  /*
+   * One template for the rows and the axis, so the baseline lands under the
+   * tracks rather than under the labels beside them. Both columns either side
+   * are hooks: a set of long labels widens the first without the part having
+   * to guess at a measure it cannot see.
+   */
+  .helia-bars__row,
+  .helia-bars__axis {
+    align-items: center;
+    display: grid;
+    gap: var(--helia-space-3);
+    grid-template-columns:
+      var(--helia-bars-label, 5.5rem)
+      minmax(0, 1fr)
+      var(--helia-bars-value, 3rem);
+  }
+
+  .helia-bars__label {
+    font-size: var(--helia-text-small);
+    font-weight: var(--helia-weight-semibold);
+  }
+
+  .helia-bars__track {
+    background: var(--helia-surface-card-muted);
+    block-size: var(--helia-bars-track, 1.25rem);
+    border: 1px solid var(--helia-surface-border);
+    border-radius: var(--helia-radius-sm);
+    /* Clips the fill to the track's radius at either end of the scale. */
+    overflow: hidden;
+  }
+
+  /*
+   * The quiet end of the chart ramp rather than the hairline: a bar is a
+   * graphic object, so it carries the weight a series carries in `Chart` and
+   * clears the same contrast against the surface under it.
+   */
+  .helia-bars__fill {
+    background: var(--helia-chart-3);
+    block-size: 100%;
+    display: block;
+    inline-size: var(--helia-bars-share, 0%);
+  }
+
+  .helia-bars__fill--accent {
+    background: var(--helia-product-accent);
+  }
+
+  .helia-bars__value {
+    color: var(--helia-ink-secondary);
+    font-size: var(--helia-text-caption);
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+  }
+
+  .helia-bars__axis {
+    margin: 0;
+  }
+
+  .helia-bars__ticks {
+    border-block-start: var(--helia-chart-grid-width) solid
+      var(--helia-chart-grid);
+    color: var(--helia-ink-muted);
+    display: flex;
+    font-size: var(--helia-chart-tick-size);
+    font-variant-numeric: tabular-nums;
+    grid-column: 2;
+    justify-content: space-between;
+    padding-block-start: var(--helia-space-1);
+  }
+
+  .helia-bars__caption {
+    color: var(--helia-ink-muted);
+    font-size: var(--helia-text-caption);
+    margin: 0;
+  }
+</style>

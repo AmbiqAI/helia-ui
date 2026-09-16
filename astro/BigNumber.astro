@@ -15,6 +15,10 @@
  * it qualifies. The figures are tabular, so a row or a column of them lines up
  * on the digit rather than on the glyph width.
  *
+ * `accent` colors the unit and nothing else. The glyph is the smallest thing
+ * on a figure that still reads across a section, so it is what the accent
+ * budget can afford here; the number itself stays ink.
+ *
  * `direction` draws the arrow and `deltaTone` picks the ink, and they are two
  * props because up is not always good: a figure that counts open findings goes
  * up and reads `danger`. Neither is decided here.
@@ -42,6 +46,8 @@ interface Props extends HTMLAttributes<'div'> {
   step?: 'display' | 'heading';
   /** What the figure is measured in, set beside it a step down. */
   unit?: string;
+  /** Draws the unit glyph in the product accent. The figure stays ink. */
+  accent?: boolean;
   /** The change beside the figure. Omit it and nothing renders. */
   delta?: string;
   /** Which way the change went. Draws the arrow; says nothing about whether it is good. */
@@ -57,6 +63,7 @@ const {
   labelPosition = 'above',
   step = 'display',
   unit,
+  accent = false,
   delta,
   direction = 'flat',
   deltaTone = 'neutral',
@@ -79,7 +86,11 @@ const {
     }
     <span class="quantity">
       <span class="value"><slot /></span>
-      {unit && <span class="unit">{unit}</span>}
+      {
+        unit && (
+          <span class:list={['unit', accent && 'unit--accent']}>{unit}</span>
+        )
+      }
     </span>
     {
       delta !== undefined && (
@@ -156,6 +167,14 @@ const {
     );
     font-weight: var(--helia-weight-medium);
     letter-spacing: normal;
+  }
+
+  /*
+   * The accented unit. It follows `.unit` at the same weight rather than
+   * outranking it, so the color is the only thing the flag changes.
+   */
+  .unit--accent {
+    color: var(--helia-product-accent);
   }
 
   .delta {

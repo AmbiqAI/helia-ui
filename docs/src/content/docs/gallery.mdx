@@ -7,6 +7,7 @@ import AccordionGroup from '@ambiqai/helia-ui/astro/AccordionGroup';
 import AsciiTerminal from '@ambiqai/helia-ui/astro/AsciiTerminal';
 import Badge from '@ambiqai/helia-ui/astro/Badge';
 import Band from '@ambiqai/helia-ui/astro/Band';
+import Bars from '@ambiqai/helia-ui/astro/Bars';
 import BigNumber from '@ambiqai/helia-ui/astro/BigNumber';
 import Button from '@ambiqai/helia-ui/astro/Button';
 import Callout from '@ambiqai/helia-ui/astro/Callout';
@@ -47,6 +48,7 @@ import SectionHeader from '@ambiqai/helia-ui/astro/SectionHeader';
 import ShowcaseCarousel from '@ambiqai/helia-ui/astro/ShowcaseCarousel';
 import Sparkline from '@ambiqai/helia-ui/astro/Sparkline';
 import SplitPanel from '@ambiqai/helia-ui/astro/SplitPanel';
+import Stack from '@ambiqai/helia-ui/astro/Stack';
 import StatCard from '@ambiqai/helia-ui/astro/StatCard';
 import Timeline from '@ambiqai/helia-ui/astro/Timeline';
 import {
@@ -631,6 +633,195 @@ here is a measurement of any part.
     </BigNumber>
   </Example>
 </div>
+
+## Accent and ink
+
+The accent is a hint, not a field, and so is the ink. A page spends both a few
+times: the accent word in the hero, one inked tile in a mosaic, the layer of a
+stack the page is about, the leading bar in a comparison, and the link out to
+the hub. The parts below are what make those moments cheap to write. What a
+page may spend, and how often, is the accent budget in the design system.
+
+### The inked tile
+
+`tone="ink"` puts one card of a set on the ground the contrast hero uses,
+pinned dark in both themes, with the inks and the accent re-derived against it.
+The title, which is the link, takes the accent. One of them in a set: two
+inked tiles is a dark row with a gap in it.
+
+<Example
+  title='<LinkCard tone="ink">'
+  code={`
+    <CardGrid columns={3} equalize class="not-content">
+      <LinkCard titleAs="h4" href="/helia-ui/cards/" eyebrow="Guide" title="The card parts">
+        What each part owns, and how a subset of them composes.
+      </LinkCard>
+      <LinkCard titleAs="h4" href="/helia-ui/layout/" eyebrow="Guide" title="Bands and grids">
+        Bands, grids and mosaics, and which one a section wants.
+      </LinkCard>
+      <LinkCard tone="ink" titleAs="h4" href="/helia-ui/foundations/" eyebrow="Reference" title="Tokens and scales">
+        The spacing, radius and type ladders every part is built from.
+      </LinkCard>
+    </CardGrid>
+  `}
+>
+  <CardGrid columns={3} equalize class="not-content">
+    <LinkCard
+      titleAs="h4"
+      href="/helia-ui/cards/"
+      eyebrow="Guide"
+      title="The card parts"
+    >
+      What each part owns, and how a subset of them composes.
+    </LinkCard>
+    <LinkCard
+      titleAs="h4"
+      href="/helia-ui/layout/"
+      eyebrow="Guide"
+      title="Bands and grids"
+    >
+      Bands, grids and mosaics, and which one a section wants.
+    </LinkCard>
+    <LinkCard
+      tone="ink"
+      titleAs="h4"
+      href="/helia-ui/foundations/"
+      eyebrow="Reference"
+      title="Tokens and scales"
+    >
+      The spacing, radius and type ladders every part is built from.
+    </LinkCard>
+  </CardGrid>
+</Example>
+
+### The accent figure
+
+`accent` on a `BigNumber` colors the unit and nothing else. The glyph is the
+smallest thing on a figure that still reads across a section, so it is what the
+budget can afford here; the number stays ink.
+
+Every number below is invented and measures nothing.
+
+<Example
+  title="<BigNumber accent unit>"
+  code={`
+    <Card>
+      <CardContent variant="stats">
+        <BigNumber label="Vector over scalar" unit="×" accent>
+          <span>12</span>
+        </BigNumber>
+        <BigNumber label="Vector over DSP" unit="×" accent>
+          <span>8</span>
+        </BigNumber>
+        <BigNumber label="DSP over scalar" unit="×" accent>
+          <span>3</span>
+        </BigNumber>
+      </CardContent>
+    </Card>
+  `}
+>
+  <Card>
+    <CardContent variant="stats">
+      <BigNumber label="Vector over scalar" unit="×" accent>
+        <span>12</span>
+      </BigNumber>
+      <BigNumber label="Vector over DSP" unit="×" accent>
+        <span>8</span>
+      </BigNumber>
+      <BigNumber label="DSP over scalar" unit="×" accent>
+        <span>3</span>
+      </BigNumber>
+    </CardContent>
+  </Card>
+</Example>
+
+### Stack
+
+`Stack` is the chain of layers a product page opens with: what sits above the
+thing, the thing, and what it runs on. One layer carries `accent`, and it is
+the page's own. Below 62rem the chain folds to two columns, because four
+columns of wrapped pills on a phone is not a diagram.
+
+<Example
+  title="<Stack layers>"
+  code={`
+    <Stack
+      ariaLabel="Where the kernel layer sits"
+      layers={[
+        { label: 'Model tooling', chips: [{ label: 'Compiler' }, { label: 'Runtime' }] },
+        {
+          label: 'Kernels',
+          accent: true,
+          chips: [{ label: 'This layer', accent: true }, { label: '23 families' }],
+        },
+        { label: 'Acceleration path', chips: [{ label: 'Scalar' }, { label: 'DSP' }, { label: 'Vector' }] },
+        { label: 'Silicon', chips: [{ label: 'Cortex-M4' }, { label: 'Cortex-M55' }] },
+      ]}
+    />
+  `}
+>
+  <Stack
+    ariaLabel="Where the kernel layer sits"
+    layers={[
+      {
+        label: 'Model tooling',
+        chips: [{ label: 'Compiler' }, { label: 'Runtime' }],
+      },
+      {
+        label: 'Kernels',
+        accent: true,
+        chips: [
+          { label: 'This layer', accent: true },
+          { label: '23 families' },
+        ],
+      },
+      {
+        label: 'Acceleration path',
+        chips: [{ label: 'Scalar' }, { label: 'DSP' }, { label: 'Vector' }],
+      },
+      {
+        label: 'Silicon',
+        chips: [{ label: 'Cortex-M4' }, { label: 'Cortex-M55' }],
+      },
+    ]}
+  />
+</Example>
+
+### Bars
+
+`Bars` is the comparison a heading needs and a chart is too heavy for: labeled
+tracks against one scale, an axis under them, and one accented row. Every row
+is text as well as a bar, so the reading survives without the tracks. Past a
+handful of rows, or with a series that has a shape, reach for `Chart`.
+
+The figures below are invented and measure nothing.
+
+<Example
+  title="<Bars rows max ticks>"
+  code={`
+    <Bars
+      max={12}
+      ticks={['0×', '6×', '12×']}
+      caption="Invented figures, held here to show the scale."
+      rows={[
+        { label: 'Vector', value: 12, display: '12.0×', accent: true },
+        { label: 'DSP', value: 3.3, display: '3.3×' },
+        { label: 'Scalar', value: 1, display: '1.0×' },
+      ]}
+    />
+  `}
+>
+  <Bars
+    max={12}
+    ticks={['0×', '6×', '12×']}
+    caption="Invented figures, held here to show the scale."
+    rows={[
+      { label: 'Vector', value: 12, display: '12.0×', accent: true },
+      { label: 'DSP', value: 3.3, display: '3.3×' },
+      { label: 'Scalar', value: 1, display: '1.0×' },
+    ]}
+  />
+</Example>
 
 ## LinkCard
 
