@@ -58,6 +58,14 @@ Pages land at `<out>/<module path>/index.mdx`, so `helia_aot.air.model` becomes
 `/helia-aot/reference/api/helia_aot/air/model/`. That is the same shape the
 MkDocs `api/` tree had, so inbound links survive the move.
 
+Every route segment is slugged the way Astro derives a content id from a file
+path, lowercased and with punctuation dropped, so the page a generator writes
+and the URL it advertises are one string; two module paths that slug to one
+route fail the render. The module path itself is unchanged as the module's
+identity, title and cross-reference target. A module whose source carries no
+summary still gets a description on its page, worded mechanically per language,
+since a page without one fails the discoverability check.
+
 <DataTable
   caption="Command-line options"
   columns={['Option', 'Default', 'What it does']}

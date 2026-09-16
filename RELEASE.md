@@ -7,13 +7,38 @@ required facts in the package root next to LICENSE and NOTICE.
 | Field             | Value                                                                       |
 | ----------------- | --------------------------------------------------------------------------- |
 | Package           | `@ambiqai/helia-ui`                                                         |
-| Version           | 0.1.0-alpha.7                                                               |
-| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.7`.         |
+| Version           | 0.1.0-alpha.8                                                               |
+| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.8`.         |
 | License           | BSD-3-Clause (`LICENSE`)                                                    |
 | Licensing tier    | Tier 1, ADR-0005                                                            |
 | Source repository | https://github.com/AmbiqAI/helia-ui                                         |
 | Source path       | Repository root, mirrored from `packages/helia-ui` in `helia-developer-hub` |
 | Source commit     | Recorded at tag time.                                                       |
+
+## What changed in 0.1.0-alpha.8
+
+The first fix release out of the heliaCORE reference migration, which ran the
+Doxygen generator against a real library for the first time. Three defects that
+run found are fixed; nothing else in the catalog moves.
+
+Issue references below are to `AmbiqAI/helia-ui`.
+
+### Added
+
+- `scripts/fixtures/doxygen-groups`, real Doxygen output for a header with
+  mixed-case groups, and the renderer and extractor tests that read it (#72).
+
+### Fixed
+
+- Generated reference routes are slugged the way Starlight slugs a content id,
+  so the module pages, the JSON artifacts, `llms.txt` and the sidebar fragment
+  all name the same URL. A group such as `NNConv` was linked at a route no host
+  serves; on a case-sensitive filesystem every such link 404s (#72).
+- Every generated module page carries a description, mechanical and worded per
+  language when the source has no summary, so a library that does not brief
+  each group still passes the plugin's discoverability check (#73).
+- `llms.txt` resolves an `autogenerate` sidebar group to the group's own label
+  instead of filing its pages under "Other pages" (#70).
 
 ## What changed in 0.1.0-alpha.7
 
