@@ -47,6 +47,27 @@ export interface HeliaFooterOptions {
   logo?: 'ambiq' | false;
 }
 
+export interface HeliaHeaderLink {
+  label: string;
+  href: string;
+  /**
+   * Path prefix that marks the link current, for a section whose pages do not
+   * live under its `href`. Defaults to the `href`.
+   */
+  match?: string;
+}
+
+export interface HeliaHeaderOptions {
+  /** The name at the top-left. Defaults to the site's own title. */
+  title?: string;
+  /** The sections beside the name. */
+  links?: HeliaHeaderLink[];
+  /** Starlight's search trigger. Default `true`. */
+  search?: boolean;
+  /** The package theme menu. Default `true`, and off with `shell.themeSelect`. */
+  themeToggle?: boolean;
+}
+
 export interface HeliaShellOptions {
   themeSelect?: boolean;
   mobileMenuToggle?: boolean;
@@ -72,6 +93,12 @@ export interface HeliaStarlightOptions {
   shell?: HeliaShellOptions;
   footer?: HeliaFooterOptions;
   /**
+   * Installs the package top bar: the site name as text at the top-left, the
+   * links beside it, search, and the theme menu. Absent, Starlight's own
+   * header stands.
+   */
+  header?: HeliaHeaderOptions;
+  /**
    * Search-engine and agent discoverability. Every part defaults to `true`;
    * `false` switches the lot off. Needs an absolute `site` in astro.config,
    * and the per-page tags need `shell.head` left installed.
@@ -86,6 +113,13 @@ export interface HeliaStarlightConfig {
     tagline: string | undefined;
     logo: 'ambiq' | false;
   };
+  /** `null` when the site asked for no package header. */
+  header: {
+    title: string;
+    links: HeliaHeaderLink[];
+    search: boolean;
+    themeToggle: boolean;
+  } | null;
   /** The site's own title and description, which a component override cannot read. */
   site: {
     title: string;
@@ -332,7 +366,13 @@ function configModule(config: HeliaStarlightConfig): AstroIntegration {
 export function heliaStarlight(
   options: HeliaStarlightOptions = {},
 ): StarlightPlugin {
-  const { styles = true, code = true, shell = {}, footer } = options;
+  const {
+    styles = true,
+    code = true,
+    shell = {},
+    footer,
+    header,
+  } = options;
   const discoverability = resolveDiscoverability(options.discoverability);
 
   return {
@@ -354,6 +394,12 @@ export function heliaStarlight(
           if (shell[key as keyof HeliaShellOptions] === false) continue;
           if (name in components) continue;
           components[name] = `@ambiqai/helia-ui/starlight/${file}`;
+        }
+
+        /* Off the map above: it is the option rather than `shell` that asks
+           for this one, since a header with nothing in it is not a header. */
+        if (header && !('Header' in components)) {
+          components.Header = '@ambiqai/helia-ui/starlight/Header.astro';
         }
 
         const expressiveCode =
@@ -378,6 +424,17 @@ export function heliaStarlight(
               tagline: footer?.tagline,
               logo: footer?.logo ?? 'ambiq',
             },
+            header: header
+              ? {
+                  title: header.title ?? site.title,
+                  links: header.links ?? [],
+                  search: header.search ?? true,
+                  /* A site that took the theme menu off the shell does not get
+                     it back through the header. */
+                  themeToggle:
+                    (header.themeToggle ?? true) && shell.themeSelect !== false,
+                }
+              : null,
             site,
             discoverability,
           }),

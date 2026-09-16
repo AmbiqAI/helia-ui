@@ -138,6 +138,134 @@
   font-weight: var(--helia-weight-bold);
 }
 
+/*
+ * The top bar the plugin's `header` option installs. Starlight's frame owns the
+ * strip's height, its ground and its padding; what is here is the arrangement
+ * inside it, the link states, and the two things that change on a narrow
+ * screen: the links give way to the sidebar button, and the search field gives
+ * way to its icon.
+ */
+.helia-site-header {
+  align-items: center;
+  display: flex;
+  gap: var(--helia-space-4);
+  height: 100%;
+}
+
+.helia-site-header__toggle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: var(--helia-radius-sm);
+  color: var(--sl-color-gray-1);
+  cursor: pointer;
+  display: none;
+  height: 2.35rem;
+  justify-content: center;
+  padding: 0;
+  width: 2.35rem;
+}
+
+.helia-site-header__toggle:hover,
+.helia-site-header__toggle:focus-visible {
+  background: var(--sl-color-gray-6);
+}
+
+.helia-site-header__toggle svg {
+  fill: none;
+  height: 1.25rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 1.8;
+  width: 1.25rem;
+}
+
+.helia-site-header__title {
+  color: var(--sl-color-white);
+  font-size: var(--helia-text-subhead);
+  font-weight: var(--helia-weight-strong);
+  letter-spacing: var(--helia-tracking-display);
+  line-height: var(--helia-leading-tight);
+  min-width: 0;
+  overflow: hidden;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.helia-site-header__nav {
+  align-items: center;
+  display: flex;
+  gap: var(--helia-space-1);
+}
+
+.helia-site-header__nav > a {
+  border-radius: var(--helia-radius-md);
+  color: var(--sl-color-gray-2);
+  font-size: var(--helia-text-small);
+  font-weight: var(--helia-weight-medium);
+  line-height: 1;
+  padding: var(--helia-space-2) var(--helia-space-3);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.helia-site-header__nav > a:hover,
+.helia-site-header__nav > a:focus-visible {
+  color: var(--sl-color-white);
+}
+
+.helia-site-header__nav > a[aria-current='page'] {
+  background: var(--sl-color-gray-6);
+  color: var(--sl-color-white);
+}
+
+.helia-site-header__actions {
+  align-items: center;
+  display: flex;
+  gap: var(--helia-space-2);
+  margin-inline-start: auto;
+}
+
+.helia-site-header__search {
+  min-width: 0;
+  width: min(17rem, 20vw);
+}
+
+/*
+ * The trigger keeps its field shape only while there is room for one beside
+ * the links. Below that it is the magnifier alone, which is what the label and
+ * the shortcut hint are hidden for.
+ */
+@media (width < 72rem) {
+  .helia-site-header__search {
+    width: 2.5rem;
+  }
+
+  .helia-site-header__search button[data-open-modal] {
+    background: transparent;
+    border: 0;
+    justify-content: center;
+    padding: 0;
+    width: 2.5rem;
+  }
+
+  .helia-site-header__search button[data-open-modal] > span,
+  .helia-site-header__search button[data-open-modal] > kbd {
+    display: none !important;
+  }
+}
+
+@media (width < 62rem) {
+  .helia-site-header__toggle {
+    display: flex;
+  }
+
+  .helia-site-header__nav {
+    display: none;
+  }
+}
+
 @media (width >= 62rem) {
   site-search button[data-open-modal] {
     background: var(--sl-color-bg-nav) !important;

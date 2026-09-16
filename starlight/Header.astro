@@ -1,0 +1,115 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/*
+ * The product top bar: the site name as text at the top-left, the sections the
+ * site names beside it, search and the theme menu at the end. It is installed
+ * only when the plugin is given a `header` option, and only under a key the
+ * site left alone.
+ *
+ * The rules are in starlight.css rather than in a scoped block here. The bar is
+ * part of Starlight's frame, and the frame's skins are all in that one sheet;
+ * a scoped block would also put the search button and the theme menu out of
+ * reach, since neither is this component's own markup.
+ *
+ * The narrow-width button opens the same sidebar the package's empty
+ * MobileMenuToggle takes off Starlight's frame: starlight.css carries the
+ * `data-helia-sidebar-open` rules it drives.
+ */
+import Search from '@astrojs/starlight/components/Search.astro';
+import config from 'virtual:helia-ui/starlight-config';
+
+import ThemeMenu from './ThemeMenu.astro';
+
+const header = config.header;
+const { hasSidebar, siteTitleHref } = Astro.locals.starlightRoute;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const path = Astro.url.pathname.replace(/\/?$/, '/');
+
+/*
+ * A prefix rather than an equality, so a section stays current on every page
+ * under it, and `match` for a link whose pages do not live under its href. A
+ * link to the site root is the exception: every path on the site starts with
+ * the base, so a prefix there would be current everywhere.
+ */
+function isCurrent(target: string) {
+  const prefix = target.replace(/\/?$/, '/');
+  return prefix === base ? path === base : path.startsWith(prefix);
+}
+---
+
+{
+  header && (
+    <div class="helia-site-header">
+      {hasSidebar && (
+        <button
+          class="helia-site-header__toggle"
+          type="button"
+          aria-label="Open navigation"
+          aria-controls="starlight__sidebar"
+          aria-expanded="false"
+          data-helia-sidebar-toggle
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
+      )}
+
+      <a class="helia-site-header__title" href={siteTitleHref}>
+        {header.title}
+      </a>
+
+      {header.links.length > 0 && (
+        <nav class="helia-site-header__nav" aria-label="Primary">
+          {header.links.map((link) => (
+            <a
+              href={link.href}
+              aria-current={
+                isCurrent(link.match ?? link.href) ? 'page' : undefined
+              }
+            >
+              {link.label}
+            </a>
+          ))}
+        </nav>
+      )}
+
+      <div class="helia-site-header__actions">
+        {header.search && (
+          <div class="helia-site-header__search">
+            <Search />
+          </div>
+        )}
+        {header.themeToggle && <ThemeMenu />}
+      </div>
+    </div>
+  )
+}
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>(
+    '[data-helia-sidebar-toggle]',
+  );
+  const sidebar = document.querySelector<HTMLElement>('#starlight__sidebar');
+  const narrow = window.matchMedia('(max-width: 61.999rem)');
+
+  const close = () => {
+    document.body.removeAttribute('data-helia-sidebar-open');
+    sidebar?.style.removeProperty('--sl-sidebar-visibility');
+    toggle?.setAttribute('aria-expanded', 'false');
+  };
+
+  toggle?.addEventListener('click', () => {
+    const open = document.body.toggleAttribute('data-helia-sidebar-open');
+    if (open) sidebar?.style.setProperty('--sl-sidebar-visibility', 'visible');
+    else sidebar?.style.removeProperty('--sl-sidebar-visibility');
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') close();
+  });
+
+  narrow.addEventListener('change', close);
+</script>
