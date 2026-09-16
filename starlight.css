@@ -395,3 +395,120 @@
     background: currentColor;
   }
 }
+
+/* Pagination */
+
+/*
+ * Starlight draws the previous/next footer as two bordered boxes the width of
+ * the column, each with a heading-sized title, so the last thing on a guide
+ * page is a pair of cards that outweigh its content. Here the pair is one row
+ * of links at the outer edges: eyebrow over a body-sized title, the arrow on
+ * the title's line, and no edge until the pointer is on it.
+ *
+ * The rules are complete rather than corrective. Starlight's own sit in
+ * `@layer starlight.core` behind a scope class, so a site that renders its own
+ * Pagination through the plugin's Footer seam -- the hub does, to keep the
+ * links inside one workspace -- inherits none of them and takes the treatment
+ * from here alone.
+ */
+.pagination-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helia-space-4);
+  justify-content: space-between;
+}
+
+/*
+ * The negative inline margin is the hover padding given back, so the eyebrow
+ * and the title still start on the content measure rather than inset from it.
+ */
+.pagination-links a {
+  align-items: end;
+  border: 0;
+  border-radius: var(--helia-radius-sm);
+  box-shadow: none;
+  color: var(--helia-ink-muted);
+  display: flex;
+  flex: 0 1 auto;
+  gap: var(--helia-space-2);
+  justify-content: flex-start;
+  margin-inline: calc(var(--helia-space-3) * -1);
+  max-width: 48%;
+  overflow-wrap: anywhere;
+  padding: var(--helia-space-2) var(--helia-space-3);
+  text-decoration: none;
+  transition: background-color var(--helia-motion-fast) var(--helia-ease-out);
+  width: auto;
+}
+
+/* The auto margin is what holds the end edge when there is no previous link. */
+.pagination-links a[rel='next'] {
+  flex-direction: row-reverse;
+  margin-inline-start: auto;
+  text-align: end;
+}
+
+.pagination-links a:hover {
+  background: var(--helia-surface-hover);
+  color: var(--helia-ink-primary);
+}
+
+/*
+ * The ring of `.helia-focus-ring`, written out: the markup is Starlight's, so
+ * there is nowhere to put the class.
+ */
+.pagination-links a:focus-visible {
+  outline: 2px solid var(--helia-focus-ring-color, var(--helia-ink-primary));
+  outline-offset: 2px;
+}
+
+/* The eyebrow is a bare text node in the link's span, ahead of the title. */
+.pagination-links a > span {
+  color: var(--helia-ink-muted);
+  font-size: var(--helia-text-label);
+  font-weight: var(--helia-weight-bold);
+  letter-spacing: var(--helia-tracking-caps);
+  line-height: var(--helia-leading-heading);
+  min-width: 0;
+  text-transform: uppercase;
+}
+
+/* The title is its own line without the break, which would leave an empty one. */
+.pagination-links a br {
+  display: none;
+}
+
+.pagination-links .link-title {
+  color: var(--helia-ink-primary);
+  display: block;
+  font-size: var(--helia-text-body);
+  font-weight: var(--helia-weight-medium);
+  letter-spacing: normal;
+  line-height: var(--helia-leading-heading);
+  text-transform: none;
+}
+
+/*
+ * Starlight sizes the arrow with an inline style on the icon, which only a
+ * raised declaration can bring down to the title's line.
+ */
+.pagination-links a svg {
+  flex-shrink: 0;
+  font-size: var(--helia-text-lead) !important;
+}
+
+@media (width < 42rem) {
+  .pagination-links {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .pagination-links a {
+    max-width: 100%;
+  }
+
+  .pagination-links a[rel='next'] {
+    align-self: end;
+    margin-inline-start: calc(var(--helia-space-3) * -1);
+  }
+}
