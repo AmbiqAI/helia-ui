@@ -1,0 +1,102 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * A searchable, filterable index of every symbol in a generated reference.
+ *
+ * A reference of any size is a corpus rather than an index: the reader who
+ * knows there is an int8 depthwise convolution somewhere has fifty module
+ * pages and a browser search. This part is the other half of the reference --
+ * one flat list, a search box, a chip per facet value, and a link from every
+ * row into the page that documents the symbol.
+ *
+ * The rows are built here, at build, from the same `reference.json` the pages
+ * are a view of, so nothing is derived twice and nothing is fetched. What
+ * crosses into the browser is the rows and the facet definitions, as props: a
+ * filter is the one thing on a reference page that has to happen in the
+ * reader's hands, so this part is the package's one island wrapper and a page
+ * writes one tag for it.
+ *
+ * The model is a prop rather than a path because a part may not read the
+ * filesystem. A site imports its own artifact -- `import reference from
+ * '../../public/reference/api/reference.json'` -- and passes it in, which also
+ * means the build fails on a missing artifact instead of rendering an empty
+ * index. Mounting the island needs the site's own React integration, the same
+ * as any other island.
+ */
+import type { ReferenceModel, SymbolKind } from '../reference-model';
+import {
+  buildRefIndex,
+  refIndexFacets,
+  type RefIndexGroup,
+  type RefIndexOverlay,
+} from '../ref-index-model';
+import { RefIndex } from '../react/ref-index';
+
+interface Props {
+  /** The parsed `reference.json`, imported by the page. */
+  reference: ReferenceModel;
+  /** The table's caption and the accessible name of the search box. */
+  label?: string;
+  /** Site base path, so a row's link resolves. Pass the same value the reference was rendered with. */
+  base?: string;
+  /** Where the generated pages live under the content root. */
+  routePrefix?: string;
+  /** The symbol families, in the order they are offered. Without them every row is ungrouped and no group filter appears. */
+  groups?: readonly RefIndexGroup[];
+  /** What a symbol no group matches is called. */
+  ungrouped?: string;
+  /** Which kinds to index. An empty array indexes every kind. */
+  kinds?: readonly SymbolKind[];
+  /** Whether struct fields and enum values get rows of their own. */
+  includeMembers?: boolean;
+  /** The kernel manifest: facet values and contract fields, keyed by symbol name. */
+  overlay?: RefIndexOverlay;
+  /** Facet labels by facet id, for a vocabulary the defaults do not cover. */
+  facetLabels?: Record<string, string>;
+  /** Placeholder for the search box. */
+  placeholder?: string;
+  /** Height of the scroll frame the rows sit in, as a CSS length. Filtering moves nothing below it. */
+  height?: string;
+  /** Forwarded to the island's root element. */
+  class?: string;
+}
+
+const {
+  reference,
+  label = 'Symbol index',
+  base = '/',
+  routePrefix = 'reference/api',
+  groups,
+  ungrouped = 'Other',
+  kinds,
+  includeMembers = false,
+  overlay,
+  facetLabels,
+  placeholder = 'Filter by name',
+  height = '32rem',
+  class: className,
+} = Astro.props;
+
+const rows = buildRefIndex(reference, {
+  base,
+  routePrefix,
+  ungrouped,
+  includeMembers,
+  ...(groups ? { groups } : {}),
+  ...(kinds ? { kinds } : {}),
+  ...(overlay ? { overlay } : {}),
+});
+
+const facets = refIndexFacets(rows, facetLabels ?? {});
+---
+
+<RefIndex
+  client:load
+  rows={rows}
+  facets={facets}
+  label={label}
+  placeholder={placeholder}
+  height={height}
+  className={className}
+/>

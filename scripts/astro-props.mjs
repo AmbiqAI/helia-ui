@@ -143,6 +143,15 @@ const EXAMPLES = {
   Media: { page: 'media', label: 'Media', anchor: 'generative-artwork' },
   MediaEmbed: { page: 'media', label: 'Media', anchor: 'hosted-video' },
   Mosaic: { page: 'gallery', label: 'Gallery', anchor: 'mosaic' },
+  /* The one part whose example cannot be on the gallery: it mounts an island,
+     and assert-docs-build holds the whole Astro lane, gallery included, to
+     shipping no JavaScript. It is documented where the other hydrating
+     components are. */
+  RefIndex: {
+    page: 'react/data-display',
+    label: 'Data display',
+    anchor: 'symbol-index',
+  },
   RefMembers: { page: 'gallery', label: 'Gallery', anchor: 'reference' },
   RefNav: { page: 'gallery', label: 'Gallery', anchor: 'reference' },
   RefParams: { page: 'gallery', label: 'Gallery', anchor: 'reference' },

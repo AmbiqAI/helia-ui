@@ -4,10 +4,16 @@ description: The static data table, the Plot chart, the interactive ECharts char
 ---
 
 import DataTable from '@ambiqai/helia-ui/astro/DataTable';
+import RefIndex from '@ambiqai/helia-ui/astro/RefIndex';
 import ChartInteractiveShowcase from '../../../islands/ChartInteractiveShowcase';
 import ChartPlotShowcase from '../../../islands/ChartPlotShowcase';
 import ChartShowcase from '../../../islands/ChartShowcase';
 import MkDocsChartMigration from '../../../islands/MkDocsChartMigration';
+import {
+  INDEX_GROUPS,
+  INDEX_MODEL,
+  INDEX_OVERLAY,
+} from '../../../lib/ref-index-gallery-model';
 
 ## Dense data table
 
@@ -29,6 +35,52 @@ Tables are for comparison and dense structured data—not primary navigation.
 A table that becomes a tool rather than a comparison belongs on the React
 side instead: the shadcn table primitives draw it, TanStack drives the sorting
 and the paging, and the page pays for an island.
+
+## Symbol index
+
+`RefIndex` is the searchable half of a generated API reference. The rows are
+built at build time from the same `reference.json` the reference pages are a
+view of, and the part mounts one island with them, so an MDX page writes one
+tag and the reader gets a filter over the whole library.
+
+It is the only Astro part that mounts an island. A filter is the one thing on a
+reference page that has to happen in the reader's hands, and the alternative is
+every consuming site writing the same island itself.
+
+```astro
+---
+import RefIndex from '@ambiqai/helia-ui/astro/RefIndex';
+import reference from '../../public/reference/api/reference.json';
+import { groups } from '../../reference.config.json';
+---
+
+<RefIndex reference={reference} base="/my-product/" groups={groups} />
+```
+
+Facets are derived, not declared: the data type comes off the name suffix a
+kernel library already encodes, the header off the declaring file, and the
+group off a config of name patterns. A facet with no values renders no control,
+which is why the path filter below exists only because the manifest supplies
+it. Search matches the name, the summary, the module and every facet value.
+
+Prerequisites, the buffer-size rule, tolerances and supported paths are not in
+any declaration. They come from an overlay keyed by symbol name, which is the
+shape a kernel manifest takes, and a row that the overlay covers gains a
+disclosure. Two of the fourteen rows below are covered.
+
+The library is invented and so are the routes: the links are the anchors a
+generated reference serves, and this site publishes no such reference, so they
+are here to be read rather than followed.
+
+<RefIndex
+  reference={INDEX_MODEL}
+  groups={INDEX_GROUPS}
+  overlay={INDEX_OVERLAY}
+  base="/helia-ui/"
+  label="Kernel index"
+  placeholder="Filter kernels by name"
+  height="24rem"
+/>
 
 ## Charts
 
