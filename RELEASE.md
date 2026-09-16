@@ -7,13 +7,77 @@ required facts in the package root next to LICENSE and NOTICE.
 | Field             | Value                                                                       |
 | ----------------- | --------------------------------------------------------------------------- |
 | Package           | `@ambiqai/helia-ui`                                                         |
-| Version           | 0.1.0-alpha.9                                                               |
-| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.9`.         |
+| Version           | 0.1.0-alpha.10                                                              |
+| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.10`.        |
 | License           | BSD-3-Clause (`LICENSE`)                                                    |
 | Licensing tier    | Tier 1, ADR-0005                                                            |
 | Source repository | https://github.com/AmbiqAI/helia-ui                                         |
 | Source path       | Repository root, mirrored from `packages/helia-ui` in `helia-developer-hub` |
 | Source commit     | Recorded at tag time.                                                       |
+
+## What changed in 0.1.0-alpha.10
+
+The third release out of the heliaCORE reference migration: the navigation a
+product site of several sections needs, a searchable index over a generated
+reference, and the chart options a benchmark page asks for.
+
+Issue references below are to `AmbiqAI/helia-ui`.
+
+### Added
+
+- The plugin option `sections`, one list that drives both the top bar and the
+  sidebar. Each section is a link in the bar, and a page inside a section reads
+  that section's pages as the whole sidebar, under the section's name. The bar
+  is derived from the list unless the site writes `header.links`, which stays
+  the way out for a bar carrying something that is not a section. The entries
+  stay Starlight's to resolve: the plugin appends one top-level group per
+  section to the sidebar config, so `autogenerate`, slugs, labels and badges
+  behave as they do anywhere else. Longest prefix decides which section a path
+  is in, a section at the site base is the landing page alone, and a page in no
+  section keeps the sidebar the site declared (#95).
+- `RefIndex`, the searchable symbol index a generated reference of any size
+  needs: search, a chip per facet value, a count, and a table whose names link
+  to the anchor on the module page. The `ref-index-model` export is the row
+  schema and `buildRefIndex`, a pure projection of `reference-model` over
+  pluggable facet extractors, with an overlay keyed by symbol name for what a
+  declaration cannot state, so the index ships before the manifest behind it
+  does. `react/ref-index` is the island, and the part builds the rows at build
+  and passes them as props, so no model and no fetch reach the browser. This is
+  the first part to mount the React layer, which `check:islands` forbade
+  outright; the rule now states the shape it was protecting, a `client:`
+  directive and no children, so that nothing is composed or serialized across
+  the boundary, and it fails everything else (#96, superseding #75).
+- `orientation: 'horizontal'` on a chart spec, for categories whose names are
+  too long to label under a vertical bar. The categories move to the y axis
+  with the gridlines, and the left margin is taken from the longest label
+  rather than from the density step. The data contract does not turn with the
+  drawing: `x` still names the categories and `y` the measure, and only bars
+  turn (#80).
+- A `scale` on the value axis, `log` or `linear`, with either end of the domain
+  fixed when the author wants it. A log axis ticks at 1, 2 and 5 through each
+  decade and thins to the decades past ten ticks. Given a value at or below
+  zero it draws linear and says which axis and why in the build log, since a
+  log axis drops such a row silently. Bars anchor on the bottom of the axis
+  whenever the floor is raised (#81).
+- Bars in a group run in the order the series list names them, which is the
+  order the legend reads, so a series list written in any order other than
+  alphabetical no longer labels the chart against its own bars (#82).
+- `axis` titles on either axis, with the margins paying for them rather than
+  the plot area; `valueLabels`, which writes each bar's value at its end
+  through the spec's number format and drops the set when the bands are too
+  small to hold it; and `referenceLines`, a dashed rule in the chart ink, named
+  once in the first band and carried on a series of its own so switching a
+  series off does not take the rule with it (#83).
+
+### Fixed
+
+- The items of `CardGrid`, `ChartGroup`, `Masonry` and `Mosaic` keep level
+  inside markdown content. Starlight steps every non-first child of its markdown
+  container down by 1rem, which left the first card of a row in place and sat
+  the rest 16px lower, and dropped the timeline rail and items below their own
+  label. The block-start margin of a direct child is zeroed for all four and for
+  the timeline group's three columns, unlayered so it stands in front of a page
+  sheet that layers its rhythm (#94).
 
 ## What changed in 0.1.0-alpha.9
 
