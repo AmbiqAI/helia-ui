@@ -1,0 +1,152 @@
+# Stage two of two, and the only workflow in this repository that may write a
+# tag. It produces nothing new: the version is already on main, reviewed, and
+# already green. All this does is make that commit addressable forever, which is
+# what a consumer pins.
+#
+# Every gate is a refusal rather than a fixup. Run it from main, with the
+# version main already carries, once and only once.
+name: Publish release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to tag, without the leading v (e.g. 0.1.0-alpha.12)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-publish
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify the commit is releasable
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      actions: read
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: ${{ inputs.version }}
+
+    outputs:
+      sha: ${{ steps.commit.outputs.sha }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Refuse anything but main
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_REF_NAME}" != "main" ]; then
+            echo "Tags are cut from main; this ran on ${GITHUB_REF_NAME}." >&2
+            exit 1
+          fi
+
+      - name: Refuse a version main does not carry
+        run: |
+          set -euo pipefail
+          manifest="$(node --print 'require("./package.json").version')"
+          if [ "${manifest}" != "${VERSION}" ]; then
+            echo "main is at ${manifest}; you asked to tag ${VERSION}." >&2
+            echo "Merge the bump pull request for ${VERSION} first." >&2
+            exit 1
+          fi
+          if ! grep -Fxq "## What changed in ${VERSION}" RELEASE.md; then
+            echo "RELEASE.md has no \"## What changed in ${VERSION}\" section to release from." >&2
+            exit 1
+          fi
+
+      # Checked here so the run stops before it has written anything. The ref
+      # creation in the next job refuses a second time, on the server, which is
+      # the check that actually holds against a race.
+      - name: Refuse a tag that exists
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" >/dev/null 2>&1; then
+            echo "v${VERSION} already exists. Tags here are immutable: cut the next version rather than move it." >&2
+            exit 1
+          fi
+
+      - name: Refuse a commit CI has not passed
+        id: commit
+        run: |
+          set -euo pipefail
+          sha="$(git rev-parse HEAD)"
+          echo "sha=${sha}" >>"${GITHUB_OUTPUT}"
+          passed="$(gh api \
+            "repos/${GITHUB_REPOSITORY}/actions/workflows/ci.yml/runs?head_sha=${sha}&status=success" \
+            --jq '[.workflow_runs[] | select(.head_branch == "main" and .conclusion == "success")] | length')"
+          if [ "${passed}" -eq 0 ]; then
+            echo "No successful CI run for ${sha} on main." >&2
+            echo "A tag is only worth cutting on a commit that has been proven." >&2
+            exit 1
+          fi
+          echo "CI is green on ${sha} (${passed} successful run(s))."
+
+  publish:
+    name: Tag and release
+    needs: verify
+    runs-on: ubuntu-latest
+
+    # The only write grant in this repository's workflows, and it ends here:
+    # no `pull-requests`, no `packages`, no `id-token`.
+    permissions:
+      contents: write
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: ${{ inputs.version }}
+      SHA: ${{ needs.verify.outputs.sha }}
+
+    steps:
+      - name: Check out the verified commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.verify.outputs.sha }}
+
+      - name: Take the notes from the release manifest
+        run: |
+          set -euo pipefail
+          awk -v heading="## What changed in ${VERSION}" '
+            $0 == heading { found = 1; next }
+            found && /^## / { exit }
+            found { print }
+          ' RELEASE.md >"${RUNNER_TEMP}/notes.md"
+          if [ ! -s "${RUNNER_TEMP}/notes.md" ]; then
+            echo "The ${VERSION} section of RELEASE.md is empty." >&2
+            exit 1
+          fi
+
+      # The ref API refuses an existing ref with a 422, which is the refusal
+      # that matters: it is atomic, so two runs cannot both believe they are
+      # first.
+      - name: Create the tag
+        run: |
+          set -euo pipefail
+          gh api "repos/${GITHUB_REPOSITORY}/git/refs" \
+            --method POST \
+            --field "ref=refs/tags/v${VERSION}" \
+            --field "sha=${SHA}"
+
+      - name: Create the GitHub release
+        run: |
+          set -euo pipefail
+          prerelease=""
+          case "${VERSION}" in *-*) prerelease="--prerelease" ;; esac
+          # shellcheck disable=SC2086
+          gh release create "v${VERSION}" \
+            --verify-tag \
+            --title "helia-ui ${VERSION}" \
+            --notes-file "${RUNNER_TEMP}/notes.md" \
+            ${prerelease}
+          echo "Consumers pin this tag: \"@ambiqai/helia-ui\": \"github:AmbiqAI/helia-ui#v${VERSION}\"" >>"${GITHUB_STEP_SUMMARY}"

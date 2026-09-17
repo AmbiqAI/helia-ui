@@ -2,18 +2,105 @@
 
 ADR-0005 requires "a release manifest carrying license and provenance, per demo
 policy" but does not prescribe a filename or format, so this file records the
-required facts in the package root next to LICENSE and NOTICE.
+required facts in the package root next to LICENSE and NOTICE. It is also the
+release process of record, and the notes a release is cut from are the sections
+below.
 
-| Field             | Value                                                                       |
-| ----------------- | --------------------------------------------------------------------------- |
-| Package           | `@ambiqai/helia-ui`                                                         |
-| Version           | 0.1.0-alpha.11                                                              |
-| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.11`.        |
-| License           | BSD-3-Clause (`LICENSE`)                                                    |
-| Licensing tier    | Tier 1, ADR-0005                                                            |
-| Source repository | https://github.com/AmbiqAI/helia-ui                                         |
-| Source path       | Repository root, mirrored from `packages/helia-ui` in `helia-developer-hub` |
-| Source commit     | Recorded at tag time.                                                       |
+This repository is the source. The package grew up as `packages/helia-ui` inside
+`helia-developer-hub` and was mirrored out with `git subtree split`; that mirror
+is retired and tags are no longer made by hand from another tree. Changes land
+here, CI runs here, tags are cut here, and the Dev Hub is now an ordinary
+consumer pinning a tag like any other site.
+
+| Field             | Value                                                                |
+| ----------------- | -------------------------------------------------------------------- |
+| Package           | `@ambiqai/helia-ui`                                                  |
+| Version           | 0.1.0-alpha.11                                                       |
+| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.11`. |
+| License           | BSD-3-Clause (`LICENSE`)                                             |
+| Licensing tier    | Tier 1, ADR-0005                                                     |
+| Source repository | https://github.com/AmbiqAI/helia-ui                                  |
+| Source path       | Repository root. Authoritative, not a mirror of anything.            |
+| Source commit     | Recorded at tag time.                                                |
+
+## Releasing
+
+Two stages, both dispatched from the Actions tab of this repository, and neither
+of them the place where the notes get written.
+
+Write the notes first. A `## What changed in <version>` section for the version
+being released lands on main through an ordinary pull request, like any other
+change. Both release stages refuse a version this file has no section for.
+
+**Prepare release** takes the version, without the leading `v`. It writes the
+version into `package.json`, regenerates both lockfiles and the facts table
+above, and opens a pull request. It creates no tag: the bump is reviewed like
+any other diff, and nothing immutable comes out of a job before someone has read
+it. It refuses a malformed version, a version already tagged, and a version with
+no notes.
+
+Lockfiles regenerate in place here, because this package is not a workspace of
+anything:
+
+```sh
+npm install --package-lock-only --ignore-scripts
+npm install --package-lock-only --ignore-scripts --prefix docs
+```
+
+A regenerated lockfile counts only once it has been proven installable from
+scratch, `npm ci --ignore-scripts` in the package and `npm ci --ignore-scripts
+--prefix docs` in the gallery, and that proof happens before the bump pull
+request is opened, not after it merges. `docs/` has its own lockfile and pins
+the package as `file:..`, so a version bump moves it too. Never hand-edit
+either file.
+
+**Publish release** runs after that pull request merges, from main, with the
+same version. It refuses to run anywhere but main, refuses a version main's
+manifest does not carry, refuses a version with no notes, refuses if CI has not
+passed for that exact commit, and refuses a tag that already exists. Only then
+does it create the tag and a GitHub Release whose body is this file's section
+for that version. Creating the ref through the API is the refusal that holds
+against two people pressing the button at once.
+
+When the dependency tree changed, regenerate `THIRD-PARTY-NOTICES.md` with
+`npm run notices` from the environment the release is cut in. `npm run validate`
+fails on a stale file, so this is a gate rather than a reminder.
+
+A tag is immutable. A release that went out wrong is superseded by the next
+version, never fixed by moving `v<version>`. Consumers pin the tag:
+
+```json
+{
+  "dependencies": { "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v<version>" }
+}
+```
+
+## What changed in 0.1.0-alpha.12
+
+Six fixes carried over from the Dev Hub, where they were reviewed against a
+product site's generated reference before this repository became the place such
+changes land.
+
+Issue references below are to `AmbiqAI/helia-ui`.
+
+### Fixed
+
+- A titled code frame keeps the separator beneath it. The active tab drew its
+  own ground over the bar it sits in, which erased the rule the frame is closed
+  with; it now draws on that bar rather than across it (#67).
+- The hub link in the product bar uses the shared external-link icon in the
+  desktop header and in the mobile menu, so one glyph answers for both and the
+  menu does not say something quieter than the bar (#67).
+- An inline link's underline clears the descenders of the letters above it, so
+  a link whose text has a `g` or a `p` in it is still legible (#67).
+- A long reference name wraps instead of widening the page. A generated symbol
+  is as long as its declaration makes it, and one of them was setting the
+  scroll width of every page on a phone (#59).
+- A multiline C or C++ signature separates its arguments without leaving a
+  comma after the last one (#59).
+- A C parameter shows the direction its documentation states rather than a
+  default that reads as pointer nullability, which is a different claim than
+  the one the source makes (#59).
 
 ## What changed in 0.1.0-alpha.11
 
@@ -590,8 +677,3 @@ generated by `scripts/third-party-notices.mjs` v1.0.0 and verified in CI by
 `npm run check:notices`. It is generated from this package's own
 `package-lock.json`, which is the tree the package installs, so it is
 regenerated from the package root rather than from a workspace that vendors it.
-
-## Before publishing
-
-Set the version, record the publishing commit above, and regenerate the notices
-from the environment that builds the published artifact.

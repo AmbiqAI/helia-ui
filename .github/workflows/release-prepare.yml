@@ -1,0 +1,137 @@
+# Stage one of two. This one is reviewable and reversible: it writes the version
+# into the manifest, both lockfiles and the release manifest's facts table, and
+# opens a pull request. It never creates a tag, because a tag is immutable and
+# nothing immutable should come out of a job whose diff nobody has read.
+#
+# The release notes themselves are written by hand before this runs. The job
+# refuses a version RELEASE.md has no section for rather than inventing one.
+name: Prepare release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release, without the leading v (e.g. 0.1.0-alpha.12)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-prepare
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Open the version bump pull request
+    runs-on: ubuntu-latest
+
+    # The narrowest pair that can push a branch and open a pull request. No job
+    # here may create a tag or a release; that is `release-publish.yml` alone.
+    permissions:
+      contents: write
+      pull-requests: write
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: ${{ inputs.version }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Refuse anything but main
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_REF_NAME}" != "main" ]; then
+            echo "Releases are prepared from main; this ran on ${GITHUB_REF_NAME}." >&2
+            exit 1
+          fi
+
+      - name: Refuse a version that is malformed, already tagged, or unwritten
+        run: |
+          set -euo pipefail
+          if ! printf '%s' "${VERSION}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$'; then
+            echo "\"${VERSION}\" is not a semantic version." >&2
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" >/dev/null 2>&1; then
+            echo "v${VERSION} is already tagged, and a tag here is immutable." >&2
+            exit 1
+          fi
+          if ! grep -Fxq "## What changed in ${VERSION}" RELEASE.md; then
+            echo "RELEASE.md has no \"## What changed in ${VERSION}\" section." >&2
+            echo "Write the notes first; this job does not invent them." >&2
+            exit 1
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            docs/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Set the version
+        run: npm version "${VERSION}" --no-git-tag-version
+
+      - name: Record the version in the release manifest
+        run: |
+          set -euo pipefail
+          sed -i -E "s/^\| Version( +)\| [^|]*\|/| Version\1| ${VERSION} |/" RELEASE.md
+          sed -i -E "s#^\| Status( +)\| [^|]*\|#| Status\1| Not published. Private, consumed from the git tag \`v${VERSION}\`. |#" RELEASE.md
+          grep -F "${VERSION}" RELEASE.md | head -2
+
+      # docs/ pins the package as `file:..`, so its lockfile carries the version
+      # too and goes stale on a bump the package alone would not notice.
+      - name: Regenerate both lockfiles
+        run: |
+          set -euo pipefail
+          npm install --package-lock-only --ignore-scripts
+          npm install --package-lock-only --ignore-scripts --prefix docs
+
+      - name: Reformat what was edited
+        run: npx prettier --write package.json RELEASE.md
+
+      # A regenerated lockfile counts only once it has been proven installable
+      # from scratch. Both trees, separately, because they are separate projects.
+      - name: Prove both lockfiles install
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          npm ci --ignore-scripts --prefix docs
+
+      - name: Commit the bump on a branch
+        env:
+          GIT_AUTHOR_NAME: ${{ github.actor }}
+          GIT_AUTHOR_EMAIL: ${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com
+          GIT_COMMITTER_NAME: ${{ github.actor }}
+          GIT_COMMITTER_EMAIL: ${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com
+        run: |
+          set -euo pipefail
+          git switch -c "release/v${VERSION}"
+          git add package.json package-lock.json docs/package-lock.json RELEASE.md
+          git commit -m "Prepare helia-ui ${VERSION}"
+          git push --set-upstream origin "release/v${VERSION}"
+
+      - name: Open the pull request
+        run: |
+          set -euo pipefail
+          gh pr create \
+            --base main \
+            --head "release/v${VERSION}" \
+            --title "Prepare helia-ui ${VERSION}" \
+            --body "$(printf '%s\n' \
+              "Version, both lockfiles and the release manifest's facts table set to ${VERSION}." \
+              "" \
+              "The notes for this version are the \`What changed in ${VERSION}\` section of RELEASE.md, already on main." \
+              "" \
+              "No tag exists yet. Merge this, then run \`Publish release\` from main with the same version to cut \`v${VERSION}\`.")"
