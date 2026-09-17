@@ -13,6 +13,63 @@ changing fails `validate`, so what is here is what the package ships.
 Props marked `(req.)` have no default and must be passed. A part that also
 lists inherited attributes forwards them to its root element.
 
+## Card family
+
+| Component     | Class                  | Props                                                                                            | Slots                                          |
+| ------------- | ---------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| `Card`        | `.helia-card`          | `as`, `tone`, `media`, `density`, `lift`, `interactive`                                          | `default`                                      |
+| `CardMedia`   | `.helia-card-media`    | `ratio`, `fit`                                                                                   | `default`                                      |
+| `CardHeader`  | `.helia-card-header`   | `titleAs`, `padding`, `href`, `eyebrow`, `step`, `scale`                                         | `default`, `icon`, `eyebrow`, `meta`, `action` |
+| `CardContent` | `.helia-card-content`  | `padding`, `variant`                                                                             | `default`                                      |
+| `CardActions` | `.helia-card-actions`  | `align`, `padding`                                                                               | `default`                                      |
+| `CardList`    | `.helia-card-list`     | `items`, `marker`, `icon`, `padding`                                                             | none                                           |
+| `CardQuote`   | `.helia-card-quote`    | `attribution`, `detail`, `initials`, `padding`                                                   | `default`, `attribution`                       |
+| `Badge`       | `.helia-badge`         | `tone`, `dot`, `size`                                                                            | `default`                                      |
+| `Media`       | `.helia-media`         | `treatment`, `ratio`                                                                             | none                                           |
+| `Reveal`      | `.helia-motion-reveal` | `threshold`, `stagger`                                                                           | `default`                                      |
+| `StatCard`    | `.helia-stat-card`     | `label`, `delta`, `deltaTone`, `tone`, `density`, `lift`, `interactive`                          | `default`, `sparkline`                         |
+| `LinkCard`    | `.helia-link-card`     | `href`, `title`, `titleAs`, `eyebrow`, `meta`, `tone`, `density`, `lift`                         | `default`, `icon`                              |
+| `IconTile`    | `.helia-icon-tile`     | `name`, `label`, `size`, `variant`                                                               | `default`                                      |
+| `IconRow`     | `.helia-icon-row`      | `title`, `href`, `titleAs`, `icon`, `variant`, `size`                                            | `default`, `icon`                              |
+| `SplitPanel`  | `.helia-split-panel`   | `tone`, `ratio`, `density`, `titleAs`, `as`                                                      | `eyebrow`, `title`, `body`, `actions`, `code`  |
+| `BigNumber`   | `.helia-big-number`    | `label`, `labelPosition`, `step`, `unit`, `accent`, `delta`, `direction`, `deltaTone`, `caption` | `default`, `sparkline`                         |
+| `Sparkline`   | `.helia-sparkline`     | `values`, `ariaLabel`, `kind`, `width`, `height`, `marker`, `lastValue`                          | none                                           |
+
+## Card variant values
+
+| Component     | Prop            | Values                                                                     | Default       |
+| ------------- | --------------- | -------------------------------------------------------------------------- | ------------- |
+| `Card`        | `tone`          | `card`, `muted`, `paper`, `outlined`, `filled`, `elevated`, `ghost`, `ink` | `card`        |
+| `Card`        | `media`         | `top`, `side`, `background`                                                | `top`         |
+| `Card`        | `density`       | `default`, `compact`, `comfortable`                                        | `default`     |
+| `CardMedia`   | `ratio`         | `16/9`, `4/3`, `1/1`                                                       | `16/9`        |
+| `CardMedia`   | `fit`           | `cover`, `contain`                                                         | `cover`       |
+| `CardHeader`  | `titleAs`       | `h2`, `h3`, `h4`                                                           | `h3`          |
+| `CardHeader`  | `scale`         | `default`, `display`                                                       | `default`     |
+| `CardContent` | `variant`       | `prose`, `stats`                                                           | `prose`       |
+| `CardActions` | `align`         | `start`, `end`, `between`                                                  | `start`       |
+| `CardList`    | `marker`        | `check`, `bullet`, `number`                                                | `check`       |
+| `Badge`       | `tone`          | `neutral`, `info`, `success`, `warning`, `danger`, `accent`, `secondary`   | `neutral`     |
+| `Badge`       | `size`          | `sm`, `md`                                                                 | `sm`          |
+| `Media`       | `treatment`     | `color-field`, `graphite`, `slate`, `wire`                                 | `color-field` |
+| `Media`       | `ratio`         | `16/9`, `4/3`, `1/1`                                                       | --            |
+| `StatCard`    | `density`       | `default`, `compact`, `comfortable`                                        | --            |
+| `LinkCard`    | `titleAs`       | `h2`, `h3`, `h4`                                                           | `h3`          |
+| `LinkCard`    | `density`       | `default`, `compact`, `comfortable`                                        | --            |
+| `IconTile`    | `size`          | `sm`, `md`, `lg`                                                           | `md`          |
+| `IconTile`    | `variant`       | `outlined`, `tinted`, `filled`                                             | `tinted`      |
+| `IconRow`     | `titleAs`       | `h2`, `h3`, `h4`                                                           | `h3`          |
+| `IconRow`     | `variant`       | `outlined`, `tinted`, `filled`                                             | `tinted`      |
+| `IconRow`     | `size`          | `sm`, `md`, `lg`                                                           | `md`          |
+| `SplitPanel`  | `tone`          | `tinted`, `muted`, `plain`                                                 | `tinted`      |
+| `SplitPanel`  | `ratio`         | `1:1`, `2:3`, `3:2`                                                        | `1:1`         |
+| `SplitPanel`  | `density`       | `compact`, `default`, `comfortable`                                        | `default`     |
+| `SplitPanel`  | `titleAs`       | `h2`, `h3`, `h4`                                                           | `h2`          |
+| `SplitPanel`  | `as`            | `section`, `div`, `aside`                                                  | `section`     |
+| `BigNumber`   | `labelPosition` | `above`, `below`                                                           | `above`       |
+| `BigNumber`   | `step`          | `display`, `heading`                                                       | `display`     |
+| `BigNumber`   | `direction`     | `up`, `down`, `flat`                                                       | `flat`        |
+
 ## AccordionGroup
 
 **Use it for:** A stack of disclosure rows: one `<details>` per item, the first one open.

@@ -41,10 +41,12 @@ const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
 const tokensOnly = args.includes('--tokens-only');
 const rootArg = args[args.indexOf('--root') + 1];
-const ROOT = path.resolve(
-  args.includes('--root') && rootArg
-    ? rootArg
-    : path.join(import.meta.dirname, '..'),
+const ROOT = fs.realpathSync(
+  path.resolve(
+    args.includes('--root') && rootArg
+      ? rootArg
+      : path.join(import.meta.dirname, '..'),
+  ),
 );
 
 const EXTENSIONS = new Set([
@@ -67,8 +69,7 @@ const SKIP_FILES = new Set([
   'docs/spike-shadcn.md',
   'docs/handoff.md',
   'package-lock.json',
-  'scripts/rename-token-prefix.mjs',
-  'packages/helia-ui/scripts/rename-token-prefix.mjs',
+  path.relative(ROOT, import.meta.filename),
 ]);
 
 /*
@@ -123,12 +124,16 @@ const RULES = tokensOnly ? TOKEN_RULES : [...TOKEN_RULES, ...CLASS_RULES];
  * own accent), `--sidebar-accent` (namespaced, so no collision) and the
  * `--helia-accent-*` card palette.
  *
- * The generated directory is found rather than named, so the rule holds
- * whether the root is a workspace holding the package or the package itself.
  */
-const REACT_DIR = fs.existsSync(path.join(ROOT, 'packages/helia-ui/react'))
-  ? 'packages/helia-ui/react/'
-  : 'react/';
+const packagePath = path.relative(
+  ROOT,
+  path.resolve(import.meta.dirname, '..'),
+);
+const packageWithinRoot =
+  packagePath !== '..' &&
+  !packagePath.startsWith(`..${path.sep}`) &&
+  !path.isAbsolute(packagePath);
+const REACT_DIR = `${packageWithinRoot && packagePath ? `${packagePath}/` : ''}react/`;
 
 const ACCENT_RULE = {
   name: 'shadcn-accent',
@@ -165,7 +170,7 @@ const CN_IMPORT_RULE = {
  * The shadcn/Astro alignment, in the same reapply-after-an-add form as the
  * accent rename above. `shadcn add` writes its own ring, radius, icon and
  * height ladders back into a regenerated file; these rules put them back onto
- * the hub tokens, so the two rendering paths land on the same pixels again
+ * the shared tokens, so the two rendering paths land on the same pixels again
  * without anyone having to remember which class strings were edited.
  *
  * Per file rather than across the directory: `h-9` is a control height on a

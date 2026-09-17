@@ -4,8 +4,8 @@
 /*
  * Generates the Astro parts reference from the parts themselves.
  *
- *   node scripts/astro-props.mjs           write the page and the doc table
- *   node scripts/astro-props.mjs --check   fail if either is out of date
+ *   node scripts/astro-props.mjs           write the package reference
+ *   node scripts/astro-props.mjs --check   fail if the reference is out of date
  *
  * The contract of a part is its `Props` interface, the defaults in its
  * `Astro.props` destructure, and the `@slot` lines in its component doc
@@ -22,15 +22,11 @@
  * sites that are not this one, and a URL into this docs site would be wrong in
  * every one of them.
  *
- * The card family table in the hub's design-system document is generated from
- * the same reading, into a marked region rather than a whole file, because the
- * prose around it is the argument the table is evidence for. That document
- * belongs to the hub, so when the package is the root of its own repository
- * there is nothing there to write and the step says so and stops.
+ * Card family tables belong to this package's reference too. Generation must
+ * not depend on the checkout location or inspect neighboring repositories.
  */
 
 import {
-  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -41,6 +37,7 @@ import { tmpdir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
+import { createRequire } from 'node:module';
 
 import prettier from 'prettier';
 import ts from 'typescript';
@@ -54,13 +51,6 @@ const OUT_PATH = join(
 
 /** The docs site's base path. Its own `astro.config.mjs` sets the same value. */
 const DOCS_BASE = '/helia-ui';
-
-/** The hub document the card family table is spliced into, and its markers. */
-const CONTRACT_PATH = join(PACKAGE_ROOT, '../../docs/design-system.md');
-const CONTRACT_REGIONS = {
-  'card-family': contractTable,
-  'card-family-values': valuesTable,
-};
 
 /*
  * The card family, in the order the document argues them, with the class each
@@ -567,7 +557,7 @@ function render(parts) {
     'lists inherited attributes forwards them to its root element.',
     '',
   ].join('\n');
-  return `${head}\n${parts.map(section).join('\n')}`;
+  return `${head}\n## Card family\n\n${cardTables[0]}\n\n## Card variant values\n\n${cardTables[1]}\n\n${parts.map(section).join('\n')}`;
 }
 
 /** A list of code spans, or the word for an empty one. */
@@ -638,25 +628,6 @@ function valuesTable(parts) {
   ].join('\n');
 }
 
-/**
- * Splice a generated body between a region's markers, keeping the prose around
- * it. A document that has lost a marker is a failure rather than something to
- * repair: the region is the contract between the generator and the writing.
- */
-function splice(document, region, body) {
-  const begin = `<!-- generated: ${region}. Edit the parts, not this table. -->`;
-  const end = `<!-- /generated: ${region} -->`;
-  const from = document.indexOf(begin);
-  const to = document.indexOf(end);
-  if (from === -1 || to === -1 || to < from) {
-    console.error(
-      `${CONTRACT_PATH} is missing the ${region} markers.\nExpected:\n${begin}\n${end}`,
-    );
-    process.exit(1);
-  }
-  return `${document.slice(0, from)}${begin}\n\n${body}\n\n${document.slice(to)}`;
-}
-
 /* --------------------------------------------------------------------- main */
 
 const files = readdirSync(ASTRO_DIR)
@@ -668,9 +639,7 @@ const parts = files.map(readPart).filter(Boolean);
 
 /* Built before the gate below so a part named in CARD_FAMILY but missing from
    astro/ is reported with the other contract problems, not after them. */
-const contractBodies = Object.entries(CONTRACT_REGIONS).map(
-  ([region, build]) => [region, build(parts)],
-);
+const cardTables = [contractTable(parts), valuesTable(parts)];
 
 if (failures.length > 0) {
   for (const failure of failures) console.error(failure);
@@ -681,8 +650,12 @@ if (failures.length > 0) {
 }
 
 const config = await prettier.resolveConfig(OUT_PATH);
+const require = createRequire(import.meta.url);
 const output = await prettier.format(render(parts), {
   ...config,
+  plugins: (config?.plugins ?? []).map((plugin) =>
+    typeof plugin === 'string' ? require.resolve(plugin) : plugin,
+  ),
   filepath: OUT_PATH,
   parser: 'mdx',
 });
@@ -701,7 +674,7 @@ if (process.argv.includes('--check')) {
     );
     writeFileSync(scratch, output);
     console.error(
-      `${OUT_PATH} is out of date.\nGenerated form: ${scratch}\nRun: node packages/helia-ui/scripts/astro-props.mjs`,
+      `${OUT_PATH} is out of date.\nGenerated form: ${scratch}\nRun: node scripts/astro-props.mjs`,
     );
     process.exit(1);
   }
@@ -710,46 +683,4 @@ if (process.argv.includes('--check')) {
   mkdirSync(dirname(OUT_PATH), { recursive: true });
   writeFileSync(OUT_PATH, output);
   console.log(`astro-props: ${parts.length} parts written to ${OUT_PATH}.`);
-}
-
-/* ------------------------------------------------- the hub's contract table */
-
-if (!existsSync(CONTRACT_PATH)) {
-  console.log(
-    `astro-props: no ${CONTRACT_PATH}; the card family table belongs to the hub.`,
-  );
-} else {
-  const current = readFileSync(CONTRACT_PATH, 'utf8');
-  const contractConfig = await prettier.resolveConfig(CONTRACT_PATH);
-  const spliced = contractBodies.reduce(
-    (document, [region, body]) => splice(document, region, body),
-    current,
-  );
-  const contract = await prettier.format(spliced, {
-    ...contractConfig,
-    filepath: CONTRACT_PATH,
-    parser: 'markdown',
-  });
-
-  if (process.argv.includes('--check')) {
-    if (current !== contract) {
-      const scratch = join(
-        mkdtempSync(join(tmpdir(), 'helia-card-family-')),
-        'design-system.md',
-      );
-      writeFileSync(scratch, contract);
-      console.error(
-        `${CONTRACT_PATH} card family table is out of date.\nGenerated form: ${scratch}\nRun: node packages/helia-ui/scripts/astro-props.mjs`,
-      );
-      process.exit(1);
-    }
-    console.log(
-      `astro-props: ${contractBodies.length} card family regions, tables up to date.`,
-    );
-  } else {
-    writeFileSync(CONTRACT_PATH, contract);
-    console.log(
-      `astro-props: ${contractBodies.length} card family regions written to ${CONTRACT_PATH}.`,
-    );
-  }
 }

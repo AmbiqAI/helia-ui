@@ -21,7 +21,16 @@
  */
 
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import {
+  existsSync,
+  readFileSync,
+  readdirSync,
+  statSync,
+  mkdirSync,
+  mkdtempSync,
+  writeFileSync,
+  rmSync,
+} from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import process from 'node:process';
 import { parseArgs } from 'node:util';
@@ -159,6 +168,59 @@ for (const file of shipped) {
       fail(`${file} imports "${specifier}", which did not ship.`);
     }
   }
+}
+
+const fixture = mkdtempSync(join(resolve(values.consumer), 'discoverability-'));
+try {
+  const dist = join(fixture, 'dist');
+  mkdirSync(dist);
+  writeFileSync(
+    join(dist, 'content-index.json'),
+    JSON.stringify({
+      base: '/',
+      routes: [{ route: '/', markdown: '/index.md' }],
+    }),
+  );
+  writeFileSync(
+    join(dist, 'index.html'),
+    '<title>Fixture</title><link rel="canonical" href="https://example.com/"><meta name="description" content="Fixture"><meta property="og:title" content="Fixture"><meta property="og:description" content="Fixture"><meta property="og:image" content="https://example.com/image.svg">',
+  );
+  writeFileSync(join(dist, 'index.md'), '# Fixture');
+  for (const name of [
+    'llms.txt',
+    'llms-full.txt',
+    'sitemap-index.xml',
+    'robots.txt',
+  ]) {
+    writeFileSync(join(dist, name), '/index.md');
+  }
+  const command = join(
+    resolve(values.consumer),
+    'node_modules/.bin/helia-ui-check-discoverability',
+  );
+  const run = () =>
+    spawnSync(process.execPath, [command, '--root', fixture], {
+      cwd: values.consumer,
+      encoding: 'utf8',
+      timeout: 60000,
+    });
+  const valid = run();
+  if (valid.status !== 0)
+    fail(
+      `Installed discoverability command rejected a valid fixture: ${valid.stderr}`,
+    );
+  rmSync(join(dist, 'robots.txt'));
+  const invalid = run();
+  if (
+    invalid.status === 0 ||
+    !invalid.stderr.includes('robots.txt is missing')
+  ) {
+    fail(
+      'Installed discoverability command did not reject a missing artifact.',
+    );
+  }
+} finally {
+  rmSync(fixture, { recursive: true, force: true });
 }
 
 if (failures.length > 0) {

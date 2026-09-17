@@ -42,7 +42,8 @@
     "helia-ui-doxyref": "./scripts/doxyref.mjs",
     "helia-ui-tsref": "./scripts/tsref.mjs",
     "helia-ui-mkdocs-convert": "./scripts/mkdocs-convert.mjs",
-    "helia-ui-serve-dist": "./scripts/serve-dist.mjs"
+    "helia-ui-serve-dist": "./scripts/serve-dist.mjs",
+    "helia-ui-check-discoverability": "./scripts/check-discoverability.mjs"
   },
   "exports": {
     "./astro/*": "./astro/*.astro",

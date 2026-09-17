@@ -3,9 +3,8 @@
 // Copyright (c) 2026, Ambiq
 /*
  * Fails when a style block reintroduces a literal that belongs in the token
- * layer. The scales live in packages/helia-ui/semantic.css and the primitives
- * in packages/helia-ui/tokens.css; see docs/design-system.md for the tables and
- * for the escape syntax.
+ * layer. The scales live in semantic.css and the primitives
+ * in tokens.css. The escape syntax is documented below.
  *
  * Scope: the package's own stylesheets and parts, plus the <style> blocks of
  * whatever a site declares under `styles` in helia-ui.config.json; see
@@ -419,7 +418,7 @@ for (const rel of [
  * literal is not mistaken for a bracket.
  */
 /*
- * packages/helia-ui/react is generated: `shadcn add` writes those files and
+ * react is generated: `shadcn add` writes those files and
  * rewrites them on the next add, so an escape comment placed in one does not
  * survive. The arbitrary-value rule exists to stop a hand-written literal that
  * no token owns; a vendored file is not hand-written, and its variants are how
@@ -428,8 +427,8 @@ for (const rel of [
  * that directory: src/components/islands is hand-authored and fully in scope.
  *
  * What keeps this honest is the theme bridge, not this exemption. Those class
- * strings resolve against packages/helia-ui/shadcn.css, so a shadcn size or color
- * still comes from a hub token or it does not render at all.
+ * strings resolve against shadcn.css, so a shadcn size or color
+ * still comes from a shared token or it does not render at all.
  */
 const GENERATED_DIR = `${pkg('react')}/`;
 

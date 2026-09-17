@@ -173,31 +173,29 @@ reason it is not a workspace is that a `workspaces` field in a package manifest
 travels with the package: it lands in the lockfile entry of everyone who
 installs it, and it describes a directory that is not in the tarball.
 
-`.npmrc` sets `engine-strict=true` in the package root and in `docs/` alike, so
-the node range refuses to install rather than warning. `docs/` also floors
-`engines.npm` at `>=11`, which stops an older npm silently rewriting its
-lockfile in a dialect CI does not install from; the package root cannot carry
-that floor, because its manifest is also what a consumer installs (see
-"Install"). Use the node from `.nvmrc` here regardless of what is on your path
-— this root commits a lockfile too, and nothing but the workflow protects it.
+`.npmrc` sets `engine-strict=true` in both the package and gallery. Both require
+Node 24 or newer and npm 11 or newer; `packageManager` records the npm version
+used for lockfile maintenance. Use `.nvmrc` when developing this repository.
 
 ## Site checks
 
-Five of the checks this repository runs on itself are about a HELIA site rather
+The consumer checks are about a HELIA site rather
 than about this package, so they ship as bins. A site runs them against its own
 tree without vendoring the package source:
 
-| bin                       | what it checks                                                                            |
-| ------------------------- | ----------------------------------------------------------------------------------------- |
-| `helia-ui-check-spelling` | prose is American English; `--fix` rewrites                                               |
-| `helia-ui-check-spdx`     | first-party source carries the BSD-3-Clause header (ADR-0005 Tier 1); `--fix` inserts it  |
-| `helia-ui-notices`        | writes `THIRD-PARTY-NOTICES.md` from the installed tree; `--check` fails when it is stale |
-| `helia-ui-check-styles`   | no style block reintroduces a literal the token layer owns                                |
-| `helia-ui-check-islands`  | React composition stays in islands, off the MDX boundary                                  |
+| bin                              | what it checks                                                                            |
+| -------------------------------- | ----------------------------------------------------------------------------------------- |
+| `helia-ui-check-spelling`        | prose is American English; `--fix` rewrites                                               |
+| `helia-ui-check-spdx`            | first-party source carries the BSD-3-Clause header (ADR-0005 Tier 1); `--fix` inserts it  |
+| `helia-ui-notices`               | writes `THIRD-PARTY-NOTICES.md` from the installed tree; `--check` fails when it is stale |
+| `helia-ui-check-styles`          | no style block reintroduces a literal the token layer owns                                |
+| `helia-ui-check-discoverability` | built HTML and discoverability artifacts agree; use `--root <site>`                       |
+| `helia-ui-check-islands`         | React composition stays in islands, off the MDX boundary                                  |
 
-Each takes `--root <dir>`, the tree to check, and reports paths relative to it.
-Without `--root` the root is the package, which is what this repository's own
-`npm run validate` uses.
+Each takes `--root <dir>`, the site to check. Pass it explicitly in consumer
+scripts. Discoverability checks `<root>/dist` and defaults to the current working
+directory; the source checks default to the installed package. No checker needs
+a sibling Developer Hub checkout.
 
 Which directories hold components, islands, or the data an island may not reach
 for is the site's own arrangement, and an installed package cannot infer it. The

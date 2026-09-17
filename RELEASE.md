@@ -75,6 +75,18 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 }
 ```
 
+## What changed in 0.1.0-alpha.13
+
+- Keep generated card contracts inside the package gallery; props generation no
+  longer reads or rewrites a neighboring repository's design document.
+- Export `helia-ui-check-discoverability` as a supported consumer command.
+- Remove retired monorepo path assumptions from maintenance tooling and preserve
+  token migration rules when scanning a parent checkout.
+- Test props generation with a neighboring document present and exercise the
+  installed discoverability command in a scratch consumer.
+
+Refs AmbiqAI/helia-developer-hub#30 and AmbiqAI/helia-ui#38.
+
 ## What changed in 0.1.0-alpha.12
 
 Six fixes carried over from the Dev Hub, where they were reviewed against a
