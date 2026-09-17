@@ -1,72 +1,68 @@
-# The docs site builds against the base path /helia-ui, so it deploys to
-# https://ambiqai.github.io/helia-ui/. The repository guard on both jobs keeps
-# the workflow a no-op wherever this tree is not that repository, which is how
-# it can travel with the split rather than be written after it.
+# The gallery builds against the base path /helia-ui, so it deploys to
+# https://ambiqai.github.io/helia-ui/. The repository guard keeps the workflow a
+# no-op wherever this tree is not that repository, which is how it can travel
+# with a fork or a mirror rather than have to be written after one.
+#
+# It is driven by CI's conclusion rather than by the push, so a red main cannot
+# publish, and it re-uses the Pages artifact CI built instead of building main a
+# second time: what is served is the tree the browser tests ran against.
 name: Deploy docs
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: github-pages
   cancel-in-progress: false
 
 jobs:
-  build:
-    if: github.repository == 'AmbiqAI/helia-ui'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v7
-
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v6
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            docs/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      # docs/ installs from its own lockfile; see ci.yml.
-      - name: Install docs dependencies
-        run: npm ci --prefix docs
-
-      - name: Install the headless browser rehype-mermaid renders with
-        run: npx playwright install --with-deps chromium-headless-shell
-
-      - name: Build docs site
-        run: npm run docs:build
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: ./docs/dist
-
   deploy:
-    if: github.repository == 'AmbiqAI/helia-ui'
-    needs: build
+    # `workflow_run` fires for a failed run as well as a green one, and for any
+    # event CI accepts. A pull request never reaches here: its CI run carries
+    # the head branch, which the trigger filters, and it uploads no artifact.
+    if: >-
+      github.repository == 'AmbiqAI/helia-ui' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      actions: read
+      pages: write
+      id-token: write
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
+      - name: Download the artifact CI tested
+        uses: actions/download-artifact@v6
+        with:
+          name: github-pages
+          path: ${{ runner.temp }}/pages
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      # `deploy-pages` resolves the artifact by name within its own run, so the
+      # tar has to be re-uploaded here. It is a transport step and not a rebuild:
+      # the bytes are the ones CI produced, uncompressed and unopened.
+      - name: Re-upload it as this run's Pages artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: github-pages
+          path: ${{ runner.temp }}/pages/artifact.tar
+          retention-days: 1
+          compression-level: 0
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
