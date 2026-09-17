@@ -225,7 +225,12 @@ skipped. A site whose layout follows the hub's writes:
   "styles": {
     "sources": ["src/components", "src/styles"],
     "markup": ["src"],
-    "shell": ["src/components/Header.astro", "src/styles/site.css"],
+    "shell": [
+      "src/components/Header.astro",
+      "src/components/Sidebar.astro",
+      "src/components/PageTitle.astro",
+      "src/styles/site.css"
+    ],
     "tokens": ["src/styles/site.css", "src/styles/site-theme.css"]
   },
   "islands": {
