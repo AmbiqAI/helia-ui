@@ -144,8 +144,8 @@ emitted stylesheet.
 
 ```sh
 npm ci                 # Node from .nvmrc, which brings the npm CI installs with
-npm run validate       # formatting, SPDX headers, notices, style, boundary and island checks
-npm test               # the script unit tests
+npm run validate       # formatting, SPDX headers, notices, style, boundary and island checks, unit tests
+npm test               # the script unit tests on their own
 
 npm ci --prefix docs   # the docs site installs separately, once
 npm run docs:dev       # the documentation site, which consumes the package through its exports
@@ -180,6 +180,71 @@ lockfile in a dialect CI does not install from; the package root cannot carry
 that floor, because its manifest is also what a consumer installs (see
 "Install"). Use the node from `.nvmrc` here regardless of what is on your path
 — this root commits a lockfile too, and nothing but the workflow protects it.
+
+## Site checks
+
+Five of the checks this repository runs on itself are about a HELIA site rather
+than about this package, so they ship as bins. A site runs them against its own
+tree without vendoring the package source:
+
+| bin                       | what it checks                                                                            |
+| ------------------------- | ----------------------------------------------------------------------------------------- |
+| `helia-ui-check-spelling` | prose is American English; `--fix` rewrites                                               |
+| `helia-ui-check-spdx`     | first-party source carries the BSD-3-Clause header (ADR-0005 Tier 1); `--fix` inserts it  |
+| `helia-ui-notices`        | writes `THIRD-PARTY-NOTICES.md` from the installed tree; `--check` fails when it is stale |
+| `helia-ui-check-styles`   | no style block reintroduces a literal the token layer owns                                |
+| `helia-ui-check-islands`  | React composition stays in islands, off the MDX boundary                                  |
+
+Each takes `--root <dir>`, the tree to check, and reports paths relative to it.
+Without `--root` the root is the package, which is what this repository's own
+`npm run validate` uses.
+
+Which directories hold components, islands, or the data an island may not reach
+for is the site's own arrangement, and an installed package cannot infer it. The
+site declares it in an optional `helia-ui.config.json` at the root it points the
+checks at:
+
+| key                                 | takes                                                                                              | used by         |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------- | --------------- |
+| `styles.sources`                    | directories whose `.astro` and `.css` files are scanned for style literals                         | `check-styles`  |
+| `styles.markup`                     | directories whose `.astro`, `.mdx` and `.tsx` class attributes are scanned for arbitrary utilities | `check-styles`  |
+| `styles.shell`                      | files that override a frame the site does not own, where the escape hatches stay available         | `check-styles`  |
+| `styles.tokens`                     | files where a bare `:root` block defines a scale, so literals in custom properties are the point   | `check-styles`  |
+| `islands.pages`                     | directories of `.astro` and `.mdx` pages that must not import the React layer                      | `check-islands` |
+| `islands.dirs`                      | directories that hold the islands, which are what may compose it                                   | `check-islands` |
+| `islands.data`                      | directories the React layer must not import from; it takes data through props                      | `check-islands` |
+| `spdx.roots`                        | directories holding first-party source, when the whole tree is too much                            | `check-spdx`    |
+| `notices.title` and `notices.scope` | what the notices file is called and what its walk covered                                          | `notices`       |
+
+Every value is a path relative to the root. A key the schema does not know, or
+a path that climbs out of the root, fails with the reason rather than being
+skipped. A site whose layout follows the hub's writes:
+
+```json
+{
+  "styles": {
+    "sources": ["src/components", "src/styles"],
+    "markup": ["src"],
+    "shell": ["src/components/Header.astro", "src/styles/site.css"],
+    "tokens": ["src/styles/site.css", "src/styles/site-theme.css"]
+  },
+  "islands": {
+    "pages": ["src/content", "src/components", "src/pages"],
+    "dirs": ["src/components/islands"],
+    "data": ["src/data"]
+  },
+  "notices": {
+    "title": "HELIA Developer Hub",
+    "scope": "the runtime dependencies bundled into the deployed site"
+  }
+}
+```
+
+With no config file the only tree in scope is the package's own, which is how
+this repository runs these checks on itself. An installed copy has no tree of
+its own to check -- its files were fixed at pack time -- so a site-facing check
+run from `node_modules` without the declaration it needs fails and says which
+key is missing, rather than passing on an empty scan.
 
 ## Starting a product docs site
 
