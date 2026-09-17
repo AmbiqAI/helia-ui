@@ -41,10 +41,12 @@ const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
 const tokensOnly = args.includes('--tokens-only');
 const rootArg = args[args.indexOf('--root') + 1];
-const ROOT = path.resolve(
-  args.includes('--root') && rootArg
-    ? rootArg
-    : path.join(import.meta.dirname, '..'),
+const ROOT = fs.realpathSync(
+  path.resolve(
+    args.includes('--root') && rootArg
+      ? rootArg
+      : path.join(import.meta.dirname, '..'),
+  ),
 );
 
 const EXTENSIONS = new Set([
@@ -67,7 +69,7 @@ const SKIP_FILES = new Set([
   'docs/spike-shadcn.md',
   'docs/handoff.md',
   'package-lock.json',
-  'scripts/rename-token-prefix.mjs',
+  path.relative(ROOT, import.meta.filename),
 ]);
 
 /*
@@ -123,7 +125,15 @@ const RULES = tokensOnly ? TOKEN_RULES : [...TOKEN_RULES, ...CLASS_RULES];
  * `--helia-accent-*` card palette.
  *
  */
-const REACT_DIR = 'react/';
+const packagePath = path.relative(
+  ROOT,
+  path.resolve(import.meta.dirname, '..'),
+);
+const packageWithinRoot =
+  packagePath !== '..' &&
+  !packagePath.startsWith(`..${path.sep}`) &&
+  !path.isAbsolute(packagePath);
+const REACT_DIR = `${packageWithinRoot && packagePath ? `${packagePath}/` : ''}react/`;
 
 const ACCENT_RULE = {
   name: 'shadcn-accent',

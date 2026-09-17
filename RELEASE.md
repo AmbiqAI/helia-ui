@@ -80,7 +80,8 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 - Keep generated card contracts inside the package gallery; props generation no
   longer reads or rewrites a neighboring repository's design document.
 - Export `helia-ui-check-discoverability` as a supported consumer command.
-- Remove retired monorepo path assumptions from maintenance tooling.
+- Remove retired monorepo path assumptions from maintenance tooling and preserve
+  token migration rules when scanning a parent checkout.
 - Test props generation with a neighboring document present and exercise the
   installed discoverability command in a scratch consumer.
 
