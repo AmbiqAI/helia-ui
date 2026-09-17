@@ -28,19 +28,7 @@ consumer pinning a tag like any other site.
 Two stages, both dispatched from the Actions tab of this repository, and neither
 of them the place where the notes get written.
 
-Write the notes first. A `## What changed in 0.1.0-alpha.13
-
-- Keep generated card contracts inside the package gallery; props generation no
-  longer reads or rewrites a neighboring repository's design document.
-- Export `helia-ui-check-discoverability` as a supported consumer command.
-- Remove retired monorepo path assumptions from maintenance tooling.
-- Test props generation with a neighboring document present and exercise the
-  installed discoverability command in a scratch consumer.
-
-Refs AmbiqAI/helia-developer-hub#30 and AmbiqAI/helia-ui#38.
-
-## What changed in <version>` section for the version
-
+Write the notes first. A `## What changed in <version>` section for the version
 being released lands on main through an ordinary pull request, like any other
 change. Both release stages refuse a version this file has no section for.
 
@@ -86,6 +74,17 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
   "dependencies": { "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v<version>" }
 }
 ```
+
+## What changed in 0.1.0-alpha.13
+
+- Keep generated card contracts inside the package gallery; props generation no
+  longer reads or rewrites a neighboring repository's design document.
+- Export `helia-ui-check-discoverability` as a supported consumer command.
+- Remove retired monorepo path assumptions from maintenance tooling.
+- Test props generation with a neighboring document present and exercise the
+  installed discoverability command in a scratch consumer.
+
+Refs AmbiqAI/helia-developer-hub#30 and AmbiqAI/helia-ui#38.
 
 ## What changed in 0.1.0-alpha.12
 
