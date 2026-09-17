@@ -7,8 +7,9 @@
  * in packages/helia-ui/tokens.css; see docs/design-system.md for the tables and
  * for the escape syntax.
  *
- * Scope: <style> blocks in src/components (recursively), src/styles, and the
- * stylesheets of packages/helia-ui. Literals are allowed in tokens.css and in
+ * Scope: the package's own stylesheets and parts, plus the <style> blocks of
+ * whatever a site declares under `styles` in helia-ui.config.json; see
+ * scripts/lib/site-config.mjs. Literals are allowed in tokens.css and in
  * custom property declarations on a bare :root selector in the files that
  * define tokens, which is where the scales are defined. React components and
  * islands are out of scope: they have no <style> block to scan, and the
@@ -24,22 +25,24 @@ import {
   IGNORED_DIRS,
   PACKAGE_DIR,
   ROOT,
-  WORKSPACE,
   isUnder,
   joinRel,
   pkg,
 } from './lib/scope.mjs';
+import { INSTALLED, SITE, requireDeclaration } from './lib/site-config.mjs';
+
+requireDeclaration(SITE, 'styles', ['sources', 'markup']);
 
 const BREAKPOINTS = new Set(['42rem', '62rem', '72rem']);
 const DOCS_DIR = pkg('docs/src');
 const PRIMITIVES_FILE = pkg('tokens.css');
 
 // Starlight owns the page frame, so these files still need the escape hatches.
-// The package recipes are not shell: they render into markup we own.
+// The package recipes are not shell: they render into markup we own. A site
+// overrides the same frame from files only it knows about, which is what
+// `styles.shell` names.
 const SHELL_FILES = new Set([
-  'src/components/Header.astro',
-  'src/components/Sidebar.astro',
-  'src/components/PageTitle.astro',
+  ...SITE.styles.shell,
   pkg('starlight/Footer.astro'),
   pkg('starlight/ThemeMenu.astro'),
   pkg('starlight.css'),
@@ -47,9 +50,6 @@ const SHELL_FILES = new Set([
   // that maps those diagrams onto the tokens is an override of a foreign frame
   // in the same way the Starlight skins are.
   pkg('mermaid.css'),
-  // Site-title color and the markdown margins the catalog grids sit in are
-  // both Starlight's frame, reached from the hub's own sheet.
-  'src/styles/site.css',
 ]);
 
 // Where a bare :root selector is the definition of a scale rather than a use of
@@ -57,11 +57,10 @@ const SHELL_FILES = new Set([
 // A site theme file is nothing but a bare :root block of dials, so a hue or a
 // font stack written there is the point in the same way a scale is here.
 const TOKEN_DEFINITION_FILES = new Set([
+  ...SITE.styles.tokens,
   pkg('semantic.css'),
   pkg('site-theme.css'),
   pkg('docs/src/styles/site-theme.css'),
-  'src/styles/site.css',
-  'src/styles/site-theme.css',
 ]);
 
 /*
@@ -111,6 +110,7 @@ const RULES = [
 
 function collectFiles(dir) {
   const files = [];
+  if (!fs.existsSync(path.join(ROOT, dir))) return files;
   for (const entry of fs
     .readdirSync(path.join(ROOT, dir), { withFileTypes: true })
     .sort((a, b) => a.name.localeCompare(b.name))) {
@@ -212,11 +212,14 @@ function statements(lines) {
 const violations = [];
 const notes = [];
 
+/* An installed copy carries the stylesheets pack time fixed and its own
+ * repository checked, so from one of those only the site around it is in
+ * scope. */
+const packageTree = (files) => (INSTALLED ? [] : files);
+
 for (const rel of [
-  ...(WORKSPACE
-    ? [...collectFiles('src/components'), ...collectFiles('src/styles')]
-    : []),
-  ...collectFiles(PACKAGE_DIR),
+  ...SITE.styles.sources.flatMap((dir) => collectFiles(dir)),
+  ...packageTree(collectFiles(PACKAGE_DIR)),
 ]) {
   if (rel === PRIMITIVES_FILE) continue;
   const source = fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -438,6 +441,7 @@ const ALLOW_ARBITRARY = /style-lint:\s*allow\s+arbitrary\s+--\s*\S/;
 
 function collectMarkup(dir) {
   const files = [];
+  if (!fs.existsSync(path.join(ROOT, dir))) return files;
   for (const entry of fs
     .readdirSync(path.join(ROOT, dir), { withFileTypes: true })
     .sort((a, b) => a.name.localeCompare(b.name))) {
@@ -453,9 +457,8 @@ function collectMarkup(dir) {
 let generatedSuppressed = 0;
 
 for (const rel of [
-  ...(WORKSPACE ? collectMarkup('src') : []),
-  ...collectMarkup(pkg('react')),
-  ...collectMarkup(DOCS_DIR),
+  ...SITE.styles.markup.flatMap((dir) => collectMarkup(dir)),
+  ...packageTree([...collectMarkup(pkg('react')), ...collectMarkup(DOCS_DIR)]),
 ]) {
   const generated = rel.startsWith(GENERATED_DIR);
   const source = fs.readFileSync(path.join(ROOT, rel), 'utf8');

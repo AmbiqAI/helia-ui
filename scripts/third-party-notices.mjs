@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
 /*
@@ -8,11 +9,12 @@
  *   npm run check:notices     exit 1 when one of them is stale
  *
  * Each root generates the notices its own lockfile determines, and only those:
- * the package's when the package is the root, the site's when a workspace root
- * is passed. Two lockfiles resolve the same ranges to different versions, so a
- * root that regenerated the other's file would overwrite a record of a tree it
- * did not install. The site's notices cover the package's runtime dependencies
- * anyway, because the walk follows first-party links into their dependencies.
+ * the package's when the package is the root, the site's when the root it is
+ * pointed at names itself under `notices` in helia-ui.config.json. Two
+ * lockfiles resolve the same ranges to different versions, so a root that
+ * regenerated the other's file would overwrite a record of a tree it did not
+ * install. The site's notices cover the package's runtime dependencies anyway,
+ * because the walk follows first-party links into their dependencies.
  *
  * The walk reads the installed tree in node_modules, following `dependencies`
  * only. Development dependencies are excluded because they do not ship.
@@ -38,15 +40,20 @@ import {
 } from 'node:fs';
 import { dirname, join } from 'node:path';
 
-import { PACKAGE_DIR, ROOT as repoRoot, WORKSPACE } from './lib/scope.mjs';
+import { PACKAGE_DIR, ROOT as repoRoot } from './lib/scope.mjs';
+import { CONFIG_FILE, INSTALLED, SITE } from './lib/site-config.mjs';
 
 /** Bumped whenever the output shape changes, so a rerun is reproducible. */
 const GENERATOR_VERSION = '1.0.0';
 
-const HUB_TARGET = {
-  title: 'HELIA Developer Hub',
-  scope:
-    'the runtime dependencies bundled into the deployed site, plus component source derived from shadcn/ui',
+/*
+ * A site's notices are its own: only the site can say what it is called and
+ * what the file covers, so it says both under `notices` in helia-ui.config.json
+ * and the walk then reads the lockfile beside them.
+ */
+const SITE_TARGET = {
+  title: SITE.notices.title,
+  scope: SITE.notices.scope,
   manifestDir: repoRoot,
   output: join(repoRoot, 'THIRD-PARTY-NOTICES.md'),
 };
@@ -59,7 +66,16 @@ const PACKAGE_TARGET = {
   output: join(repoRoot, PACKAGE_DIR, 'THIRD-PARTY-NOTICES.md'),
 };
 
-const TARGETS = WORKSPACE ? [HUB_TARGET] : [PACKAGE_TARGET];
+if (INSTALLED && SITE.notices.title === '') {
+  console.error(
+    `${CONFIG_FILE} at the scan root declares no 'notices.title' and 'notices.scope', ` +
+      `and an installed copy of @ambiqai/helia-ui generates the notices of the tree ` +
+      `it is pointed at, not its own. Add the file and name the site.`,
+  );
+  process.exit(1);
+}
+
+const TARGETS = SITE.notices.title === '' ? [PACKAGE_TARGET] : [SITE_TARGET];
 
 /**
  * shadcn/ui is not an npm dependency: its parts are copied into the tree and

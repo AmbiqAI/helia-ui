@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
 /*
@@ -14,7 +15,7 @@
  * the notice in front of every visitor on every page.
  */
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { readdir } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 
@@ -24,8 +25,22 @@ import {
   WORKSPACE,
   pkg,
 } from './lib/scope.mjs';
+import { INSTALLED, SITE } from './lib/site-config.mjs';
 
-const ROOTS = WORKSPACE ? ['src', 'scripts', pkg('')] : ['.'];
+/*
+ * Tier 1 is first-party source, so the scan roots are whatever holds it. A
+ * site that keeps its source somewhere other than the whole tree says so under
+ * `spdx.roots`; a package vendored inside a workspace scans that workspace's
+ * source and itself, and anything else scans everything the walk does not
+ * ignore. A declared root that does not exist is skipped, because a site
+ * shares one config across checks that do not all want the same directories.
+ */
+const ROOTS =
+  SITE.spdx.roots.length > 0
+    ? SITE.spdx.roots
+    : WORKSPACE && !INSTALLED
+      ? ['src', 'scripts', pkg('')]
+      : ['.'];
 const EXTENSIONS = ['.astro', '.css', '.mjs', '.ts', '.tsx'];
 
 /**
@@ -45,6 +60,7 @@ const COPYRIGHT_PATTERN = /Copyright \(c\) \d{4}, Ambiq\b/;
 const DIRECTIVE_PATTERN = /^\s*(['"])use [a-z]+\1;?\s*$/;
 
 async function* walk(dir) {
+  if (!existsSync(dir)) return;
   const entries = await readdir(dir, { withFileTypes: true });
   for (const entry of entries) {
     const full = join(dir, entry.name);

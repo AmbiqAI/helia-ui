@@ -10,38 +10,48 @@
  *    page -- Tabs, Dialog, Select, Accordion, Command, Popover, DropdownMenu --
  *    throws at build with "must be used within". The rule is therefore that
  *    `.mdx` and `.astro` never import the React components, by package
- *    specifier or by path: every interactive use is an island in
- *    src/components/islands. See docs/spike-shadcn.md, corner case 5b. The one
- *    exception is a part under the package's astro/ that mounts a whole
- *    component as a leaf island -- a `client:` directive and no children -- for
- *    which see `mountsLeafIsland` below.
+ *    specifier or by path: every interactive use is an island. See
+ *    docs/spike-shadcn.md, corner case 5b. The one exception is a part under
+ *    the package's astro/ that mounts a whole component as a leaf island -- a
+ *    `client:` directive and no children -- for which see `mountsLeafIsland`
+ *    below.
  *
- * 2. packages/helia-ui/react is the `/react` export of the package, and
- *    src/components/islands is what composes it. Neither may reach into
- *    src/data: a component that knows what a demo or a product is cannot
- *    leave this repo. That is the same contract check:boundaries applies to
- *    the Astro parts, applied to the React ones.
+ * 2. react/ is the `/react` export of the package, and a site's islands are
+ *    what compose it. Neither may reach into the site's data: a component that
+ *    knows what a demo or a product is cannot leave the site it was written
+ *    for. That is the same contract check:boundaries applies to the Astro
+ *    parts, applied to the React ones.
+ *
+ * A site names its pages, its islands and its data under `islands` in
+ * helia-ui.config.json; see scripts/lib/site-config.mjs.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 
-import { ROOT, WORKSPACE, isUnder, pkg } from './lib/scope.mjs';
+import { ROOT, isUnder, pkg } from './lib/scope.mjs';
+import { INSTALLED, SITE, requireDeclaration } from './lib/site-config.mjs';
+
+requireDeclaration(SITE, 'islands', ['pages', 'dirs', 'data']);
 
 const UI_DIR = pkg('react');
 const PARTS_DIR = pkg('astro');
-/* The hub's own islands, and the data they must not reach for, are in scope
- * only when the hub is the scan root. */
-const ISLAND_DIR = WORKSPACE ? 'src/components/islands' : null;
-const SITE_DATA_DIR = WORKSPACE ? 'src/data' : null;
+/* A site's pages, its islands and the data they must not reach for are its own
+ * arrangement, so they are in scope exactly as far as the site declares them. */
+const SITE_PAGE_DIRS = SITE.islands.pages;
+const SITE_ISLAND_DIRS = SITE.islands.dirs;
+const SITE_DATA_DIRS = SITE.islands.data;
 /* The package's own docs site is a second consumer with the same two
  * boundaries: its pages are .mdx and its islands live beside them. */
 const DOCS_DIR = pkg('docs/src');
 const DOCS_ISLAND_DIR = `${DOCS_DIR}/islands`;
-/* The same directory seen from outside the workspace, which is how the hub
+/* The same directory seen from outside the package, which is how a site
  * addresses it now that the components ship from the package. */
 const UI_SPECIFIER = '@ambiqai/helia-ui/react/';
+/* An installed copy carries the files pack time fixed and its own repository
+ * checked, so from one of those only the site around it is in scope. */
+const packageTree = (dirs) => (INSTALLED ? [] : dirs);
 
 /* Same specifier patterns as check:boundaries, for the same reason. */
 const FROM_SPECIFIER = /\b(?:import|export)\b[^;]*?\bfrom\s*['"]([^'"]+)['"]/g;
@@ -197,22 +207,19 @@ function mountsLeafIsland(source, specifier) {
 
 /* Rule 1: no page assembles the React layer inline. */
 const pages = [
-  ...(WORKSPACE
-    ? [
-        ...collect('src/content', ['.mdx']),
-        ...collect('src/components', ['.astro']),
-        ...collect('src/pages', ['.astro', '.mdx']),
-      ]
-    : []),
-  ...collect(pkg('astro'), ['.astro']),
-  ...collect(pkg('starlight'), ['.astro']),
-  ...collect(`${DOCS_DIR}/content`, ['.mdx']),
-  ...collect(`${DOCS_DIR}/components`, ['.astro']),
+  ...SITE_PAGE_DIRS.flatMap((dir) => collect(dir, ['.astro', '.mdx'])),
+  ...packageTree([
+    ...collect(pkg('astro'), ['.astro']),
+    ...collect(pkg('starlight'), ['.astro']),
+    ...collect(`${DOCS_DIR}/content`, ['.mdx']),
+    ...collect(`${DOCS_DIR}/components`, ['.astro']),
+  ]),
 ];
 
+const SITE_ISLAND_HOME = SITE_ISLAND_DIRS[0] ?? 'an island directory';
+
 for (const rel of pages) {
-  const home =
-    ISLAND_DIR && !isUnder(rel, DOCS_DIR) ? ISLAND_DIR : DOCS_ISLAND_DIR;
+  const home = isUnder(rel, DOCS_DIR) ? DOCS_ISLAND_DIR : SITE_ISLAND_HOME;
   const raw = fs.readFileSync(path.join(ROOT, rel), 'utf8');
   const source = rel.endsWith('.mdx') ? stripFences(raw) : raw;
   for (const { specifier, line } of specifiers(source)) {
@@ -229,16 +236,18 @@ for (const rel of pages) {
 
 /* Rule 2: the React layer takes its data through props. */
 const reactLayer = [
-  ...collect(UI_DIR, ['.ts', '.tsx']),
-  ...(ISLAND_DIR ? collect(ISLAND_DIR, ['.ts', '.tsx']) : []),
-  ...collect(DOCS_ISLAND_DIR, ['.ts', '.tsx']),
+  ...SITE_ISLAND_DIRS.flatMap((dir) => collect(dir, ['.ts', '.tsx'])),
+  ...packageTree([
+    ...collect(UI_DIR, ['.ts', '.tsx']),
+    ...collect(DOCS_ISLAND_DIR, ['.ts', '.tsx']),
+  ]),
 ];
 
 for (const rel of reactLayer) {
   const source = fs.readFileSync(path.join(ROOT, rel), 'utf8');
   for (const { specifier, line } of specifiers(source)) {
     const target = resolveLocal(rel, specifier);
-    if (SITE_DATA_DIR && target && isUnder(target, SITE_DATA_DIR)) {
+    if (target && SITE_DATA_DIRS.some((dir) => isUnder(target, dir))) {
       failures.push(
         `${rel}:${line} data: imports ${specifier}; the React layer takes data through props`,
       );

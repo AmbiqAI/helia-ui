@@ -11,7 +11,7 @@
     "npm": ">=11"
   },
   "scripts": {
-    "validate": "npm run format:check && npm run check:spdx && npm run check:notices && npm run check:spelling && npm run check:styles && npm run check:boundaries && npm run check:islands && npm run check:shadcn-align && npm run check:astro-props && npm run check:site-theme && npm run check:foundations && npm run check:peers && npm run check:discoverability",
+    "validate": "npm run format:check && npm run check:spdx && npm run check:notices && npm run check:spelling && npm run check:styles && npm run check:boundaries && npm run check:islands && npm run check:shadcn-align && npm run check:astro-props && npm run check:site-theme && npm run check:foundations && npm run check:peers && npm run check:discoverability && npm test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check:spdx": "node scripts/check-spdx.mjs",
@@ -33,6 +33,11 @@
     "test": "node --test \"scripts/**/*.test.mjs\""
   },
   "bin": {
+    "helia-ui-check-spelling": "./scripts/check-spelling.mjs",
+    "helia-ui-check-spdx": "./scripts/check-spdx.mjs",
+    "helia-ui-check-styles": "./scripts/check-style-literals.mjs",
+    "helia-ui-check-islands": "./scripts/check-islands.mjs",
+    "helia-ui-notices": "./scripts/third-party-notices.mjs",
     "helia-ui-pyref": "./scripts/pyref.mjs",
     "helia-ui-doxyref": "./scripts/doxyref.mjs",
     "helia-ui-tsref": "./scripts/tsref.mjs",
@@ -78,6 +83,13 @@
     "scripts/lib/material-icons.json",
     "scripts/serve-dist.mjs",
     "scripts/check-discoverability.mjs",
+    "scripts/check-spelling.mjs",
+    "scripts/check-spdx.mjs",
+    "scripts/check-style-literals.mjs",
+    "scripts/check-islands.mjs",
+    "scripts/third-party-notices.mjs",
+    "scripts/lib/scope.mjs",
+    "scripts/lib/site-config.mjs",
     "react",
     "starlight",
     "*.css",
