@@ -45,6 +45,10 @@ export const WORKSPACE = PACKAGE_DIR !== '';
 /** Build output and installed dependencies live under the walked roots. */
 export const IGNORED_DIRS = new Set([
   '.astro',
+  // Agent tooling puts task worktrees under .claude/worktrees, which are whole
+  // checkouts of this repository. Walking into one reports every finding again
+  // against a path the committing developer does not own.
+  '.claude',
   '.git',
   'dist',
   'node_modules',
