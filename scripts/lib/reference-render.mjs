@@ -342,10 +342,12 @@ const paramRows = (symbol) =>
     name: param.name,
     ...(param.type ? { type: param.type } : {}),
     default:
-      param.default ??
-      (param.direction
-        ? `${REQUIRED} · ${DIRECTIONS[param.direction]}`
-        : REQUIRED),
+      symbol.language === 'c'
+        ? (DIRECTIONS[param.direction] ?? '')
+        : (param.default ??
+          (param.direction
+            ? `${REQUIRED} · ${DIRECTIONS[param.direction]}`
+            : REQUIRED)),
     description: param.description,
   }));
 
@@ -395,7 +397,7 @@ function symbolMdx(symbol, context, level) {
     body.push(
       section(
         'Parameters',
-        `<RefParams\n  caption={${JSON.stringify(`Parameters of ${symbol.name}`)}}\n  density={${JSON.stringify(options.density)}}\n  rows={${JSON.stringify(params)}}\n/>`,
+        `<RefParams\n  caption={${JSON.stringify(`Parameters of ${symbol.name}`)}}\n  defaultLabel={${JSON.stringify(symbol.language === 'c' ? 'Direction' : 'Default')}}\n  density={${JSON.stringify(options.density)}}\n  rows={${JSON.stringify(params)}}\n/>`,
       ),
     );
   }
@@ -559,7 +561,15 @@ export function renderModuleMarkdown(module, { index, options }) {
     const params = paramRows(symbol);
     if (params.length > 0) {
       blocks.push(
-        `**Parameters**\n\n${markdownTable(['Name', 'Type', 'Default', 'Description'], params)}`,
+        `**Parameters**\n\n${markdownTable(
+          [
+            'Name',
+            'Type',
+            symbol.language === 'c' ? 'Direction' : 'Default',
+            'Description',
+          ],
+          params.map((row) => ({ ...row, direction: row.default })),
+        )}`,
       );
     }
     const returns = returnRows(symbol);

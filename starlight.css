@@ -12,7 +12,9 @@
 }
 
 .sl-markdown-content a:not([class]) {
-  text-underline-offset: 0.18em;
+  text-underline-offset: 0.25em;
+  text-decoration-thickness: 1px;
+  text-decoration-skip-ink: auto;
 }
 
 /*
@@ -379,15 +381,19 @@
   font-weight: var(--helia-weight-semibold);
 }
 
-.helia-site-header__hub svg,
-.helia-sidebar-hub svg {
-  fill: none;
-  height: 0.85rem;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.4;
-  width: 0.85rem;
+.helia-hub-icon {
+  display: inline-flex;
+  flex: none;
+  height: 1em;
+  width: 1em;
+}
+
+.helia-hub-icon svg {
+  display: block;
+  fill: currentColor;
+  height: 100%;
+  stroke: none;
+  width: 100%;
 }
 
 /* One link, two places: the bar above the collapse point, the menu below it. */

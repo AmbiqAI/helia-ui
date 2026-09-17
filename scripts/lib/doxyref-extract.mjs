@@ -630,7 +630,7 @@ function functionSignature(node) {
   const tail = qualifiers ? ` ${qualifiers}` : '';
   const oneLine = `${lead}(${args.join(', ')})${tail}`;
   if (oneLine.length <= LINE_LENGTH || args.length === 0) return oneLine;
-  return `${lead}(\n${args.map((arg) => `    ${arg},`).join('\n')}\n)${tail}`;
+  return `${lead}(\n${args.map((arg) => `    ${arg}`).join(',\n')}\n)${tail}`;
 }
 
 function memberSignature(node, kind) {
