@@ -632,7 +632,7 @@ if (process.argv.includes('--check')) {
     );
     writeFileSync(scratch, output);
     console.error(
-      `${OUT_PATH} is out of date.\nGenerated form: ${scratch}\nRun: node packages/helia-ui/scripts/foundations-doc.mjs`,
+      `${OUT_PATH} is out of date.\nGenerated form: ${scratch}\nRun: node scripts/foundations-doc.mjs`,
     );
     process.exit(1);
   }

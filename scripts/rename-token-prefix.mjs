@@ -68,7 +68,6 @@ const SKIP_FILES = new Set([
   'docs/handoff.md',
   'package-lock.json',
   'scripts/rename-token-prefix.mjs',
-  'packages/helia-ui/scripts/rename-token-prefix.mjs',
 ]);
 
 /*
@@ -123,12 +122,8 @@ const RULES = tokensOnly ? TOKEN_RULES : [...TOKEN_RULES, ...CLASS_RULES];
  * own accent), `--sidebar-accent` (namespaced, so no collision) and the
  * `--helia-accent-*` card palette.
  *
- * The generated directory is found rather than named, so the rule holds
- * whether the root is a workspace holding the package or the package itself.
  */
-const REACT_DIR = fs.existsSync(path.join(ROOT, 'packages/helia-ui/react'))
-  ? 'packages/helia-ui/react/'
-  : 'react/';
+const REACT_DIR = 'react/';
 
 const ACCENT_RULE = {
   name: 'shadcn-accent',

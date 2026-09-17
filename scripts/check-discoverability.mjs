@@ -20,11 +20,23 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import process from 'node:process';
+import { parseArgs } from 'node:util';
 
-const args = process.argv.slice(2);
-const rootIndex = args.indexOf('--root');
-const root = resolve(rootIndex === -1 ? '.' : (args[rootIndex + 1] ?? '.'));
-const allowMissing = args.includes('--allow-missing');
+const { values } = parseArgs({
+  options: {
+    root: { type: 'string', default: process.cwd() },
+    'allow-missing': { type: 'boolean', default: false },
+    help: { type: 'boolean', default: false },
+  },
+});
+if (values.help) {
+  console.log(
+    'Usage: helia-ui-check-discoverability [--root <site>] [--allow-missing]',
+  );
+  process.exit(0);
+}
+const root = resolve(values.root);
+const allowMissing = values['allow-missing'];
 
 const dist = join(root, 'dist');
 const indexPath = join(dist, 'content-index.json');

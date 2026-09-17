@@ -3,7 +3,7 @@
 // Copyright (c) 2026, Ambiq
 /*
  * Enforces the component contract in docs/design-system-extraction-plan.md for
- * the components that ship in packages/helia-ui.
+ * the components that ship in this package.
  *
  * Publishable is a matter of location now: every .astro file under the
  * package's astro/ directory is part of the published surface, so there is no
