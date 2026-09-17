@@ -258,7 +258,7 @@ for (const rel of reactLayer) {
 if (failures.length > 0) {
   for (const failure of failures) console.error(failure);
   console.error(
-    `\n${failures.length} island boundary violation${failures.length === 1 ? '' : 's'}. See docs/design-system.md, "React layer".`,
+    `\n${failures.length} island boundary violation${failures.length === 1 ? '' : 's'}. Compose React components inside one island and pass site data through props.`,
   );
   process.exit(1);
 }

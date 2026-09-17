@@ -278,7 +278,7 @@ for (const rel of packageFiles(PACKAGE_DIR)) {
     const target = relativeTo(rel, specifier);
     if (SITE_DIR && isUnder(target, SITE_DIR)) {
       failures.push(
-        `${rel}:${line} site: imports ${specifier}, which resolves to ${target}; the package may not depend on the hub`,
+        `${rel}:${line} site: imports ${specifier}, which resolves to ${target}; the package may not depend on a consuming site`,
       );
     }
   }
@@ -287,7 +287,7 @@ for (const rel of packageFiles(PACKAGE_DIR)) {
 if (failures.length > 0) {
   for (const failure of failures) console.error(failure);
   console.error(
-    `\n${failures.length} boundary violation${failures.length === 1 ? '' : 's'}. See docs/design-system.md, "Composable components".`,
+    `\n${failures.length} boundary violation${failures.length === 1 ? '' : 's'}. Keep shared components independent of consuming sites.`,
   );
   process.exit(1);
 }

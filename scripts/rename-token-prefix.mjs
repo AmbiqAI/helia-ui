@@ -160,7 +160,7 @@ const CN_IMPORT_RULE = {
  * The shadcn/Astro alignment, in the same reapply-after-an-add form as the
  * accent rename above. `shadcn add` writes its own ring, radius, icon and
  * height ladders back into a regenerated file; these rules put them back onto
- * the hub tokens, so the two rendering paths land on the same pixels again
+ * the shared tokens, so the two rendering paths land on the same pixels again
  * without anyone having to remember which class strings were edited.
  *
  * Per file rather than across the directory: `h-9` is a control height on a

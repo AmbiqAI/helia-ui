@@ -4,8 +4,7 @@
 /*
  * Fails when a style block reintroduces a literal that belongs in the token
  * layer. The scales live in semantic.css and the primitives
- * in tokens.css; see docs/design-system.md for the tables and
- * for the escape syntax.
+ * in tokens.css. The escape syntax is documented below.
  *
  * Scope: the package's own stylesheets and parts, plus the <style> blocks of
  * whatever a site declares under `styles` in helia-ui.config.json; see
@@ -429,7 +428,7 @@ for (const rel of [
  *
  * What keeps this honest is the theme bridge, not this exemption. Those class
  * strings resolve against shadcn.css, so a shadcn size or color
- * still comes from a hub token or it does not render at all.
+ * still comes from a shared token or it does not render at all.
  */
 const GENERATED_DIR = `${pkg('react')}/`;
 
