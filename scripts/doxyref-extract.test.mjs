@@ -16,6 +16,7 @@
  */
 
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
@@ -322,22 +323,18 @@ test('a symbol page carries the anchors a link is written against', () => {
   ]);
 });
 
-test('an out parameter reaches the page as a direction on its row', () => {
+test('C parameter rows show direction without implying pointer nullability', () => {
   const { mdx } = rendered.pages[1];
   assert.match(
     mdx,
     /import RefParams from '@ambiqai\/helia-ui\/astro\/RefParams';/,
   );
   assert.match(mdx, /language=\{"c"\}/);
+  assert.match(mdx, /defaultLabel=\{"Direction"\}/);
+  assert.doesNotMatch(mdx, /Required/);
   assert.match(mdx, /kind=\{"macro"\}/);
-  assert.match(
-    mdx,
-    /"name":"output","type":"float \*","default":"Required · out"/,
-  );
-  assert.match(
-    mdx,
-    /"name":"scratch","type":"size_t \*","default":"Required · in, out"/,
-  );
+  assert.match(mdx, /"name":"output","type":"float \*","default":"out"/);
+  assert.match(mdx, /"name":"scratch","type":"size_t \*","default":"in, out"/);
   assert.match(mdx, /deprecated=\{"Use helia_model_invoke\(\)/);
 });
 
@@ -432,4 +429,37 @@ test('a group with no brief still carries a description frontmatter', () => {
   /* The group that does brief itself keeps its own words. */
   const conv = grouped.pages.find((page) => page.path.includes('nnconv'));
   assert.match(conv.mdx, /^description: "Convolution kernels\."$/m);
+});
+
+test('wrapped C declarations separate parameters without a trailing comma', () => {
+  const name =
+    'helia_model_load_with_a_long_name_that_requires_a_wrapped_signature';
+  const compounds = new Map(
+    ['helia__sample_8h', 'structhelia__config__t'].map((id) => [
+      id,
+      readFileSync(join(FIXTURE, `${id}.xml`), 'utf8').replaceAll(
+        'helia_model_load',
+        name,
+      ),
+    ]),
+  );
+  const input = parseDoxygenXml({
+    index: readFileSync(join(FIXTURE, 'index.xml'), 'utf8').replaceAll(
+      'helia_model_load',
+      name,
+    ),
+    compounds,
+  });
+  const result = extractModel(input);
+  const symbols = (module) => [
+    ...module.symbols,
+    ...module.submodules.flatMap(symbols),
+  ];
+  const fn = result.model.modules
+    .flatMap(symbols)
+    .find((symbol) => symbol.name === name);
+  assert.equal(
+    fn.signature,
+    `helia_status_t ${name}(\n    const helia_config_t *config,\n    helia_model_t **model\n)`,
+  );
 });

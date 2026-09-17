@@ -84,13 +84,11 @@ const { items, label, layout = 'grid', class: className } = Astro.props;
     }
   }
 
-  /* The kind column takes what is left rather than its content width, so an
-     item never pushes its own cell wider than the column it sits in. */
   .helia-ref-members li {
     display: grid;
     column-gap: var(--helia-space-2);
     row-gap: var(--helia-space-1);
-    grid-template-columns: max-content minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) max-content;
     margin: 0;
     min-width: 0;
   }
@@ -117,6 +115,7 @@ const { items, label, layout = 'grid', class: className } = Astro.props;
 
   .helia-ref-members__kind {
     align-self: baseline;
+    white-space: nowrap;
     color: var(--sl-color-gray-3);
     font-size: var(--helia-text-meta);
     letter-spacing: var(--helia-tracking-caps);

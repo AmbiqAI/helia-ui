@@ -342,7 +342,8 @@ const CODE_MARKER_OVERRIDES: NonNullable<CodeStyleOverrides['textMarkers']> = {
  * flat toolbar the parts draw rather than as a VS Code tab.
  */
 const CODE_FRAME_OVERRIDES: NonNullable<CodeStyleOverrides['frames']> = {
-  editorActiveTabBackground: 'var(--helia-surface-card-muted)',
+  // The filename must not cover the separator painted by the tab bar.
+  editorActiveTabBackground: 'transparent',
   editorActiveTabForeground: 'var(--helia-ink-primary)',
   editorActiveTabIndicatorBottomColor: 'transparent',
   editorActiveTabIndicatorHeight: '0px',

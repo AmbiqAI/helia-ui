@@ -23,6 +23,8 @@
  * component is installed under the name, which here is this one, and a
  * component that renders itself renders until the stack runs out.
  */
+import { icon } from '@fortawesome/fontawesome-svg-core';
+import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import Default from '@astrojs/starlight/components/Sidebar.astro';
 import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
 import config from 'virtual:helia-ui/starlight-config';
@@ -98,9 +100,11 @@ const hubParts = hub ? hubLabelParts(hub.label) : [];
           part.text
         ),
       )}
-      <svg viewBox="0 0 16 16" aria-hidden="true">
-        <path d="M6 3.5h6.5V10M12.5 3.5 7 9M12 9.5v3h-9v-9h3" />
-      </svg>
+      <span
+        class="helia-hub-icon"
+        aria-hidden="true"
+        set:html={icon(faArrowUpRightFromSquare).html.join('')}
+      />
     </a>
   )
 }
