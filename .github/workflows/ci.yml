@@ -11,6 +11,10 @@ on:
     branches:
       - main
   workflow_dispatch:
+  # Several sites depend on this package, so a break the ecosystem introduces
+  # between pushes should not wait for the next release to surface.
+  schedule:
+    - cron: '23 8 * * 1'
 
 permissions:
   contents: read
@@ -144,3 +148,32 @@ jobs:
 
       - name: Verify the installed package
         run: node .github/scripts/verify-package.mjs --consumer "${RUNNER_TEMP}/consumer"
+
+  security:
+    name: Dependency audit
+    # Advisories land between pushes, so this answers the schedule rather than
+    # gating a commit that was clean when it was written.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            docs/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit what a consumer inherits
+        run: npm run audit:production
+
+      - name: Audit the gallery's own dependencies
+        run: npm audit --prefix docs --audit-level=high

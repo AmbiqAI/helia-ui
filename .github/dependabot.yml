@@ -1,0 +1,32 @@
+# The package and its gallery carry separate lockfiles on purpose: docs/ is a
+# standalone project rather than a workspace, so a `workspaces` field here would
+# follow the package into a consumer's dependency tree. Each therefore needs its
+# own entry.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+      timezone: America/Chicago
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: npm
+    directory: /docs
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:15'
+      timezone: America/Chicago
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:30'
+      timezone: America/Chicago
+    open-pull-requests-limit: 5
