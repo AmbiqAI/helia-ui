@@ -79,6 +79,7 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 
 - Preserve C++ class and function template declarations, including defaults, in
   generated API signatures.
+- Preserve pure virtual method markers and class inheritance declarations.
 - Use stable Doxygen member identities for C++ overloads, without allowing
   excluded private members to change public anchors. C identities are unchanged.
 - Diagnose incomplete template declarators in Doxygen XML and exercise real

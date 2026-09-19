@@ -577,6 +577,22 @@ test('C++ pointer template parameters put the name inside the declarator', () =>
   ]);
 });
 
+test('C++ abstract methods and base classes retain their declaration contracts', () => {
+  const abstract = cppSymbols.find((symbol) => symbol.name === 'Abstract');
+  assert.equal(
+    abstract.members.find((symbol) => symbol.name === 'Execute').signature,
+    'virtual int runtime::Abstract::Execute(int count) const = 0',
+  );
+  assert.equal(
+    cppSymbols.find((symbol) => symbol.name === 'Derived').signature,
+    'class Derived : public virtual runtime::Abstract, protected runtime::Utility, private runtime::Detail',
+  );
+  assert.equal(
+    cppSymbols.find((symbol) => symbol.name === 'DerivedResolver').signature,
+    'class DerivedResolver : public runtime::Resolver< 4, float >',
+  );
+});
+
 test('private and package overloads never change public anchors', () => {
   const publicInput = resolver.members.find(
     (symbol) => symbol.name === 'input',

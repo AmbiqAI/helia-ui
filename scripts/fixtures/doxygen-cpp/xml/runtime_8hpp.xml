@@ -5,6 +5,11 @@
     <innerclass refid="classruntime_1_1_resolver" prot="public">runtime::Resolver</innerclass>
     <innerclass refid="classruntime_1_1_callback" prot="public">runtime::Callback</innerclass>
     <innerclass refid="classruntime_1_1_array_holder" prot="public">runtime::ArrayHolder</innerclass>
+    <innerclass refid="classruntime_1_1_abstract" prot="public">runtime::Abstract</innerclass>
+    <innerclass refid="classruntime_1_1_utility" prot="public">runtime::Utility</innerclass>
+    <innerclass refid="classruntime_1_1_detail" prot="public">runtime::Detail</innerclass>
+    <innerclass refid="classruntime_1_1_derived" prot="public">runtime::Derived</innerclass>
+    <innerclass refid="classruntime_1_1_derived_resolver" prot="public">runtime::DerivedResolver</innerclass>
     <innernamespace refid="namespaceruntime">runtime</innernamespace>
     <briefdescription>
     </briefdescription>

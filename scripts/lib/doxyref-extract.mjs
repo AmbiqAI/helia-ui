@@ -649,6 +649,7 @@ function functionSignature(node) {
   const qualifiers = [
     node.attrs.const === 'yes' ? 'const' : '',
     typeText(child(node, 'exceptions')),
+    node.attrs.virt === 'pure-virtual' ? '= 0' : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -837,6 +838,16 @@ function compoundSymbol(compound, context, nested) {
   const { description, summary, fields } = document(def, inner);
   const kind = SYMBOL_KINDS[compound.kind];
   const short = name.split('::').pop();
+  const bases = children(def, 'basecompoundref').map((base) =>
+    [
+      base.attrs.prot,
+      base.attrs.virt === 'virtual' ? 'virtual' : '',
+      typeText(base),
+    ]
+      .filter(Boolean)
+      .join(' '),
+  );
+  const inheritance = bases.length ? ` : ${bases.join(', ')}` : '';
 
   return withOptional(
     {
@@ -844,7 +855,7 @@ function compoundSymbol(compound, context, nested) {
       name: short,
       kind,
       language: context.language,
-      signature: `${templateDeclaration(def, inner)}${compound.kind} ${short}`,
+      signature: `${templateDeclaration(def, inner)}${compound.kind} ${short}${inheritance}`,
       summary,
       description,
       params: [],

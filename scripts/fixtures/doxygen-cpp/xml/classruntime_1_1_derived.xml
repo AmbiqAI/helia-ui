@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="classruntime_1_1_derived" kind="class" language="C++" prot="public">
+    <compoundname>runtime::Derived</compoundname>
+    <basecompoundref refid="classruntime_1_1_abstract" prot="public" virt="virtual">runtime::Abstract</basecompoundref>
+    <basecompoundref refid="classruntime_1_1_utility" prot="protected" virt="non-virtual">runtime::Utility</basecompoundref>
+    <basecompoundref refid="classruntime_1_1_detail" prot="private" virt="non-virtual">runtime::Detail</basecompoundref>
+    <includes refid="runtime_8hpp" local="no">runtime.hpp</includes>
+    <briefdescription>
+<para>Public, protected and private inheritance retain their access semantics. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>runtime::Abstract</label>
+        <link refid="classruntime_1_1_abstract"/>
+      </node>
+      <node id="1">
+        <label>runtime::Derived</label>
+        <link refid="classruntime_1_1_derived"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+        <childnode refid="3" relation="protected-inheritance">
+        </childnode>
+        <childnode refid="4" relation="private-inheritance">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>runtime::Detail</label>
+        <link refid="classruntime_1_1_detail"/>
+      </node>
+      <node id="3">
+        <label>runtime::Utility</label>
+        <link refid="classruntime_1_1_utility"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>runtime::Abstract</label>
+        <link refid="classruntime_1_1_abstract"/>
+      </node>
+      <node id="1">
+        <label>runtime::Derived</label>
+        <link refid="classruntime_1_1_derived"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+        <childnode refid="3" relation="protected-inheritance">
+        </childnode>
+        <childnode refid="4" relation="private-inheritance">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>runtime::Detail</label>
+        <link refid="classruntime_1_1_detail"/>
+      </node>
+      <node id="3">
+        <label>runtime::Utility</label>
+        <link refid="classruntime_1_1_utility"/>
+      </node>
+    </collaborationgraph>
+    <location file="src/runtime.hpp" line="45" column="1" bodyfile="src/runtime.hpp" bodystart="45" bodyend="45"/>
+    <listofallmembers>
+      <member refid="classruntime_1_1_abstract_1a3dc9cbba9f4448c9941f2bc71c1ea7f6" prot="public" virt="pure-virtual"><scope>runtime::Derived</scope><name>Execute</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

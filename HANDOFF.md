@@ -15,3 +15,5 @@ Verified: full package validation (184 unit tests), gallery build (42 pages), an
 Next: inspect diff and tests independently. Draft PR preparation in progress; no release or consumer dependency change.
 
 Independent review corrections: pointer template parameter names are placed inside declarators; incomplete array/reference declarators omitted by Doxygen emit a warning. Shared visibility filtering keeps private/package overloads out of anchor identity decisions. Real fixture covers private overload extraction and an array-bound omission diagnostic. Targeted31 tests and full186 tests pass after these corrections. Prior gallery/browser run preceded these extractor-only changes.
+
+PR#113 is published for issue#112. Independent consumer review additionally found omitted pure-virtual markers and base declarations; both now have real fixture coverage. 33 targeted tests pass; full validation and hosted CI follow. No merge/release authorized yet.

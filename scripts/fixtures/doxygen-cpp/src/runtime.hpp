@@ -31,4 +31,18 @@ class Callback {};
 /// Array reference template parameter.
 template <int (&Array)[3]>
 class ArrayHolder {};
+/// Abstract execution contract.
+class Abstract {
+ public:
+  /// Return the execution status.
+  virtual int Execute(int count) const = 0;
+};
+/// Protected implementation extension.
+class Utility {};
+/// Private implementation dependency.
+class Detail {};
+/// Public, protected and private inheritance retain their access semantics.
+class Derived : public virtual Abstract, protected Utility, private Detail {};
+/// Fixed resolver specialization.
+class DerivedResolver : public Resolver<4, float> {};
 }
