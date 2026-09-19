@@ -190,6 +190,6 @@
     "recharts": "^3.8.0",
     "sonner": "^2.0.8",
     "tailwindcss": "^4.3.3",
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   }
 }
