@@ -606,6 +606,31 @@ function declaredParams(node) {
   });
 }
 
+function templateDeclaration(node, context) {
+  const params = declaredParams(child(node, 'templateparamlist') ?? {});
+  if (params.length === 0) return '';
+  return `template <${params
+    .map((param) => {
+      let declaration = [param.type, param.name].filter(Boolean).join(' ');
+      const indirect = /\(([^()]*(?:\*|&)[^()]*)\)/;
+      const pointerMatch = indirect.exec(param.type ?? '');
+      if (param.name && pointerMatch) {
+        declaration = param.type.replace(
+          indirect,
+          (_, pointer) =>
+            `(${pointer}${/\w$/.test(pointer) ? ' ' : ''}${param.name})`,
+        );
+        if (pointerMatch.index + pointerMatch[0].length === param.type.length) {
+          context.warn(
+            `template parameter "${param.name}" has an incomplete pointer/reference declarator in Doxygen XML; consult its source`,
+          );
+        }
+      }
+      return declaration + (param.default ? ` = ${param.default}` : '');
+    })
+    .join(', ')}>\n`;
+}
+
 /**
  * A function declaration, wrapped one parameter per line when the single-line
  * form would run past the line length.
@@ -633,13 +658,13 @@ function functionSignature(node) {
   return `${lead}(\n${args.map((arg) => `    ${arg}`).join(',\n')}\n)${tail}`;
 }
 
-function memberSignature(node, kind) {
+function memberSignature(node, kind, context) {
   const name = typeText(child(node, 'name'));
   const type = typeText(child(node, 'type'));
   const initializer = typeText(child(node, 'initializer'));
   switch (kind) {
     case 'function':
-      return functionSignature(node);
+      return templateDeclaration(node, context) + functionSignature(node);
     case 'macro': {
       const params = children(node, 'param').map((param) =>
         typeText(child(param, 'defname')),
@@ -715,6 +740,12 @@ function enumValues(node, id, context, scoped) {
   });
 }
 
+function memberBaseId(node, scope) {
+  const qualified = typeText(child(node, 'qualifiedname'));
+  const name = typeText(child(node, 'name'));
+  return qualified || (scope ? `${scope}::${name}` : name);
+}
+
 /** One `memberdef` as a symbol, with its documented parameters merged in. */
 function memberSymbol(node, context, scope) {
   const kind = MEMBER_KINDS[node.attrs.kind];
@@ -725,8 +756,10 @@ function memberSymbol(node, context, scope) {
   const name = typeText(child(node, 'name'));
   if (!name) return null;
 
-  const qualified = typeText(child(node, 'qualifiedname'));
-  const id = qualified || (scope ? `${scope}::${name}` : name);
+  const baseId = memberBaseId(node, scope);
+  const id = context.overloads.has(baseId)
+    ? `${baseId}--${node.attrs.id}`
+    : baseId;
   const inner = context.scoped(id);
   const { description, summary, fields } = document(node, inner);
 
@@ -751,7 +784,7 @@ function memberSymbol(node, context, scope) {
       name,
       kind: kind === 'function' && scope ? 'method' : kind,
       language: context.language,
-      signature: memberSignature(node, kind),
+      signature: memberSignature(node, kind, inner),
       summary,
       description,
       params: kind === 'function' || kind === 'macro' ? params : [],
@@ -773,19 +806,25 @@ function memberSymbol(node, context, scope) {
   );
 }
 
-/** Every `memberdef` of a compound, in the order the source declares them. */
-function compoundMembers(def, context, scope) {
-  const out = [];
+function* visibleMembers(def) {
   for (const section of children(def, 'sectiondef')) {
     /* Private and package members are implementation, not API surface. The
      * Doxyfile decides what is emitted at all; this only declines to publish
      * what Doxygen itself marked as not part of the interface. */
     if (/private|package/.test(section.attrs.kind ?? '')) continue;
     for (const member of children(section, 'memberdef')) {
-      if (member.attrs.prot === 'private') continue;
-      const symbol = memberSymbol(member, context, scope);
-      if (symbol) out.push({ symbol, line: symbol.source.line });
+      if (/private|package/.test(member.attrs.prot ?? '')) continue;
+      yield member;
     }
+  }
+}
+
+/** Every public or protected member, in the order the source declares it. */
+function compoundMembers(def, context, scope) {
+  const out = [];
+  for (const member of visibleMembers(def)) {
+    const symbol = memberSymbol(member, context, scope);
+    if (symbol) out.push({ symbol, line: symbol.source.line });
   }
   return out.sort((a, b) => a.line - b.line).map((entry) => entry.symbol);
 }
@@ -805,7 +844,7 @@ function compoundSymbol(compound, context, nested) {
       name: short,
       kind,
       language: context.language,
-      signature: `${compound.kind} ${short}`,
+      signature: `${templateDeclaration(def, inner)}${compound.kind} ${short}`,
       summary,
       description,
       params: [],
@@ -898,6 +937,24 @@ export function extractModel(dump, options = DEFAULTS, meta = {}) {
   const resolved = { ...DEFAULTS, ...options };
   const warnings = [];
   const language = resolved.language || detectLanguage(dump.compounds);
+  const declarations = new Map();
+  if (language === 'cpp') {
+    for (const compound of dump.compounds) {
+      const scope = Object.hasOwn(SYMBOL_KINDS, compound.kind)
+        ? typeText(child(compound.def, 'compoundname'))
+        : undefined;
+      for (const member of visibleMembers(compound.def)) {
+        if (member.attrs.kind !== 'function') continue;
+        const name = memberBaseId(member, scope);
+        if (!declarations.has(name)) declarations.set(name, new Set());
+        declarations.get(name).add(member.attrs.id);
+      }
+    }
+  }
+  // Doxygen identities distinguish overloads independently of declaration order.
+  const overloads = new Set(
+    [...declarations].filter(([, ids]) => ids.size > 1).map(([name]) => name),
+  );
   /* A warning names the symbol it came from, so every context carries the
    * factory that makes the next one: a member reads its own documentation and
    * reports against its own id rather than against whichever page it was
@@ -905,6 +962,7 @@ export function extractModel(dump, options = DEFAULTS, meta = {}) {
   const scoped = (subject) => ({
     options: resolved,
     language,
+    overloads,
     scoped,
     warn: (message) => warnings.push(`${subject}: ${message}`),
   });

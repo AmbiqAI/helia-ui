@@ -75,6 +75,17 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 }
 ```
 
+## What changed in 0.1.0-alpha.14
+
+- Preserve C++ class and function template declarations, including defaults, in
+  generated API signatures.
+- Use stable Doxygen member identities for C++ overloads, without allowing
+  excluded private members to change public anchors. C identities are unchanged.
+- Diagnose incomplete template declarators in Doxygen XML and exercise real
+  C++ fixtures, rendered signatures and overload links.
+
+Refs #112.
+
 ## What changed in 0.1.0-alpha.13
 
 - Keep generated card contracts inside the package gallery; props generation no
