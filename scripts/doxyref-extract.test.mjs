@@ -463,3 +463,174 @@ test('wrapped C declarations separate parameters without a trailing comma', () =
     `helia_status_t ${name}(\n    const helia_config_t *config,\n    helia_model_t **model\n)`,
   );
 });
+
+const cppDump = await readDoxygenXml(join(FIXTURE, '../../doxygen-cpp/xml'));
+const cppOptions = {
+  sourceUrl: 'https://example.test/blob/abc123/{path}#L{line}',
+};
+const cpp = extractModel(cppDump, cppOptions);
+const cppSymbols = cpp.model.modules[0].submodules[0].symbols;
+const resolver = cppSymbols.find((symbol) => symbol.name === 'Resolver');
+
+test('C++ templates retain class, member and free-function parameters and defaults', () => {
+  assert.equal(
+    resolver.signature,
+    'template <unsigned Capacity, typename Value = int>\nclass Resolver',
+  );
+  assert.match(
+    resolver.members.find((symbol) => symbol.name === 'input').signature,
+    /^template <typename T>\nT \* .*input\(int index\)$/,
+  );
+  assert.equal(
+    cppSymbols.find((symbol) => symbol.name === 'read').signature,
+    'template <typename T = float>\nT runtime::read(const T *data)',
+  );
+  assert.equal(
+    resolver.members.some((symbol) => symbol.name === 'hidden'),
+    false,
+  );
+});
+
+test('C++ constructors and three-way overloads have unique stable identities', () => {
+  assert.equal(
+    cpp.warnings.some((warning) => warning.includes('duplicate id')),
+    false,
+  );
+  assert.equal(
+    resolver.members.filter((symbol) => symbol.name === 'Resolver').length,
+    2,
+  );
+  assert.equal(
+    resolver.members.filter((symbol) => symbol.name === 'Find').length,
+    3,
+  );
+  assert.equal(
+    new Set(resolver.members.map((symbol) => symbol.id)).size,
+    resolver.members.length,
+  );
+  const reversed = structuredClone(cppDump);
+  reversed.compounds.reverse();
+  for (const compound of reversed.compounds) {
+    for (const node of compound.def.children) {
+      if (node?.name === 'sectiondef') node.children.reverse();
+    }
+  }
+  const again = extractModel(reversed, cppOptions);
+  const againResolver = again.model.modules[0].submodules[0].symbols.find(
+    (symbol) => symbol.name === 'Resolver',
+  );
+  assert.deepEqual(
+    againResolver.members.map((symbol) => [symbol.signature, symbol.id]).sort(),
+    resolver.members.map((symbol) => [symbol.signature, symbol.id]).sort(),
+  );
+});
+
+test('C++ rendered overload anchors retain ownership contracts and exact source links', () => {
+  assert.deepEqual(validateReferenceModel(cpp.model), cpp.model);
+  const result = renderReference(cpp.model, options);
+  const page = result.pages.find((page) =>
+    page.mdx.includes('Fixed-capacity resolver'),
+  );
+  assert.ok(page);
+  for (const symbol of resolver.members) {
+    assert.ok(page.mdx.includes(symbol.id), symbol.id);
+    assert.ok(page.mdx.includes(symbol.source.url), symbol.source.url);
+  }
+  assert.match(page.mdx, /caller retains ownership of the borrowed arena/);
+  assert.match(page.mdx, /caller retains ownership of the allocator/);
+});
+
+test('C++ overload identities retain class scope without qualifiedname nodes', () => {
+  const input = structuredClone(cppDump);
+  for (const compound of input.compounds) {
+    for (const section of compound.def.children) {
+      if (section?.name !== 'sectiondef') continue;
+      for (const member of section.children) {
+        if (member?.name !== 'memberdef') continue;
+        member.children = member.children.filter(
+          (node) => node?.name !== 'qualifiedname',
+        );
+      }
+    }
+  }
+  const result = extractModel(input, cppOptions);
+  const extracted = result.model.modules[0].submodules[0].symbols.find(
+    (symbol) => symbol.name === 'Resolver',
+  );
+  assert.deepEqual(
+    extracted.members.map((symbol) => symbol.id),
+    resolver.members.map((symbol) => symbol.id),
+  );
+  assert.equal(
+    result.warnings.some((warning) => warning.includes('duplicate id')),
+    false,
+  );
+});
+
+test('C++ pointer template parameters put the name inside the declarator', () => {
+  assert.equal(
+    cppSymbols.find((symbol) => symbol.name === 'Callback').signature,
+    'template <int(*Fn)(int)>\nclass Callback',
+  );
+  assert.deepEqual(cpp.warnings, [
+    'runtime::ArrayHolder: template parameter "Array" has an incomplete pointer/reference declarator in Doxygen XML; consult its source',
+  ]);
+});
+
+test('C++ abstract methods and base classes retain their declaration contracts', () => {
+  const abstract = cppSymbols.find((symbol) => symbol.name === 'Abstract');
+  assert.equal(
+    abstract.members.find((symbol) => symbol.name === 'Execute').signature,
+    'virtual int runtime::Abstract::Execute(int count) const = 0',
+  );
+  assert.equal(
+    cppSymbols.find((symbol) => symbol.name === 'Derived').signature,
+    'class Derived : public virtual runtime::Abstract, protected runtime::Utility, private runtime::Detail',
+  );
+  assert.equal(
+    cppSymbols.find((symbol) => symbol.name === 'DerivedResolver').signature,
+    'class DerivedResolver : public runtime::Resolver< 4, float >',
+  );
+});
+
+test('private and package overloads never change public anchors', () => {
+  const publicInput = resolver.members.find(
+    (symbol) => symbol.name === 'input',
+  );
+  assert.equal(publicInput.id, 'runtime::Resolver::input');
+  for (const visibility of ['absent', 'package']) {
+    const input = structuredClone(cppDump);
+    const def = input.compounds.find(
+      (compound) =>
+        compound.kind === 'class' &&
+        compound.def.children.some(
+          (node) =>
+            node?.name === 'compoundname' &&
+            textOf(node) === 'runtime::Resolver',
+        ),
+    ).def;
+    if (visibility === 'absent') {
+      def.children = def.children.filter(
+        (node) => !String(node?.attrs?.kind).includes('private'),
+      );
+    } else {
+      for (const node of def.children) {
+        if (String(node?.attrs?.kind).includes('private')) {
+          node.attrs.kind = node.attrs.kind.replace('private', 'package');
+          for (const member of node.children) {
+            if (member?.attrs?.prot === 'private')
+              member.attrs.prot = 'package';
+          }
+        }
+      }
+    }
+    const result = extractModel(input, cppOptions);
+    const publicResolver = result.model.modules[0].submodules[0].symbols.find(
+      (symbol) => symbol.name === 'Resolver',
+    );
+    assert.deepEqual(
+      publicResolver.members.map((symbol) => symbol.id),
+      resolver.members.map((symbol) => symbol.id),
+    );
+  }
+});

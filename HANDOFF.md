@@ -1,9 +1,19 @@
-# Standalone tooling cleanup
+# C++ reference extraction
 
-Goal: remove remaining Developer Hub filesystem assumptions and provide supported consumer tooling. Tracked by AmbiqAI/helia-developer-hub#30 and AmbiqAI/helia-ui#38.
+Goal: preserve C++ templates and stable overload anchors for heliaRT API reference. Existing issue: AmbiqAI/helia-ui#59. Owner approved issue and draft PR publication. Specific issue: AmbiqAI/helia-ui#112. Merge/release remains pending final review.
 
-Branch: codex/standalone-tooling, based on alpha.12 at 8d217e4. Generated card tables now live in the gallery reference. Props generation ignores neighboring repositories and resolves formatter plugins from its own dependencies. Discoverability has a public CLI; installed-package validation exercises valid and broken artifacts. Retired monorepo paths and stale environment guidance are removed. Token migration excludes its own script and discovers React sources relative to any containing checkout; regression covers two successive runs.
+Worktree: /Users/adam.page/.codex/worktrees/helia-ui-cpp-reference
+Branch: codex/cpp-reference-contracts
+Base: 6dd46f2 main. Original checkout left unchanged.
 
-Verified: package validation with 181 passing unit tests, gallery build with 42 pages, 148 passing browser tests, and a scratch tarball consumer checking 139 files and 11 commands. Isolation regression creates a neighboring design document and verifies generation/checking leave it untouched.
+Implemented locally: template declarations for class and function signatures; C++ overloads identified from distinct Doxygen member IDs, with every overload using its Doxygen identity rather than source-order collision repair. Ordinary C identities unchanged.
 
-Next: publish reviewed changes through a PR, prepare/release alpha.13 using this repository's workflows, then update heliaCORE's tag and lockfile and verify its clean install/rendering. Existing tags remain immutable. Developer Hub's consumer dependency update belongs to its owner; do not restore subtree mirroring.
+Tests: real Doxygen1.17.0 C++ fixture includes two constructors, three Find overloads, class/defaulted templates, member/free templates, ownership prose and private-member exclusion. All 31 extractor tests pass. Local shared extractor consumes existing RT trial XML with no warnings; class and typed accessor templates retained. RT dependency pin/node_modules untouched. Ordinary // ownership comments remain an input-documentation concern, not solved here.
+
+Verified: full package validation (184 unit tests), gallery build (42 pages), and 148 browser tests passed. Browser suite used a temporary config on port 4391 because RT uses the default port; temporary file removed. Packed package installed into isolated scratch consumer and CLI generated four RT trial pages plus seven artifacts without warnings.
+
+Next: inspect diff and tests independently. Draft PR preparation in progress; no release or consumer dependency change.
+
+Independent review corrections: pointer template parameter names are placed inside declarators; incomplete array/reference declarators omitted by Doxygen emit a warning. Shared visibility filtering keeps private/package overloads out of anchor identity decisions. Real fixture covers private overload extraction and an array-bound omission diagnostic. Targeted31 tests and full186 tests pass after these corrections. Prior gallery/browser run preceded these extractor-only changes.
+
+PR#113 is published for issue#112. Independent consumer review additionally found omitted pure-virtual markers and base declarations; both now have real fixture coverage. 33 targeted tests pass; full validation and hosted CI follow. No merge/release authorized yet.

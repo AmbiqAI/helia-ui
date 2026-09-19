@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="namespaceruntime" kind="namespace" language="C++">
+    <compoundname>runtime</compoundname>
+    <innerclass refid="classruntime_1_1_resolver" prot="public">runtime::Resolver</innerclass>
+    <innerclass refid="classruntime_1_1_callback" prot="public">runtime::Callback</innerclass>
+    <innerclass refid="classruntime_1_1_array_holder" prot="public">runtime::ArrayHolder</innerclass>
+    <innerclass refid="classruntime_1_1_abstract" prot="public">runtime::Abstract</innerclass>
+    <innerclass refid="classruntime_1_1_utility" prot="public">runtime::Utility</innerclass>
+    <innerclass refid="classruntime_1_1_detail" prot="public">runtime::Detail</innerclass>
+    <innerclass refid="classruntime_1_1_derived" prot="public">runtime::Derived</innerclass>
+    <innerclass refid="classruntime_1_1_derived_resolver" prot="public">runtime::DerivedResolver</innerclass>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="namespaceruntime_1ab2d066f24f03f94c47567834f40aff49" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>typename T</type>
+            <defval>float</defval>
+          </param>
+        </templateparamlist>
+        <type>T</type>
+        <definition>T runtime::read</definition>
+        <argsstring>(const T *data)</argsstring>
+        <name>read</name>
+        <qualifiedname>runtime::read</qualifiedname>
+        <param>
+          <type>const T *</type>
+          <declname>data</declname>
+        </param>
+        <briefdescription>
+<para>Read a scalar value. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/runtime.hpp" line="27" column="3" declfile="src/runtime.hpp" declline="27" declcolumn="3"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/runtime.hpp" line="3" column="1"/>
+  </compounddef>
+</doxygen>
