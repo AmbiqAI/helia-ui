@@ -95,6 +95,43 @@ test('a multi-line import goes with its specifiers', () => {
   assert.equal(stripped.trim(), 'Prose.');
 });
 
+/*
+ * An import ends at its specifier, not at a bracket, so the clause may sit on
+ * a line of its own and the statement is judged on the whole of itself.
+ */
+test('a multi-line import goes whole, with the clause wherever it sits', () => {
+  const split = [
+    'import {',
+    '  CardGrid,',
+    '  LinkCard,',
+    '}',
+    "from '@ambiqai/helia-ui/astro';",
+    'Prose.',
+  ].join('\n');
+
+  assert.equal(stripEsm(split).trim(), 'Prose.');
+});
+
+/* A brace is not a binding. Prose that opens with the word and happens to
+   close a brace later is a sentence either side of it. */
+test('prose that opens a brace after the word import is kept whole', () => {
+  const unquoted = [
+    'import { the values',
+    '} and the sentence carries on.',
+    '',
+    'The paragraph after it.',
+  ].join('\n');
+  const quoted = [
+    'import { the values',
+    "} and then the site's own prose follows.",
+    '',
+    'The paragraph after it.',
+  ].join('\n');
+
+  assert.equal(stripEsm(unquoted), unquoted);
+  assert.equal(stripEsm(quoted), quoted);
+});
+
 /* A sentence is not a statement. A line that opens with one of the words
    keeps itself, and so do the lines after it. */
 test('prose that opens with the word import is kept', () => {

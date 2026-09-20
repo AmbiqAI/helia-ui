@@ -324,6 +324,9 @@ const IMPORT_WHOLE = new RegExp(
   String.raw`^\s*import\s*(?:['"][^'"]*['"]|(?:type\s+)?${IMPORT_BINDING}(?:\s*,\s*${IMPORT_BINDING})?\s+from\s*['"][^'"]*['"])\s*;?\s*$`,
 );
 
+/* The specifier of an import is the only quoted thing in it. */
+const QUOTED = /['"]/;
+
 const EXPORT_LINE = /^\s*export\b/;
 /*
  * The shapes a real export statement takes: something is named and then
@@ -356,21 +359,35 @@ const EXPORT_SHAPES = [
 export function stripEsm(text: string): string {
   return withoutInlineCode(text, (masked) => {
     const kept: string[] = [];
-    /* The lines of a statement that has not closed yet. A statement closes
-       its own brackets, so a run that ends with one still open never held a
-       statement, and its lines go back rather than being dropped on a guess
-       that would take the rest of the page with them. */
+    /* The lines of a statement that has not finished. Nothing is dropped
+       until the whole of it is in hand and reads as a statement; a run that
+       ends with one still open never held a statement, and its lines go back
+       rather than being dropped on a guess that would take the rest of the
+       page with them. */
     let pending: string[] = [];
-    let open: EsmScan | null = null;
+    /* What the open statement is waiting for: a module specifier, or the
+       bracket that closes a body. */
+    let open: { waits: 'specifier' | 'brackets'; scan: EsmScan } | null = null;
+
+    const settle = (dropped: boolean) => {
+      if (!dropped) kept.push(...pending);
+      open = null;
+      pending = [];
+    };
 
     for (const line of masked.split('\n')) {
       if (open) {
         pending.push(line);
-        open = scanEsm(line, open);
-        if (open.depth === 0 && !open.template) {
-          open = null;
-          pending = [];
+        /* An import ends at its specifier, which is the only quoted thing in
+           it, rather than at a bracket: the `from` clause may sit on a line
+           of its own, past the brace that closed the bindings. Until then
+           there is nothing to judge the statement on. */
+        if (open.waits === 'specifier') {
+          if (QUOTED.test(line)) settle(IMPORT_WHOLE.test(pending.join('\n')));
+          continue;
         }
+        open.scan = scanEsm(line, open.scan);
+        if (open.scan.depth === 0 && !open.scan.template) settle(true);
         continue;
       }
 
@@ -385,12 +402,23 @@ export function stripEsm(text: string): string {
 
       const scanned = scanEsm(line, { depth: 0, template: false });
       const unfinished = scanned.depth > 0 || scanned.template;
-      if (isImport && !unfinished && !IMPORT_WHOLE.test(line)) {
-        kept.push(line);
+
+      if (isImport) {
+        if (IMPORT_WHOLE.test(line)) continue;
+        /* A statement that is going to continue has an open brace or a comma
+           waiting for the next binding. Anything else that opens with the
+           word is a sentence. */
+        if (!unfinished && !/,\s*$/.test(line)) {
+          kept.push(line);
+          continue;
+        }
+        open = { waits: 'specifier', scan: scanned };
+        pending = [line];
         continue;
       }
+
       if (unfinished) {
-        open = scanned;
+        open = { waits: 'brackets', scan: scanned };
         pending = [line];
       }
     }
