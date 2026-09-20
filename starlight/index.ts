@@ -14,20 +14,21 @@
 
 import type { AstroIntegration } from 'astro';
 import type { HookParameters, StarlightPlugin } from '@astrojs/starlight/types';
-import type { HeliaSectionLink } from './sections';
-import { resolveHub, type HeliaHeaderHub } from './header-hub';
+import type { HeliaSectionLink } from './sections.ts';
+import { resolveHub, type HeliaHeaderHub } from './header-hub.ts';
 import {
   discoverabilityIntegration,
   resolveDiscoverability,
   type HeliaDiscoverabilityOptions,
   type ResolvedDiscoverability,
-} from './discoverability';
+} from './discoverability.ts';
+import { markdownCalloutsIntegration } from './markdown-callouts.ts';
 
-export type { HeliaDiscoverabilityOptions } from './discoverability';
-export { heliaFrontmatterSchema } from './schema';
-export type { HeliaFrontmatter } from './schema';
-export type { HeliaSectionLink } from './sections';
-export type { HeliaHeaderHub } from './header-hub';
+export type { HeliaDiscoverabilityOptions } from './discoverability.ts';
+export { heliaFrontmatterSchema } from './schema.ts';
+export type { HeliaFrontmatter } from './schema.ts';
+export type { HeliaSectionLink } from './sections.ts';
+export type { HeliaHeaderHub } from './header-hub.ts';
 
 type StarlightConfigInput = HookParameters<'config:setup'>['config'];
 
@@ -158,6 +159,14 @@ export interface HeliaStarlightOptions {
    * installed; with scripting off the accent stays the default slate.
    */
   accent?: HeliaProductAccent;
+  /**
+   * Renders Starlight's markdown asides -- `:::note`, `:::tip`, `:::caution`
+   * and `:::danger` -- as the package `Callout`, in `.md` and `.mdx` alike, so
+   * a page written in plain markdown needs no import. A directive label
+   * becomes the title and Starlight's own default title stands without one.
+   * Default `true`; `false` leaves Starlight's asides as they are.
+   */
+  markdownCallouts?: boolean;
   /** Per-component opt-out of the shell overrides. Each defaults to `true`. */
   shell?: HeliaShellOptions;
   footer?: HeliaFooterOptions;
@@ -468,6 +477,7 @@ export function heliaStarlight(
   const {
     styles = true,
     code = true,
+    markdownCallouts = true,
     shell = {},
     footer,
     header,
@@ -592,6 +602,8 @@ export function heliaStarlight(
           expressiveCode,
           ...(sections.length > 0 ? { sidebar: sectionSidebar } : {}),
         });
+        if (markdownCallouts) addIntegration(markdownCalloutsIntegration());
+
         addIntegration(
           configModule({
             accent,

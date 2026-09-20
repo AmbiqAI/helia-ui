@@ -50,7 +50,7 @@ published tarball. Copy them out of `AmbiqAI/helia-ui`.
 - **A Playwright smoke test** that loads the built app, starts the simulated
   source, and asserts the chart receives data.
 
-<Callout tone="caution" title="Name each React component in the scan list">
+<Callout tone="warning" title="Name each React component in the scan list">
   Tailwind 4.3 applies its ignore rules to `@source` paths inside
   `node_modules`. Both `.../react` and `.../react/*.tsx` silently match nothing,
   so `text-foreground` and the rest are never emitted and the components render
