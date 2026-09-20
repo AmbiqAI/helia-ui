@@ -27,6 +27,58 @@ const text = (value) => ({ type: 'text', value });
 
 const paragraph = (value) => element('p', {}, [text(value)]);
 
+const jsx = (name, attributes, children) => ({
+  type: 'mdxJsxFlowElement',
+  name,
+  attributes,
+  children,
+});
+
+const jsxAttribute = (name, value) => ({
+  type: 'mdxJsxAttribute',
+  name,
+  value,
+});
+
+/**
+ * One aside as the Satteri processor materializes it: `class` rather than
+ * `className`, and the icon as a raw HTML node in `.md` or a `set:html`
+ * fragment in `.mdx` instead of an SVG element.
+ */
+function satteriAside(variant, title, { mdx = false } = {}) {
+  const icon =
+    '<svg viewBox="0 0 24 24" class="starlight-aside__icon"><path d="M0 0"/></svg>';
+  const iconNode = mdx
+    ? {
+        type: 'mdxJsxTextElement',
+        name: 'Fragment',
+        attributes: [jsxAttribute('set:html', icon)],
+      }
+    : { type: 'raw', value: icon };
+  return {
+    type: 'element',
+    tagName: 'aside',
+    properties: {
+      'aria-label': title,
+      class: `starlight-aside starlight-aside--${variant}`,
+    },
+    children: [
+      {
+        type: 'element',
+        tagName: 'p',
+        properties: { class: 'starlight-aside__title' },
+        children: [iconNode, text(title)],
+      },
+      {
+        type: 'element',
+        tagName: 'div',
+        properties: { class: 'starlight-aside__content' },
+        children: [paragraph('Body.')],
+      },
+    ],
+  };
+}
+
 /** One aside in the shape Starlight's remark plugin leaves behind. */
 function aside(variant, title, content = [paragraph('Body.')]) {
   return element(
@@ -76,9 +128,15 @@ test('each Starlight aside name becomes its callout tone', () => {
       'helia-callout--critical',
     ],
   );
+  /* No explicit role: the implicit complementary landmark stands, and build
+     time content must not announce itself. The name comes across instead. */
   assert.deepEqual(
     tree.children.map((node) => node.properties.role),
-    ['note', 'note', 'note', 'alert'],
+    [undefined, undefined, undefined, undefined],
+  );
+  assert.deepEqual(
+    tree.children.map((node) => node.properties['aria-label']),
+    ['Note', 'Tip', 'Caution', 'Danger'],
   );
   for (const node of tree.children) {
     assert.equal(node.tagName, 'aside');
@@ -207,4 +265,60 @@ test('the markdown rendition keeps the directive and no callout markup', () => {
       `rendition should not contain ${markup}`,
     );
   }
+});
+
+test('an aside inside an MDX JSX wrapper is transformed', () => {
+  const tree = root(
+    jsx('Steps', [], [element('ol', {}, [aside('tip', 'Tip')])]),
+    jsx('CardGrid', [], [aside('danger', 'Danger')]),
+  );
+
+  transformAsides(tree);
+
+  const inSteps = tree.children[0].children[0].children[0];
+  assert.deepEqual(classesOf(inSteps).at(-1), 'helia-callout--tip');
+  assert.deepEqual(
+    classesOf(tree.children[1].children[0]).at(-1),
+    'helia-callout--critical',
+  );
+});
+
+test('an aside inside a not-content JSX wrapper is left alone', () => {
+  const inner = aside('note', 'Note');
+  const tree = root(
+    jsx('div', [jsxAttribute('className', 'helia-stack not-content')], [inner]),
+  );
+
+  transformAsides(tree);
+
+  assert.equal(tree.children[0].children[0], inner);
+  assert.deepEqual(classesOf(inner), [
+    'starlight-aside',
+    'starlight-aside--note',
+  ]);
+});
+
+test('the Satteri shape is transformed in .md and .mdx alike', () => {
+  for (const mdx of [false, true]) {
+    const tree = root(satteriAside('caution', 'Watch out', { mdx }));
+
+    transformAsides(tree);
+
+    const callout = tree.children[0];
+    assert.deepEqual(classesOf(callout).at(-1), 'helia-callout--warning');
+    assert.equal(callout.properties['aria-label'], 'Watch out');
+    /* The raw SVG and the `set:html` fragment are Starlight's icon in the two
+       shapes Satteri builds it in; neither may survive into the title. */
+    assert.deepEqual(titleOf(callout).children, [text('Watch out')]);
+    assert.ok(!JSON.stringify(callout).includes('starlight-aside__icon'));
+  }
+});
+
+test('an aside with no label takes its name from the title text', () => {
+  const tree = root(aside('note', 'Note'));
+  delete tree.children[0].properties['aria-label'];
+
+  transformAsides(tree);
+
+  assert.equal(tree.children[0].properties['aria-label'], 'Note');
 });

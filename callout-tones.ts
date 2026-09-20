@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
 /**
- * The callout vocabulary as data: which icon a tone draws, whether it
- * interrupts, and the geometry of the icon itself.
+ * The callout vocabulary as data: which icon a tone draws, and the geometry of
+ * the icon itself.
  *
  * `Callout.astro` renders this and the Starlight plugin's markdown transform
  * builds the same markup from it, so an aside written as `:::note` and one
  * written as the component cannot drift apart. The icon is described once as
  * attributes and path data rather than taken from FontAwesome's own renderer,
  * because the transform needs element nodes and `set:html` needs a string, and
- * only a shared description makes the two byte-identical.
+ * only a shared description makes the two identical.
  */
 
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
@@ -24,44 +24,52 @@ import {
   faTriangleExclamation,
 } from '@fortawesome/free-solid-svg-icons';
 
-interface CalloutToneDefinition {
-  icon: IconDefinition;
-  /**
-   * `alert` is announced as soon as it renders. Only `critical` earns it: it
-   * is the one tone that means the reader loses something by reading past it.
-   */
-  role: 'alert' | 'note';
-}
+/*
+ * Written out rather than derived from the table below, because the props
+ * reference inlines the alias and a reader of that page wants the tones, not
+ * `keyof typeof`. The `Record` keeps the two in step: a tone added here and
+ * nowhere else does not type-check, and neither does the reverse.
+ */
+export type CalloutTone =
+  | 'note'
+  | 'tip'
+  | 'success'
+  | 'important'
+  | 'warning'
+  | 'critical'
+  | 'compatibility'
+  | 'experimental'
+  | 'deprecated';
 
-export const CALLOUT_TONES = {
-  note: { icon: faCircleInfo, role: 'note' },
-  tip: { icon: faArrowRight, role: 'note' },
+export const CALLOUT_ICONS: Record<CalloutTone, IconDefinition> = {
+  note: faCircleInfo,
+  tip: faArrowRight,
   /* Distinct from tip: tip is a suggestion, success is a step that finished. */
-  success: { icon: faCircleCheck, role: 'note' },
-  important: { icon: faCircleExclamation, role: 'note' },
-  warning: { icon: faTriangleExclamation, role: 'note' },
-  critical: { icon: faTriangleExclamation, role: 'alert' },
-  compatibility: { icon: faLink, role: 'note' },
-  experimental: { icon: faCodeBranch, role: 'note' },
-  deprecated: { icon: faClockRotateLeft, role: 'note' },
-} as const satisfies Record<string, CalloutToneDefinition>;
-
-export type CalloutTone = keyof typeof CALLOUT_TONES;
+  success: faCircleCheck,
+  important: faCircleExclamation,
+  warning: faTriangleExclamation,
+  critical: faTriangleExclamation,
+  compatibility: faLink,
+  experimental: faCodeBranch,
+  deprecated: faClockRotateLeft,
+};
 
 /**
- * The tone's icon and role.
+ * The tone, or `note` when it is not one.
  *
- * An unknown tone falls back to `note` rather than failing: MDX hands the prop
- * through as an unchecked string, so a typo in a page would otherwise take the
- * whole build down.
+ * MDX hands the prop through as an unchecked string, so a typo in a page falls
+ * back rather than taking the build down. Every use of the tone goes through
+ * here, so the icon and the class cannot disagree about which tone it is.
+ * `check:callout-tones` fails the build on a typo that reaches a page in this
+ * repository, so the fallback is for a consumer's content rather than ours.
  */
-export const calloutDefinition = (tone: CalloutTone): CalloutToneDefinition =>
-  CALLOUT_TONES[tone] ?? CALLOUT_TONES.note;
+export const resolveTone = (tone: CalloutTone): CalloutTone =>
+  tone in CALLOUT_ICONS ? tone : 'note';
 
 /** The classes that make an element the callout recipe, without the surface. */
 export const calloutClasses = (tone: CalloutTone): string[] => [
   'helia-callout',
-  `helia-callout--${tone}`,
+  `helia-callout--${resolveTone(tone)}`,
 ];
 
 export interface CalloutIconSvg {
@@ -72,7 +80,7 @@ export interface CalloutIconSvg {
 }
 
 export function calloutIcon(tone: CalloutTone): CalloutIconSvg {
-  const [width, height, , , pathData] = calloutDefinition(tone).icon.icon;
+  const [width, height, , , pathData] = CALLOUT_ICONS[resolveTone(tone)].icon;
   return {
     attributes: {
       xmlns: 'http://www.w3.org/2000/svg',

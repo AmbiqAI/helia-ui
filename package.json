@@ -11,7 +11,7 @@
     "npm": ">=11"
   },
   "scripts": {
-    "validate": "npm run format:check && npm run check:spdx && npm run check:notices && npm run check:spelling && npm run check:styles && npm run check:boundaries && npm run check:islands && npm run check:shadcn-align && npm run check:astro-props && npm run check:site-theme && npm run check:foundations && npm run check:peers && npm run check:discoverability && npm test",
+    "validate": "npm run format:check && npm run check:spdx && npm run check:notices && npm run check:spelling && npm run check:styles && npm run check:callout-tones && npm run check:boundaries && npm run check:islands && npm run check:shadcn-align && npm run check:astro-props && npm run check:site-theme && npm run check:foundations && npm run check:peers && npm run check:discoverability && npm test",
     "audit:production": "npm audit --omit=dev --audit-level=high",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -20,6 +20,7 @@
     "notices": "node scripts/third-party-notices.mjs",
     "check:notices": "node scripts/third-party-notices.mjs --check",
     "check:styles": "node scripts/check-style-literals.mjs",
+    "check:callout-tones": "node scripts/check-callout-tones.mjs",
     "check:boundaries": "node scripts/check-component-boundaries.mjs",
     "check:islands": "node scripts/check-islands.mjs",
     "check:shadcn-align": "node scripts/rename-token-prefix.mjs --check",
@@ -53,6 +54,7 @@
     "./chart-echarts-theme": "./chart-echarts-theme.ts",
     "./reference-model": "./reference-model.ts",
     "./ref-index-model": "./ref-index-model.ts",
+    "./callout-tones": "./callout-tones.ts",
     "./starlight": "./starlight/index.ts",
     "./starlight/*": "./starlight/*",
     "./tokens.css": "./tokens.css",

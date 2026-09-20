@@ -108,9 +108,27 @@ for (const route of [...ASTRO_LANE, ...TEMPLATE_LANE, ...REACT_LANE]) {
 /* The Callouts page is the one that carries aside directives; see its
    "Markdown form" section. */
 const CALLOUT_PAGE = 'callouts';
-/* One per directive name, so a mapping that drifts is caught rather than just
-   the plugin being switched off. */
-const CALLOUT_TONES = ['note', 'tip', 'warning', 'critical'];
+
+/*
+ * One authored directive per tone, each with body text used nowhere else on
+ * the page. Matching on the body rather than counting asides is what makes a
+ * drifted mapping fail: the page also renders a component callout of every
+ * tone, so a `:::caution` that started resolving to `critical` would leave the
+ * tone counts untouched.
+ */
+const AUTHORED_ASIDES = [
+  ['note', 'Directive asides carry the package surface without an import.'],
+  ['tip', 'Reach for the component only when the tone has no directive name.'],
+  [
+    'warning',
+    'A directive aside is prose, so a long one reads better as a section.',
+  ],
+  [
+    'critical',
+    'A destructive step earns the strongest tone the directive set offers.',
+  ],
+];
+
 /* Markup an agent reading the Callouts rendition must never be handed. The
    page is one route, so the whole rendered vocabulary can be ruled out. */
 const RENDERED_MARKUP = ['helia-callout', 'helia-surface', '<svg', '<aside'];
@@ -132,13 +150,33 @@ if (!existsSync(calloutHtmlPath)) {
   );
 } else {
   const html = readFileSync(calloutHtmlPath, 'utf8');
-  for (const tone of CALLOUT_TONES) {
-    if (!html.includes(`helia-callout--${tone}`)) {
+  const asides = [
+    ...html.matchAll(/<aside class="([^"]*)"[^>]*>([\s\S]*?)<\/aside>/g),
+  ];
+
+  for (const [tone, body] of AUTHORED_ASIDES) {
+    const match = asides.find(([, , inner]) => inner.includes(body));
+    if (!match) {
       failures.push(
-        `/${CALLOUT_PAGE} renders no ${tone} callout; the aside transform did not run.`,
+        `/${CALLOUT_PAGE} renders no aside carrying "${body}"; the aside transform did not run.`,
+      );
+      continue;
+    }
+    const classes = match[1].split(/\s+/);
+    if (!classes.includes(`helia-callout--${tone}`)) {
+      failures.push(
+        `/${CALLOUT_PAGE}: the aside carrying "${body}" is ${match[1]}, not helia-callout--${tone}.`,
+      );
+    }
+    /* A component callout is scoped by Astro; a transformed one cannot be,
+       because the transform emits markup rather than rendering a component. */
+    if (classes.some((name) => name.startsWith('astro-'))) {
+      failures.push(
+        `/${CALLOUT_PAGE}: the aside carrying "${body}" came from the component, not the transform.`,
       );
     }
   }
+
   if (html.includes('starlight-aside')) {
     failures.push(
       `/${CALLOUT_PAGE} still carries Starlight's own aside markup.`,
@@ -180,5 +218,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `assert: ${ASTRO_LANE.length + TEMPLATE_LANE.length + REACT_LANE.length} routes emitted, React confined to ${REACT_LANE.length}, ${CALLOUT_TONES.length} markdown asides rendered as callouts and absent from the text artifacts.`,
+  `assert: ${ASTRO_LANE.length + TEMPLATE_LANE.length + REACT_LANE.length} routes emitted, React confined to ${REACT_LANE.length}, ${AUTHORED_ASIDES.length} markdown asides rendered as callouts and absent from the text artifacts.`,
 );

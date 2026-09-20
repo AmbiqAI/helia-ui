@@ -6,8 +6,11 @@
  * implies.
  *
  * The tone picks the icon and the tint together, so a consumer never chooses
- * an icon that contradicts the color. Only `critical` is announced: it is the
- * one tone that means the reader loses something by reading past it.
+ * an icon that contradicts the color. The title is the aside's accessible
+ * name; no explicit role is set, so the implicit `complementary` landmark
+ * stands, the way Starlight's own asides do. Nothing here announces itself:
+ * the content is built into the page rather than arriving in response to
+ * something the reader did.
  *
  * The recipe is `.helia-callout` in `recipes.css` rather than a scoped block
  * here, because the Starlight plugin builds the same markup out of a `:::note`
@@ -17,25 +20,23 @@
  */
 import {
   calloutClasses,
-  calloutDefinition,
   calloutIconMarkup,
   type CalloutTone,
 } from '../callout-tones';
 import Surface from './Surface.astro';
 
 interface Props {
-  /** The heading of the aside. Required: an untitled aside is a paragraph. */
+  /** The heading of the aside, and its accessible name. */
   title: string;
   /** What the aside means. Picks the tint and the icon together. */
   tone?: CalloutTone;
 }
 
 const { title, tone = 'note' } = Astro.props;
-const { role } = calloutDefinition(tone);
 const iconMarkup = calloutIconMarkup(tone);
 ---
 
-<Surface as="aside" class:list={calloutClasses(tone)} role={role}>
+<Surface as="aside" class:list={calloutClasses(tone)} aria-label={title}>
   <span class="helia-callout__icon" aria-hidden="true" set:html={iconMarkup} />
   <div class="helia-callout__content">
     <strong>{title}</strong>
