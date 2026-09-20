@@ -75,6 +75,23 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 }
 ```
 
+## What changed in 0.1.0-alpha.15
+
+- Render Starlight Markdown asides (`:::note`, `:::tip`, `:::caution`,
+  `:::danger`) as `Callout` in `.md` and `.mdx`, on both the Sätteri and the
+  unified Markdown processors, through the new `markdownCallouts` plugin option
+  (default on). Markdown renditions and llms output keep the aside as plain
+  Markdown.
+- Move the Callout recipe into `recipes.css` so the component and the transform
+  share one set of global rules; a site that overrode the previously scoped
+  Callout rules loses that override.
+- Callout carries `aria-label` from its title and no longer sets `role`; the
+  icon SVG no longer carries FontAwesome classes, `role="img"` or `data-icon`.
+- Export the tone table as `@ambiqai/helia-ui/callout-tones` and add the
+  `check:callout-tones` validation step.
+
+Refs #124, #128.
+
 ## What changed in 0.1.0-alpha.14
 
 - Preserve C++ class and function template declarations, including defaults, in
