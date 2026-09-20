@@ -14,7 +14,12 @@
  * agent where the markdown rendition of this page lives.
  */
 import config from 'virtual:helia-ui/starlight-config';
-import { markdownHref, ogImageHref, OG_IMAGE_SIZE } from './discoverability';
+import {
+  markdownHref,
+  ogImageHref,
+  serializeJsonLd,
+  OG_IMAGE_SIZE,
+} from './discoverability';
 
 interface Crumb {
   label: string;
@@ -197,7 +202,7 @@ if (discoverability.jsonLd && !isNotFound) {
     <script
       type="application/ld+json"
       is:inline
-      set:html={JSON.stringify({
+      set:html={serializeJsonLd({
         '@context': 'https://schema.org',
         '@graph': graph,
       })}

@@ -1,102 +1,92 @@
-# Markdown asides as callouts
+# Faithful Markdown renditions for MDX pages
 
-Goal: `heliaStarlight` renders Starlight's `:::note`, `:::tip`, `:::caution`
-and `:::danger` asides as the package `Callout`, in `.md` and `.mdx` alike,
-with no code on the consuming site. Issue: AmbiqAI/helia-ui#124.
+Goal: the `.md` rendition and the llms artifacts carry what an MDX page
+rendered, not the source it was written in. Issues: AmbiqAI/helia-ui#143
+(`export const` bodies leaking as prose, attribute-only components rendering as
+nothing), #135 (MDX comments and expressions kept), #136 (JSON-LD written into
+a script body unescaped).
 
-Worktree: /Users/adam.page/Ambiq/helia/helia-ui-issue-124
-Branch: 124-markdown-callouts, from 95eb9f1 (v0.1.0-alpha.14). Not pushed, no
-pull request, no version bump. The main checkout is untouched.
+Worktree: /Users/adam.page/Ambiq/helia/helia-ui-issue-143
+Branch: 143-rendition-fidelity, from 266f614. Not pushed, no pull request, no
+version bump. The main checkout is untouched.
 
 ## What is implemented
 
-The callout recipe moved out of `Callout.astro`'s scoped `<style>` into
-`recipes.css` under the same class names, so markup produced outside the
-component is styled by it. `callout-tones.ts` holds the tone table -- the icon
-each tone draws and the geometry the SVG is built from -- and both the
-component and the transform build their markup from it, which is what keeps
-the two renderings identical.
+`starlight/discoverability.ts` holds the rendition pass, and it is now four
+transforms rather than two, each of them exported so the fixtures can reach it.
 
-`starlight/markdown-callouts.ts` rewrites the aside after Starlight has built
-it, so there is an element tree to work on rather than a directive to re-parse
-and one transform covers both file types. The title is read back off
-Starlight's own title node rather than from a table of defaults here, which
-keeps a directive label, an unlabeled default, and a translated default all
-correct, and the aside's `aria-label` is carried across. An aside inside a
-`not-content` region is left alone, an aside inside an MDX JSX wrapper is
-reached, and a rewritten aside no longer matches, so the pass is idempotent.
-`markdownCallouts: false` opts out.
+`stripEsm` tracks bracket depth from the opening line of a statement through
+the line that closes it, so a multi-line `export const`, `export default`,
+`export function` or named-import block goes whole instead of losing its first
+line and publishing the rest. It runs with inline code held out, because a prop
+carrying a code sample holds whole statements of someone else's JavaScript and
+none of that is the page's ESM. A sentence that opens with the word "import" is
+no longer mistaken for a statement: a real one ends in a quoted specifier.
 
-Astro 7 ships two markdown processors and the transform is registered on
-whichever one the site configured: a Satteri hast plugin on
-`processor.options.hastPlugins`, a rehype plugin on
-`processor.options.rehypePlugins`, and a named warning if it is neither. This
-is not optional. Satteri is the default and does not run `rehypePlugins`, so
-registering through Astro's deprecated `markdown.rehypePlugins` option would
-work only on a site that already sets that option, and would earn every other
-site a deprecation warning for nothing. The two shapes differ in more than the
-list: under Satteri the aside icon is a raw HTML node in `.md` and a
-`set:html` fragment in `.mdx`, and the classes arrive as `class` rather than
-`className`. Both are covered by fixtures.
+`stripComments` drops `{/* ... */}` and `stripExpressions` drops the rest of
+the MDX expressions. Both are gated on the file being `.mdx`, because a brace
+in a plain markdown page is a character rather than syntax, and both skip
+fenced code, because a page documenting MDX quotes the syntax on purpose.
 
-The Markdown renditions and `llms.txt` are unaffected by design: they are built
-from the authored source, never from the rendered page. Asserted both as a unit
-test over `renderMarkdown` and against the built site.
+`reduceTags` parses the tags into a tree instead of stripping them a line at a
+time, and reduces the parts whose content is in their props: anything carrying
+both a `title` and an `href` becomes `- [title](href): children`, a `Card` with
+a title becomes an `h3` over its body, and an `AsciiTerminal` with an inline
+literal `lines` prop becomes a fenced text block with its prompts. Everything
+else still reduces to its children. A prop whose value is an expression is a
+loss by design: the rendition has the source and not the page's scope.
+
+`serializeJsonLd` escapes `<`, `>` and `&` as `\uXXXX`, and
+`Discoverability.astro` serializes the graph through it.
 
 ## Consumer-visible changes
 
 These belong in the release note.
 
-- Markdown asides render as `Callout` by default. `markdownCallouts: false`
-  restores Starlight's own asides.
-- The callout CSS is global, in `recipes.css`, rather than scoped to the
-  component. A site that overrode it through the scoped class no longer can.
-- `Callout` carries `aria-label` equal to its title, and no longer sets
-  `role`. `critical` used to set `role="alert"`; build-time content must not
-  announce itself, and without an explicit role the implicit `complementary`
-  landmark stands, the way Starlight's asides do.
-- The callout icon is built from FontAwesome's path data rather than its
-  renderer, so the SVG no longer carries `svg-inline--fa`, `fa-*`,
-  `role="img"` or `data-icon`, and `fill` sits on the `svg` rather than the
-  `path`. A site selecting `.helia-callout .svg-inline--fa` stops matching.
-- A site that overrode the callout rules through Astro's scoped class has lost
-  that override, now that the recipe is global in `recipes.css`. The class
-  names are unchanged, so the override moves to a plain selector.
-- New published file and export, `@ambiqai/helia-ui/callout-tones`.
-- A `Callout` with a tone that is not a real tone now falls back to `note`
-  whole, class included, instead of drawing the note icon under an unmatched
-  class.
+- Renditions and `llms-full.txt` grow. A card grid that published three
+  orphan sentences now publishes three links with their descriptions, and a
+  terminal transcript that published nothing now publishes its lines.
+- Renditions and `llms-full.txt` shrink where they carried source. MDX
+  comments, MDX expressions and the body of a multi-line `export` statement
+  are gone. A site that was working around either loss should drop the
+  workaround rather than stack it on this.
+- `llms.txt` line counts and byte sizes move for any page with a component on
+  it. Nothing about the route list or the headings changes.
+- JSON-LD is escaped. The rendered graph is unchanged for anything that parses
+  it; a site diffing the built HTML will see `<` where it had `<`.
+- `starlight/discoverability.ts` names five more exports: `stripComments`,
+  `stripEsm`, `stripExpressions`, `reduceTags` and `serializeJsonLd`. The
+  plugin entry re-exports none of them; they are reachable through
+  `@ambiqai/helia-ui/starlight/discoverability.ts` the way `renderMarkdown`
+  already was.
+- `renderMarkdown` takes an `mdx` option, defaulting to `true`. The plugin
+  passes the page's own extension.
 
 ## Verified
 
-`npm ci` in both trees, full `npm run validate`, `npm run docs:build`,
-`npm run docs:test`, and `npm pack --dry-run`. The Satteri path is proved on a
-stock consumer: the neuralspotx astro-site, installed from a packed tarball
-with no `rehypePlugins` in its config, renders its `:::note` asides as
-callouts in `.md` and `.mdx`, with no `starlight-aside` left and no Astro
-deprecation warning. The unified path is proved by this repository's own
-gallery, which sets `rehypePlugins` for mermaid. One aside's before/after HTML
-was captured by building once with `markdownCallouts: false`, which also proves
-the opt-out.
+`npm ci` in both trees, `npm run validate`, `npm run docs:build`,
+`npm run docs:test`. `scripts/discoverability-rendition.test.mjs` covers each
+transform over MDX fixtures, and `docs/scripts/assert-docs-build.mjs` proves
+the claims on the built gallery rendition. Every page in the gallery was
+rendered before and after the change and the diff read line by line: the only
+removals are comments, expressions and descriptions that moved into their
+card's list item.
 
 ## Decisions and gotchas
 
-- Only Starlight's four directive names have a markdown spelling. The other
-  six tones stay with the component; there is no directive for them.
-- `docs/src/content/docs/templates/web-apps.mdx` passed `tone="caution"`,
-  which is not a callout tone. It rendered as an untinted note before.
-  Corrected to `warning`; `resolveTone` falls back for a consumer's content,
-  and `check:callout-tones` fails the build for this repository's own pages
-  and the templates it ships.
-- `CalloutTone` moved out of `Callout.astro` into `callout-tones.ts`, so the
-  props generator now follows a relative type-alias import one hop and inlines
-  it when it is a union of literals. `SymbolKind` and `ReferenceLanguage`,
-  which are computed from a value, stay names; `ChartKind` and `SparklineKind`
-  gained their members.
-- The gallery build prints an Astro deprecation warning about
-  `markdown.rehypePlugins`. That is the gallery's own mermaid entry in
-  `docs/astro.config.mjs`, not this plugin, and it predates this branch.
+- A card title is an `h3` because `LinkCard` defaults to `h3`, not because of
+  where the card sits. A generated heading does not join the page's heading
+  index, which is read off the source.
+- A fenced code block splits a prose run, so an element whose children hold a
+  fence arrives at the tag parser with its closing tag in another run. An
+  unclosed element takes the rest of the run and a stray closing tag is
+  dropped, which is the degradation the line-at-a-time pass already had.
+- An unbracketed multi-line assignment is still not tracked. Nothing
+  distinguishes its second line from prose.
+- `Callout` and the aside directives are untouched: the rendition carries the
+  directive, which is what #124 settled.
 
 ## Next
 
-Owner review of the diff, then an issue-linked pull request. No release.
+Owner review of the diff, then an issue-linked pull request closing #143, #135
+and #136. No release.
