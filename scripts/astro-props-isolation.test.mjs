@@ -4,9 +4,9 @@ import assert from 'node:assert/strict';
 import {
   cpSync,
   mkdirSync,
-  readdirSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
   rmSync,
   symlinkSync,
   writeFileSync,

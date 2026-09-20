@@ -57,14 +57,16 @@ export const CALLOUT_ICONS: Record<CalloutTone, IconDefinition> = {
 /**
  * The tone, or `note` when it is not one.
  *
- * MDX hands the prop through as an unchecked string, so a typo in a page falls
- * back rather than taking the build down. Every use of the tone goes through
+ * Takes a string rather than a tone: MDX and frontmatter hand the prop through
+ * unchecked, which is the case this exists for, and a narrower parameter would
+ * make the guard unreachable and the call a type error. A typo falls back
+ * rather than taking the build down. Every use of the tone goes through
  * here, so the icon and the class cannot disagree about which tone it is.
  * `check:callout-tones` fails the build on a typo that reaches a page in this
  * repository, so the fallback is for a consumer's content rather than ours.
  */
-export const resolveTone = (tone: CalloutTone): CalloutTone =>
-  tone in CALLOUT_ICONS ? tone : 'note';
+export const resolveTone = (tone: string): CalloutTone =>
+  Object.hasOwn(CALLOUT_ICONS, tone) ? (tone as CalloutTone) : 'note';
 
 /** The classes that make an element the callout recipe, without the surface. */
 export const calloutClasses = (tone: CalloutTone): string[] => [

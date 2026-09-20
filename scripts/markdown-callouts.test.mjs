@@ -128,8 +128,8 @@ test('each Starlight aside name becomes its callout tone', () => {
       'helia-callout--critical',
     ],
   );
-  /* No explicit role: the implicit complementary landmark stands, and build
-     time content must not announce itself. The name comes across instead. */
+  /* No explicit role: the implicit complementary landmark stands, and build-time
+     content must not announce itself. The name comes across instead. */
   assert.deepEqual(
     tree.children.map((node) => node.properties.role),
     [undefined, undefined, undefined, undefined],

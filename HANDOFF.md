@@ -12,9 +12,10 @@ pull request, no version bump. The main checkout is untouched.
 
 The callout recipe moved out of `Callout.astro`'s scoped `<style>` into
 `recipes.css` under the same class names, so markup produced outside the
-component is styled by it. `callout-tones.ts` holds the tone table -- icon,
-role, and the SVG geometry -- and both the component and the transform build
-their markup from it, which is what keeps the two renderings identical.
+component is styled by it. `callout-tones.ts` holds the tone table -- the icon
+each tone draws and the geometry the SVG is built from -- and both the
+component and the transform build their markup from it, which is what keeps
+the two renderings identical.
 
 `starlight/markdown-callouts.ts` rewrites the aside after Starlight has built
 it, so there is an element tree to work on rather than a directive to re-parse
@@ -54,6 +55,13 @@ These belong in the release note.
   `role`. `critical` used to set `role="alert"`; build-time content must not
   announce itself, and without an explicit role the implicit `complementary`
   landmark stands, the way Starlight's asides do.
+- The callout icon is built from FontAwesome's path data rather than its
+  renderer, so the SVG no longer carries `svg-inline--fa`, `fa-*`,
+  `role="img"` or `data-icon`, and `fill` sits on the `svg` rather than the
+  `path`. A site selecting `.helia-callout .svg-inline--fa` stops matching.
+- A site that overrode the callout rules through Astro's scoped class has lost
+  that override, now that the recipe is global in `recipes.css`. The class
+  names are unchanged, so the override moves to a plain selector.
 - New published file and export, `@ambiqai/helia-ui/callout-tones`.
 - A `Callout` with a tone that is not a real tone now falls back to `note`
   whole, class included, instead of drawing the note icon under an unmatched
