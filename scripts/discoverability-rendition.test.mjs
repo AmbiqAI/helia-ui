@@ -95,9 +95,8 @@ test('a multi-line import goes with its specifiers', () => {
   assert.equal(stripped.trim(), 'Prose.');
 });
 
-/* A sentence is not a statement, and the rendition used to lose any line that
-   opened with one of the words -- and, once the brackets were tracked, every
-   line after it as well. */
+/* A sentence is not a statement. A line that opens with one of the words
+   keeps itself, and so do the lines after it. */
 test('prose that opens with the word import is kept', () => {
   const line = 'import that module: it is an implementation detail.';
 
@@ -136,8 +135,8 @@ test('prose shaped like an export keeps itself and the lines after it', () => {
 
 /*
  * A statement closes its own brackets. A run that ends with one still open
- * never held a statement, and dropping the lines on that guess is how a stray
- * backtick or bracket used to take the rest of the page with it.
+ * never held a statement, so its lines go back and a stray backtick or
+ * bracket takes nothing after it.
  */
 test('a statement that never closes gives its lines back', () => {
   const unbalanced = [
@@ -158,7 +157,7 @@ test('a statement that never closes gives its lines back', () => {
   assert.equal(stripEsm(template), template);
 });
 
-test('a code sample in a prop is not read as this file ESM', () => {
+test("a code sample in a prop is not read as this file's ESM", () => {
   const stripped = stripEsm(
     [
       '<CodeBlock',
@@ -298,7 +297,7 @@ test('a card title cannot forge a link', () => {
   );
 });
 
-test('a bracket in a title is escaped and a bracket in a target is enclosed', () => {
+test('a bracket in a title is escaped and a parenthesis in a target is enclosed', () => {
   assert.equal(
     reduceTags(
       '<LinkCard href="/slices/" title="Arrays [and] slices" />',
@@ -315,6 +314,29 @@ test('an enclosed target still reaches the deployed site', () => {
   const rendition = render('<LinkCard href="/a(b)c" title="Parens" />\n');
 
   assert.match(rendition, /\(<https:\/\/example\.com\/a\(b\)c>\)/);
+});
+
+/* An attribute list wraps, and a value can wrap with it. A list item is one
+   line, so the break and the indentation behind it have to go. */
+test('a title written across two lines is one line of markdown', () => {
+  const reduced = reduceTags(
+    [
+      '<CardGrid>',
+      '  <LinkCard',
+      '    href="/cards/"',
+      '    title="The card',
+      '      parts"',
+      '  >',
+      '    What each part owns.',
+      '  </LinkCard>',
+      '</CardGrid>',
+    ].join('\n'),
+  );
+
+  assert.equal(
+    reduced.trim(),
+    '- [The card parts](/cards/): What each part owns.',
+  );
 });
 
 /* An anchor is already the link it makes, and `title` on one is a tooltip. */

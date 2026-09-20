@@ -328,10 +328,8 @@ const EXPORT_LINE = /^\s*export\b/;
 /*
  * The shapes a real export statement takes: something is named and then
  * assigned, called, or given a body. A sentence that opens with the word names
- * nothing -- "export default (the site's own) value is used", "export const
- * values ... (see below)" -- and dropping one would delete the page's own
- * prose, the more so because an unbalanced bracket in it used to take every
- * line that followed with it.
+ * nothing, and dropping one deletes the page's own prose -- and, where its
+ * brackets do not balance, every line after it as well.
  */
 const EXPORT_SHAPES = [
   /^\s*export\s+(?:async\s+)?(?:const|let|var|function|class|type|interface)\s+(?:[A-Za-z_$][\w$]*|\{[^}]*\}|\[[^\]]*\])\s*(?:[=({:<]|extends\b|implements\b)/,
@@ -358,10 +356,10 @@ const EXPORT_SHAPES = [
 export function stripEsm(text: string): string {
   return withoutInlineCode(text, (masked) => {
     const kept: string[] = [];
-    /* The lines of a statement that has not closed yet. A statement closes its
-       own brackets, so a run that ends with one still open never held a
-       statement at all, and the lines go back rather than being dropped on a
-       guess that has already eaten the rest of the page. */
+    /* The lines of a statement that has not closed yet. A statement closes
+       its own brackets, so a run that ends with one still open never held a
+       statement, and its lines go back rather than being dropped on a guess
+       that would take the rest of the page with them. */
     let pending: string[] = [];
     let open: EsmScan | null = null;
 
@@ -572,8 +570,7 @@ type TagNode = ElementNode | TextNode;
  * A rendition is built one prose run at a time, and a fenced code block splits
  * a run, so an element whose children hold a fence arrives here with its
  * closing tag in another run. An unclosed element therefore takes the rest of
- * the run as its children and a closing tag that matches nothing is dropped,
- * which is the same degradation the line-at-a-time reduction had.
+ * the run as its children, and a closing tag that matches nothing is dropped.
  */
 function parseTags(text: string): TagNode[] {
   const root: ElementNode = {
@@ -676,8 +673,8 @@ const CONTROL = /[\u0001-\u001f\u007f]/g;
 const linkText = (value: string): string =>
   value.replace(CONTROL, '').replace(/([\\[\]])/g, '\\$1');
 
-/* A target holding whitespace or a bracket needs the pointy form to stay one
-   target, and `<` and `>` inside it need escaping in turn. */
+/* A target holding whitespace or a parenthesis needs the pointy form to stay
+   one target, and `<` and `>` inside it need escaping in turn. */
 const linkTarget = (value: string): string => {
   const href = value.replace(CONTROL, '');
   return /[\s()]/.test(href) ? `<${href.replace(/([\\<>])/g, '\\$1')}>` : href;
@@ -803,9 +800,9 @@ function reduceNodes(nodes: readonly TagNode[], inside: boolean): Reduction {
  *
  * What a component renders is mostly its children, and dropping the tags is
  * the whole of it. What a card renders is its props: an attribute-only
- * `<LinkCard title href />` has no children at all, and stripping it published
- * nothing where the page shows a link, so a section index reached a reader as
- * a list of orphan sentences. Anything carrying both a title and a target is
+ * `<LinkCard title href />` has no children at all, so stripping it publishes
+ * nothing where the page shows a link and leaves a section index as a list of
+ * orphan sentences. Anything carrying both a title and a target is
  * therefore emitted as a list item, and a titled `Card` as a heading over its
  * body. Nesting authored inside an element that renders as one of those goes
  * with it, which is the cheaper of the two losses.
@@ -816,8 +813,9 @@ function reduceNodes(nodes: readonly TagNode[], inside: boolean): Reduction {
  */
 export function reduceTags(text: string): string {
   return withoutInlineCode(text, (masked) => {
-    /* An attribute list wraps, and the tag with it. Folding a wrapped tag back
-       onto one line is what lets the rest of this work a line at a time. */
+    /* An attribute list wraps, and the tag with it. A wrapped tag folds back
+       onto one line so that a value broken across lines -- a title written
+       over two of them -- is one line of markdown and not two. */
     const folded = masked.replace(TAG, (tag) =>
       tag.includes('\n') ? tag.replace(/\s*\n\s*/g, ' ') : tag,
     );
@@ -843,8 +841,8 @@ function absolutize(target: string, pageUrl: string, origin: string): string {
   return new URL(value, pageUrl).href;
 }
 
-/* The pointy form is the one a target holding a bracket or a space is written
-   in, and it still has to reach the deployed site. */
+/* The pointy form is the one a target holding a parenthesis or a space is
+   written in, and it still has to reach the deployed site. */
 const INLINE_LINK = /(!?\[[^\]]*\]\()(<[^<>]*>|[^()\s]+)((?:\s+"[^"]*")?\))/g;
 const REFERENCE_LINK = /^([ \t]{0,3}\[[^\]]+\]:[ \t]*)(\S+)(.*)$/gm;
 
