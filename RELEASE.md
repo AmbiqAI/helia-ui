@@ -86,7 +86,12 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 - `renderMarkdown` gains an `mdx` option, and the rendition helpers are exported
   from `starlight/discoverability.ts`.
 
-Refs #143, #135, #136, #146.
+- Set up every `AsciiTerminal` on a page, not only the first: instances parsed
+  after the element definition waited for children that had not been parsed
+  yet. Readiness is an instance field, an element connected empty is retried
+  once, and the element exposes `play()`, which resolves when the run ends.
+
+Refs #143, #135, #136, #146, #149, #150.
 
 ## What changed in 0.1.0-alpha.15
 
