@@ -75,6 +75,19 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 }
 ```
 
+## What changed in 0.1.0-alpha.16
+
+- Make Markdown renditions and llms output faithful for MDX pages: multi-line
+  `import` and `export` statements, MDX comments and expressions are removed
+  from the rendition; `LinkCard`, `Card` and `AsciiTerminal` content is
+  rendered to Markdown instead of dropped; card titles and targets are escaped
+  so text from another repository cannot forge a link.
+- Escape JSON-LD strings.
+- `renderMarkdown` gains an `mdx` option, and the rendition helpers are exported
+  from `starlight/discoverability.ts`.
+
+Refs #143, #135, #136, #146.
+
 ## What changed in 0.1.0-alpha.15
 
 - Render Starlight Markdown asides (`:::note`, `:::tip`, `:::caution`,
