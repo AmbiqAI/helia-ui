@@ -11,6 +11,11 @@
  *
  * The default form is inert and ships no behavior. Setting `animated`, `copy`
  * or `replay` opts the page into the inline script.
+ *
+ * An interactive instance exposes `play()`, which starts the animation the way
+ * the replay control does and resolves when the run ends. It waits for the
+ * element to be set up, so it is safe to call before the transcript's own
+ * markup has been parsed.
  */
 export type AsciiTerminalLineKind =
   'command' | 'muted' | 'output' | 'success' | 'warning' | 'error';
@@ -105,10 +110,60 @@ const BEHAVIOR = `
       super();
       this.runId = 0;
       this.hasPlayed = false;
+      this.isReady = false;
+      this.awaitingChildren = false;
+      /* A clone carries the ready attribute, and a consumer's own load
+         listener can run before this one, so readiness is an instance fact and
+         a promise rather than something anyone can copy or race. */
+      this.whenReady = new Promise((resolve) => {
+        this.markReady = resolve;
+      });
     }
 
+    /*
+     * The definition lives in an inline script after the first instance, so
+     * every instance the parser reaches after it is upgraded on its opening
+     * tag, with none of its children parsed yet. Setting up then would bind
+     * nothing, and an upgrade happens once, so nothing would retry.
+     */
     connectedCallback() {
-      if (this.dataset.ready === 'true') return;
+      if (this.isReady || this.awaitingChildren) return;
+      if (this.querySelector('[data-line]')) {
+        this.setup();
+        return;
+      }
+
+      this.awaitingChildren = true;
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.resume(), {
+          once: true,
+        });
+        return;
+      }
+
+      /* Connected empty after the parse: a script that appends the transcript
+         right after the frame gets the same setup as the parser does. */
+      const observer = new MutationObserver(() => {
+        if (!this.querySelector('[data-line]')) return;
+        observer.disconnect();
+        this.resume();
+      });
+      observer.observe(this, { childList: true, subtree: true });
+    }
+
+    resume() {
+      this.awaitingChildren = false;
+      this.setup();
+    }
+
+    async play() {
+      await this.whenReady;
+      return this.run();
+    }
+
+    setup() {
+      if (this.isReady) return;
+      this.isReady = true;
       this.dataset.ready = 'true';
 
       const lines = Array.from(this.querySelectorAll('[data-line]'));
@@ -192,6 +247,12 @@ const BEHAVIOR = `
 
         if (currentRun === this.runId) this.removeAttribute('data-playing');
       };
+
+      /* The replay control is markup; a consumer driving the transcript from
+         its own script reaches the same run through the play method, which
+         waits on this. */
+      this.run = play;
+      this.markReady();
 
       replayButton?.addEventListener('click', () => {
         if (status) status.textContent = '';
