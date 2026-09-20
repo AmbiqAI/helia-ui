@@ -20,6 +20,11 @@
  *    the directive that was written. The two artifacts come from different
  *    ends of the build -- the rehype transform rewrites the rendered tree, the
  *    renditions are read off the source -- and only a built site proves both.
+ *
+ * 4. A rendition carries what a component rendered rather than what it was
+ *    written as: a card's link and title, a transcript's lines, and none of
+ *    the props or comments those were authored in. The gallery is where every
+ *    one of those shapes is on a page, so it is where the claim is provable.
  */
 
 import { existsSync, readFileSync } from 'node:fs';
@@ -209,6 +214,49 @@ for (const [label, path, forbidden] of [
   }
 }
 
+/*
+ * The rendition of a page whose content is in its props. The gallery writes
+ * `LinkCard` with a title and an href, and `AsciiTerminal` with an inline
+ * transcript; both used to reduce to nothing or to their children, which is
+ * how a section index reached an agent with none of its links. Matched on the
+ * authored strings rather than on a count, so a card that stops carrying its
+ * href fails here rather than passing with a link to the wrong place.
+ */
+const RENDITION_CLAIMS = [
+  [
+    'gallery',
+    [
+      /- \[The card parts]\(\S+\/cards\/\): What each part owns/,
+      /- \[Tokens and scales]\(\S+\/foundations\/\): The spacing, radius/,
+      /```text\n\$ npm run build\n/,
+    ],
+    ['<LinkCard', '<AsciiTerminal', "{ kind: 'command'", 'titleAs='],
+  ],
+  /* Generated pages open with a comment naming the script that wrote them.
+     A comment renders nothing, so a rendition must not carry one. */
+  ['foundations/tokens', [], ['{/*']],
+  ['reference/astro-parts', [], ['{/*']],
+];
+
+for (const [route, expected, forbidden] of RENDITION_CLAIMS) {
+  const path = join(dist, route, 'index.md');
+  if (!existsSync(path)) {
+    failures.push(`the /${route} rendition was not emitted (${path}).`);
+    continue;
+  }
+  const text = readFileSync(path, 'utf8');
+  for (const pattern of expected) {
+    if (!pattern.test(text)) {
+      failures.push(`the /${route} rendition does not match ${pattern}.`);
+    }
+  }
+  for (const source of forbidden) {
+    if (text.includes(source)) {
+      failures.push(`the /${route} rendition carries MDX source: ${source}.`);
+    }
+  }
+}
+
 if (failures.length > 0) {
   for (const failure of failures) console.error(failure);
   console.error(
@@ -218,5 +266,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `assert: ${ASTRO_LANE.length + TEMPLATE_LANE.length + REACT_LANE.length} routes emitted, React confined to ${REACT_LANE.length}, ${AUTHORED_ASIDES.length} markdown asides rendered as callouts and absent from the text artifacts.`,
+  `assert: ${ASTRO_LANE.length + TEMPLATE_LANE.length + REACT_LANE.length} routes emitted, React confined to ${REACT_LANE.length}, ${AUTHORED_ASIDES.length} markdown asides rendered as callouts and absent from the text artifacts, ${RENDITION_CLAIMS.length} renditions carrying what their components rendered.`,
 );

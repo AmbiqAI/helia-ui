@@ -97,6 +97,21 @@ const xmlEscape = (value: string) =>
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 
+/**
+ * JSON for a `<script>` body.
+ *
+ * An HTML parser looks for the end of a script element in its text, so a page
+ * description holding `</script>` would end the block and leave the rest of
+ * the page's own frontmatter to be parsed as markup. `<`, `>` and `&` have a
+ * JSON escape that no parser can mistake, and the value they carry is
+ * unchanged for anything reading the JSON. See AmbiqAI/helia-ui#136.
+ */
+export const serializeJsonLd = (value: unknown): string =>
+  JSON.stringify(value)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026');
+
 /* ------------------------------------------------------------------ *
  * Frontmatter
  * ------------------------------------------------------------------ */
@@ -211,37 +226,278 @@ function splitFences(body: string): { code: boolean; text: string }[] {
   return segments;
 }
 
-/*
- * ESM at the top of an MDX file, including the multi-line named-import form.
- * A rendition is markdown for a reader that cannot resolve a module, so the
- * imports are noise; the tags they name are reduced separately.
- */
-function stripEsm(text: string): string {
-  const lines = text.split('\n');
-  const kept: string[] = [];
-  let open = false;
+const INLINE_CODE = /(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/g;
 
-  for (const line of lines) {
-    if (open) {
-      if (/^\s*\}\s*from\s*['"][^'"]*['"];?\s*$/.test(line)) open = false;
-      continue;
-    }
-    if (/^\s*import\s+\{[^}]*$/.test(line)) {
-      open = true;
-      continue;
-    }
-    if (
-      /^\s*import\s[^\n]*$/.test(line) ||
-      /^\s*export\s+(?:const|let|default|function)\s/.test(line)
-    ) {
-      continue;
-    }
-    kept.push(line);
-  }
-  return kept.join('\n');
+/*
+ * Inline code is the one place a brace, a tag or a comment is content rather
+ * than syntax, so every transform below runs with those spans held out and put
+ * back afterwards.
+ */
+function withoutInlineCode(
+  text: string,
+  transform: (masked: string) => string,
+): string {
+  const spans: string[] = [];
+  const masked = text.replace(INLINE_CODE, (match) => {
+    spans.push(match);
+    return `\u0000${spans.length - 1}\u0000`;
+  });
+  return transform(masked).replace(
+    /\u0000(\d+)\u0000/g,
+    (_, index: string) => spans[Number(index)]!,
+  );
 }
 
-const INLINE_CODE = /(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/g;
+const MDX_COMMENT = /\{\s*\/\*[\s\S]*?\*\/\s*\}/g;
+
+/**
+ * Drops MDX comments.
+ *
+ * A comment renders nothing, so a rendition carrying one states something the
+ * page does not. It runs before everything else because a comment holds
+ * whatever the author commented out -- tags, imports, a whole section -- and
+ * none of that should reach a later pass as content.
+ */
+export function stripComments(text: string): string {
+  return withoutInlineCode(text, (masked) => masked.replace(MDX_COMMENT, ''));
+}
+
+interface EsmScan {
+  /** Open brackets of every kind, carried into the next line. */
+  depth: number;
+  /** Whether the line ended inside a template literal. */
+  template: boolean;
+}
+
+/*
+ * Bracket depth across one line of JavaScript.
+ *
+ * Quotes are consumed rather than counted, so a brace inside a string cannot
+ * open a block. A template literal is skipped whole, interpolations included:
+ * reading them would need a real parser, and skipping them keeps an unbalanced
+ * brace inside a template from swallowing the rest of the file.
+ */
+function scanEsm(line: string, state: EsmScan): EsmScan {
+  let { depth, template } = state;
+
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index]!;
+    if (char === '\\') {
+      index += 1;
+      continue;
+    }
+    if (template) {
+      if (char === '`') template = false;
+      continue;
+    }
+    if (char === '`') {
+      template = true;
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      index += 1;
+      while (index < line.length && line[index] !== char) {
+        if (line[index] === '\\') index += 1;
+        index += 1;
+      }
+      continue;
+    }
+    if (char === '/' && line[index + 1] === '/') break;
+    if (char === '{' || char === '[' || char === '(') depth += 1;
+    else if (char === '}' || char === ']' || char === ')') depth -= 1;
+  }
+
+  return { depth: Math.max(0, depth), template };
+}
+
+const IMPORT_LINE = /^\s*import\b/;
+const IMPORT_BINDING = String.raw`(?:[A-Za-z_$][\w$]*|\*\s+as\s+[A-Za-z_$][\w$]*|\{[^}]*\})`;
+/*
+ * A whole import statement, as against a sentence that opens with the word.
+ * The specifier is quoted and what stands in front of it is a binding rather
+ * than a run of words, so a sentence about importing values out of a table is
+ * read as the prose it is. The shape is spelled out in the fixtures, not
+ * here: an example written as source in a comment is a specifier as far as
+ * the boundary check is concerned.
+ */
+const IMPORT_WHOLE = new RegExp(
+  String.raw`^\s*import\s*(?:['"][^'"]*['"]|(?:type\s+)?${IMPORT_BINDING}(?:\s*,\s*${IMPORT_BINDING})?\s+from\s*['"][^'"]*['"])\s*;?\s*$`,
+);
+
+/* The specifier of an import is the only quoted thing in it. */
+const QUOTED = /['"]/;
+
+const EXPORT_LINE = /^\s*export\b/;
+/*
+ * The shapes a real export statement takes: something is named and then
+ * assigned, called, or given a body. A sentence that opens with the word names
+ * nothing, and dropping one deletes the page's own prose -- and, where its
+ * brackets do not balance, every line after it as well.
+ */
+const EXPORT_SHAPES = [
+  /^\s*export\s+(?:async\s+)?(?:const|let|var|function|class|type|interface)\s+(?:[A-Za-z_$][\w$]*|\{[^}]*\}|\[[^\]]*\])\s*(?:[=({:<]|extends\b|implements\b)/,
+  /^\s*export\s+default\s+(?:[{[]|(?:async\s+)?function\b|class\b|[A-Za-z_$][\w$]*\s*(?:\(|;?\s*$))/,
+  /^\s*export\s*[{*]/,
+];
+
+/**
+ * Drops the ESM at the top of an MDX file, statement by statement.
+ *
+ * A rendition is markdown for a reader that cannot resolve a module, so the
+ * imports are noise and the tags they name are reduced separately. A statement
+ * that opens a bracket carries the rest of itself on the lines that follow,
+ * and those lines are JavaScript too: the depth is tracked from the opening
+ * line through the closing `];` or `}` so that an `export const` publishes no
+ * more of its body than an `import` does. See AmbiqAI/helia-ui#143.
+ *
+ * The unbracketed continuation -- an assignment broken across lines with no
+ * bracket to close -- is not tracked, because nothing distinguishes its second
+ * line from prose. Inline code is held out first: a prop carrying a code
+ * sample holds whole statements of someone else's JavaScript, and none of it
+ * is this file's ESM.
+ */
+export function stripEsm(text: string): string {
+  return withoutInlineCode(text, (masked) => {
+    const kept: string[] = [];
+    /* The lines of a statement that has not finished. Nothing is dropped
+       until the whole of it is in hand and reads as a statement; a run that
+       ends with one still open never held a statement, and its lines go back
+       rather than being dropped on a guess that would take the rest of the
+       page with them. */
+    let pending: string[] = [];
+    /* What the open statement is waiting for: a module specifier, or the
+       bracket that closes a body. */
+    let open: { waits: 'specifier' | 'brackets'; scan: EsmScan } | null = null;
+
+    const settle = (dropped: boolean) => {
+      if (!dropped) kept.push(...pending);
+      open = null;
+      pending = [];
+    };
+
+    for (const line of masked.split('\n')) {
+      if (open) {
+        pending.push(line);
+        /* An import ends at its specifier, which is the only quoted thing in
+           it, rather than at a bracket: the `from` clause may sit on a line
+           of its own, past the brace that closed the bindings. Until then
+           there is nothing to judge the statement on. */
+        if (open.waits === 'specifier') {
+          if (QUOTED.test(line)) settle(IMPORT_WHOLE.test(pending.join('\n')));
+          continue;
+        }
+        open.scan = scanEsm(line, open.scan);
+        if (open.scan.depth === 0 && !open.scan.template) settle(true);
+        continue;
+      }
+
+      const isImport = IMPORT_LINE.test(line);
+      const isExport =
+        EXPORT_LINE.test(line) &&
+        EXPORT_SHAPES.some((shape) => shape.test(line));
+      if (!isImport && !isExport) {
+        kept.push(line);
+        continue;
+      }
+
+      const scanned = scanEsm(line, { depth: 0, template: false });
+      const unfinished = scanned.depth > 0 || scanned.template;
+
+      if (isImport) {
+        if (IMPORT_WHOLE.test(line)) continue;
+        /* A statement that is going to continue has an open brace or a comma
+           waiting for the next binding. Anything else that opens with the
+           word is a sentence. */
+        if (!unfinished && !/,\s*$/.test(line)) {
+          kept.push(line);
+          continue;
+        }
+        open = { waits: 'specifier', scan: scanned };
+        pending = [line];
+        continue;
+      }
+
+      if (unfinished) {
+        open = { waits: 'brackets', scan: scanned };
+        pending = [line];
+      }
+    }
+
+    return [...kept, ...pending].join('\n');
+  });
+}
+
+/**
+ * The index of the brace closing the group that opens at `start`, or `-1`.
+ *
+ * Quoted and template spans are consumed rather than counted, the way a line
+ * of ESM is: the brace in `{items.join('} ')}` is a character in a string and
+ * neither closes the expression nor opens one.
+ */
+function closingBrace(text: string, start: number): number {
+  let depth = 0;
+  for (let index = start; index < text.length; index += 1) {
+    const char = text[index]!;
+    if (char === '\\') {
+      index += 1;
+      continue;
+    }
+    if (char === '"' || char === "'" || char === '`') {
+      index += 1;
+      while (index < text.length && text[index] !== char) {
+        if (text[index] === '\\') index += 1;
+        index += 1;
+      }
+      continue;
+    }
+    if (char === '{') depth += 1;
+    else if (char === '}') {
+      depth -= 1;
+      if (depth === 0) return index;
+    }
+  }
+  return -1;
+}
+
+/**
+ * Drops MDX expressions.
+ *
+ * What `{count}` renders is whatever the page's scope makes of it, and a
+ * rendition is read without that scope. The source of the expression is not
+ * its value, so publishing it would state something the page never said; the
+ * value is a documented loss. Runs after the tags are reduced, so the braces
+ * left by then are the page's own and not a component's props. An unbalanced
+ * brace is left alone, as is a brace inside inline code or escaped as `\{`.
+ */
+export function stripExpressions(text: string): string {
+  return withoutInlineCode(text, (masked) => {
+    let out = '';
+    let index = 0;
+
+    while (index < masked.length) {
+      const char = masked[index]!;
+      if (char === '\\') {
+        out += masked.slice(index, index + 2);
+        index += 2;
+        continue;
+      }
+      if (char !== '{') {
+        out += char;
+        index += 1;
+        continue;
+      }
+      const end = closingBrace(masked, index);
+      if (end === -1) {
+        out += masked.slice(index);
+        break;
+      }
+      index = end + 1;
+    }
+
+    return out;
+  });
+}
+
 /*
  * A tag, including the wrapped and the expression-bearing forms MDX allows. An
  * attribute value is read as a whole -- a quoted string, or a braced expression
@@ -258,6 +514,12 @@ const braces = (depth: number): string =>
 const ATTRIBUTE = String.raw`(?:"[^"]*"|'[^']*'|${braces(3)}|[^<>"'{}])`;
 const TAG = new RegExp(
   String.raw`</?[A-Za-z][A-Za-z0-9.:-]*(?:\s${ATTRIBUTE}*?)?/?>`,
+  'g',
+);
+
+const TAG_NAME = /^<\/?([A-Za-z][A-Za-z0-9.:-]*)/;
+const ATTRIBUTE_PAIR = new RegExp(
+  String.raw`([A-Za-z_$][\w$.:-]*)(?:\s*=\s*("[^"]*"|'[^']*'|${braces(3)}))?`,
   'g',
 );
 
@@ -279,45 +541,314 @@ const VOID_TAGS = new Set([
   'wbr',
 ]);
 
-/**
- * Drops component and HTML tags, keeping whatever text sat between them.
- *
- * The children of a component are indented under it, and that indentation
- * outlives the tags: four spaces in front of a sentence is an indented code
- * block in plain markdown, so a card's title would reach a reader as code. A
- * line inside a component is therefore flattened to the margin. Nesting
- * authored inside a component goes with it, which is the cheaper of the two
- * losses.
+interface Attribute {
+  /** The value when it is a string literal, `null` when it is an expression. */
+  text: string | null;
+  /** The value as authored, braces included. */
+  raw: string;
+}
+
+/*
+ * A prop is a string literal or an expression. `title="x"` and `title={"x"}`
+ * are the same string and are read as one; anything else is an expression
+ * whose value this pass cannot know, and is carried as raw source for the few
+ * renderers that read the source rather than the value.
  */
-function reduceTags(text: string): string {
-  const spans: string[] = [];
-  const masked = text.replace(INLINE_CODE, (match) => {
-    spans.push(match);
-    return `\u0000${spans.length - 1}\u0000`;
-  });
+function attributeOf(raw: string): Attribute {
+  const value = raw.trim();
+  if (value.startsWith('"') || value.startsWith("'")) {
+    return { text: value.slice(1, -1), raw: value };
+  }
+  const inner = value.slice(1, -1).trim();
+  const quoted =
+    (inner.startsWith('"') && inner.endsWith('"')) ||
+    (inner.startsWith("'") && inner.endsWith("'"));
+  return { text: quoted ? inner.slice(1, -1) : null, raw: value };
+}
 
-  /* An attribute list wraps, and the tag with it. Folding a wrapped tag back
-     onto one line is what lets the rest of this work a line at a time. */
-  const folded = masked.replace(TAG, (tag) =>
-    tag.includes('\n') ? tag.replace(/\s*\n\s*/g, ' ') : tag,
-  );
+function attributesOf(tag: string): Record<string, Attribute> {
+  const inner = tag.replace(TAG_NAME, '').replace(/\/?>$/, '');
+  const attributes: Record<string, Attribute> = {};
 
-  let depth = 0;
-  const lines = folded.split('\n').map((line) => {
-    const inside = depth > 0;
-    for (const tag of line.match(TAG) ?? []) {
-      const name = /^<\/?([A-Za-z][A-Za-z0-9.:-]*)/.exec(tag)?.[1] ?? '';
-      if (tag.startsWith('</')) depth = Math.max(0, depth - 1);
-      else if (!tag.endsWith('/>') && !VOID_TAGS.has(name.toLowerCase()))
-        depth += 1;
+  for (const [, name, raw] of inner.matchAll(ATTRIBUTE_PAIR)) {
+    attributes[name!] =
+      raw === undefined ? { text: null, raw: '' } : attributeOf(raw);
+  }
+
+  return attributes;
+}
+
+interface ElementNode {
+  type: 'element';
+  name: string;
+  attributes: Record<string, Attribute>;
+  children: TagNode[];
+}
+
+interface TextNode {
+  type: 'text';
+  value: string;
+}
+
+type TagNode = ElementNode | TextNode;
+
+/*
+ * The tags and the text between them as a tree.
+ *
+ * A rendition is built one prose run at a time, and a fenced code block splits
+ * a run, so an element whose children hold a fence arrives here with its
+ * closing tag in another run. An unclosed element therefore takes the rest of
+ * the run as its children, and a closing tag that matches nothing is dropped.
+ */
+function parseTags(text: string): TagNode[] {
+  const root: ElementNode = {
+    type: 'element',
+    name: '',
+    attributes: {},
+    children: [],
+  };
+  const stack: ElementNode[] = [root];
+  let index = 0;
+
+  for (const match of text.matchAll(TAG)) {
+    const tag = match[0];
+    const open = stack.at(-1)!;
+    if (match.index > index) {
+      open.children.push({
+        type: 'text',
+        value: text.slice(index, match.index),
+      });
     }
-    const stripped = line.replace(TAG, '');
-    return inside ? stripped.replace(/^\s+/, '') : stripped;
-  });
+    index = match.index + tag.length;
 
-  return lines
-    .join('\n')
-    .replace(/\u0000(\d+)\u0000/g, (_, index: string) => spans[Number(index)]!);
+    const name = TAG_NAME.exec(tag)?.[1] ?? '';
+    if (tag.startsWith('</')) {
+      const at = stack.findLastIndex((node) => node.name === name);
+      if (at > 0) stack.length = at;
+      continue;
+    }
+
+    const element: ElementNode = {
+      type: 'element',
+      name,
+      attributes: attributesOf(tag),
+      children: [],
+    };
+    open.children.push(element);
+    if (!tag.endsWith('/>') && !VOID_TAGS.has(name.toLowerCase())) {
+      stack.push(element);
+    }
+  }
+
+  if (index < text.length) {
+    stack.at(-1)!.children.push({ type: 'text', value: text.slice(index) });
+  }
+
+  return root.children;
+}
+
+const TRANSCRIPT_ENTRY = /\{([^{}]*)\}/g;
+const ENTRY_TEXT = /\btext\s*:\s*('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")/;
+const ENTRY_KIND = /\bkind\s*:\s*(?:'([^']*)'|"([^"]*)")/;
+const ENTRY_PROMPT = /\bprompt\s*:\s*(?:'([^']*)'|"([^"]*)")/;
+
+const unquoteJs = (value: string): string =>
+  value
+    .slice(1, -1)
+    .replace(/\\n/g, '\n')
+    .replace(/\\t/g, '\t')
+    .replace(/\\(['"\\])/g, '$1');
+
+/*
+ * `lines={[{ kind: 'command', text: 'npm run build' }]}` read back as the
+ * transcript it renders, prompts included. Only the inline literal form: a
+ * transcript imported from a module is not in this file, so there is nothing
+ * to render and the component reduces to its children like any other.
+ */
+function transcriptOf(raw: string | undefined): string | null {
+  if (raw === undefined) return null;
+  const entries = [...raw.matchAll(TRANSCRIPT_ENTRY)];
+  if (entries.length === 0) return null;
+
+  const lines: string[] = [];
+  for (const [, body] of entries) {
+    const quoted = ENTRY_TEXT.exec(body!)?.[1];
+    if (quoted === undefined) return null;
+    const kindMatch = ENTRY_KIND.exec(body!);
+    const kind = kindMatch?.[1] ?? kindMatch?.[2];
+    const promptMatch = ENTRY_PROMPT.exec(body!);
+    const prompt = promptMatch?.[1] ?? promptMatch?.[2] ?? '$';
+    const value = unquoteJs(quoted);
+    lines.push(
+      kind === 'command' && prompt !== '' ? `${prompt} ${value}` : value,
+    );
+  }
+
+  return lines.join('\n');
+}
+
+/*
+ * `\u0000` is what this pass masks an inline-code span with, so it survives;
+ * every other control character is neither content nor markup.
+ */
+const CONTROL = /[\u0001-\u001f\u007f]/g;
+
+/*
+ * A title is the page's own prose and a rendition is markdown, so a `]` in a
+ * title would close the link text and let whatever the author wrote next pose
+ * as the target of a link the page never made.
+ */
+const linkText = (value: string): string =>
+  value.replace(CONTROL, '').replace(/([\\[\]])/g, '\\$1');
+
+/* A target holding whitespace or a parenthesis needs the pointy form to stay
+   one target, and `<` and `>` inside it need escaping in turn. */
+const linkTarget = (value: string): string => {
+  const href = value.replace(CONTROL, '');
+  return /[\s()]/.test(href) ? `<${href.replace(/([\\<>])/g, '\\$1')}>` : href;
+};
+
+/** The longest run of backticks in a string, which a fence has to clear. */
+const longestRun = (value: string): number =>
+  Math.max(0, ...[...value.matchAll(/`+/g)].map((run) => run[0]!.length));
+
+/** What an element reduced to, and how the text around it must be joined. */
+interface Reduction {
+  /** `item` is one line of a list; `block` stands alone; `inline` is prose. */
+  kind: 'inline' | 'item' | 'block';
+  text: string;
+}
+
+const literal = (node: ElementNode, name: string): string | undefined =>
+  node.attributes[name]?.text ?? undefined;
+
+/*
+ * A card's title is a heading in the package's own markup -- `LinkCard`
+ * defaults to `h3` -- so it is one here too, rather than a level derived from
+ * where the card happens to sit.
+ */
+const CARD_HEADING = '###';
+
+function reduceElement(node: ElementNode): Reduction {
+  const children = reduceNodes(node.children, true);
+
+  if (node.name === 'AsciiTerminal') {
+    const transcript = transcriptOf(node.attributes['lines']?.raw);
+    if (transcript !== null) {
+      const fence = '`'.repeat(Math.max(3, longestRun(transcript) + 1));
+      return { kind: 'block', text: `${fence}text\n${transcript}\n${fence}` };
+    }
+    return children;
+  }
+
+  const title = literal(node, 'title');
+  const href = literal(node, 'href');
+
+  /* Whatever component carries both a name and a target is a link, whoever
+     wrote it: the package's own parts, Starlight's, and a consuming site's
+     alike. An element is not: `<a href title>` is already the link it makes,
+     and `title` on it is a tooltip rather than the link's name. */
+  if (/^[A-Z]/.test(node.name) && title !== undefined && href !== undefined) {
+    const description = children.text.replace(/\s+/g, ' ').trim();
+    const link = `- [${linkText(title)}](${linkTarget(href)})`;
+    return {
+      kind: 'item',
+      text: description === '' ? link : `${link}: ${description}`,
+    };
+  }
+
+  if (node.name === 'Card' && title !== undefined) {
+    const body = children.text.trim();
+    const heading = `${CARD_HEADING} ${title.replace(CONTROL, '')}`;
+    return {
+      kind: 'block',
+      text: body === '' ? heading : `${heading}\n\n${body}`,
+    };
+  }
+
+  return children;
+}
+
+/*
+ * Children of an element are indented under it, and that indentation outlives
+ * the tags: four spaces in front of a sentence is an indented code block in
+ * plain markdown, so a card's title would reach a reader as code. A line
+ * inside an element is therefore flattened to the margin.
+ */
+function reduceNodes(nodes: readonly TagNode[], inside: boolean): Reduction {
+  let out = '';
+  let last: 'none' | 'inline' | 'item' | 'block' = 'none';
+  let standalone = false;
+
+  for (const node of nodes) {
+    if (node.type === 'text') {
+      let value = node.value;
+      if (inside) {
+        value = value.replace(/\n[ \t]+/g, '\n');
+        /* The line may have opened with a tag that is now gone, leaving its
+           indentation in front of the first text of the line. */
+        if (/(?:^|\n)[ \t]*$/.test(out)) value = value.replace(/^[ \t]+/, '');
+      }
+      if (value.trim() === '') {
+        /* Between two blocks the whitespace is the authoring indentation and
+           nothing else, so it goes with the tags it was laid out for. */
+        if (last === 'none' || last === 'inline') out += value;
+        continue;
+      }
+      if (last === 'item' || last === 'block') {
+        out = `${out.replace(/\s+$/, '')}\n\n`;
+      }
+      out += value;
+      last = 'inline';
+      continue;
+    }
+
+    const reduced = reduceElement(node);
+    if (reduced.text === '') continue;
+    if (reduced.kind === 'inline') {
+      out += reduced.text;
+      last = 'inline';
+      continue;
+    }
+
+    standalone = true;
+    out = out.replace(/\s+$/, '');
+    if (out !== '') {
+      out += last === 'item' && reduced.kind === 'item' ? '\n' : '\n\n';
+    }
+    out += reduced.text;
+    last = reduced.kind;
+  }
+
+  return { kind: standalone ? 'block' : 'inline', text: out };
+}
+
+/**
+ * Reduces component and HTML tags to markdown.
+ *
+ * What a component renders is mostly its children, and dropping the tags is
+ * the whole of it. What a card renders is its props: an attribute-only
+ * `<LinkCard title href />` has no children at all, so stripping it publishes
+ * nothing where the page shows a link and leaves a section index as a list of
+ * orphan sentences. Anything carrying both a title and a target is
+ * therefore emitted as a list item, and a titled `Card` as a heading over its
+ * body. Nesting authored inside an element that renders as one of those goes
+ * with it, which is the cheaper of the two losses.
+ *
+ * A prop whose value is an expression is a documented loss: its value is the
+ * page's to compute and this pass has only the source. See
+ * AmbiqAI/helia-ui#143.
+ */
+export function reduceTags(text: string): string {
+  return withoutInlineCode(text, (masked) => {
+    /* An attribute list wraps, and the tag with it. A wrapped tag folds back
+       onto one line so that a value broken across lines -- a title written
+       over two of them -- is one line of markdown and not two. */
+    const folded = masked.replace(TAG, (tag) =>
+      tag.includes('\n') ? tag.replace(/\s*\n\s*/g, ' ') : tag,
+    );
+    return reduceNodes(parseTags(folded), false).text;
+  });
 }
 
 /**
@@ -338,7 +869,9 @@ function absolutize(target: string, pageUrl: string, origin: string): string {
   return new URL(value, pageUrl).href;
 }
 
-const INLINE_LINK = /(!?\[[^\]]*\]\()([^()\s]+)((?:\s+"[^"]*")?\))/g;
+/* The pointy form is the one a target holding a parenthesis or a space is
+   written in, and it still has to reach the deployed site. */
+const INLINE_LINK = /(!?\[[^\]]*\]\()(<[^<>]*>|[^()\s]+)((?:\s+"[^"]*")?\))/g;
 const REFERENCE_LINK = /^([ \t]{0,3}\[[^\]]+\]:[ \t]*)(\S+)(.*)$/gm;
 
 function resolveLinks(text: string, pageUrl: string, origin: string): string {
@@ -348,11 +881,12 @@ function resolveLinks(text: string, pageUrl: string, origin: string): string {
     return `\u0000${spans.length - 1}\u0000`;
   });
   const linked = masked
-    .replace(
-      INLINE_LINK,
-      (_, open: string, target: string, close: string) =>
-        `${open}${absolutize(target, pageUrl, origin)}${close}`,
-    )
+    .replace(INLINE_LINK, (_, open: string, target: string, close: string) => {
+      const pointy = target.startsWith('<') && target.endsWith('>');
+      const value = pointy ? target.slice(1, -1) : target;
+      const resolved = absolutize(value, pageUrl, origin);
+      return `${open}${pointy ? `<${resolved}>` : resolved}${close}`;
+    })
     .replace(
       REFERENCE_LINK,
       (_, open: string, target: string, rest: string) =>
@@ -364,16 +898,33 @@ function resolveLinks(text: string, pageUrl: string, origin: string): string {
   );
 }
 
-/** The markdown rendition of one page: frontmatter gone, links resolved. */
+/**
+ * The markdown rendition of one page: frontmatter gone, links resolved.
+ *
+ * `mdx` says whether a brace is syntax or a character. In an MDX page it opens
+ * an expression and a comment renders nothing; in a plain markdown page both
+ * are ordinary text, and dropping them would delete the page's own prose. It
+ * defaults to `false`, the answer that changes nothing for a caller that does
+ * not know; the plugin passes the page's own extension.
+ */
 export function renderMarkdown(
   body: string,
-  options: { pageUrl: string; origin: string; title: string },
+  options: {
+    pageUrl: string;
+    origin: string;
+    title: string;
+    mdx?: boolean;
+  },
 ): string {
+  const mdx = options.mdx ?? false;
   const rendered = splitFences(body)
     .map(({ code, text }) => {
+      /* A fenced block is quoted, not authored: a page documenting MDX shows
+         a comment and an expression as the syntax they are. */
       if (code) return text;
+      const reduced = reduceTags(stripEsm(mdx ? stripComments(text) : text));
       return resolveLinks(
-        reduceTags(stripEsm(text)),
+        mdx ? stripExpressions(reduced) : reduced,
         options.pageUrl,
         options.origin,
       );
@@ -720,6 +1271,7 @@ function llmsFull(pages: readonly PageRecord[], origin: string): string {
         pageUrl: page.url,
         origin,
         title: page.title,
+        mdx: page.sourcePath.endsWith('.mdx'),
       });
       return `<!-- ${page.url} -->\n\n${rendition.trimEnd()}`;
     })
@@ -876,6 +1428,7 @@ export function discoverabilityIntegration(options: {
                 pageUrl: page.url,
                 origin,
                 title: page.title,
+                mdx: page.sourcePath.endsWith('.mdx'),
               }),
             );
           }
