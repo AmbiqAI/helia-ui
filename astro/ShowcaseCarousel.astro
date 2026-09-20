@@ -12,6 +12,15 @@
  * The variant sizes the cards through `--carousel-card-basis` and softens their
  * artwork through `--helia-field-blur`, both inherited by the slotted cards.
  *
+ * Once the cards overflow, the rail rests one give in from either end rather
+ * than on its scroll boundary. Safari starts its back or forward swipe the
+ * moment a horizontal gesture begins on a scroller that cannot move that way,
+ * and `overscroll-behavior` does not stop it; a rail with room to move latches
+ * the gesture, rubber-bands into the give, and snaps back to the card. Each
+ * card snaps by whichever edge can rest inside the rail, so no snap position
+ * falls on a boundary. A rail that fits keeps no give, so its first card sits
+ * flush with the column.
+ *
  * @slot default -- The cards, in the same order as `tabs`.
  */
 interface Props {
@@ -106,10 +115,57 @@ const { tabs, variant = 'feature' } = Astro.props;
       const cardStart = (card: HTMLElement) =>
         card.offsetLeft - track.offsetLeft;
 
+      const firstCard = cards[0];
+      const lastCard = cards[cards.length - 1];
+      // Where the rail rests at either end: the first card's leading edge on
+      // the visible left edge, the last card's trailing edge on the right.
+      // With the give on, neither is a scroll boundary.
+      const restStart = () => (firstCard ? cardStart(firstCard) : 0);
+      const restEnd = () =>
+        lastCard
+          ? cardStart(lastCard) + lastCard.offsetWidth - track.clientWidth
+          : 0;
+      const clampToRest = (left: number) =>
+        Math.min(Math.max(left, restStart()), restEnd());
+
+      // The give exists only while the cards overflow, measured from the
+      // cards rather than the track so the spacers do not count themselves.
+      // With it on, a card snaps by whichever edge can land between the two
+      // rests, and a card that reaches neither snaps by none: a snap position
+      // past the end of the range is clamped onto the boundary, and the
+      // boundary is the one place the rail must not come to rest.
+      const settle = () => {
+        const extent =
+          firstCard && lastCard
+            ? cardStart(lastCard) + lastCard.offsetWidth - cardStart(firstCard)
+            : 0;
+        const overflows = extent > track.clientWidth + epsilon;
+        if (overflows !== track.hasAttribute('data-give')) {
+          track.toggleAttribute('data-give', overflows);
+          if (overflows) track.scrollLeft = restStart();
+        }
+        const start = restStart();
+        const end = restEnd();
+        for (const card of cards) {
+          const leading = cardStart(card);
+          const trailing = leading + card.offsetWidth - track.clientWidth;
+          const align = !overflows
+            ? ''
+            : leading <= end + epsilon
+              ? 'start'
+              : trailing >= start - epsilon
+                ? 'end'
+                : 'none';
+          if (card.style.scrollSnapAlign !== align) {
+            card.style.scrollSnapAlign = align;
+          }
+        }
+      };
+
       const updateControls = () => {
-        const maxScroll = track.scrollWidth - track.clientWidth;
-        previous.disabled = track.scrollLeft <= epsilon;
-        next.disabled = track.scrollLeft >= maxScroll - epsilon;
+        settle();
+        previous.disabled = track.scrollLeft <= restStart() + epsilon;
+        next.disabled = track.scrollLeft >= restEnd() - epsilon;
         // The active tab tracks the first card whose leading edge is at or
         // past the visible left edge, so a track at rest (scrollLeft 0, with
         // or without overflow) always marks the first card.
@@ -124,8 +180,10 @@ const { tabs, variant = 'feature' } = Astro.props;
       };
 
       const move = (direction: -1 | 1) => {
-        track.scrollBy({
-          left: direction * track.clientWidth * 0.72,
+        track.scrollTo({
+          left: clampToRest(
+            track.scrollLeft + direction * track.clientWidth * 0.72,
+          ),
           behavior: scrollBehavior,
         });
       };
@@ -137,7 +195,7 @@ const { tabs, variant = 'feature' } = Astro.props;
           const card = cards[index];
           if (!card) return;
           track.scrollTo({
-            left: card.offsetLeft - track.offsetLeft,
+            left: clampToRest(cardStart(card)),
             behavior: scrollBehavior,
           });
         });
@@ -265,6 +323,7 @@ const { tabs, variant = 'feature' } = Astro.props;
 
   .track {
     --carousel-card-basis: min(72%, 44rem);
+    --carousel-give: var(--helia-space-6);
 
     display: flex;
     gap: var(--helia-space-3);
@@ -274,6 +333,19 @@ const { tabs, variant = 'feature' } = Astro.props;
     scroll-snap-type: inline mandatory;
     scrollbar-width: none;
     touch-action: pan-x;
+  }
+
+  /*
+   * The give at either end, present only while the script has found the
+   * cards overflowing. Neither spacer is a snap area, so the rail cannot
+   * come to rest on a boundary: the first card snaps to the left edge and the
+   * last card to the right, and what lies beyond each is the room a gesture
+   * rubber-bands into.
+   */
+  .track[data-give]::before,
+  .track[data-give]::after {
+    content: '';
+    flex: 0 0 var(--carousel-give);
   }
 
   /*
