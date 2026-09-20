@@ -54,6 +54,51 @@ snackbars for transient confirmation.
   </Callout>
 </div>
 
+## Markdown form
+
+The plugin renders Starlight's aside directives as callouts, in `.md` and
+`.mdx` alike, so a page written in plain Markdown needs no import. The four
+directive names map onto four tones, a directive label becomes the title, and
+a directive without one keeps Starlight's default title.
+
+```md
+:::note
+Profiling results vary with board revision, clock configuration, and model
+input shape.
+:::
+
+:::tip[Recommended path]
+Start with heliaRT when an application already follows the LiteRT runtime
+model.
+:::
+```
+
+:::note
+Profiling results vary with board revision, clock configuration, and model
+input shape.
+:::
+
+:::tip[Recommended path]
+Start with heliaRT when an application already follows the LiteRT runtime
+model.
+:::
+
+:::caution
+Regenerate the deployment bundle after changing the target device or model
+input shape.
+:::
+
+:::danger[Data will be replaced]
+The generation command overwrites files in the configured output directory.
+:::
+
+`caution` is the `warning` tone and `danger` is `critical`; the other six tones
+have no directive of their own and stay with the component. Set
+`markdownCallouts: false` on the plugin to leave Starlight's own asides in
+place. The Markdown renditions and `llms.txt` the plugin writes carry the
+directive as authored, because they are built from the source rather than from
+the rendered page.
+
 ## Usage
 
 - Keep the title specific enough to scan without reading the body.

@@ -15,6 +15,11 @@
  *    part was documented through an island that did not need to be one.
  *    `<astro-island>` is the marker: Astro emits one per hydrated component
  *    and nothing else on these pages produces it.
+ *
+ * 3. A Markdown aside reaches the page as a callout and reaches an agent as
+ *    the directive that was written. The two artifacts come from different
+ *    ends of the build -- the rehype transform rewrites the rendered tree, the
+ *    renditions are read off the source -- and only a built site proves both.
  */
 
 import { existsSync, readFileSync } from 'node:fs';
@@ -100,6 +105,72 @@ for (const route of [...ASTRO_LANE, ...TEMPLATE_LANE, ...REACT_LANE]) {
   }
 }
 
+/* The Callouts page is the one that carries aside directives; see its
+   "Markdown form" section. */
+const CALLOUT_PAGE = 'callouts';
+/* One per directive name, so a mapping that drifts is caught rather than just
+   the plugin being switched off. */
+const CALLOUT_TONES = ['note', 'tip', 'warning', 'critical'];
+/* Markup an agent reading the Callouts rendition must never be handed. The
+   page is one route, so the whole rendered vocabulary can be ruled out. */
+const RENDERED_MARKUP = ['helia-callout', 'helia-surface', '<svg', '<aside'];
+/* The same claim over llms-full.txt, which is the whole site: `<svg` and the
+   recipe class names are legitimate content on the pages that document them,
+   so only what the aside transform itself emits is ruled out here. */
+const CALLOUT_MARKUP = [
+  'helia-callout__body',
+  'helia-callout__icon',
+  'helia-callout--',
+  'helia-surface--pad-4',
+  'starlight-aside',
+];
+
+const calloutHtmlPath = join(dist, CALLOUT_PAGE, 'index.html');
+if (!existsSync(calloutHtmlPath)) {
+  failures.push(
+    `/${CALLOUT_PAGE} was not emitted; the aside checks cannot run.`,
+  );
+} else {
+  const html = readFileSync(calloutHtmlPath, 'utf8');
+  for (const tone of CALLOUT_TONES) {
+    if (!html.includes(`helia-callout--${tone}`)) {
+      failures.push(
+        `/${CALLOUT_PAGE} renders no ${tone} callout; the aside transform did not run.`,
+      );
+    }
+  }
+  if (html.includes('starlight-aside')) {
+    failures.push(
+      `/${CALLOUT_PAGE} still carries Starlight's own aside markup.`,
+    );
+  }
+}
+
+for (const [label, path, forbidden] of [
+  [
+    'the Callouts rendition',
+    join(dist, CALLOUT_PAGE, 'index.md'),
+    RENDERED_MARKUP,
+  ],
+  ['llms-full.txt', join(dist, 'llms-full.txt'), CALLOUT_MARKUP],
+]) {
+  if (!existsSync(path)) {
+    failures.push(`${label} was not emitted (${path} is missing).`);
+    continue;
+  }
+  const text = readFileSync(path, 'utf8');
+  for (const directive of [':::note', ':::tip[', ':::caution', ':::danger[']) {
+    if (!text.includes(directive)) {
+      failures.push(`${label} lost the ${directive} it was written with.`);
+    }
+  }
+  for (const markup of forbidden) {
+    if (text.includes(markup)) {
+      failures.push(`${label} carries rendered markup: ${markup}.`);
+    }
+  }
+}
+
 if (failures.length > 0) {
   for (const failure of failures) console.error(failure);
   console.error(
@@ -109,5 +180,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `assert: ${ASTRO_LANE.length + TEMPLATE_LANE.length + REACT_LANE.length} routes emitted, React confined to ${REACT_LANE.length}.`,
+  `assert: ${ASTRO_LANE.length + TEMPLATE_LANE.length + REACT_LANE.length} routes emitted, React confined to ${REACT_LANE.length}, ${CALLOUT_TONES.length} markdown asides rendered as callouts and absent from the text artifacts.`,
 );

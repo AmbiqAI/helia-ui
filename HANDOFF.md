@@ -1,19 +1,60 @@
-# C++ reference extraction
+# Markdown asides as callouts
 
-Goal: preserve C++ templates and stable overload anchors for heliaRT API reference. Existing issue: AmbiqAI/helia-ui#59. Owner approved issue and draft PR publication. Specific issue: AmbiqAI/helia-ui#112. Merge/release remains pending final review.
+Goal: `heliaStarlight` renders Starlight's `:::note`, `:::tip`, `:::caution`
+and `:::danger` asides as the package `Callout`, in `.md` and `.mdx` alike,
+with no code on the consuming site. Issue: AmbiqAI/helia-ui#124.
 
-Worktree: /Users/adam.page/.codex/worktrees/helia-ui-cpp-reference
-Branch: codex/cpp-reference-contracts
-Base: 6dd46f2 main. Original checkout left unchanged.
+Worktree: /Users/adam.page/Ambiq/helia/helia-ui-issue-124
+Branch: 124-markdown-callouts, from 95eb9f1 (v0.1.0-alpha.14). Not pushed, no
+pull request, no version bump. The main checkout is untouched.
 
-Implemented locally: template declarations for class and function signatures; C++ overloads identified from distinct Doxygen member IDs, with every overload using its Doxygen identity rather than source-order collision repair. Ordinary C identities unchanged.
+## What is implemented
 
-Tests: real Doxygen1.17.0 C++ fixture includes two constructors, three Find overloads, class/defaulted templates, member/free templates, ownership prose and private-member exclusion. All 31 extractor tests pass. Local shared extractor consumes existing RT trial XML with no warnings; class and typed accessor templates retained. RT dependency pin/node_modules untouched. Ordinary // ownership comments remain an input-documentation concern, not solved here.
+The callout recipe moved out of `Callout.astro`'s scoped `<style>` into
+`recipes.css` under the same class names, so markup produced outside the
+component is styled by it. `callout-tones.ts` holds the tone table -- icon,
+role, and the SVG geometry -- and both the component and the transform build
+their markup from it, which is what keeps the two renderings identical.
 
-Verified: full package validation (184 unit tests), gallery build (42 pages), and 148 browser tests passed. Browser suite used a temporary config on port 4391 because RT uses the default port; temporary file removed. Packed package installed into isolated scratch consumer and CLI generated four RT trial pages plus seven artifacts without warnings.
+`starlight/markdown-callouts.ts` is a rehype plugin. Starlight turns a
+directive into `<aside class="starlight-aside ...">` during the remark pass,
+so by rehype there is an element tree to rewrite and one transform covers both
+file types. The title is read back off Starlight's own title node rather than
+from a table of defaults here, which keeps a directive label, an unlabeled
+default, and a translated default all correct. An aside inside a `not-content`
+region is left alone, and a rewritten aside no longer matches, so the pass is
+idempotent. The plugin installs it through an added Astro integration, because
+`markdown` is Astro's config rather than Starlight's; Astro concatenates
+arrays on `updateConfig`, so a site's own rehype plugins still run.
+`markdownCallouts: false` opts out.
 
-Next: inspect diff and tests independently. Draft PR preparation in progress; no release or consumer dependency change.
+The Markdown renditions and `llms.txt` are unaffected by design: they are built
+from the authored source, never from the rendered page. Asserted both as a unit
+test over `renderMarkdown` and against the built site.
 
-Independent review corrections: pointer template parameter names are placed inside declarators; incomplete array/reference declarators omitted by Doxygen emit a warning. Shared visibility filtering keeps private/package overloads out of anchor identity decisions. Real fixture covers private overload extraction and an array-bound omission diagnostic. Targeted31 tests and full186 tests pass after these corrections. Prior gallery/browser run preceded these extractor-only changes.
+## Verified
 
-PR#113 is published for issue#112. Independent consumer review additionally found omitted pure-virtual markers and base declarations; both now have real fixture coverage. 33 targeted tests pass; full validation and hosted CI follow. No merge/release authorized yet.
+`npm ci` in both trees, full `npm run validate` (197 unit tests), and
+`npm run docs:build` (42 pages, docs assertions pass). One aside's before/after
+HTML was captured by building once with `markdownCallouts: false`, which also
+proves the opt-out.
+
+## Decisions and gotchas
+
+- Only Starlight's four directive names have a markdown spelling. The other
+  six tones stay with the component; there is no directive for them.
+- `docs/src/content/docs/templates/web-apps.mdx` passed `tone="caution"`,
+  which is not a callout tone. It rendered as an untinted note before and
+  threw once the tone table became a lookup. Corrected to `warning`, and
+  `calloutDefinition` now falls back to `note` so an unchecked MDX string
+  cannot take a build down.
+- `CalloutTone` moved out of `Callout.astro`, so the generated props reference
+  shows the alias name instead of the nine members, the way `ReferenceLanguage`
+  already does. The Callouts page it links to still lists every tone.
+- The rewritten aside drops Starlight's `aria-label`, matching `Callout.astro`,
+  which carries no accessible name either. Giving the component one is a
+  separate question.
+
+## Next
+
+Owner review of the diff, then an issue-linked pull request. No release.

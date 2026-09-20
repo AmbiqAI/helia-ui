@@ -67,6 +67,7 @@
   },
   "files": [
     "astro",
+    "callout-tones.ts",
     "chart-echarts-theme.ts",
     "chart-plot-spec.ts",
     "reference-model.ts",

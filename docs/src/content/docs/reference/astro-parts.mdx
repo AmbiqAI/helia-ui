@@ -259,10 +259,10 @@ Also accepts `Omit<HTMLAttributes<'a'>, 'href'>`, `HTMLAttributes<'button'>`.
 import Callout from '@ambiqai/helia-ui/astro/Callout';
 ```
 
-| Prop           | Type                                                                                                                             | Default  | Description                                                           |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------- |
-| `title` (req.) | `string`                                                                                                                         | --       | The heading of the aside. Required: an untitled aside is a paragraph. |
-| `tone`         | `\| 'note' \| 'tip' \| 'success' \| 'important' \| 'warning' \| 'critical' \| 'compatibility' \| 'experimental' \| 'deprecated'` | `'note'` | What the aside means. Picks the tint and the icon together.           |
+| Prop           | Type          | Default  | Description                                                           |
+| -------------- | ------------- | -------- | --------------------------------------------------------------------- |
+| `title` (req.) | `string`      | --       | The heading of the aside. Required: an untitled aside is a paragraph. |
+| `tone`         | `CalloutTone` | `'note'` | What the aside means. Picks the tint and the icon together.           |
 
 **Slots**
 
