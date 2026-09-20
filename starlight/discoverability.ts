@@ -311,11 +311,33 @@ function scanEsm(line: string, state: EsmScan): EsmScan {
 }
 
 const IMPORT_LINE = /^\s*import\b/;
-/* A whole import statement, as against a sentence that opens with the word:
-   the module specifier is quoted, which prose is not. */
-const IMPORT_WHOLE = /^\s*import\b[^'"]*['"][^'"]*['"]\s*;?\s*$/;
-const EXPORT_LINE =
-  /^\s*export\b(?:\s+(?:default|const|let|var|function|async|class|type|interface)\b|\s*[{*])/;
+const IMPORT_BINDING = String.raw`(?:[A-Za-z_$][\w$]*|\*\s+as\s+[A-Za-z_$][\w$]*|\{[^}]*\})`;
+/*
+ * A whole import statement, as against a sentence that opens with the word.
+ * The specifier is quoted and what stands in front of it is a binding rather
+ * than a run of words, so a sentence about importing values out of a table is
+ * read as the prose it is. The shape is spelled out in the fixtures, not
+ * here: an example written as source in a comment is a specifier as far as
+ * the boundary check is concerned.
+ */
+const IMPORT_WHOLE = new RegExp(
+  String.raw`^\s*import\s*(?:['"][^'"]*['"]|(?:type\s+)?${IMPORT_BINDING}(?:\s*,\s*${IMPORT_BINDING})?\s+from\s*['"][^'"]*['"])\s*;?\s*$`,
+);
+
+const EXPORT_LINE = /^\s*export\b/;
+/*
+ * The shapes a real export statement takes: something is named and then
+ * assigned, called, or given a body. A sentence that opens with the word names
+ * nothing -- "export default (the site's own) value is used", "export const
+ * values ... (see below)" -- and dropping one would delete the page's own
+ * prose, the more so because an unbalanced bracket in it used to take every
+ * line that followed with it.
+ */
+const EXPORT_SHAPES = [
+  /^\s*export\s+(?:async\s+)?(?:const|let|var|function|class|type|interface)\s+(?:[A-Za-z_$][\w$]*|\{[^}]*\}|\[[^\]]*\])\s*(?:[=({:<]|extends\b|implements\b)/,
+  /^\s*export\s+default\s+(?:[{[]|(?:async\s+)?function\b|class\b|[A-Za-z_$][\w$]*\s*(?:\(|;?\s*$))/,
+  /^\s*export\s*[{*]/,
+];
 
 /**
  * Drops the ESM at the top of an MDX file, statement by statement.
@@ -336,17 +358,29 @@ const EXPORT_LINE =
 export function stripEsm(text: string): string {
   return withoutInlineCode(text, (masked) => {
     const kept: string[] = [];
+    /* The lines of a statement that has not closed yet. A statement closes its
+       own brackets, so a run that ends with one still open never held a
+       statement at all, and the lines go back rather than being dropped on a
+       guess that has already eaten the rest of the page. */
+    let pending: string[] = [];
     let open: EsmScan | null = null;
 
     for (const line of masked.split('\n')) {
       if (open) {
+        pending.push(line);
         open = scanEsm(line, open);
-        if (open.depth === 0 && !open.template) open = null;
+        if (open.depth === 0 && !open.template) {
+          open = null;
+          pending = [];
+        }
         continue;
       }
 
       const isImport = IMPORT_LINE.test(line);
-      if (!isImport && !EXPORT_LINE.test(line)) {
+      const isExport =
+        EXPORT_LINE.test(line) &&
+        EXPORT_SHAPES.some((shape) => shape.test(line));
+      if (!isImport && !isExport) {
         kept.push(line);
         continue;
       }
@@ -357,20 +391,37 @@ export function stripEsm(text: string): string {
         kept.push(line);
         continue;
       }
-      open = unfinished ? scanned : null;
+      if (unfinished) {
+        open = scanned;
+        pending = [line];
+      }
     }
 
-    return kept.join('\n');
+    return [...kept, ...pending].join('\n');
   });
 }
 
-/** The index of the brace closing the group that opens at `start`. */
+/**
+ * The index of the brace closing the group that opens at `start`, or `-1`.
+ *
+ * Quoted and template spans are consumed rather than counted, the way a line
+ * of ESM is: the brace in `{items.join('} ')}` is a character in a string and
+ * neither closes the expression nor opens one.
+ */
 function closingBrace(text: string, start: number): number {
   let depth = 0;
   for (let index = start; index < text.length; index += 1) {
     const char = text[index]!;
     if (char === '\\') {
       index += 1;
+      continue;
+    }
+    if (char === '"' || char === "'" || char === '`') {
+      index += 1;
+      while (index < text.length && text[index] !== char) {
+        if (text[index] === '\\') index += 1;
+        index += 1;
+      }
       continue;
     }
     if (char === '{') depth += 1;
@@ -611,6 +662,31 @@ function transcriptOf(raw: string | undefined): string | null {
   return lines.join('\n');
 }
 
+/*
+ * `\u0000` is what this pass masks an inline-code span with, so it survives;
+ * every other control character is neither content nor markup.
+ */
+const CONTROL = /[\u0001-\u001f\u007f]/g;
+
+/*
+ * A title is the page's own prose and a rendition is markdown, so a `]` in a
+ * title would close the link text and let whatever the author wrote next pose
+ * as the target of a link the page never made.
+ */
+const linkText = (value: string): string =>
+  value.replace(CONTROL, '').replace(/([\\[\]])/g, '\\$1');
+
+/* A target holding whitespace or a bracket needs the pointy form to stay one
+   target, and `<` and `>` inside it need escaping in turn. */
+const linkTarget = (value: string): string => {
+  const href = value.replace(CONTROL, '');
+  return /[\s()]/.test(href) ? `<${href.replace(/([\\<>])/g, '\\$1')}>` : href;
+};
+
+/** The longest run of backticks in a string, which a fence has to clear. */
+const longestRun = (value: string): number =>
+  Math.max(0, ...[...value.matchAll(/`+/g)].map((run) => run[0]!.length));
+
 /** What an element reduced to, and how the text around it must be joined. */
 interface Reduction {
   /** `item` is one line of a list; `block` stands alone; `inline` is prose. */
@@ -634,7 +710,8 @@ function reduceElement(node: ElementNode): Reduction {
   if (node.name === 'AsciiTerminal') {
     const transcript = transcriptOf(node.attributes['lines']?.raw);
     if (transcript !== null) {
-      return { kind: 'block', text: `\`\`\`text\n${transcript}\n\`\`\`` };
+      const fence = '`'.repeat(Math.max(3, longestRun(transcript) + 1));
+      return { kind: 'block', text: `${fence}text\n${transcript}\n${fence}` };
     }
     return children;
   }
@@ -642,24 +719,25 @@ function reduceElement(node: ElementNode): Reduction {
   const title = literal(node, 'title');
   const href = literal(node, 'href');
 
-  /* Whatever carries both a name and a target is a link, whoever wrote it:
-     the package's own parts, Starlight's, and a consuming site's alike. */
-  if (title !== undefined && href !== undefined) {
+  /* Whatever component carries both a name and a target is a link, whoever
+     wrote it: the package's own parts, Starlight's, and a consuming site's
+     alike. An element is not: `<a href title>` is already the link it makes,
+     and `title` on it is a tooltip rather than the link's name. */
+  if (/^[A-Z]/.test(node.name) && title !== undefined && href !== undefined) {
     const description = children.text.replace(/\s+/g, ' ').trim();
+    const link = `- [${linkText(title)}](${linkTarget(href)})`;
     return {
       kind: 'item',
-      text: `- [${title}](${href})${description === '' ? '' : `: ${description}`}`,
+      text: description === '' ? link : `${link}: ${description}`,
     };
   }
 
   if (node.name === 'Card' && title !== undefined) {
     const body = children.text.trim();
+    const heading = `${CARD_HEADING} ${title.replace(CONTROL, '')}`;
     return {
       kind: 'block',
-      text:
-        body === ''
-          ? `${CARD_HEADING} ${title}`
-          : `${CARD_HEADING} ${title}\n\n${body}`,
+      text: body === '' ? heading : `${heading}\n\n${body}`,
     };
   }
 
@@ -765,7 +843,9 @@ function absolutize(target: string, pageUrl: string, origin: string): string {
   return new URL(value, pageUrl).href;
 }
 
-const INLINE_LINK = /(!?\[[^\]]*\]\()([^()\s]+)((?:\s+"[^"]*")?\))/g;
+/* The pointy form is the one a target holding a bracket or a space is written
+   in, and it still has to reach the deployed site. */
+const INLINE_LINK = /(!?\[[^\]]*\]\()(<[^<>]*>|[^()\s]+)((?:\s+"[^"]*")?\))/g;
 const REFERENCE_LINK = /^([ \t]{0,3}\[[^\]]+\]:[ \t]*)(\S+)(.*)$/gm;
 
 function resolveLinks(text: string, pageUrl: string, origin: string): string {
@@ -775,11 +855,12 @@ function resolveLinks(text: string, pageUrl: string, origin: string): string {
     return `\u0000${spans.length - 1}\u0000`;
   });
   const linked = masked
-    .replace(
-      INLINE_LINK,
-      (_, open: string, target: string, close: string) =>
-        `${open}${absolutize(target, pageUrl, origin)}${close}`,
-    )
+    .replace(INLINE_LINK, (_, open: string, target: string, close: string) => {
+      const pointy = target.startsWith('<') && target.endsWith('>');
+      const value = pointy ? target.slice(1, -1) : target;
+      const resolved = absolutize(value, pageUrl, origin);
+      return `${open}${pointy ? `<${resolved}>` : resolved}${close}`;
+    })
     .replace(
       REFERENCE_LINK,
       (_, open: string, target: string, rest: string) =>
@@ -796,7 +877,9 @@ function resolveLinks(text: string, pageUrl: string, origin: string): string {
  *
  * `mdx` says whether a brace is syntax or a character. In an MDX page it opens
  * an expression and a comment renders nothing; in a plain markdown page both
- * are ordinary text, and dropping them would delete the page's own prose.
+ * are ordinary text, and dropping them would delete the page's own prose. It
+ * defaults to `false`, the answer that changes nothing for a caller that does
+ * not know; the plugin passes the page's own extension.
  */
 export function renderMarkdown(
   body: string,
@@ -807,7 +890,7 @@ export function renderMarkdown(
     mdx?: boolean;
   },
 ): string {
-  const mdx = options.mdx ?? true;
+  const mdx = options.mdx ?? false;
   const rendered = splitFences(body)
     .map(({ code, text }) => {
       /* A fenced block is quoted, not authored: a page documenting MDX shows

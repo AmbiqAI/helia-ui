@@ -48,8 +48,14 @@ These belong in the release note.
   terminal transcript that published nothing now publishes its lines.
 - Renditions and `llms-full.txt` shrink where they carried source. MDX
   comments, MDX expressions and the body of a multi-line `export` statement
-  are gone. A site that was working around either loss should drop the
-  workaround rather than stack it on this.
+  are gone.
+- A site working around the old losses should drop only the part this
+  replaces. On neuralspotx that is the component-link recovery in
+  `scripts/lib/render-agent-markdown.mjs`; the composer around it stays, and
+  has to, because it rebuilds 94 renditions out of `cli.json` and
+  `config.json` and the argument tables it draws from live in component props
+  no source-based pass can read. Stacked on this branch the two produced no
+  duplicate links.
 - `llms.txt` line counts and byte sizes move for any page with a component on
   it. Nothing about the route list or the headings changes.
 - JSON-LD is escaped. The rendered graph is unchanged for anything that parses
@@ -59,8 +65,12 @@ These belong in the release note.
   plugin entry re-exports none of them; they are reachable through
   `@ambiqai/helia-ui/starlight/discoverability.ts` the way `renderMarkdown`
   already was.
-- `renderMarkdown` takes an `mdx` option, defaulting to `true`. The plugin
+- `renderMarkdown` takes an `mdx` option, defaulting to `false` so that an
+  external caller that does not pass it gets what it got before. The plugin
   passes the page's own extension.
+- Semver: additive exports and a changed rendition body make this at least a
+  minor pre-release bump, and it earns a release note rather than a line in
+  the changelog. The version is the owner's call.
 
 ## Verified
 
@@ -90,3 +100,15 @@ card's list item.
 
 Owner review of the diff, then an issue-linked pull request closing #143, #135
 and #136. No release.
+
+## Review answered
+
+An adversarial pass blocked the first commit and is answered in the second.
+`stripEsm` now requires a declaration shape before it will treat a line as a
+statement, and gives the lines back when a statement never closes, so prose
+that opens with `export` keeps itself and everything after it. A card title is
+escaped into its link text and a target holding a bracket or a space is
+enclosed, so a title cannot forge a link. The link rule fires on components
+only, never on `<a>`. `closingBrace` consumes strings, the transcript fence is
+sized to what it encloses, `IMPORT_WHOLE` requires a real binding, and the
+`mdx` option defaults to `false`.

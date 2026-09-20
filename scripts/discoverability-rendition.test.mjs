@@ -28,6 +28,7 @@ const render = (body, options = {}) =>
     pageUrl: 'https://example.com/docs/page/',
     origin: 'https://example.com/docs/',
     title: 'Page',
+    mdx: true,
     ...options,
   });
 
@@ -95,11 +96,66 @@ test('a multi-line import goes with its specifiers', () => {
 });
 
 /* A sentence is not a statement, and the rendition used to lose any line that
-   opened with the word. */
+   opened with one of the words -- and, once the brackets were tracked, every
+   line after it as well. */
 test('prose that opens with the word import is kept', () => {
   const line = 'import that module: it is an implementation detail.';
 
   assert.equal(stripEsm(line), line);
+  assert.equal(
+    stripEsm("import the values from 'the table' above."),
+    "import the values from 'the table' above.",
+  );
+});
+
+test('prose shaped like an export keeps itself and the lines after it', () => {
+  const runs = [
+    [
+      "export default (the site's own) value is used.",
+      '',
+      'The sentence after it.',
+    ],
+    [
+      '- export const values ... (see the list below for the',
+      '  ones a product site overrides).',
+      '',
+      'The sentence after it.',
+    ],
+    [
+      'export type aliases are re-exported (see the table',
+      'below).',
+      '',
+      'The sentence after it.',
+    ],
+  ];
+
+  for (const run of runs) {
+    assert.equal(stripEsm(run.join('\n')), run.join('\n'));
+  }
+});
+
+/*
+ * A statement closes its own brackets. A run that ends with one still open
+ * never held a statement, and dropping the lines on that guess is how a stray
+ * backtick or bracket used to take the rest of the page with it.
+ */
+test('a statement that never closes gives its lines back', () => {
+  const unbalanced = [
+    'export const values = [',
+    "  'unclosed',",
+    '',
+    'The sentence after it.',
+  ].join('\n');
+  const template = [
+    'export const label = `a ` b ` c;',
+    '',
+    '## The section after it',
+    '',
+    'The sentence after it.',
+  ].join('\n');
+
+  assert.equal(stripEsm(unbalanced), unbalanced);
+  assert.equal(stripEsm(template), template);
 });
 
 test('a code sample in a prop is not read as this file ESM', () => {
@@ -139,6 +195,29 @@ test('an expression is dropped, and a plain markdown brace is not', () => {
   assert.equal(stripExpressions('`{kept}`'), '`{kept}`');
   assert.match(render('Use {slug} here.\n', { mdx: false }), /\{slug\}/);
   assert.ok(!render('Use {slug} here.\n').includes('{slug}'));
+});
+
+/* A brace in a string is a character. The expression ends where the JavaScript
+   says it does, not at the first `}` that happens to be quoted. */
+test('a brace inside a string neither closes an expression nor opens one', () => {
+  assert.equal(
+    stripExpressions("Total: {items.join('} ')} done."),
+    'Total:  done.',
+  );
+  assert.equal(stripExpressions("a {'x { y'} b"), 'a  b');
+});
+
+/* A caller that does not say which it has gets the answer that changes
+   nothing: MDX syntax is only syntax on a page that is MDX. */
+test('renderMarkdown treats a page as plain markdown unless told otherwise', () => {
+  const rendition = renderMarkdown('{/* kept */} Use {slug} here.\n', {
+    pageUrl: 'https://example.com/docs/page/',
+    origin: 'https://example.com/docs/',
+    title: 'Page',
+  });
+
+  assert.match(rendition, /\{\/\* kept \*\/\}/);
+  assert.match(rendition, /\{slug\}/);
 });
 
 test('a card grid reduces to its links, in source order', () => {
@@ -201,6 +280,54 @@ test('a titled card is a heading over its body, nesting included', () => {
   assert.equal(reduced.trim(), '### Boards\n\nTwo are supported.');
 });
 
+/* A title is prose and a rendition is markdown: a bracket in one would close
+   the link text and let the rest of the title pose as the target. */
+test('a card title cannot forge a link', () => {
+  const reduced = reduceTags(
+    '<LinkCard href="/real/" title="Safe page](https://evil.test/pwn) [" />',
+  );
+
+  /* Every bracket the title carried is escaped, so the one link text that
+     closes is the one this pass wrote, over the target the card named. */
+  const unescaped = reduced.replace(/\\./g, '').trim();
+  assert.equal(unescaped.match(/]\(/g).length, 1);
+  assert.match(unescaped, /]\(\/real\/\)$/);
+  assert.equal(
+    reduced.trim(),
+    '- [Safe page\\](https://evil.test/pwn) \\[](/real/)',
+  );
+});
+
+test('a bracket in a title is escaped and a bracket in a target is enclosed', () => {
+  assert.equal(
+    reduceTags(
+      '<LinkCard href="/slices/" title="Arrays [and] slices" />',
+    ).trim(),
+    '- [Arrays \\[and\\] slices](/slices/)',
+  );
+  assert.equal(
+    reduceTags('<LinkCard href="/a(b)c" title="Parens" />').trim(),
+    '- [Parens](</a(b)c>)',
+  );
+});
+
+test('an enclosed target still reaches the deployed site', () => {
+  const rendition = render('<LinkCard href="/a(b)c" title="Parens" />\n');
+
+  assert.match(rendition, /\(<https:\/\/example\.com\/a\(b\)c>\)/);
+});
+
+/* An anchor is already the link it makes, and `title` on one is a tooltip. */
+test('an HTML anchor is left as the prose it sits in', () => {
+  const sentence =
+    'See the <a href="/docs/config/" title="Configuration reference">configuration reference</a> for details.';
+
+  assert.equal(
+    reduceTags(sentence).trim(),
+    'See the configuration reference for details.',
+  );
+});
+
 test('an unknown component keeps its children and loses its tags', () => {
   const reduced = reduceTags('<Reveal label="More">\n  The body.\n</Reveal>');
 
@@ -227,6 +354,22 @@ test('an inline literal transcript is a fenced block, prompts included', () => {
       '\n',
     ),
   );
+});
+
+/* A fence has to clear the longest run of backticks it encloses, or the
+   transcript ends the block early. */
+test('a transcript holding a fence is enclosed by a longer one', () => {
+  const reduced = reduceTags(
+    [
+      '<AsciiTerminal',
+      '  lines={[',
+      "    { text: '``` fenced' },",
+      '  ]}',
+      '/>',
+    ].join('\n'),
+  );
+
+  assert.equal(reduced.trim(), '````text\n``` fenced\n````');
 });
 
 /* An imported transcript is not in this file, so there is nothing to read. */
