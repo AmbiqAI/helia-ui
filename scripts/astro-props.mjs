@@ -92,6 +92,16 @@ const EXAMPLES = {
   Band: { page: 'gallery', label: 'Gallery', anchor: 'band' },
   Bars: { page: 'gallery', label: 'Gallery', anchor: 'bars' },
   BigNumber: { page: 'gallery', label: 'Gallery', anchor: 'figures' },
+  Block: {
+    page: 'block-diagrams',
+    label: 'Block diagrams',
+    anchor: 'nesting',
+  },
+  BlockDiagram: {
+    page: 'block-diagrams',
+    label: 'Block diagrams',
+    anchor: 'a-flat-row',
+  },
   Button: { page: 'primitives', label: 'Primitives', anchor: 'button' },
   Callout: { page: 'callouts', label: 'Callouts', anchor: 'core-guidance' },
   Card: { page: 'cards', label: 'Cards', anchor: 'the-card-parts' },

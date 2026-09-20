@@ -38,6 +38,7 @@ const routes = [
   { path: `${base}/disclosure/`, heading: 'Disclosure' },
   { path: `${base}/timeline/`, heading: 'Timeline' },
   { path: `${base}/diagrams/`, heading: 'Diagrams' },
+  { path: `${base}/block-diagrams/`, heading: 'Block diagrams' },
   { path: `${base}/layout/`, heading: 'Layout' },
   {
     path: `${base}/reference/astro-parts/`,
