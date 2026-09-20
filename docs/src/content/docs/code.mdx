@@ -155,6 +155,43 @@ script, so ask for them deliberately.
   ]}
 />
 
+A page can carry as many animated transcripts as the explanation needs. Each
+one sets itself up once its own markup is complete, so the second and later
+frames replay and autoplay exactly like the first.
+
+<AsciiTerminal
+  title="Doctor"
+  animated
+  copy
+  tone="dark"
+  lines={[
+    { kind: 'command', text: 'npx thing doctor' },
+    { kind: 'muted', text: 'Checking toolchain…' },
+    { kind: 'output', text: '' },
+    { kind: 'output', text: '  NODE      24.4.1' },
+    { kind: 'error', text: '  x missing board support package' },
+    { kind: 'output', text: '' },
+    { kind: 'warning', text: '! 1 check failed' },
+  ]}
+/>
+
+Set `autoplay={false}` when the reader should decide. The transcript then sits
+complete and still until the replay control is used.
+
+<AsciiTerminal
+  title="Manual start"
+  animated
+  autoplay={false}
+  tone="dark"
+  lines={[
+    { kind: 'command', text: 'npx thing deploy --dry-run' },
+    { kind: 'muted', text: 'Planning…' },
+    { kind: 'output', text: '' },
+    { kind: 'output', text: '  UPLOAD    2 artifacts' },
+    { kind: 'success', text: '✓ Nothing to change' },
+  ]}
+/>
+
 `tone` decides which way round the transcript reads. `adaptive`, the default,
 follows the page theme. `light` is dark ink on a fixed pale backdrop and `dark`
 is pale ink on a fixed dark one; both keep their palette when the reader

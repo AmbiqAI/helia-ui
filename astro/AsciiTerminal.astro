@@ -11,6 +11,11 @@
  *
  * The default form is inert and ships no behavior. Setting `animated`, `copy`
  * or `replay` opts the page into the inline script.
+ *
+ * An interactive instance exposes `play()` on the element once it is set up,
+ * which starts the animation the way the replay control does. An instance the
+ * parser reaches after the definition is set up on `DOMContentLoaded`, so wait
+ * for that event before calling it.
  */
 export type AsciiTerminalLineKind =
   'command' | 'muted' | 'output' | 'success' | 'warning' | 'error';
@@ -105,9 +110,36 @@ const BEHAVIOR = `
       super();
       this.runId = 0;
       this.hasPlayed = false;
+      this.awaitingChildren = false;
     }
 
+    /*
+     * The definition lives in an inline script after the first instance, so
+     * every instance the parser reaches after it is upgraded on its opening
+     * tag, with none of its children parsed yet. Setting up then would bind
+     * nothing, and an upgrade happens once, so nothing would retry.
+     */
     connectedCallback() {
+      if (this.dataset.ready === 'true' || this.awaitingChildren) return;
+
+      const parsed = this.querySelector('[data-line]') !== null;
+      if (!parsed && document.readyState === 'loading') {
+        this.awaitingChildren = true;
+        document.addEventListener(
+          'DOMContentLoaded',
+          () => {
+            this.awaitingChildren = false;
+            this.setup();
+          },
+          { once: true },
+        );
+        return;
+      }
+
+      this.setup();
+    }
+
+    setup() {
       if (this.dataset.ready === 'true') return;
       this.dataset.ready = 'true';
 
@@ -192,6 +224,11 @@ const BEHAVIOR = `
 
         if (currentRun === this.runId) this.removeAttribute('data-playing');
       };
+
+      /* The replay control is markup; a consumer driving the transcript from
+         its own script needs the same entry point. Present from setup, which
+         a late instance reaches on DOMContentLoaded. */
+      this.play = play;
 
       replayButton?.addEventListener('click', () => {
         if (status) status.textContent = '';
