@@ -14,21 +14,21 @@
 
 import type { AstroIntegration } from 'astro';
 import type { HookParameters, StarlightPlugin } from '@astrojs/starlight/types';
-import type { HeliaSectionLink } from './sections';
-import { resolveHub, type HeliaHeaderHub } from './header-hub';
+import type { HeliaSectionLink } from './sections.ts';
+import { resolveHub, type HeliaHeaderHub } from './header-hub.ts';
 import {
   discoverabilityIntegration,
   resolveDiscoverability,
   type HeliaDiscoverabilityOptions,
   type ResolvedDiscoverability,
-} from './discoverability';
-import { markdownCalloutsIntegration } from './markdown-callouts';
+} from './discoverability.ts';
+import { markdownCalloutsIntegration } from './markdown-callouts.ts';
 
-export type { HeliaDiscoverabilityOptions } from './discoverability';
-export { heliaFrontmatterSchema } from './schema';
-export type { HeliaFrontmatter } from './schema';
-export type { HeliaSectionLink } from './sections';
-export type { HeliaHeaderHub } from './header-hub';
+export type { HeliaDiscoverabilityOptions } from './discoverability.ts';
+export { heliaFrontmatterSchema } from './schema.ts';
+export type { HeliaFrontmatter } from './schema.ts';
+export type { HeliaSectionLink } from './sections.ts';
+export type { HeliaHeaderHub } from './header-hub.ts';
 
 type StarlightConfigInput = HookParameters<'config:setup'>['config'];
 

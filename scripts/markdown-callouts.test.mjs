@@ -8,12 +8,24 @@
  * against that shape rather than against rendered HTML is the point -- the
  * transform's contract is with Starlight's markup, and this fails the day that
  * markup changes rather than the day a page looks wrong.
+ *
+ * Neither markdown processor is driven for real here. This package declares no
+ * processor: Satteri and unified are the consuming site's, and pulling one in
+ * as a development dependency to render a fixture string rewrites a thousand
+ * lines of the lockfile for a pipeline the gallery build and a packed-consumer
+ * build already exercise end to end. So the shapes both processors produce are
+ * fixtures, and the registration is driven through the integration hook.
  */
 
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { transformAsides } from '../starlight/markdown-callouts.ts';
+import rehypeHeliaCallouts, {
+  markdownCalloutsIntegration,
+  satteriHeliaCallouts,
+  transformAsides,
+} from '../starlight/markdown-callouts.ts';
+import { heliaStarlight } from '../starlight/index.ts';
 import { renderMarkdown } from '../starlight/discoverability.ts';
 
 const element = (tagName, properties, children = []) => ({
@@ -321,4 +333,164 @@ test('an aside with no label takes its name from the title text', () => {
   transformAsides(tree);
 
   assert.equal(tree.children[0].properties['aria-label'], 'Note');
+});
+
+/*
+ * Satteri hands a node over frozen, so anything carried out of the aside has
+ * to be copied before the transform rewrites a child list. A nested aside is
+ * the case that writes: without the copy the first replacement throws.
+ */
+function deepFreeze(node) {
+  if (Array.isArray(node.children)) {
+    node.children.forEach(deepFreeze);
+    Object.freeze(node.children);
+  }
+  if (node.properties) Object.freeze(node.properties);
+  return Object.freeze(node);
+}
+
+const noParents = { parent: () => undefined };
+
+test('a frozen aside holding another is rewritten without writing to it', () => {
+  const inner = satteriAside('danger', 'Inner');
+  const outer = satteriAside('note', 'Outer');
+  outer.children[1].children = [paragraph('Before.'), inner];
+  deepFreeze(outer);
+
+  const callout = satteriHeliaCallouts().element.visit(outer, noParents);
+
+  const body = bodyOf(callout);
+  assert.deepEqual(classesOf(callout).at(-1), 'helia-callout--note');
+  assert.deepEqual(
+    classesOf(body.children[1]).at(-1),
+    'helia-callout--critical',
+  );
+  /* The original is still Starlight's, which is what frozen means. */
+  assert.ok(Object.isFrozen(outer));
+  assert.equal(
+    inner.properties.class,
+    'starlight-aside starlight-aside--danger',
+  );
+});
+
+test('a frozen aside under a wrapper inside another is rewritten too', () => {
+  const inner = satteriAside('tip', 'Inner');
+  const outer = satteriAside('note', 'Outer');
+  outer.children[1].children = [
+    { type: 'element', tagName: 'div', properties: {}, children: [inner] },
+  ];
+  deepFreeze(outer);
+
+  const callout = satteriHeliaCallouts().element.visit(outer, noParents);
+
+  const wrapper = bodyOf(callout).children[0];
+  assert.deepEqual(classesOf(wrapper.children[0]).at(-1), 'helia-callout--tip');
+});
+
+test('a nested aside is left for its ancestor under Satteri', () => {
+  const inner = satteriAside('danger', 'Inner');
+  const outer = satteriAside('note', 'Outer');
+  const ctx = { parent: (node) => (node === inner ? outer : undefined) };
+
+  assert.equal(
+    satteriHeliaCallouts().element.visit(inner, ctx),
+    undefined,
+    'the outer replacement carries it, so a second patch would be dropped',
+  );
+});
+
+test('an aside under a not-content ancestor is left alone under Satteri', () => {
+  const aside = satteriAside('note', 'Note');
+  const wrapper = {
+    type: 'element',
+    tagName: 'div',
+    properties: { class: 'not-content' },
+    children: [aside],
+  };
+  const ctx = { parent: (node) => (node === aside ? wrapper : undefined) };
+
+  assert.equal(satteriHeliaCallouts().element.visit(aside, ctx), undefined);
+});
+
+/*
+ * The registration itself. Which list the transform lands on decides whether
+ * it runs at all: Satteri is Astro's default processor and does not read
+ * `rehypePlugins`, so a plugin on the wrong list is silently inert and every
+ * assertion above would still pass.
+ */
+const setup = async (processor, options = {}) => {
+  const warnings = [];
+  const integration = markdownCalloutsIntegration();
+  await integration.hooks['astro:config:setup']({
+    config: { markdown: { processor } },
+    logger: { warn: (message) => warnings.push(message) },
+    ...options,
+  });
+  return warnings;
+};
+
+const satteriProcessor = () => ({
+  name: 'satteri',
+  options: { mdastPlugins: [], hastPlugins: [], features: {} },
+});
+
+const unifiedProcessor = () => ({
+  name: 'unified',
+  options: { remarkPlugins: [], rehypePlugins: [], remarkRehype: {} },
+});
+
+test('a Satteri processor gets the transform as a hast plugin', async () => {
+  const processor = satteriProcessor();
+
+  const warnings = await setup(processor);
+
+  assert.deepEqual(warnings, []);
+  assert.deepEqual(processor.options.hastPlugins, [satteriHeliaCallouts]);
+  assert.deepEqual(processor.options.mdastPlugins, []);
+});
+
+test('a unified processor gets the transform as a rehype plugin', async () => {
+  const processor = unifiedProcessor();
+
+  const warnings = await setup(processor);
+
+  assert.deepEqual(warnings, []);
+  assert.deepEqual(processor.options.rehypePlugins, [rehypeHeliaCallouts]);
+  assert.deepEqual(processor.options.remarkPlugins, []);
+});
+
+test('a processor that reads neither list is named in a warning', async () => {
+  const processor = { name: 'homegrown', options: {} };
+
+  const warnings = await setup(processor);
+
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0], /homegrown/);
+  assert.match(warnings[0], /markdownCallouts: false/);
+  assert.deepEqual(processor.options, {});
+});
+
+test('markdownCallouts: false adds no integration', () => {
+  const added = [];
+  const collect = (options) => {
+    heliaStarlight(options).hooks['config:setup']({
+      addIntegration: (integration) => added.push(integration.name),
+      addRouteMiddleware: () => {},
+      config: { title: 'Site' },
+      updateConfig: () => {},
+    });
+    return added.splice(0);
+  };
+
+  const withCallouts = collect({});
+  const without = collect({ markdownCallouts: false });
+
+  const name = '@ambiqai/helia-ui/starlight:markdown-callouts';
+  assert.ok(withCallouts.includes(name), 'installed by default');
+  assert.ok(!without.includes(name));
+  /* The rest of the plugin is untouched by the opt-out. */
+  assert.deepEqual(
+    without,
+    withCallouts.filter((added) => added !== name),
+  );
 });

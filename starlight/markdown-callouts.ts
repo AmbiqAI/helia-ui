@@ -241,6 +241,21 @@ export function transformAsides(tree: HastNode): void {
   }
 }
 
+/**
+ * The subtree with every node and every child list copied.
+ *
+ * Satteri materializes a node from its own arena and hands it over frozen, so
+ * the carried content cannot be rewritten in place. Nothing below a node is
+ * mutated except its `children`, so the copy is shallow per node: properties
+ * and text values travel by reference.
+ */
+function mutableTree(node: HastNode): HastNode {
+  const children = node.children;
+  return Array.isArray(children)
+    ? { ...node, children: children.map(mutableTree) }
+    : { ...node };
+}
+
 /** The transform as a plugin for the unified processor. */
 export default function rehypeHeliaCallouts() {
   return transformAsides;
@@ -272,7 +287,11 @@ export function satteriHeliaCallouts() {
           ancestor = ctx.parent(ancestor);
         }
 
-        const callout = calloutElement(node as HastElement, tone);
+        /* Copied before the transform rather than after: `transformAsides`
+           replaces entries of the child lists it walks, and the ones carried
+           out of the aside are still Satteri's frozen arrays. A nested aside
+           would throw on the first write without this. */
+        const callout = calloutElement(mutableTree(node) as HastElement, tone);
         transformAsides(callout);
         return callout;
       },
