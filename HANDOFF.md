@@ -1,117 +1,70 @@
-# Faithful Markdown renditions for MDX pages
+# AsciiTerminal: later instances on a page never animated
 
-Goal: the `.md` rendition and the llms artifacts carry what an MDX page
-rendered, not the source it was written in. Issues: AmbiqAI/helia-ui#143
-(`export const` bodies leaking as prose, attribute-only components rendering as
-nothing), #135 (MDX comments and expressions kept), #136 (JSON-LD written into
-a script body unescaped).
+Goal: every animated `AsciiTerminal` on a page types, replays and autoplays,
+not just the first. Issue: AmbiqAI/helia-ui#149. PR: AmbiqAI/helia-ui#150.
 
-Worktree: /Users/adam.page/Ambiq/helia/helia-ui-issue-143
-Branch: 143-rendition-fidelity, on 51aaae9 (v0.1.0-alpha.15). No version bump
-in the branch. The main checkout is untouched.
+Worktree: /Users/adam.page/Ambiq/helia/helia-ui-issue-149
+Branch: 149-terminal-late-children, off origin/main (1d477cc, v0.1.0-alpha.16
+notes). No version bump in the branch. The main checkout is untouched.
 
 ## What is implemented
 
-`starlight/discoverability.ts` holds the rendition pass, and it is now four
-transforms rather than two, each of them exported so the fixtures can reach
-them.
+`astro/AsciiTerminal.astro` emits its behavior inline after each instance and
+defines the element in the first copy, so every instance the parser reaches
+after that was upgraded on its opening tag, before its lines existed.
+`connectedCallback` bound nothing, set `data-ready` and never retried.
 
-`stripEsm` tracks bracket depth from the opening line of a statement through
-the line that closes it, so a multi-line `export const`, `export default`,
-`export function` or named-import block goes whole instead of losing its first
-line and publishing the rest. It runs with inline code held out, because a prop
-carrying a code sample holds whole statements of someone else's JavaScript and
-none of that is the page's ESM. A sentence that opens with the word "import" is
-no longer mistaken for a statement: a real one ends in a quoted specifier.
+`connectedCallback` now decides how to reach the transcript and `setup()` holds
+the work it used to do. Children already there: set up now. None yet and the
+document still parsing: `DOMContentLoaded`, once. None yet after the parse: a
+`childList` `MutationObserver` that fires when a `[data-line]` appears, for an
+element a script connects empty and fills a tick later.
 
-`stripComments` drops `{/* ... */}` and `stripExpressions` drops the rest of
-the MDX expressions. Both are gated on the file being `.mdx`, because a brace
-in a plain markdown page is a character rather than syntax, and both skip
-fenced code, because a page documenting MDX quotes the syntax on purpose.
+Readiness is an instance field and a promise rather than the `data-ready`
+attribute, which a `cloneNode(true)` copies: guarding on the attribute left a
+clone of a set-up terminal permanently inert.
 
-`reduceTags` parses the tags into a tree instead of stripping them a line at a
-time, and reduces the parts whose content is in their props: anything carrying
-both a `title` and an `href` becomes `- [title](href): children`, a `Card` with
-a title becomes an `h3` over its body, and an `AsciiTerminal` with an inline
-literal `lines` prop becomes a fenced text block with its prompts. Everything
-else still reduces to its children. A prop whose value is an expression is a
-loss by design: the rendition has the source and not the page's scope.
+`play()` is a method on the element. It awaits readiness before running, so a
+consumer's own load listener registered before the component's can call it, and
+resolves when the run ends.
 
-`serializeJsonLd` escapes `<`, `>` and `&` as `\uXXXX`, and
-`Discoverability.astro` serializes the graph through it.
-
-## Consumer-visible changes
+## Consumer-visible
 
 These belong in the release note.
 
-- Renditions and `llms-full.txt` grow. A card grid that published three
-  orphan sentences now publishes three links with their descriptions, and a
-  terminal transcript that published nothing now publishes its lines.
-- Renditions and `llms-full.txt` shrink where they carried source. MDX
-  comments, MDX expressions and the body of a multi-line `export` statement
-  are gone.
-- A site carrying a workaround for either loss should drop the part this
-  replaces rather than stack one on the other.
-- `llms.txt` line counts and byte sizes move for any page with a component on
-  it. Nothing about the route list or the headings changes.
-- JSON-LD is escaped. The rendered graph is unchanged for anything that parses
-  it; a site diffing the built HTML will see `\u003c` where it had `<`.
-- `starlight/discoverability.ts` names five more exports: `stripComments`,
-  `stripEsm`, `stripExpressions`, `reduceTags` and `serializeJsonLd`. The
-  plugin entry re-exports none of them; they are reachable through
-  `@ambiqai/helia-ui/starlight/discoverability.ts` the way `renderMarkdown`
-  already was.
-- `renderMarkdown` takes an `mdx` option, defaulting to `false` so that an
-  external caller that does not pass it gets what it got before. The plugin
-  passes the page's own extension.
-- Semver: additive exports and a changed rendition body make the next
-  pre-release 0.1.0-alpha.16, and it earns a release note rather than a line
-  in the changelog.
+- Second and later animated terminals on a page replay and autoplay. A site
+  carrying a workaround, such as re-inserting a clone before playing, should
+  drop it rather than stack it on this.
+- A clone of a set-up terminal sets itself up when it is connected.
+- `play()` is new on the element and is the way to start a transcript without
+  the replay control. It resolves when the run ends.
+- No prop, markup or styling change. The default static form still ships
+  nothing, and a page with one terminal behaves as it did.
+- Semver: a fix plus an additive element method. Which pre-release carries it,
+  and whether it earns a release note, is the owner's call.
 
 ## Verified
 
 `npm ci` in both trees, `npm run validate`, `npm run docs:build`,
-`npm run docs:test`. `scripts/discoverability-rendition.test.mjs` covers each
-transform over MDX fixtures, and `docs/scripts/assert-docs-build.mjs` proves
-the claims on the built gallery rendition. Every page in the gallery was
-rendered before and after the change and the diff read line by line: the only
-removals are comments, expressions and descriptions that moved into their
-card's list item.
+`npm run docs:test`. `docs/tests/ascii-terminal.spec.ts` drives the transcripts
+on `/code/` by caption, and was proven to fail against the unfixed component:
+the second transcript reached 0 of 7 visible lines on scroll and a replay click
+left `data-playing` unset. `docs/src/content/docs/code.mdx` carries two more
+animated transcripts, one of them `autoplay={false}`, which is what the suite
+drives.
 
-## Decisions and gotchas
+## Gotchas
 
-- On neuralspotx this replaces the component-link recovery in
-  `scripts/lib/render-agent-markdown.mjs` and nothing else. The composer
-  around it stays, and has to: it rebuilds 94 renditions out of `cli.json` and
-  `config.json`, and the argument tables it draws from live in component props
-  that no source-based pass can read. Stacked on this branch the two produced
-  no duplicate links.
-
-- A card title is an `h3` because `LinkCard` defaults to `h3`, not because of
-  where the card sits. A generated heading does not join the page's heading
-  index, which is read off the source.
-- A fenced code block splits a prose run, so an element whose children hold a
-  fence arrives at the tag parser with its closing tag in another run. An
-  unclosed element takes the rest of the run and a stray closing tag is
-  dropped, which is the degradation the line-at-a-time pass already had.
-- An unbracketed multi-line assignment is still not tracked. Nothing
-  distinguishes its second line from prose.
-- `Callout` and the aside directives are untouched: the rendition carries the
-  directive, which is what #124 settled.
+- `astro/CodeTabs.astro`, `astro/DataTable.astro` and `astro/MediaEmbed.astro`
+  carry the same inline-per-instance shape and the same `data-ready` guard.
+  They were not touched here, and whether they are exposed depends on whether
+  their children are read at connection.
+- The retry observer watches `subtree` because the lines sit two levels down.
+  An element filled a node at a time could still be set up on a partial
+  transcript; a script that appends the frame whole cannot.
+- `npm ci` flips six `scripts/*.mjs` to mode 755 through bin linking. Keep that
+  out of commits; stage by path.
 
 ## Next
 
-Owner review of the diff, then an issue-linked pull request closing #143, #135
-and #136. No release.
-
-## Review answered
-
-An adversarial pass blocked the first commit and is answered in the second.
-`stripEsm` now requires a declaration shape before it will treat a line as a
-statement, and gives the lines back when a statement never closes, so prose
-that opens with `export` keeps itself and everything after it. A card title is
-escaped into its link text and a target holding a parenthesis or a space is
-enclosed, so a title cannot forge a link. The link rule fires on components
-only, never on `<a>`. `closingBrace` consumes strings, the transcript fence is
-sized to what it encloses, `IMPORT_WHOLE` requires a real binding, and the
-`mdx` option defaults to `false`.
+Owner sign-off on #150, then merge. No release cut in this branch.
