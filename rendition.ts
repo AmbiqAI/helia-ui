@@ -177,7 +177,12 @@ export function renditionText(html: string): string {
   }
 
   if (skip === null && index < html.length) out += html.slice(index);
-  return stripControl(decodeEntities(out)).replace(/\s+/g, ' ').trim();
+  /* A slot that wrapped in the source arrives with a line break between the
+     words it wrapped between, and the browser renders that break as the space
+     the reader sees. Collapsing before the control characters go is what keeps
+     it: stripped first, the break left the words joined. See
+     AmbiqAI/helia-ui#171. */
+  return stripControl(decodeEntities(out).replace(/\s+/g, ' ')).trim();
 }
 
 /**
