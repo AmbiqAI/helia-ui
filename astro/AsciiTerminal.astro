@@ -42,8 +42,12 @@ interface Props {
   animated?: boolean;
   /** Starts the animation when the frame scrolls into view. Needs `animated`. */
   autoplay?: boolean;
-  /** Adds the copy control, which copies the whole transcript as plain text. */
-  copy?: boolean;
+  /**
+   * Adds the copy control. `true` or `'transcript'` copies the whole transcript
+   * as plain text, prompts included; `'commands'` copies only the command
+   * lines, without prompts, which is what a reader pastes into a shell.
+   */
+  copy?: boolean | 'transcript' | 'commands';
   /** Adds the replay control. Defaults to whatever `animated` is. */
   replay?: boolean;
   /** `adaptive` follows the site theme; `light` and `dark` are fixed. */
@@ -75,7 +79,23 @@ const {
  * that a page with several interactive terminals repeats the source; the
  * `customElements.get` guard means only the first copy defines anything.
  */
-const interactive = animated || copy || replay;
+/* `true` keeps the original meaning of the flag; the string forms name it. A
+   value outside the contract renders no control rather than a control that
+   quietly copies the wrong thing. */
+const copyMode =
+  copy === true || copy === 'transcript'
+    ? 'transcript'
+    : copy === 'commands'
+      ? 'commands'
+      : null;
+const copyLabel =
+  copyMode === 'commands' ? 'Copy commands' : 'Copy terminal transcript';
+/* A commands control on a transcript with no command lines would copy an
+   empty string and report success, so it is not rendered. */
+const hasCopy =
+  copyMode === 'transcript' ||
+  (copyMode === 'commands' && lines.some((line) => line.kind === 'command'));
+const interactive = animated || hasCopy || replay;
 
 /*
  * Held as a string and written with `set:html` so the element renders the
@@ -176,22 +196,38 @@ const BEHAVIOR = `
       const status = this.querySelector('[data-status]');
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+      /* The commands mode copies what a reader pastes into a shell: the
+         command lines alone, without prompts or the output between them. The
+         lines carry their text as data, so the markup needs no second copy of
+         the transcript. */
+      const copyMode = copyButton?.dataset.copyMode ?? 'transcript';
+      const commands = lines
+        .filter((line) => line.dataset.kind === 'command')
+        .map((line) => line.dataset.text ?? '')
+        .join('\\n');
+      const clipboardText = copyMode === 'commands' ? commands : transcript;
+      const subject =
+        copyMode === 'commands' ? 'commands' : 'terminal transcript';
+      const idleLabel = 'Copy ' + subject;
+      const doneLabel =
+        copyMode === 'commands' ? 'Commands copied' : 'Terminal transcript copied';
+
       copyButton?.addEventListener('click', async () => {
-        const copied = await copyText(transcript);
+        const copied = await copyText(clipboardText);
         if (!status) return;
         if (!copied) {
-          status.textContent = 'Unable to copy terminal transcript';
+          status.textContent = 'Unable to copy ' + subject;
           return;
         }
 
         copyButton.dataset.copied = 'true';
-        copyButton.setAttribute('aria-label', 'Terminal transcript copied');
-        copyButton.title = 'Terminal transcript copied';
-        status.textContent = 'Terminal transcript copied';
+        copyButton.setAttribute('aria-label', doneLabel);
+        copyButton.title = doneLabel;
+        status.textContent = doneLabel;
         window.setTimeout(() => {
           delete copyButton.dataset.copied;
-          copyButton.setAttribute('aria-label', 'Copy terminal transcript');
-          copyButton.title = 'Copy terminal transcript';
+          copyButton.setAttribute('aria-label', idleLabel);
+          copyButton.title = idleLabel;
           status.textContent = '';
         }, 2400);
       });
@@ -339,13 +375,14 @@ const transcript = normalizedLines
         )
       }
       {
-        copy && (
+        hasCopy && (
           <button
-            aria-label="Copy terminal transcript"
+            aria-label={copyLabel}
             class="helia-focus-ring"
-            title="Copy terminal transcript"
+            title={copyLabel}
             type="button"
             data-copy-button
+            data-copy-mode={copyMode}
           >
             <svg aria-hidden="true" class="copy-icon" viewBox="0 0 20 20">
               <path d="M6.25 6.25V4.5A1.75 1.75 0 0 1 8 2.75h7.5a1.75 1.75 0 0 1 1.75 1.75V12A1.75 1.75 0 0 1 15.5 13.75h-1.75" />

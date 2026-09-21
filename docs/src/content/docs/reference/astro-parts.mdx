@@ -102,18 +102,18 @@ import AccordionGroup from '@ambiqai/helia-ui/astro/AccordionGroup';
 import AsciiTerminal from '@ambiqai/helia-ui/astro/AsciiTerminal';
 ```
 
-| Prop           | Type                              | Default                     | Description                                                              |
-| -------------- | --------------------------------- | --------------------------- | ------------------------------------------------------------------------ |
-| `lines` (req.) | `readonly AsciiTerminalLine[]`    | --                          | The transcript, in order.                                                |
-| `title`        | `string`                          | `'Terminal'`                | The frame's caption.                                                     |
-| `ariaLabel`    | `string`                          | `` `${title} transcript` `` | Accessible name for the frame. Defaults to the title plus `transcript`.  |
-| `animated`     | `boolean`                         | `false`                     | Types the command lines out on entry. Reduced motion shows them at once. |
-| `autoplay`     | `boolean`                         | `true`                      | Starts the animation when the frame scrolls into view. Needs `animated`. |
-| `copy`         | `boolean`                         | `false`                     | Adds the copy control, which copies the whole transcript as plain text.  |
-| `replay`       | `boolean`                         | `animated`                  | Adds the replay control. Defaults to whatever `animated` is.             |
-| `tone`         | `'adaptive' \| 'light' \| 'dark'` | `'adaptive'`                | `adaptive` follows the site theme; `light` and `dark` are fixed.         |
-| `typingSpeed`  | `number`                          | `28`                        | Milliseconds per typed character. 0 types a command line instantly.      |
-| `lineDelay`    | `number`                          | `130`                       | Milliseconds of pause after each line. 0 runs the lines together.        |
+| Prop           | Type                                    | Default                     | Description                                                                                                                                                                                                           |
+| -------------- | --------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lines` (req.) | `readonly AsciiTerminalLine[]`          | --                          | The transcript, in order.                                                                                                                                                                                             |
+| `title`        | `string`                                | `'Terminal'`                | The frame's caption.                                                                                                                                                                                                  |
+| `ariaLabel`    | `string`                                | `` `${title} transcript` `` | Accessible name for the frame. Defaults to the title plus `transcript`.                                                                                                                                               |
+| `animated`     | `boolean`                               | `false`                     | Types the command lines out on entry. Reduced motion shows them at once.                                                                                                                                              |
+| `autoplay`     | `boolean`                               | `true`                      | Starts the animation when the frame scrolls into view. Needs `animated`.                                                                                                                                              |
+| `copy`         | `boolean \| 'transcript' \| 'commands'` | `false`                     | Adds the copy control. `true` or `'transcript'` copies the whole transcript as plain text, prompts included; `'commands'` copies only the command lines, without prompts, which is what a reader pastes into a shell. |
+| `replay`       | `boolean`                               | `animated`                  | Adds the replay control. Defaults to whatever `animated` is.                                                                                                                                                          |
+| `tone`         | `'adaptive' \| 'light' \| 'dark'`       | `'adaptive'`                | `adaptive` follows the site theme; `light` and `dark` are fixed.                                                                                                                                                      |
+| `typingSpeed`  | `number`                                | `28`                        | Milliseconds per typed character. 0 types a command line instantly.                                                                                                                                                   |
+| `lineDelay`    | `number`                                | `130`                       | Milliseconds of pause after each line. 0 runs the lines together.                                                                                                                                                     |
 
 **AsciiTerminalLine**
 

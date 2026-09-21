@@ -99,6 +99,11 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
   no link.
 
 Refs #156, #167.
+- `AsciiTerminal` takes `copy="commands"`, which copies only the `command`
+  lines, newline-joined and without prompts: what a reader pastes into a shell
+  when a transcript also shows the output between the commands. `copy` and
+  `copy="transcript"` keep copying the whole transcript, and the control's
+  accessible name follows the mode ("Copy commands", "Commands copied").
 
 ## What changed in 0.1.0-alpha.17
 

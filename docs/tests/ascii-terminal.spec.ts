@@ -114,3 +114,51 @@ test('a clone of a set-up transcript sets itself up and plays', async ({
   );
   await played(clone);
 });
+
+/*
+ * The clipboard is the assertion, not the label: a mode that relabeled the
+ * control and still copied the whole transcript would pass a label check.
+ */
+test('the commands copy mode copies the command lines and nothing else', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto(code);
+
+  const install = terminal(page, 'Install the CLI');
+  const button = install.locator('[data-copy-button]');
+  await expect(button).toHaveAttribute('aria-label', 'Copy commands');
+  await button.click();
+  await expect(button).toHaveAttribute('aria-label', 'Commands copied');
+
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(copied).toBe(
+    'npm install --global @ambiqai/helia-cli\nhelia --version',
+  );
+});
+
+test('the transcript copy mode still copies prompts and output', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto(code);
+
+  const first = terminal(page, 'First run');
+  const button = first.locator('[data-copy-button]');
+  await expect(button).toHaveAttribute(
+    'aria-label',
+    'Copy terminal transcript',
+  );
+  await button.click();
+  await expect(button).toHaveAttribute(
+    'aria-label',
+    'Terminal transcript copied',
+  );
+
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  const transcript = await first.locator('[data-transcript]').textContent();
+  expect(copied).toBe(transcript);
+  expect(copied.startsWith('$ ')).toBe(true);
+});
