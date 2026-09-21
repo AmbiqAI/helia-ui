@@ -575,6 +575,46 @@ test('what a part hides from a reader stays out of what it states', () => {
   );
 });
 
+/* A child that wraps in the source reaches a part as a line break between the
+   words it wrapped between, which the page renders as a space. */
+test('child text that wrapped in the source keeps the space it wrapped at', () => {
+  const line = renditionText(
+    '<p>The full counter catalog and the\nupstream baseline.</p>',
+  );
+
+  assert.equal(
+    linkItem('Counters', '/counters/', line),
+    '- [Counters](/counters/): The full counter catalog and the upstream baseline.',
+  );
+
+  assert.equal(
+    renditionText(
+      '<span class="title">Counters and the\nbaseline<span class="helia-motion-cue" aria-hidden="true">\u2192</span></span>',
+    ),
+    'Counters and the baseline',
+  );
+
+  assert.equal(
+    inlineLink(renditionText('Read the\nrelease notes'), '/release/'),
+    '[Read the release notes](/release/)',
+  );
+});
+
+/* The transcript is the one stated block whose line breaks are its content,
+   and it is fenced rather than read back as reading text. */
+test('a stated transcript keeps the line breaks inside its fence', () => {
+  const markdown = codeFence('$ npm ci\nadded 1 package\n$ npm run build');
+
+  assert.match(
+    markdown,
+    /```text\n\$ npm ci\nadded 1 package\n\$ npm run build\n```/,
+  );
+  assert.deepEqual(
+    collectSidecars(builtPage(sidecarBlock('terminal', markdown))),
+    [{ kind: 'terminal', markdown }],
+  );
+});
+
 /* A script element ends at `</script`, and a transcript is free to hold one. */
 test('a stated transcript survives markup that would end the block', () => {
   const markdown = codeFence('$ cat page.html\n</script><!-- done -->');

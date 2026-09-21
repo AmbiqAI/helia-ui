@@ -75,6 +75,17 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 }
 ```
 
+## What changed in 0.1.0-alpha.19
+
+- A `LinkCard`, `CardHeader` or `Button` whose child text wraps across lines in
+  the source states it with the space the page renders at the break. The line
+  break used to go with the other control characters, joining the words either
+  side of it in the Markdown twin and in `llms-full.txt`. A transcript is
+  unaffected: `AsciiTerminal` states a fence, whose line breaks are its
+  content.
+
+Refs #171.
+
 ## What changed in 0.1.0-alpha.18
 
 - Carry component content into the Markdown renditions and `llms-full.txt`
