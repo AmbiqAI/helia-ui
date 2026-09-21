@@ -75,6 +75,17 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 }
 ```
 
+## What changed in 0.1.0-alpha.17
+
+- `ShowcaseCarousel` keeps a give at either end once its cards overflow, so
+  the rail never rests on a scroll boundary: the first card snaps to the left
+  edge, the last to the right, a card whose snap position would clamp onto a
+  boundary snaps by neither edge, and a gesture into the give latches,
+  rubber-bands, and snaps back. Safari turned a horizontal swipe that began on
+  a boundary into history navigation, and `overscroll-behavior` did not stop
+  it. A rail that fits keeps no give. The controls and the tab strip read the
+  rests rather than the boundaries.
+
 ## What changed in 0.1.0-alpha.16
 
 - Make Markdown renditions and llms output faithful for MDX pages: multi-line
