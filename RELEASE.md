@@ -75,6 +75,31 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 }
 ```
 
+## What changed in 0.1.0-alpha.18
+
+- Carry component content into the Markdown renditions and `llms-full.txt`
+  through a build-time sidecar. `AsciiTerminal`, `LinkCard`, a `Card` whose
+  `CardHeader` carries the link, and a linked `Button` each write their own
+  Markdown into a hidden block in the built page, and the discoverability pass
+  splices it in where the component sits, so a transcript whose lines are
+  imported, a card built from a record and a button whose label is an
+  expression reach a reader as the fence and the links the page shows. The
+  block renders nothing, is skipped by Pagefind and is not in the JSON-LD. A
+  kind is spliced only where the page rendered as many of them as the source
+  has occurrences, and the build says so when one turns itself off, naming the
+  route and the kind; a site that composes its own rendition for a generated
+  table should keep doing so. A tag imported from another package, such as
+  Starlight's own `LinkCard`, is left to the source pass.
+  `CardHeader` gains `rendition`, for a part that wraps it and states the whole
+  card itself, and `@ambiqai/helia-ui/rendition` is a new export carrying the
+  builders and the escaping a site's own part needs to state one.
+- A card's `description` prop is read like its children, and a link-bearing
+  `Button`, `LinkCard`, `Card` or `CardHeader` written with no `title` takes
+  its title from its children. Both shapes used to reach a reader as prose with
+  no link.
+
+Refs #156, #167.
+
 ## What changed in 0.1.0-alpha.17
 
 - `ShowcaseCarousel` keeps a give at either end once its cards overflow, so

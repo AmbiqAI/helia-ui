@@ -29,6 +29,8 @@ export interface AsciiTerminalLine {
   prompt?: string;
 }
 
+import { codeFence, escapeRendition, renditionAttributes } from '../rendition';
+
 interface Props {
   /** The transcript, in order. */
   lines: readonly AsciiTerminalLine[];
@@ -377,6 +379,16 @@ const transcript = normalizedLines
   }
   <span class="helia-sr-only" data-transcript>{transcript}</span>
   {interactive && <span class="helia-sr-only" aria-live="polite" data-status />}
+
+  {
+    /* The transcript is the whole of what this part is worth to a reader, and
+       a page that imports its lines states none of it in its source. */
+  }
+  <script
+    is:inline
+    {...renditionAttributes('terminal')}
+    set:html={escapeRendition(codeFence(transcript))}
+  />
 
   {interactive && <script is:inline set:html={BEHAVIOR} />}
 </helia-ascii-terminal>

@@ -109,33 +109,46 @@ test('opening an example reveals the code block', async ({ page }) => {
 test('an example renders the parts its source names', async ({ page }) => {
   await page.goto(gallery);
 
-  const stages = await page.locator('[data-example-stage]').all();
+  /*
+   * The whole comparison runs in the page. Every root here is a plain CSS
+   * selector, so asking for each one from the test process was a message per
+   * named part -- hundreds of them on a page this size, growing with every
+   * example added, which is what put this test on the clock rather than
+   * anything it asserts.
+   */
+  const stages = await page.evaluate((roots: Record<string, string>) => {
+    const found = document.querySelectorAll('[data-example-stage]');
+    return [...found].map((stage) => {
+      const tags = (stage.getAttribute('data-example-tags') ?? '')
+        .split(' ')
+        .filter(Boolean);
+      return {
+        tags,
+        untabled: tags.filter((tag) => roots[tag] === undefined),
+        missing: tags
+          .filter(
+            (tag) =>
+              roots[tag] !== undefined &&
+              stage.querySelectorAll(roots[tag]).length === 0,
+          )
+          .map((tag) => `${tag} (${roots[tag]})`),
+      };
+    });
+  }, PART_ROOTS);
+
   expect(stages.length).toBeGreaterThan(0);
-
-  const missing: string[] = [];
-  const untabled: string[] = [];
-
-  for (const stage of stages) {
-    const attribute = (await stage.getAttribute('data-example-tags')) ?? '';
-    const tags = attribute.split(' ').filter(Boolean);
-    expect(tags.length).toBeGreaterThan(0);
-
-    for (const tag of tags) {
-      const selector = PART_ROOTS[tag];
-      if (!selector) {
-        untabled.push(tag);
-        continue;
-      }
-      if ((await stage.locator(selector).count()) === 0) {
-        missing.push(`${tag} (${selector})`);
-      }
-    }
-  }
-
-  expect(untabled, 'a part with no root in PART_ROOTS').toEqual([]);
-  expect(missing, 'named in an example source but not on its stage').toEqual(
-    [],
-  );
+  expect(
+    stages.filter((stage) => stage.tags.length === 0).length,
+    'every stage names the parts on it',
+  ).toBe(0);
+  expect(
+    stages.flatMap((stage) => stage.untabled),
+    'a part with no root in PART_ROOTS',
+  ).toEqual([]);
+  expect(
+    stages.flatMap((stage) => stage.missing),
+    'named in an example source but not on its stage',
+  ).toEqual([]);
 });
 
 test('the rows and panels section renders all three parts', async ({
