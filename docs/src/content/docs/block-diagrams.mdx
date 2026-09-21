@@ -85,6 +85,40 @@ moved a level in or out takes the ground of where it lands.
 </BlockDiagram>
 ```
 
+### Plain ladder
+
+Three levels with no tone and no emphasis. The ground steps with depth and the
+second line keeps its contrast at the bottom of the ladder.
+
+<BlockDiagram
+  title="A plain ladder"
+  caption="Level one holds level two holds level three."
+  flow="row"
+  data-example="ladder"
+>
+  <Block label="System" sublabel="Level one">
+    <Block label="Subsystem" sublabel="Level two">
+      <Block label="Component" sublabel="Level three" />
+      <Block label="Component" sublabel="Level three" />
+    </Block>
+    <Block label="Subsystem" sublabel="Level two" />
+  </Block>
+  <Block label="System" sublabel="Level one" />
+</BlockDiagram>
+
+### A filled parent
+
+A filled block can hold blocks. The children start the ladder again with their
+own edge, so the filled ground is the parent's alone.
+
+<BlockDiagram title="Filled parent" flow="row">
+  <Block label="Runtime" emphasis="filled">
+    <Block label="Scheduler" />
+    <Block label="Allocator" sublabel="arena" />
+  </Block>
+  <Block label="Host" />
+</BlockDiagram>
+
 ## Three levels, with links
 
 The same part three deep. The labels here are this package, so every link goes

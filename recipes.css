@@ -2368,6 +2368,24 @@ a.helia-chip--neutral:focus-visible {
    */
   --helia-block-level-mix: 0%;
   --helia-block-mix: var(--helia-block-level-mix);
+  /*
+   * A tone or emphasis sets these on its own block. Left alone they would
+   * inherit, and a subtree under an accent block would take the accent edge
+   * and a filled block's children would lose theirs. `initial` is the
+   * guaranteed-invalid value, so var() falls through to the fallback below and
+   * each block starts from the ladder again; the tone rules are later in the
+   * sheet at equal specificity, so they still win on their own element.
+   */
+  --helia-block-ground: initial;
+  --helia-block-edge: initial;
+  /* The second line keeps its distance from the label as the ground darkens
+     with depth, which a fixed muted ink does not: three levels down in the
+     dark theme it drops under the contrast floor for caption-sized text. */
+  --helia-block-sub-ink: color-mix(
+    in srgb,
+    var(--helia-ink-primary) calc(var(--helia-block-mix) * 3),
+    var(--helia-ink-muted)
+  );
 
   background: var(
     --helia-block-ground,
@@ -2484,12 +2502,14 @@ a.helia-block__face:hover .helia-block__label {
   font-size: var(--helia-text-label);
   font-weight: var(--helia-weight-semibold);
   line-height: var(--helia-leading-tight);
+  overflow-wrap: anywhere;
 }
 
 .helia-block__sub {
-  color: var(--helia-ink-muted);
+  color: var(--helia-block-sub-ink);
   font-size: var(--helia-text-caption);
   line-height: var(--helia-leading-tight);
+  overflow-wrap: anywhere;
 }
 
 /*

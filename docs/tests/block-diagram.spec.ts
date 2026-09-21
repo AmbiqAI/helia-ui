@@ -24,24 +24,66 @@ test('a diagram is one figure holding nested lists', async ({ page }) => {
   }
 });
 
-test('nesting is nested lists and a stepped ground', async ({ page }) => {
-  await page.goto(page_);
+for (const theme of ['light', 'dark'] as const) {
+  test(`nesting is nested lists and a stepped ground in ${theme}`, async ({
+    page,
+  }) => {
+    await page.goto(page_);
+    await page.evaluate((value) => {
+      document.documentElement.dataset.theme = value;
+    }, theme);
 
-  const deep = page.locator('.helia-block .helia-block .helia-block').first();
-  await expect(deep).toBeVisible();
+    const ladder = page.locator('[data-example="ladder"]');
+    await expect(
+      ladder.locator('.helia-block .helia-block .helia-block').first(),
+    ).toBeVisible();
 
-  /* Three levels, three grounds. Two levels resolving to the same paint is the
-     nesting going invisible, which is the one thing this part is for. */
-  const grounds = await page.evaluate(() => {
-    const levels = ['.helia-block', '.helia-block .helia-block'];
-    const third = '.helia-block .helia-block .helia-block';
-    return [...levels, third].map((selector) => {
-      const node = document.querySelector(selector);
-      return node ? getComputedStyle(node).backgroundColor : '';
+    /* Three levels, three grounds, on a plain untoned unfilled diagram. Two
+       levels resolving to the same paint is the nesting going invisible,
+       which is the one thing this part is for. */
+    const grounds = await ladder.evaluate((root) => {
+      const levels = ['.helia-block', '.helia-block .helia-block'];
+      const third = '.helia-block .helia-block .helia-block';
+      return [...levels, third].map((selector) => {
+        const node = root.querySelector(selector);
+        return node ? getComputedStyle(node).backgroundColor : '';
+      });
     });
+    expect(new Set(grounds).size).toBe(grounds.length);
   });
-  expect(new Set(grounds).size).toBe(grounds.length);
-});
+
+  test(`a tone stops at its own block in ${theme}`, async ({ page }) => {
+    await page.goto(page_);
+    await page.evaluate((value) => {
+      document.documentElement.dataset.theme = value;
+    }, theme);
+
+    /* A tone or emphasis is the block's own. Its children start the ladder
+       again: same paint on parent and child is the tone leaking. */
+    for (const variant of ['accent', 'muted', 'filled']) {
+      const parent = page
+        .locator(`.helia-block--${variant}`)
+        .filter({
+          has: page.locator('.helia-block'),
+        })
+        .first();
+      await expect(parent).toBeVisible();
+      const [outer, inner] = await parent.evaluate((node) => {
+        const child = node.querySelector('.helia-block') as Element;
+        const read = (el: Element) => {
+          const style = getComputedStyle(el);
+          return `${style.backgroundColor} ${style.borderTopColor}`;
+        };
+        return [read(node), read(child)];
+      });
+      expect(inner, variant).not.toBe(outer);
+      expect(
+        inner.endsWith('rgba(0, 0, 0, 0)'),
+        `${variant} child has no edge`,
+      ).toBe(false);
+    }
+  });
+}
 
 test('a block links from its label and stays a list item', async ({ page }) => {
   await page.goto(page_);

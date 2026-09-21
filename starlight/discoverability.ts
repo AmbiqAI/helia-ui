@@ -766,6 +766,36 @@ function reduceElement(node: ElementNode): Reduction {
     };
   }
 
+  /* A block diagram is its labels and their nesting, and both are props: the
+     children of a Block are more Blocks, never text. Each block is a list
+     item and the blocks inside it are indented under it, so the hierarchy the
+     page draws is the hierarchy a reader of the rendition gets. */
+  if (node.name === 'Block') {
+    const label = literal(node, 'label');
+    if (label === undefined) return children;
+    const sublabel = literal(node, 'sublabel');
+    const name = linkText(label);
+    const head = href === undefined ? name : `[${name}](${linkTarget(href)})`;
+    const line =
+      sublabel === undefined
+        ? `- ${head}`
+        : `- ${head}: ${sublabel.replace(CONTROL, '')}`;
+    const inner = children.text.trim();
+    const nested = inner === '' ? '' : `\n${inner.replace(/^/gm, '  ')}`;
+    return { kind: 'item', text: `${line}${nested}` };
+  }
+
+  if (node.name === 'BlockDiagram') {
+    const caption = literal(node, 'caption');
+    const lead = [title, caption]
+      .filter((value): value is string => value !== undefined)
+      .map((value) => value.replace(CONTROL, ''))
+      .join(': ');
+    const body = children.text.trim();
+    if (lead === '') return { kind: 'block', text: body };
+    return { kind: 'block', text: body === '' ? lead : `${lead}\n\n${body}` };
+  }
+
   return children;
 }
 
