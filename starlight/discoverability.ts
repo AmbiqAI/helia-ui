@@ -34,10 +34,12 @@ import type { RenditionKind } from '../rendition.ts';
 import {
   RENDITION_ATTRIBUTE,
   codeFence,
+  escapeMarkup,
   inlineLink,
   linkItem,
   linkTarget,
   linkText,
+  stripBlockControl,
   stripControl,
   unescapeRendition,
 } from '../rendition.ts';
@@ -719,24 +721,52 @@ const SIDECAR = new RegExp(
   'gi',
 );
 
+/* The element Starlight wraps the rendered content in, matched as an element
+   rather than as a run of characters: the class name is also in the stylesheet
+   the page inlines in its head, which comes first and is not the content. */
+const CONTENT_ELEMENT =
+  /<([a-zA-Z][\w-]*)\b[^>]*\bclass="[^"]*\bsl-markdown-content\b[^"]*"[^>]*>/;
+
 /*
- * The region of a page that is the page. Starlight wraps the rendered content
- * in `sl-markdown-content`, so a part the layout renders -- a header's button,
- * a card in the footer -- is not read back as content the source pass was
- * supposed to have seen.
+ * The region of a page that is the page.
+ *
+ * A part the layout renders -- a header's button, a card in the footer -- is
+ * not content the source pass was ever going to see, and reading one back
+ * would leave the page with a sidecar more than its source has occurrences and
+ * so turn the splice off for that kind. The region therefore ends where the
+ * content element does, and `</main>` stands in if the depth walk runs past it.
  */
 function contentRegion(html: string): string {
-  const start = html.indexOf('sl-markdown-content');
-  if (start === -1) return html;
-  const end = html.indexOf('</main>', start);
-  return end === -1 ? html.slice(start) : html.slice(start, end);
+  const open = CONTENT_ELEMENT.exec(html);
+  if (!open) return html;
+
+  const start = open.index + open[0].length;
+  const nested = new RegExp(`<(/?)${open[1]!}\\b`, 'gi');
+  nested.lastIndex = start;
+
+  let depth = 1;
+  let end = html.length;
+  let tag = nested.exec(html);
+  while (tag !== null) {
+    depth += tag[1] === '/' ? -1 : 1;
+    if (depth === 0) {
+      end = tag.index;
+      break;
+    }
+    tag = nested.exec(html);
+  }
+
+  const main = html.indexOf('</main>', start);
+  return html.slice(start, main === -1 ? end : Math.min(end, main));
 }
 
 /** The sidecars a built page carries, in document order. */
 export function collectSidecars(html: string): RenditionSidecar[] {
   return [...contentRegion(html).matchAll(SIDECAR)].map(([, kind, body]) => ({
     kind: kind as RenditionKind,
-    markdown: unescapeRendition(body!).trim(),
+    /* A control character reaches a prop from whatever produced the data
+       behind it, and NUL is what the reduction masks inline code with. */
+    markdown: stripBlockControl(unescapeRendition(body!)).trim(),
   }));
 }
 
@@ -756,10 +786,13 @@ export interface SidecarCursor {
   take(kind: RenditionKind): string | null;
   /** How many occurrences of each kind the source pass has reached. */
   counts: Map<RenditionKind, number>;
+  /** Tag names the page imported from somewhere other than this package. */
+  foreign: ReadonlySet<string>;
 }
 
 export function createSidecarCursor(
   sidecars: readonly RenditionSidecar[],
+  foreign: ReadonlySet<string> = new Set(),
 ): SidecarCursor {
   const queues = new Map<RenditionKind, string[]>();
   const counts = new Map<RenditionKind, number>();
@@ -771,12 +804,41 @@ export function createSidecarCursor(
 
   return {
     counts,
+    foreign,
     take(kind) {
       counts.set(kind, (counts.get(kind) ?? 0) + 1);
       const next = queues.get(kind)?.shift();
       return next === undefined || next === '' ? null : next;
     },
   };
+}
+
+const PACKAGE_SPECIFIER = /^@ambiqai\/helia-ui(?:\/|$)/;
+const IMPORT_BINDINGS =
+  /\bimport\s+(?!type\b)([^;'"]+?)\s+from\s*['"]([^'"]+)['"]/g;
+
+/**
+ * The tag names a page bound to something other than one of these parts.
+ *
+ * `LinkCard` is Starlight's name as well as this package's, and the imports
+ * are stripped before the tags are read, so without this a page writing
+ * Starlight's card would have its own components counted as occurrences of a
+ * part that states nothing, and the count guard would turn the splice off for
+ * the whole page. Read off the body before anything is stripped from it.
+ */
+export function foreignBindings(body: string): Set<string> {
+  const names = new Set<string>();
+  for (const [, clause, specifier] of body.matchAll(IMPORT_BINDINGS)) {
+    if (PACKAGE_SPECIFIER.test(specifier!)) continue;
+    for (const binding of clause!.replace(/[{}]/g, ' ').split(',')) {
+      const name = binding
+        .trim()
+        .split(/\s+as\s+|\s+/)
+        .pop();
+      if (name && /^[A-Z]/.test(name)) names.add(name);
+    }
+  }
+  return names;
 }
 
 /** What an element reduced to, and how the text around it must be joined. */
@@ -801,7 +863,20 @@ const CARD_HEADING = '###';
  * for each one. A component is asked for a sidecar only where it renders one,
  * so the source sequence and the page's stay in step.
  */
-function sidecarKind(node: ElementNode): RenditionKind | null {
+function sidecarKind(
+  node: ElementNode,
+  cursor: SidecarCursor | null,
+): RenditionKind | null {
+  if (cursor !== null && cursor.foreign.has(node.name)) return null;
+  /* `rendition={false}` is a part telling the page that something around it
+     states the whole card, so the header renders no block of its own. */
+  const stating = node.attributes['rendition'];
+  if (
+    stating !== undefined &&
+    !/^(?:\{true\}|["']?true["']?)$/.test(stating.raw.trim())
+  ) {
+    return null;
+  }
   if (node.name === 'AsciiTerminal') return 'terminal';
   if (node.name === 'LinkCard') return 'link-card';
   const linked = node.attributes['href'] !== undefined;
@@ -814,7 +889,7 @@ function sidecarKind(node: ElementNode): RenditionKind | null {
    link-bearing one of these is a link, and reducing it to its children alone
    left a page's whole set of calls to action as prose. See
    AmbiqAI/helia-ui#156. */
-const LABELLED_BY_CHILDREN = new Set([
+const LABELED_BY_CHILDREN = new Set([
   'Button',
   'Card',
   'CardHeader',
@@ -826,7 +901,7 @@ function reduceElement(
   cursor: SidecarCursor | null,
 ): Reduction {
   const children = reduceNodes(node.children, true, cursor);
-  const kind = sidecarKind(node);
+  const kind = sidecarKind(node, cursor);
   const stated = kind === null ? null : (cursor?.take(kind) ?? null);
 
   if (node.name === 'AsciiTerminal') {
@@ -855,7 +930,16 @@ function reduceElement(
      alike. An element is not: `<a href title>` is already the link it makes,
      and `title` on it is a tooltip rather than the link's name. */
   if (/^[A-Z]/.test(node.name) && title !== undefined && href !== undefined) {
-    return { kind: 'item', text: linkItem(title, href, description) };
+    /* The description here is a reduced run of the page's own markdown, links
+       and code spans included, so only a tag opener is held in it. */
+    const link = `- [${linkText(title)}](${linkTarget(href)})`;
+    return {
+      kind: 'item',
+      text:
+        description === undefined || description === ''
+          ? link
+          : `${link}: ${escapeMarkup(description)}`,
+    };
   }
 
   /* A `title` prop that is an expression is a value this pass cannot have,
@@ -867,7 +951,7 @@ function reduceElement(
   if (
     href !== undefined &&
     node.attributes['title'] === undefined &&
-    LABELLED_BY_CHILDREN.has(node.name) &&
+    LABELED_BY_CHILDREN.has(node.name) &&
     line !== '' &&
     !line.includes('{')
   ) {
@@ -1056,17 +1140,30 @@ function resolveLinks(text: string, pageUrl: string, origin: string): string {
   );
 }
 
+/** What a kind turning itself off on one route is worth saying. */
+export interface SidecarSkip {
+  kind: RenditionKind;
+  /** Occurrences the source has. */
+  source: number;
+  /** Sidecars the built page carries. */
+  page: number;
+}
+
 /**
  * The cursor for the splicing pass, once the two sequences are known to agree.
  *
  * The first pass counts what the source says rendered and hands nothing back;
  * a kind the page disagrees with about the count is dropped from the second,
- * so its components keep the form the source alone can prove.
+ * so its components keep the form the source alone can prove. A kind that
+ * drops out is reported rather than dropped quietly: a consumer whose page
+ * lost its transcripts should hear it from the build and not from the
+ * artifact.
  */
 function spliceable(
-  body: string,
   compose: (cursor: SidecarCursor | null) => string,
   sidecars: readonly RenditionSidecar[],
+  foreign: ReadonlySet<string>,
+  onSkipped?: (skip: SidecarSkip) => void,
 ): SidecarCursor | null {
   if (sidecars.length === 0) return null;
 
@@ -1075,13 +1172,19 @@ function spliceable(
     totals.set(sidecar.kind, (totals.get(sidecar.kind) ?? 0) + 1);
   }
 
-  const counted = createSidecarCursor([]);
+  const counted = createSidecarCursor([], foreign);
   compose(counted);
+
+  const agreed = new Set<RenditionKind>();
+  for (const [kind, page] of totals) {
+    const source = counted.counts.get(kind) ?? 0;
+    if (source === page) agreed.add(kind);
+    else onSkipped?.({ kind, source, page });
+  }
+
   return createSidecarCursor(
-    sidecars.filter(
-      (sidecar) =>
-        counted.counts.get(sidecar.kind) === totals.get(sidecar.kind),
-    ),
+    sidecars.filter((sidecar) => agreed.has(sidecar.kind)),
+    foreign,
   );
 }
 
@@ -1103,6 +1206,8 @@ export function renderMarkdown(
     mdx?: boolean;
     /** What the built page's parts stated, in document order. */
     sidecars?: readonly RenditionSidecar[];
+    /** Told which kind turned itself off, and what the two counts were. */
+    onSidecarSkipped?: (skip: SidecarSkip) => void;
   },
 ): string {
   const mdx = options.mdx ?? false;
@@ -1124,7 +1229,15 @@ export function renderMarkdown(
       })
       .join('\n');
 
-  const rendered = compose(spliceable(body, compose, options.sidecars ?? []));
+  const sidecars = options.sidecars ?? [];
+  const rendered = compose(
+    spliceable(
+      compose,
+      sidecars,
+      sidecars.length === 0 ? new Set<string>() : foreignBindings(body),
+      options.onSidecarSkipped,
+    ),
+  );
 
   const trimmed = rendered
     .replace(/[ \t]+$/gm, '')
@@ -1459,7 +1572,11 @@ function llmsIndex(
   return `${lines.join('\n').trimEnd()}\n`;
 }
 
-function llmsFull(pages: readonly PageRecord[], origin: string): string {
+function llmsFull(
+  pages: readonly PageRecord[],
+  origin: string,
+  onSkipped: (page: PageRecord) => (skip: SidecarSkip) => void,
+): string {
   return `${pages
     .map((page) => {
       const rendition = renderMarkdown(page.body, {
@@ -1468,6 +1585,7 @@ function llmsFull(pages: readonly PageRecord[], origin: string): string {
         title: page.title,
         mdx: page.sourcePath.endsWith('.mdx'),
         sidecars: page.sidecars,
+        onSidecarSkipped: onSkipped(page),
       });
       return `<!-- ${page.url} -->\n\n${rendition.trimEnd()}`;
     })
@@ -1629,6 +1747,22 @@ export function discoverabilityIntegration(options: {
           );
         }
 
+        /* One line per route and kind, however many artifacts are rendered
+           from it: a kind that turns itself off is one fact about the page. */
+        const warned = new Set<string>();
+        const reportSkips =
+          (page: PageRecord) =>
+          ({ kind, source, page: rendered }: SidecarSkip) => {
+            const key = `${page.route} ${kind}`;
+            if (warned.has(key)) return;
+            warned.add(key);
+            logger.warn(
+              `${page.route} carries ${rendered} ${kind} rendition sidecar${rendered === 1 ? '' : 's'} ` +
+                `where its source has ${source}, so its ${kind} components keep the form the source alone can prove. ` +
+                'A set of them built from a model is the usual reason: compose that part of the rendition in the site.',
+            );
+          };
+
         // Sidebar order first, then anything the sidebar does not name, by
         // slug: both halves are stable, so the artifacts are byte-stable.
         const ordered = [...trails.named.keys()]
@@ -1650,6 +1784,7 @@ export function discoverabilityIntegration(options: {
                 title: page.title,
                 mdx: page.sourcePath.endsWith('.mdx'),
                 sidecars: page.sidecars,
+                onSidecarSkipped: reportSkips(page),
               }),
             );
           }
@@ -1675,7 +1810,7 @@ export function discoverabilityIntegration(options: {
 
         if (options.resolved.llms) {
           write(outDir, 'llms.txt', llmsIndex(routes, options.site));
-          write(outDir, 'llms-full.txt', llmsFull(routes, origin));
+          write(outDir, 'llms-full.txt', llmsFull(routes, origin, reportSkips));
           write(
             outDir,
             'content-index.json',

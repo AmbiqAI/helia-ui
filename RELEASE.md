@@ -86,8 +86,10 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
   expression reach a reader as the fence and the links the page shows. The
   block renders nothing, is skipped by Pagefind and is not in the JSON-LD. A
   kind is spliced only where the page rendered as many of them as the source
-  has occurrences, so a grid mapped over a model keeps the form it had; a site
-  that composes its own rendition for a generated table should keep doing so.
+  has occurrences, and the build says so when one turns itself off, naming the
+  route and the kind; a site that composes its own rendition for a generated
+  table should keep doing so. A tag imported from another package, such as
+  Starlight's own `LinkCard`, is left to the source pass.
   `CardHeader` gains `rendition`, for a part that wraps it and states the whole
   card itself.
 - A card's `description` prop is read like its children, and a link-bearing

@@ -107,8 +107,14 @@ JSON-LD.
 A kind is spliced only where the page rendered as many of them as the source
 has occurrences. A grid built by mapping over a model is one tag in the source
 and a card per record on the page, so the sequence that anchors one to the
-other is not there and the source form stands. A site that composes its own
-rendition for a generated table or catalog should keep doing so.
+other is not there and the source form stands. The build says so, naming the
+route and the kind, and a site that composes its own rendition for a generated
+table or catalog should keep doing so.
+
+A tag the page imported from somewhere other than this package is left alone:
+`LinkCard` is Starlight's name as well as this one's, and a page writing
+Starlight's card, or a component of its own under one of these names, is not
+writing a part that states anything.
 
 ## Checking it
 

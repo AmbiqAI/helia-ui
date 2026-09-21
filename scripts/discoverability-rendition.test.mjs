@@ -24,6 +24,7 @@ import {
 } from '../rendition.ts';
 import {
   collectSidecars,
+  foreignBindings,
   reduceTags,
   renderMarkdown,
   serializeJsonLd,
@@ -780,6 +781,164 @@ test('a label that is still an expression is not read as a title', () => {
 
   const rendition = render('<Button href="/start/">{cta.label}</Button>');
   assert.ok(!rendition.includes(']('), 'an empty link reached the rendition');
+});
+
+/*
+ * A page is chrome, content and footer, and only the middle one was ever in
+ * the source a rendition is reduced from. The class name is in the stylesheet
+ * the page inlines in its head as well, which comes first and is not an
+ * element at all.
+ */
+const chromePage = (chrome, content, footer) =>
+  [
+    '<html><head><style>.sl-markdown-content :is(h1,h2){margin:0}</style>',
+    '</head><body><header><nav>',
+    chrome,
+    '</nav></header><main><div class="sl-container">',
+    '<div class="sl-markdown-content">',
+    content,
+    '</div></div><footer class="pagination">',
+    footer,
+    '</footer></main></body></html>',
+  ].join('');
+
+test('the site chrome and the page footer are not the page', () => {
+  const html = chromePage(
+    sidecarBlock('button', '[Search](/search/)'),
+    [
+      sidecarBlock('link-card', '- [Cards](/cards/)'),
+      '<div class="helia-card-grid">',
+      sidecarBlock('card', '- [Tokens](/tokens/)'),
+      '</div>',
+    ].join(''),
+    sidecarBlock('button', '[Next](/next/)'),
+  );
+
+  assert.deepEqual(collectSidecars(html), [
+    { kind: 'link-card', markdown: '- [Cards](/cards/)' },
+    { kind: 'card', markdown: '- [Tokens](/tokens/)' },
+  ]);
+});
+
+/* What a page escaped, a part decodes when it reads its own children back. A
+   rendition that handed that on unheld would be markup a page never rendered,
+   in an artifact an agent reads. */
+test('markup a page escaped stays inert in what a part states', () => {
+  const description = renditionText(
+    '<p>&lt;img src=x onerror=alert(1)&gt; &amp; more</p>',
+  );
+  const stated = linkItem('Summary', '/summary/', description);
+
+  assert.equal(description, '<img src=x onerror=alert(1)> & more');
+  assert.equal(
+    stated,
+    '- [Summary](/summary/): \\<img src=x onerror=alert(1)> \\& more',
+  );
+
+  const rendition = render(
+    '<LinkCard href={entry.href} title={entry.title} />',
+    {
+      sidecars: collectSidecars(builtPage(sidecarBlock('link-card', stated))),
+    },
+  );
+
+  assert.ok(
+    !/(?<!\\)<img/.test(rendition),
+    'live markup reached the rendition',
+  );
+  assert.match(rendition, /\\<img src=x onerror=alert\(1\)>/);
+});
+
+/* A title is read back the same way, so it is held the same way. */
+test('markup in a title is held where the link text goes', () => {
+  assert.equal(
+    inlineLink(
+      renditionText('<span>&lt;script&gt;alert(1)&lt;/script&gt;</span>'),
+      '/x/',
+    ),
+    '[\\<script>alert(1)\\</script>](/x/)',
+  );
+});
+
+/* NUL is what the reduction masks an inline code span with, so one arriving
+   from a prop would read as a span that was never there. */
+test('a control character in a stated line does not reach the artifact', () => {
+  const [sidecar] = collectSidecars(
+    builtPage(sidecarBlock('card', '- [Ti\u0000tle](/x/)\u0007')),
+  );
+
+  assert.equal(sidecar.markdown, '- [Title](/x/)');
+});
+
+/* `rendition={false}` is a part telling the page that something around it
+   states the whole card. Counting it would leave the page a sidecar short. */
+test('a header told not to state itself is not counted', () => {
+  const body = [
+    '<Card>',
+    '  <CardHeader href="/a/" rendition={false}>Wrapped</CardHeader>',
+    '</Card>',
+    '<Card>',
+    '  <CardHeader href="/b/">{entry.title}</CardHeader>',
+    '</Card>',
+  ].join('\n');
+
+  const rendition = render(body, {
+    sidecars: collectSidecars(
+      builtPage(sidecarBlock('card', '- [The second card](/b/)')),
+    ),
+  });
+
+  assert.match(
+    rendition,
+    /- \[The second card]\(https:\/\/example\.com\/b\/\)/,
+  );
+});
+
+/* Starlight names its own card `LinkCard`, and the imports are stripped before
+   the tags are read. See AmbiqAI/helia-ui#167. */
+test('a tag bound to another package is not one of these parts', () => {
+  const imports = [
+    "import { LinkCard } from '@astrojs/starlight/components';",
+    "import AsciiTerminal from '@ambiqai/helia-ui/astro/AsciiTerminal';",
+  ].join('\n');
+
+  assert.deepEqual([...foreignBindings(imports)], ['LinkCard']);
+
+  const body = [
+    imports,
+    '',
+    '<LinkCard href="/install/" title="Install" description="Start here." />',
+    '',
+    '<AsciiTerminal lines={transcripts.install} />',
+  ].join('\n');
+
+  const rendition = render(body, {
+    sidecars: collectSidecars(
+      builtPage(sidecarBlock('terminal', '```text\n$ pip install nsx\n```')),
+    ),
+  });
+
+  assert.match(
+    rendition,
+    /- \[Install]\(https:\/\/example\.com\/install\/\): Start here\./,
+  );
+  assert.match(rendition, /```text\n\$ pip install nsx\n```/);
+});
+
+/* A kind that turns itself off is a fact about the page, not a silence. */
+test('a kind the counts disagree about is reported', () => {
+  const skips = [];
+  render('<LinkCard href="/install/" title="Install" />', {
+    sidecars: collectSidecars(
+      builtPage(
+        sidecarBlock('link-card', '- [First](/first/)'),
+        sidecarBlock('link-card', '- [Second](/second/)'),
+      ),
+    ),
+    onSidecarSkipped: (skip) => skips.push(skip),
+  });
+
+  assert.deepEqual(skips, [{ kind: 'link-card', source: 1, page: 2 }]);
 });
 
 test('a link-bearing part takes its title from its children', () => {

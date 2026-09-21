@@ -79,9 +79,16 @@ assertions can only pass through the sidecar.
 ## Gotchas
 
 - The splice is per kind and per page. An orphan sidecar -- a part the site
-  renders from its own component, a Starlight `LinkCard` the source names but
-  this package never renders -- disables that kind for that page rather than
-  landing on the wrong component.
+  renders from its own component -- disables that kind for that page rather
+  than landing on the wrong component, and the build warns with the route and
+  the kind when it does.
+- A tag imported from anywhere but this package is not one of these parts:
+  `LinkCard` is Starlight's name too, and the imports are stripped before the
+  tags are read, so `foreignBindings` reads them off the body first.
+- The content region is found by matching the element that carries
+  `sl-markdown-content` and walking to its close. The class name is also in the
+  stylesheet Starlight inlines in the head, which comes first, so a substring
+  search started the region above the header.
 - `<script>` is the carrier rather than `<template>` because a raw text element
   is read back byte for byte. `</` and `<!--` are held with a backslash and
   taken back out; nothing else is escaped.
