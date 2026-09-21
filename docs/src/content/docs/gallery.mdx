@@ -65,6 +65,12 @@ import {
   paramRows,
   symbolProps,
 } from '../../lib/reference-gallery-model';
+import {
+  modelAction,
+  modelCard,
+  modelGuide,
+  modelTranscript,
+} from '../../lib/rendition-gallery-data';
 
 This page is for choosing. Every option the card parts and the motion system
 offer is on it, side by side, each one showing the exact source that produces
@@ -917,6 +923,58 @@ card is the target and the cue is inside the same hit area.
       <Icon slot="icon" name="book" />
       Every variant on one page, with its source beside it.
     </LinkCard>
+  </Example>
+</div>
+
+### From a model
+
+A page that renders its cards from a record writes none of their words in its
+source. The parts state their own line for the page's Markdown twin, so an
+agent reading the rendition gets the card the page shows rather than the props
+it was written with.
+
+<div className="gallery-grid gallery-grid--wide not-content">
+  <Example
+    title="<LinkCard href={model.href} title={model.title}>"
+    code={`
+      <LinkCard titleAs="h4" href={modelCard.href} title={modelCard.title}>
+        {modelCard.description}
+      </LinkCard>
+    `}
+  >
+    <LinkCard titleAs="h4" href={modelCard.href} title={modelCard.title}>
+      {modelCard.description}
+    </LinkCard>
+  </Example>
+  <Example
+    title="<CardHeader href={model.href}>"
+    code={`
+      <Card>
+        <CardHeader titleAs="h4" href={modelGuide.href}>
+          {modelGuide.title}
+        </CardHeader>
+        <CardContent>{modelGuide.description}</CardContent>
+      </Card>
+    `}
+  >
+    <Card>
+      <CardHeader titleAs="h4" href={modelGuide.href}>
+        {modelGuide.title}
+      </CardHeader>
+      <CardContent>{modelGuide.description}</CardContent>
+    </Card>
+  </Example>
+  <Example
+    title="<Button href={model.href}>{model.label}</Button>"
+    code={`
+      <Button href={modelAction.href} size="sm">
+        {modelAction.label}
+      </Button>
+    `}
+  >
+    <Button href={modelAction.href} size="sm">
+      {modelAction.label}
+    </Button>
   </Example>
 </div>
 
@@ -3066,6 +3124,15 @@ draw.
       { kind: 'success', text: '✓ Build complete' },
     ]}
   />
+</Example>
+
+<Example
+  title="<AsciiTerminal lines={imported} />"
+  code={`
+    <AsciiTerminal title="From a module" lines={modelTranscript} />
+  `}
+>
+  <AsciiTerminal title="From a module" lines={modelTranscript} />
 </Example>
 
 <Example

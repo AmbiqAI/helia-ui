@@ -25,6 +25,12 @@
  * @slot icon -- A glyph for the tonal disc before the title, usually an `Icon`.
  */
 import type { HTMLAttributes } from 'astro/types';
+import {
+  escapeRendition,
+  linkItem,
+  renditionAttributes,
+  renditionText,
+} from '../rendition';
 import type { CardTone } from './Card.astro';
 import Card from './Card.astro';
 import CardContent from './CardContent.astro';
@@ -59,11 +65,20 @@ const {
   ...rest
 } = Astro.props;
 
-const hasLine = Astro.slots.has('default');
+/*
+ * The line is rendered once here rather than slotted straight through, because
+ * the card also states itself as markdown for the page's rendition and that
+ * text is this line's. A card built from a record says nothing about itself in
+ * the source the rendition is reduced from. See AmbiqAI/helia-ui#167.
+ */
+const line = Astro.slots.has('default')
+  ? await Astro.slots.render('default')
+  : '';
+const hasLine = line.trim() !== '';
 ---
 
 <Card interactive class:list={['helia-link-card', className]} {...rest}>
-  <CardHeader titleAs={titleAs} href={href} eyebrow={eyebrow}>
+  <CardHeader titleAs={titleAs} href={href} eyebrow={eyebrow} rendition={false}>
     <slot name="icon" slot="icon" />
     <span class="title"
       >{title}<span class="helia-motion-cue" aria-hidden="true">→</span></span
@@ -73,10 +88,15 @@ const hasLine = Astro.slots.has('default');
   {
     hasLine && (
       <CardContent>
-        <slot />
+        <Fragment set:html={line} />
       </CardContent>
     )
   }
+  <script
+    is:inline
+    {...renditionAttributes('link-card')}
+    set:html={escapeRendition(linkItem(title, href, renditionText(line)))}
+  />
 </Card>
 
 <style>

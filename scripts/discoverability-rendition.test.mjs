@@ -15,6 +15,15 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import {
+  codeFence,
+  escapeRendition,
+  inlineLink,
+  linkItem,
+  renditionText,
+  unescapeRendition,
+} from '../rendition.ts';
+import {
+  collectSidecars,
   reduceTags,
   renderMarkdown,
   serializeJsonLd,
@@ -491,4 +500,257 @@ test('JSON-LD escapes what would end the script block', () => {
   assert.deepEqual(JSON.parse(serialized), {
     description: 'Summary </script><img src=x> & more',
   });
+});
+
+/* ------------------------------------------------------------------ *
+ * Rendition sidecars
+ * ------------------------------------------------------------------ */
+
+/*
+ * The parts state their own markdown at build time and the pass splices it in
+ * where the source pass put the component. What each part states is built from
+ * the helpers below, so the fixtures here are the text a part writes and the
+ * splice that reads it back. That a part writes it at all is a claim about a
+ * rendered page, and is asserted against the built gallery in
+ * docs/scripts/assert-docs-build.mjs.
+ */
+
+const sidecarBlock = (kind, markdown) =>
+  `<script type="text/markdown" data-helia-rendition="${kind}" data-pagefind-ignore>${escapeRendition(markdown)}</script>`;
+
+const builtPage = (...blocks) =>
+  [
+    '<html><body><header><a class="site">Home</a></header><main>',
+    '<div class="sl-markdown-content">',
+    ...blocks,
+    '</div></main><footer>',
+    sidecarBlock('button', '[Chrome](/chrome/)'),
+    '</footer></body></html>',
+  ].join('');
+
+test('a terminal states its transcript, prompts and kinds as it reads', () => {
+  const transcript = ['$ npm run build', '  ENTRY  src/index.ts', 'done'].join(
+    '\n',
+  );
+
+  assert.equal(
+    codeFence(transcript),
+    ['```text', '$ npm run build', '  ENTRY  src/index.ts', 'done', '```'].join(
+      '\n',
+    ),
+  );
+});
+
+test('a card states its title, target and line as one list item', () => {
+  assert.equal(
+    linkItem('Apollo510', '/modules/apollo510/', 'The evaluation board.'),
+    '- [Apollo510](/modules/apollo510/): The evaluation board.',
+  );
+  assert.equal(linkItem('Install', '/install/'), '- [Install](/install/)');
+  assert.equal(inlineLink('Get started', '/start/'), '[Get started](/start/)');
+});
+
+/* A title and a target are the page's own prose, and a rendition is markdown:
+   see AmbiqAI/helia-ui#146. */
+test('a stated card escapes its title and its target', () => {
+  assert.equal(
+    linkItem('Arrays [and] brackets', '/docs/a (b)/'),
+    '- [Arrays \\[and\\] brackets](</docs/a (b)/>)',
+  );
+});
+
+test('what a part hides from a reader stays out of what it states', () => {
+  const title =
+    '<span class="title">The card parts<span class="helia-motion-cue" aria-hidden="true">→</span></span>';
+
+  assert.equal(renditionText(title), 'The card parts');
+  assert.equal(
+    renditionText('<p>Tokens &amp; scales,\n  the whole set.</p>'),
+    'Tokens & scales, the whole set.',
+  );
+  assert.equal(
+    renditionText('<svg viewBox="0 0 1 1"><title>Icon</title></svg>Start'),
+    'Start',
+  );
+});
+
+/* A script element ends at `</script`, and a transcript is free to hold one. */
+test('a stated transcript survives markup that would end the block', () => {
+  const markdown = codeFence('$ cat page.html\n</script><!-- done -->');
+
+  assert.ok(!escapeRendition(markdown).includes('</script'));
+  assert.equal(unescapeRendition(escapeRendition(markdown)), markdown);
+  assert.deepEqual(
+    collectSidecars(builtPage(sidecarBlock('terminal', markdown))),
+    [{ kind: 'terminal', markdown }],
+  );
+});
+
+/* The site chrome renders the same parts as the content does, and only the
+   content was ever in the source the rendition is reduced from. */
+test('only the rendered content region is read back', () => {
+  const html = builtPage(
+    sidecarBlock('link-card', '- [Cards](/cards/)'),
+    sidecarBlock('terminal', '```text\n$ npm ci\n```'),
+  );
+
+  assert.deepEqual(
+    collectSidecars(html).map((sidecar) => sidecar.kind),
+    ['link-card', 'terminal'],
+  );
+});
+
+test('two transcripts from a module reach the rendition in order', () => {
+  const body = [
+    "import { transcripts } from '../../data/transcripts';",
+    '',
+    '## Install',
+    '',
+    '<AsciiTerminal title="Install" lines={transcripts.install} />',
+    '',
+    '## Build',
+    '',
+    '<AsciiTerminal title="Build" lines={transcripts.build} />',
+  ].join('\n');
+
+  const rendition = render(body, {
+    sidecars: collectSidecars(
+      builtPage(
+        sidecarBlock('terminal', '```text\n$ pip install nsx\n```'),
+        sidecarBlock('terminal', '```text\n$ nsx build\n```'),
+      ),
+    ),
+  });
+
+  assert.match(
+    rendition,
+    /## Install\n\n```text\n\$ pip install nsx\n```\n\n## Build\n\n```text\n\$ nsx build\n```/,
+  );
+});
+
+test('a card built from a record carries its link and its line', () => {
+  const body = [
+    '<CardGrid>',
+    '  <LinkCard href={module.href} title={module.name}>',
+    '    {module.summary}',
+    '  </LinkCard>',
+    '</CardGrid>',
+  ].join('\n');
+
+  const rendition = render(body, {
+    sidecars: collectSidecars(
+      builtPage(
+        sidecarBlock(
+          'link-card',
+          '- [nsx-board-apollo510-evb](/modules/apollo510-evb/): The evaluation board.',
+        ),
+      ),
+    ),
+  });
+
+  assert.match(
+    rendition,
+    /- \[nsx-board-apollo510-evb]\(https:\/\/example\.com\/modules\/apollo510-evb\/\): The evaluation board\./,
+  );
+});
+
+test('a card whose header carries the link states the whole row', () => {
+  const body = [
+    '<CardGrid>',
+    '  <Card>',
+    '    <CardHeader href="/guides/install/">{guide.title}</CardHeader>',
+    '    <CardContent>Everything a first build needs.</CardContent>',
+    '  </Card>',
+    '  <Card>',
+    '    <CardHeader href="/guides/deploy/">{guide.title}</CardHeader>',
+    '    <CardContent>Shipping it somewhere.</CardContent>',
+    '  </Card>',
+    '</CardGrid>',
+  ].join('\n');
+
+  const rendition = render(body, {
+    sidecars: collectSidecars(
+      builtPage(
+        sidecarBlock('card', '- [Install](/guides/install/)'),
+        sidecarBlock('card', '- [Deploy](/guides/deploy/)'),
+      ),
+    ),
+  });
+
+  assert.match(rendition, /- \[Install]\(\S+\/guides\/install\/\)/);
+  assert.match(rendition, /Everything a first build needs\./);
+  assert.match(rendition, /- \[Deploy]\(\S+\/guides\/deploy\/\)/);
+});
+
+test('a button whose label is a child keeps its link', () => {
+  const rendition = render('<Button href={cta.href}>{cta.label}</Button>', {
+    sidecars: collectSidecars(
+      builtPage(sidecarBlock('button', '[Read the guide](/guides/)')),
+    ),
+  });
+
+  assert.match(
+    rendition,
+    /\[Read the guide]\(https:\/\/example\.com\/guides\/\)/,
+  );
+});
+
+/*
+ * A grid built by mapping over a model is one tag in the source and a card per
+ * record on the page. Nothing orders the second against the first, so the kind
+ * is left alone rather than spliced onto the wrong component.
+ */
+test('a kind the page and the source disagree about is not spliced', () => {
+  const body = [
+    '<CardGrid>',
+    '  {modules.map((module) => (',
+    '    <LinkCard href={module.href} title={module.name} />',
+    '  ))}',
+    '</CardGrid>',
+    '',
+    '<LinkCard href="/install/" title="Install">Start here.</LinkCard>',
+  ].join('\n');
+
+  const rendition = render(body, {
+    sidecars: collectSidecars(
+      builtPage(
+        sidecarBlock('link-card', '- [First](/first/)'),
+        sidecarBlock('link-card', '- [Second](/second/)'),
+        sidecarBlock('link-card', '- [Install](/install/): Start here.'),
+      ),
+    ),
+  });
+
+  assert.match(
+    rendition,
+    /- \[Install]\(https:\/\/example\.com\/install\/\): Start here\./,
+  );
+  for (const wrong of ['First', 'Second']) {
+    assert.ok(
+      !rendition.includes(wrong),
+      `the rendition should not carry ${wrong}`,
+    );
+  }
+});
+
+/* Starlight's own cards take the line as a prop, and no part of this package
+   renders them, so the source pass is the only thing that can read it. See
+   AmbiqAI/helia-ui#156. */
+test("a card's description prop is read like its children", () => {
+  const reduced = reduceTags(
+    '<LinkCard href="/modules/" title="Modules" description="Seventeen of them." />',
+  );
+
+  assert.equal(reduced.trim(), '- [Modules](/modules/): Seventeen of them.');
+});
+
+test('a link-bearing part takes its title from its children', () => {
+  assert.equal(
+    reduceTags('<Button href="/start/">Get started</Button>').trim(),
+    '[Get started](/start/)',
+  );
+  assert.equal(
+    reduceTags('<CardHeader href="/cards/">The card parts</CardHeader>').trim(),
+    '- [The card parts](/cards/)',
+  );
 });

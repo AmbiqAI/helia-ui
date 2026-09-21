@@ -77,20 +77,38 @@ its own through Starlight's `head` config.
 
 Four artifacts land at the site root, under the base path.
 
-| URL                  | What it is                                                                                                                                         |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `<route>/index.md`   | The page's own markdown, frontmatter stripped, links resolved to absolute site URLs, component tags reduced to their text, code fences untouched   |
-| `llms.txt`           | The site title, its one-line description, and every route with its title and description, grouped by sidebar section and linking to the renditions |
-| `llms-full.txt`      | Every rendition concatenated in sidebar order                                                                                                      |
-| `content-index.json` | Route, title, description, section, headings, source path, and the git commit date per route                                                       |
+| URL                  | What it is                                                                                                                                                                  |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<route>/index.md`   | The page's own markdown, frontmatter stripped, links resolved to absolute site URLs, component tags reduced to their text or to what the part stated, code fences untouched |
+| `llms.txt`           | The site title, its one-line description, and every route with its title and description, grouped by sidebar section and linking to the renditions                          |
+| `llms-full.txt`      | Every rendition concatenated in sidebar order                                                                                                                               |
+| `content-index.json` | Route, title, description, section, headings, source path, and the git commit date per route                                                                                |
 
-The renditions are a pure function of the source tree and the sidebar, so two
-builds of one commit produce identical bytes and a deploy diff shows only what
-actually changed.
+The renditions are a pure function of the source tree, the sidebar and the
+pages the build just wrote, so two builds of one commit produce identical bytes
+and a deploy diff shows only what actually changed.
 
 `robots.txt` is written with a `Sitemap:` line if the site does not already
 ship one; a site with its own keeps it. An RSS feed at `rss.xml` is written
 when the site has a `blog` content collection, and skipped when it has none.
+
+### What a part states for itself
+
+A rendition is reduced from the authored source, which cannot see a value a
+component was handed: a transcript whose lines are imported from a module, a
+card whose title and line come from a record, a button whose label is an
+expression. Those parts -- `AsciiTerminal`, `LinkCard`, a `Card` whose
+`CardHeader` carries the link, and a linked `Button` -- write their own
+markdown into a hidden block in the built page, and the pass splices it in
+where the component sits. A site needs no code of its own for this, and the
+block renders nothing, is not indexed by search, and is not in the page's
+JSON-LD.
+
+A kind is spliced only where the page rendered as many of them as the source
+has occurrences. A grid built by mapping over a model is one tag in the source
+and a card per record on the page, so the sequence that anchors one to the
+other is not there and the source form stands. A site that composes its own
+rendition for a generated table or catalog should keep doing so.
 
 ## Checking it
 

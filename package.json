@@ -73,6 +73,7 @@
     "chart-echarts-theme.ts",
     "chart-plot-spec.ts",
     "reference-model.ts",
+    "rendition.ts",
     "ref-index-model.ts",
     "scripts/pyref.mjs",
     "scripts/lib/pyref-extract.mjs",
