@@ -25,8 +25,7 @@ export const RENDITION_ATTRIBUTE = 'data-helia-rendition';
  * `\u0000` is the mask the rendition pass holds an inline-code span with, so
  * it survives; every other control character, a line break in a title
  * included, is neither content nor markup. Written as escapes rather than as
- * the bytes themselves: a literal one in this file makes it binary to git and
- * undiffable to a reviewer.
+ * the bytes themselves: a literal one in this file makes it binary to git.
  */
 const CONTROL = /[\u0001-\u001f\u007f]/g;
 
@@ -190,7 +189,7 @@ export function renditionText(html: string): string {
  * end tag. Rather than match that grammar, every `</` and every `<!--` is held
  * with a backslash the reader takes back out, so `</SCRIPT\t>` is held exactly
  * as `</script>` is. A backslash already standing between `<` and one of those
- * openings is doubled, which is what makes the round trip exact. Nothing else
+ * openings is joined by one more, which is what makes the round trip exact. Nothing else
  * in the block is markup, which is why the sidecar is a script rather than a
  * template: what is written is what is read back, entities and all.
  */

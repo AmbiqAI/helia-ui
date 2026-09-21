@@ -91,7 +91,8 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
   table should keep doing so. A tag imported from another package, such as
   Starlight's own `LinkCard`, is left to the source pass.
   `CardHeader` gains `rendition`, for a part that wraps it and states the whole
-  card itself.
+  card itself, and `@ambiqai/helia-ui/rendition` is a new export carrying the
+  builders and the escaping a site's own part needs to state one.
 - A card's `description` prop is read like its children, and a link-bearing
   `Button`, `LinkCard`, `Card` or `CardHeader` written with no `title` takes
   its title from its children. Both shapes used to reach a reader as prose with

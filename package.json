@@ -55,6 +55,7 @@
     "./reference-model": "./reference-model.ts",
     "./ref-index-model": "./ref-index-model.ts",
     "./callout-tones": "./callout-tones.ts",
+    "./rendition": "./rendition.ts",
     "./starlight": "./starlight/index.ts",
     "./starlight/*": "./starlight/*",
     "./tokens.css": "./tokens.css",

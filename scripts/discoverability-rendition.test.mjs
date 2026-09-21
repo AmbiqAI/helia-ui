@@ -529,7 +529,7 @@ const builtPage = (...blocks) =>
     '</footer></body></html>',
   ].join('');
 
-test('a terminal states its transcript, prompts and kinds as it reads', () => {
+test('a stated transcript is a fenced block, verbatim', () => {
   const transcript = ['$ npm run build', '  ENTRY  src/index.ts', 'done'].join(
     '\n',
   );
@@ -542,7 +542,7 @@ test('a terminal states its transcript, prompts and kinds as it reads', () => {
   );
 });
 
-test('a card states its title, target and line as one list item', () => {
+test('a card is a list item and a button is an inline link', () => {
   assert.equal(
     linkItem('Apollo510', '/modules/apollo510/', 'The evaluation board.'),
     '- [Apollo510](/modules/apollo510/): The evaluation board.',

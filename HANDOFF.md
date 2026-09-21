@@ -60,11 +60,14 @@ them. Another session adds #166's bullet to the same section.
   shape the count guard refuses to splice.
 - `CardHeader` gains `rendition`, a boolean, for a part that wraps it and
   states the whole card itself. `LinkCard` sets it false.
+- `@ambiqai/helia-ui/rendition` is a new export: the builders and the escaping
+  a site's own part needs to state a sidecar of its own, which is what a
+  composition like neuralspotx's `ModuleCard` would reach for.
 - Semver: additive. Renditions change content, which is the point of it.
 
 ## Verified
 
-`npm ci` in both trees, `npm run validate` (254 unit tests), `npm run
+`npm ci` in both trees, `npm run validate` (263 unit tests), `npm run
 docs:build`, `npm run docs:test` (163 Playwright tests, gallery accessibility
 included).
 
