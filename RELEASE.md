@@ -15,8 +15,8 @@ consumer pinning a tag like any other site.
 | Field             | Value                                                                |
 | ----------------- | -------------------------------------------------------------------- |
 | Package           | `@ambiqai/helia-ui`                                                  |
-| Version           | 0.1.0-alpha.13                                                       |
-| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.13`. |
+| Version           | 0.1.0-alpha.16                                                       |
+| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.16`. |
 | License           | BSD-3-Clause (`LICENSE`)                                             |
 | Licensing tier    | Tier 1, ADR-0005                                                     |
 | Source repository | https://github.com/AmbiqAI/helia-ui                                  |
@@ -74,6 +74,53 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
   "dependencies": { "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v<version>" }
 }
 ```
+
+## What changed in 0.1.0-alpha.16
+
+- Make Markdown renditions and llms output faithful for MDX pages: multi-line
+  `import` and `export` statements, MDX comments and expressions are removed
+  from the rendition; `LinkCard`, `Card` and `AsciiTerminal` content is
+  rendered to Markdown instead of dropped; card titles and targets are escaped
+  so text from another repository cannot forge a link.
+- Escape JSON-LD strings.
+- `renderMarkdown` gains an `mdx` option, and the rendition helpers are exported
+  from `starlight/discoverability.ts`.
+
+- Set up every `AsciiTerminal` on a page, not only the first: instances parsed
+  after the element definition waited for children that had not been parsed
+  yet. Readiness is an instance field, an element connected empty is retried
+  once, and the element exposes `play()`, which resolves when the run ends.
+
+Refs #143, #135, #136, #146, #149, #150.
+
+## What changed in 0.1.0-alpha.15
+
+- Render Starlight Markdown asides (`:::note`, `:::tip`, `:::caution`,
+  `:::danger`) as `Callout` in `.md` and `.mdx`, on both the Sätteri and the
+  unified Markdown processors, through the new `markdownCallouts` plugin option
+  (default on). Markdown renditions and llms output keep the aside as plain
+  Markdown.
+- Move the Callout recipe into `recipes.css` so the component and the transform
+  share one set of global rules; a site that overrode the previously scoped
+  Callout rules loses that override.
+- Callout carries `aria-label` from its title and no longer sets `role`; the
+  icon SVG no longer carries FontAwesome classes, `role="img"` or `data-icon`.
+- Export the tone table as `@ambiqai/helia-ui/callout-tones` and add the
+  `check:callout-tones` validation step.
+
+Refs #124, #128.
+
+## What changed in 0.1.0-alpha.14
+
+- Preserve C++ class and function template declarations, including defaults, in
+  generated API signatures.
+- Preserve pure virtual method markers and class inheritance declarations.
+- Use stable Doxygen member identities for C++ overloads, without allowing
+  excluded private members to change public anchors. C identities are unchanged.
+- Diagnose incomplete template declarators in Doxygen XML and exercise real
+  C++ fixtures, rendered signatures and overload links.
+
+Refs #112.
 
 ## What changed in 0.1.0-alpha.13
 

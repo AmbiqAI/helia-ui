@@ -54,6 +54,46 @@ snackbars for transient confirmation.
   </Callout>
 </div>
 
+## Markdown form
+
+The plugin renders Starlight's aside directives as callouts, in `.md` and
+`.mdx` alike, so a page written in plain Markdown needs no import. The four
+directive names map onto four tones, a directive label becomes the title, and
+a directive without one keeps Starlight's default title.
+
+```md
+:::note
+Directive asides carry the package surface without an import.
+:::
+
+:::tip[Pick the directive]
+Reach for the component only when the tone has no directive name.
+:::
+```
+
+:::note
+Directive asides carry the package surface without an import.
+:::
+
+:::tip[Pick the directive]
+Reach for the component only when the tone has no directive name.
+:::
+
+:::caution
+A directive aside is prose, so a long one reads better as a section.
+:::
+
+:::danger[Read before running]
+A destructive step earns the strongest tone the directive set offers.
+:::
+
+`caution` is the `warning` tone and `danger` is `critical`; the other six tones
+have no directive of their own and stay with the component. Set
+`markdownCallouts: false` on the plugin to leave Starlight's own asides in
+place. The Markdown renditions and `llms.txt` the plugin writes carry the
+directive as authored, because they are built from the source rather than from
+the rendered page.
+
 ## Usage
 
 - Keep the title specific enough to scan without reading the body.

@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="classruntime_1_1_derived_resolver" kind="class" language="C++" prot="public">
+    <compoundname>runtime::DerivedResolver</compoundname>
+    <basecompoundref refid="classruntime_1_1_resolver" prot="public" virt="non-virtual">runtime::Resolver&lt; 4, float &gt;</basecompoundref>
+    <includes refid="runtime_8hpp" local="no">runtime.hpp</includes>
+    <briefdescription>
+<para>Fixed resolver specialization. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>runtime::DerivedResolver</label>
+        <link refid="classruntime_1_1_derived_resolver"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>runtime::Resolver&lt; 4, float &gt;</label>
+        <link refid="classruntime_1_1_resolver"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>runtime::DerivedResolver</label>
+        <link refid="classruntime_1_1_derived_resolver"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>runtime::Resolver&lt; 4, float &gt;</label>
+        <link refid="classruntime_1_1_resolver"/>
+      </node>
+    </collaborationgraph>
+    <location file="src/runtime.hpp" line="47" column="1" bodyfile="src/runtime.hpp" bodystart="47" bodyend="47"/>
+    <listofallmembers>
+      <member refid="classruntime_1_1_resolver_1a7a73dc9b4b67aec50ea261e37189b121" prot="public" virt="non-virtual"><scope>runtime::DerivedResolver</scope><name>Find</name></member>
+      <member refid="classruntime_1_1_resolver_1a6d35647ea6271c05ba1bd705963671b3" prot="private" virt="non-virtual"><scope>runtime::DerivedResolver</scope><name>hidden</name></member>
+      <member refid="classruntime_1_1_resolver_1aff8cdb045e16336c511161cd857e9c11" prot="public" virt="non-virtual"><scope>runtime::DerivedResolver</scope><name>input</name></member>
+      <member refid="classruntime_1_1_resolver_1aaba9e31a780fde70d3ab91fcc99a37d6" prot="public" virt="non-virtual"><scope>runtime::DerivedResolver</scope><name>Resolver</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

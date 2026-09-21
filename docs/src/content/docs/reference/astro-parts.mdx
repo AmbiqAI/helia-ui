@@ -69,6 +69,7 @@ lists inherited attributes forwards them to its root element.
 | `BigNumber`   | `labelPosition` | `above`, `below`                                                           | `above`       |
 | `BigNumber`   | `step`          | `display`, `heading`                                                       | `display`     |
 | `BigNumber`   | `direction`     | `up`, `down`, `flat`                                                       | `flat`        |
+| `Sparkline`   | `kind`          | `line`, `area`                                                             | `line`        |
 
 ## AccordionGroup
 
@@ -259,10 +260,10 @@ Also accepts `Omit<HTMLAttributes<'a'>, 'href'>`, `HTMLAttributes<'button'>`.
 import Callout from '@ambiqai/helia-ui/astro/Callout';
 ```
 
-| Prop           | Type                                                                                                                             | Default  | Description                                                           |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------- |
-| `title` (req.) | `string`                                                                                                                         | --       | The heading of the aside. Required: an untitled aside is a paragraph. |
-| `tone`         | `\| 'note' \| 'tip' \| 'success' \| 'important' \| 'warning' \| 'critical' \| 'compatibility' \| 'experimental' \| 'deprecated'` | `'note'` | What the aside means. Picks the tint and the icon together.           |
+| Prop           | Type                                                                                                                             | Default  | Description                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------- |
+| `title` (req.) | `string`                                                                                                                         | --       | The heading of the aside, and its accessible name.          |
+| `tone`         | `\| 'note' \| 'tip' \| 'success' \| 'important' \| 'warning' \| 'critical' \| 'compatibility' \| 'experimental' \| 'deprecated'` | `'note'` | What the aside means. Picks the tint and the icon together. |
 
 **Slots**
 
@@ -464,26 +465,26 @@ Also accepts `HTMLAttributes<'figure'>`.
 import Chart from '@ambiqai/helia-ui/astro/Chart';
 ```
 
-| Prop             | Type                            | Default        | Description                                                                                                                                                      |
-| ---------------- | ------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `title` (req.)   | `string`                        | --             | The chart's heading. Also the accessible name of the SVG.                                                                                                        |
-| `subtitle`       | `string`                        | --             | What is plotted against what. Stands in for the axis titles.                                                                                                     |
-| `caption`        | `string`                        | --             | A note under the chart: provenance, units, a caveat.                                                                                                             |
-| `kind`           | `ChartKind`                     | `'line'`       | Which marks to draw. `dot` and `scatter` draw the same mark; only `scatter` grids both axes.                                                                     |
-| `data` (req.)    | `readonly ChartRecord[]`        | --             | The rows. Every row carries the `x`, `y` and `series` keys.                                                                                                      |
-| `x` (req.)       | `string`                        | --             | Key on each row for the horizontal position.                                                                                                                     |
-| `y` (req.)       | `string`                        | --             | Key on each row for the vertical position.                                                                                                                       |
-| `series`         | `string`                        | --             | Key whose distinct values split the rows into series. Omit it for one series.                                                                                    |
-| `height`         | `number`                        | `CHART_HEIGHT` | The height, in pixels, Plot lays the chart out at.                                                                                                               |
-| `width`          | `number`                        | `CHART_WIDTH`  | The width, in pixels, Plot lays the chart out at. The SVG then scales to its container and keeps that aspect ratio, so pick a width near the one it is shown at. |
-| `density`        | `ChartDensity`                  | `'default'`    | Moves the margins and the tick count.                                                                                                                            |
-| `legend`         | `ChartLegend`                   | `'auto'`       | `auto` names the series when there is more than one; `none` never does.                                                                                          |
-| `orientation`    | `ChartOrientation`              | `'vertical'`   | Which way the bars run. `horizontal` puts the categories on the y axis and takes the left margin from the longest label.                                         |
-| `scale`          | `ChartScale`                    | --             | The measure's scale. A `log` axis over a value at or below zero is drawn linear, and the build says so.                                                          |
-| `axis`           | `ChartAxisTitles`               | --             | Axis titles, for the chart whose unit will not fit in the subtitle.                                                                                              |
-| `valueLabels`    | `boolean`                       | `false`        | Writes each bar's value at its end, where the bands leave room for it.                                                                                           |
-| `valueFormat`    | `(value: number) => string`     | --             | How a value is written, on a bar and on a titled or logarithmic axis.                                                                                            |
-| `referenceLines` | `readonly ChartReferenceLine[]` | --             | Rules across the measure: a baseline, a target, a budget.                                                                                                        |
+| Prop             | Type                                              | Default        | Description                                                                                                                                                      |
+| ---------------- | ------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `title` (req.)   | `string`                                          | --             | The chart's heading. Also the accessible name of the SVG.                                                                                                        |
+| `subtitle`       | `string`                                          | --             | What is plotted against what. Stands in for the axis titles.                                                                                                     |
+| `caption`        | `string`                                          | --             | A note under the chart: provenance, units, a caveat.                                                                                                             |
+| `kind`           | `'line' \| 'area' \| 'bar' \| 'scatter' \| 'dot'` | `'line'`       | Which marks to draw. `dot` and `scatter` draw the same mark; only `scatter` grids both axes.                                                                     |
+| `data` (req.)    | `readonly ChartRecord[]`                          | --             | The rows. Every row carries the `x`, `y` and `series` keys.                                                                                                      |
+| `x` (req.)       | `string`                                          | --             | Key on each row for the horizontal position.                                                                                                                     |
+| `y` (req.)       | `string`                                          | --             | Key on each row for the vertical position.                                                                                                                       |
+| `series`         | `string`                                          | --             | Key whose distinct values split the rows into series. Omit it for one series.                                                                                    |
+| `height`         | `number`                                          | `CHART_HEIGHT` | The height, in pixels, Plot lays the chart out at.                                                                                                               |
+| `width`          | `number`                                          | `CHART_WIDTH`  | The width, in pixels, Plot lays the chart out at. The SVG then scales to its container and keeps that aspect ratio, so pick a width near the one it is shown at. |
+| `density`        | `'default' \| 'compact' \| 'comfortable'`         | `'default'`    | Moves the margins and the tick count.                                                                                                                            |
+| `legend`         | `'auto' \| 'none'`                                | `'auto'`       | `auto` names the series when there is more than one; `none` never does.                                                                                          |
+| `orientation`    | `'vertical' \| 'horizontal'`                      | `'vertical'`   | Which way the bars run. `horizontal` puts the categories on the y axis and takes the left margin from the longest label.                                         |
+| `scale`          | `ChartScale`                                      | --             | The measure's scale. A `log` axis over a value at or below zero is drawn linear, and the build says so.                                                          |
+| `axis`           | `ChartAxisTitles`                                 | --             | Axis titles, for the chart whose unit will not fit in the subtitle.                                                                                              |
+| `valueLabels`    | `boolean`                                         | `false`        | Writes each bar's value at its end, where the bands leave room for it.                                                                                           |
+| `valueFormat`    | `(value: number) => string`                       | --             | How a value is written, on a bar and on a titled or logarithmic axis.                                                                                            |
+| `referenceLines` | `readonly ChartReferenceLine[]`                   | --             | Rules across the measure: a baseline, a target, a budget.                                                                                                        |
 
 Also accepts `HTMLAttributes<'figure'>`.
 
@@ -1095,7 +1096,7 @@ import Sparkline from '@ambiqai/helia-ui/astro/Sparkline';
 | ------------------ | ------------------- | ------------------ | -------------------------------------------------------------------------------------- |
 | `values` (req.)    | `readonly number[]` | --                 | The series, in order. The index is the horizontal position.                            |
 | `ariaLabel` (req.) | `string`            | --                 | What the trend says, as one sentence. The accessible name of the SVG.                  |
-| `kind`             | `SparklineKind`     | `'line'`           | `line` draws the stroke alone; `area` fills under it as well.                          |
+| `kind`             | `'line' \| 'area'`  | `'line'`           | `line` draws the stroke alone; `area` fills under it as well.                          |
 | `width`            | `number`            | `SPARKLINE_WIDTH`  | The width, in pixels, Plot lays the sparkline out at. It ships at that size.           |
 | `height`           | `number`            | `SPARKLINE_HEIGHT` | The height, in pixels, Plot lays the sparkline out at.                                 |
 | `marker`           | `boolean`           | `false`            | Draws a dot on the last point, where a reader looks first.                             |

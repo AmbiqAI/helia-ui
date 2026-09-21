@@ -27,6 +27,7 @@
  */
 
 import {
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -242,6 +243,65 @@ function localDeclarations(sourceFile) {
   return { interfaces, aliases };
 }
 
+/*
+ * Aliases a part imports from a module of this package, by the name it imports
+ * them under. A tone or a language list moved into a shared module so the
+ * plugin can read it too is still the component's contract, and a reader of
+ * this page wants the members rather than a name to go and grep. The reach
+ * stops at one hop and at this package: a name from a dependency stays a name.
+ */
+function importedDeclarations(sourceFile, file) {
+  const aliases = new Map();
+  for (const statement of sourceFile.statements) {
+    if (!ts.isImportDeclaration(statement)) continue;
+    const specifier = statement.moduleSpecifier.text;
+    if (!specifier.startsWith('.')) continue;
+    const names = statement.importClause?.namedBindings;
+    if (!names || !ts.isNamedImports(names)) continue;
+
+    const resolved = resolveModule(dirname(file), specifier);
+    if (!resolved) continue;
+    const declared = localDeclarations(
+      ts.createSourceFile(
+        basename(resolved),
+        readFileSync(resolved, 'utf8'),
+        ts.ScriptTarget.ES2022,
+        true,
+        ts.ScriptKind.TS,
+      ),
+    ).aliases;
+
+    for (const binding of names.elements) {
+      const source = (binding.propertyName ?? binding.name).text;
+      const alias = declared.get(source);
+      if (alias && isNameList(alias.type))
+        aliases.set(binding.name.text, alias);
+    }
+  }
+  return aliases;
+}
+
+/*
+ * A union of literals, which is a list of names worth printing in place of the
+ * alias. A type computed from a value -- `(typeof KINDS)[number]` -- expands to
+ * something less useful than its own name, so that one stays a name.
+ */
+function isNameList(typeNode) {
+  if (ts.isLiteralTypeNode(typeNode)) return true;
+  return (
+    ts.isUnionTypeNode(typeNode) && typeNode.types.every(ts.isLiteralTypeNode)
+  );
+}
+
+/** A relative specifier as a file on disk, with or without its extension. */
+function resolveModule(from, specifier) {
+  const base = join(from, specifier);
+  for (const candidate of [base, `${base}.ts`, join(base, 'index.ts')]) {
+    if (candidate.endsWith('.ts') && existsSync(candidate)) return candidate;
+  }
+  return null;
+}
+
 function propertyDoc(member, source) {
   const block = docComment(member, source);
   if (!block) return '';
@@ -380,6 +440,9 @@ function readPart(file) {
   );
 
   const scope = localDeclarations(sourceFile);
+  for (const [name, alias] of importedDeclarations(sourceFile, file)) {
+    if (!scope.aliases.has(name)) scope.aliases.set(name, alias);
+  }
   const declaration =
     scope.interfaces.get('Props') ?? scope.aliases.get('Props');
   if (!declaration) {

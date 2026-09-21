@@ -6,6 +6,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
   rmSync,
   symlinkSync,
   writeFileSync,
@@ -26,12 +27,19 @@ test('props generation ignores neighboring repository documents', () => {
     const neighbor = join(root, 'docs', 'design-system.md');
     const sentinel = 'A neighboring document with no generator markers.\n';
     writeFileSync(neighbor, sentinel);
+    /* The root modules as well as the parts: a part takes a prop type from a
+       shared module the plugin reads too, and the generator inlines it, so
+       they are an input to the page rather than a neighbor of it. */
+    const rootModules = readdirSync(source).filter((name) =>
+      name.endsWith('.ts'),
+    );
     for (const name of [
       'astro',
       '.prettierrc.json',
       'package.json',
       'docs/src/content/docs/reference/astro-parts.mdx',
       'scripts/astro-props.mjs',
+      ...rootModules,
     ]) {
       cpSync(join(source, name), join(isolated, name), { recursive: true });
     }

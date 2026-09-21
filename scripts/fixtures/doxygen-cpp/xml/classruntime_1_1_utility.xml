@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="classruntime_1_1_utility" kind="class" language="C++" prot="public">
+    <compoundname>runtime::Utility</compoundname>
+    <derivedcompoundref refid="classruntime_1_1_derived" prot="protected" virt="non-virtual">runtime::Derived</derivedcompoundref>
+    <includes refid="runtime_8hpp" local="no">runtime.hpp</includes>
+    <briefdescription>
+<para>Protected implementation extension. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>runtime::Derived</label>
+        <link refid="classruntime_1_1_derived"/>
+        <childnode refid="1" relation="protected-inheritance">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>runtime::Utility</label>
+        <link refid="classruntime_1_1_utility"/>
+      </node>
+    </inheritancegraph>
+    <location file="src/runtime.hpp" line="41" column="1" bodyfile="src/runtime.hpp" bodystart="41" bodyend="41"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
