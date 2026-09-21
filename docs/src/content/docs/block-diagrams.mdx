@@ -1,0 +1,202 @@
+---
+title: Block diagrams
+description: BlockDiagram and Block draw the shape of a system as nested boxes, with no arrows and no runtime.
+---
+
+import Block from '@ambiqai/helia-ui/astro/Block';
+import BlockDiagram from '@ambiqai/helia-ui/astro/BlockDiagram';
+import Callout from '@ambiqai/helia-ui/astro/Callout';
+
+Two parts: `BlockDiagram` is the canvas and `Block` is a node on it. A block
+holds blocks, so the diagram nests as deep as the thing it describes without a
+second component per level. Layout is CSS grid, the page ships no script, and
+the only relationship drawn is containment.
+
+<Callout title="No arrows, by design" tone="tip">
+  A box inside a box says what an arrow between two boxes says, and it says it
+  without a line that has to be routed, themed and printed. A diagram that
+  genuinely needs a branch or a loop is a mermaid fence instead; see
+  [Diagrams](/helia-ui/diagrams/).
+</Callout>
+
+## A flat row
+
+Five peers on one line. `flow="row"` is the default, and a row stacks to one
+column below 42rem, which is where five labels stop fitting on a phone.
+
+<BlockDiagram
+  title="Capture path"
+  caption="Five stages, each one a peer of the others."
+>
+  <Block label="Probe" />
+  <Block label="Sampler" />
+  <Block label="Decoder" />
+  <Block label="Aligner" />
+  <Block label="Report" />
+</BlockDiagram>
+
+```mdx
+<BlockDiagram
+  title="Capture path"
+  caption="Five stages, each one a peer of the others."
+>
+  <Block label="Probe" />
+  <Block label="Sampler" />
+  <Block label="Decoder" />
+  <Block label="Aligner" />
+  <Block label="Report" />
+</BlockDiagram>
+```
+
+## Nesting
+
+A `Block` with children draws them in a set of its own. The children are more
+`Block`s, so the whole diagram is one `<figure>` holding nested lists and a
+screen reader walks the hierarchy the page draws. The ground steps at each
+level, and the step is read off the markup rather than declared, so a subtree
+moved a level in or out takes the ground of where it lands.
+
+<BlockDiagram
+  title="Pipeline with substeps"
+  caption="Two levels. Each stage names what it is made of."
+  flow="row"
+>
+  <Block label="Ingest" sublabel="Two sources">
+    <Block label="Reader" emphasis="filled" />
+    <Block label="Validator" emphasis="filled" />
+  </Block>
+  <Block label="Transform" sublabel="Pure functions">
+    <Block label="Normalize" emphasis="filled" />
+    <Block label="Resample" emphasis="filled" />
+    <Block label="Window" emphasis="filled" />
+  </Block>
+  <Block label="Publish" sublabel="One writer">
+    <Block label="Encoder" emphasis="filled" />
+    <Block label="Store" emphasis="filled" />
+  </Block>
+</BlockDiagram>
+
+```mdx
+<BlockDiagram title="Pipeline with substeps" flow="row">
+  <Block label="Ingest" sublabel="Two sources">
+    <Block label="Reader" emphasis="filled" />
+    <Block label="Validator" emphasis="filled" />
+  </Block>
+</BlockDiagram>
+```
+
+### Plain ladder
+
+Three levels with no tone and no emphasis. The ground steps with depth and the
+second line keeps its contrast at the bottom of the ladder.
+
+<BlockDiagram
+  title="A plain ladder"
+  caption="Level one holds level two holds level three."
+  flow="row"
+  data-example="ladder"
+>
+  <Block label="System" sublabel="Level one">
+    <Block label="Subsystem" sublabel="Level two">
+      <Block label="Component" sublabel="Level three" />
+      <Block label="Component" sublabel="Level three" />
+    </Block>
+    <Block label="Subsystem" sublabel="Level two" />
+  </Block>
+  <Block label="System" sublabel="Level one" />
+</BlockDiagram>
+
+### A filled parent
+
+A filled block can hold blocks. The children start the ladder again with their
+own edge, so the filled ground is the parent's alone.
+
+<BlockDiagram title="Filled parent" flow="row">
+  <Block label="Runtime" emphasis="filled">
+    <Block label="Scheduler" />
+    <Block label="Allocator" sublabel="arena" />
+  </Block>
+  <Block label="Host" />
+</BlockDiagram>
+
+## Three levels, with links
+
+The same part three deep. The labels here are this package, so every link goes
+to the page that documents the block it names. `tone="accent"` takes the
+product color of whatever subtree it sits in, which is the
+`data-helia-accent` attribute a product site already sets.
+
+<BlockDiagram
+  title="helia-ui"
+  caption="System, subsystems, and what each one is made of."
+  flow="grid"
+  columns={3}
+>
+  <Block label="Style layers" sublabel="Three sheets" tone="accent">
+    <Block label="Tokens" href="/helia-ui/foundations/tokens/" />
+    <Block label="Semantic" href="/helia-ui/foundations/" />
+    <Block label="Recipes" href="/helia-ui/primitives/" />
+  </Block>
+  <Block label="Astro parts" sublabel="Ship no script">
+    <Block label="Primitives" flow="row">
+      <Block label="Surface" emphasis="filled" />
+      <Block label="Chip" emphasis="filled" />
+    </Block>
+    <Block label="Composites" flow="row">
+      <Block label="Cards" href="/helia-ui/cards/" emphasis="filled" />
+      <Block label="Layout" href="/helia-ui/layout/" emphasis="filled" />
+    </Block>
+  </Block>
+  <Block label="React islands" sublabel="Hydrated on request" tone="muted">
+    <Block label="Inputs" href="/helia-ui/react/inputs/" />
+    <Block label="Overlays" href="/helia-ui/react/overlays/" />
+    <Block label="Proposed" emphasis="dashed" />
+  </Block>
+</BlockDiagram>
+
+## The variants
+
+Each block below is labeled with the prop that draws it.
+
+<BlockDiagram title="Tone" flow="row">
+  <Block label="Neutral" sublabel="tone default" />
+  <Block label="Muted" sublabel='tone="muted"' tone="muted" />
+  <Block label="Accent" sublabel='tone="accent"' tone="accent" />
+</BlockDiagram>
+
+<BlockDiagram title="Emphasis" flow="row">
+  <Block label="Outline" sublabel="emphasis default" />
+  <Block label="Filled" sublabel='emphasis="filled"' emphasis="filled" />
+  <Block label="Dashed" sublabel='emphasis="dashed"' emphasis="dashed" />
+</BlockDiagram>
+
+<BlockDiagram title="Span and icons" flow="grid" columns={4}>
+  <Block label="Wide" sublabel="span={2}" span={2} icon="layer-group" />
+  <Block label="Plain" icon="cube" />
+  <Block label="Plain" icon="cube" />
+</BlockDiagram>
+
+<BlockDiagram
+  title="Density and ground"
+  caption='density="compact" on a tone="muted" canvas.'
+  tone="muted"
+  density="compact"
+  flow="row"
+>
+  <Block label="One">
+    <Block label="Inner" emphasis="filled" />
+  </Block>
+  <Block label="Two">
+    <Block label="Inner" emphasis="filled" />
+  </Block>
+  <Block label="Three">
+    <Block label="Inner" emphasis="filled" />
+  </Block>
+</BlockDiagram>
+
+## What belongs in a label
+
+One to three words. The box was drawn to be taken in at a glance, and a block
+carrying a sentence is a card that has lost its frame. A qualifier that will
+not fit in the name goes in `sublabel`, on its own line and in the muted ink,
+where it stays out of the way of the shape.

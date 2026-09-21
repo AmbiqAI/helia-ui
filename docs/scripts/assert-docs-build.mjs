@@ -60,6 +60,7 @@ const ASTRO_LANE = [
   /* Diagrams belongs here rather than anywhere else: build-time mermaid is
      only worth the browser it costs if the page ships no island. */
   'diagrams',
+  'block-diagrams',
   'layout',
   'reference/astro-parts',
 ];

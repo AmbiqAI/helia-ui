@@ -216,6 +216,7 @@ export default defineConfig({
             { label: 'Disclosure', slug: 'disclosure' },
             { label: 'Timeline', slug: 'timeline' },
             { label: 'Diagrams', slug: 'diagrams' },
+            { label: 'Block diagrams', slug: 'block-diagrams' },
             { label: 'Layout', slug: 'layout' },
           ],
         },

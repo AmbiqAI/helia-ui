@@ -277,6 +277,32 @@ test('a card grid reduces to its links, in source order', () => {
   );
 });
 
+test('a block diagram is its labels as a nested list', () => {
+  const reduced = reduceTags(
+    [
+      '<BlockDiagram title="Pipeline" caption="What a run does" flow="row">',
+      '  <Block label="Build" sublabel="firmware">',
+      '    <Block label="Compile" href="/compile/" />',
+      '    <Block label="Link" />',
+      '  </Block>',
+      '  <Block label="Capture" />',
+      '</BlockDiagram>',
+    ].join('\n'),
+  );
+
+  assert.equal(
+    reduced.trim(),
+    [
+      'Pipeline: What a run does',
+      '',
+      '- Build: firmware',
+      '  - [Compile](/compile/)',
+      '  - Link',
+      '- Capture',
+    ].join('\n'),
+  );
+});
+
 test('a link-bearing component is a link wherever it was written', () => {
   const reduced = reduceTags(
     '<Button href="/start/" title="Get started">Go</Button>',
