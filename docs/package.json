@@ -23,7 +23,7 @@
   "dependencies": {
     "@ambiqai/helia-ui": "file:..",
     "@astrojs/markdown-remark": "^7.3.1",
-    "@astrojs/react": "^6.0.2",
+    "@astrojs/react": "^6.0.6",
     "@astrojs/starlight": "^0.41.5",
     "@astrojs/starlight-tailwind": "^5.0.0",
     "@tailwindcss/vite": "^4.3.3",
