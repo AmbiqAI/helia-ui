@@ -744,6 +744,44 @@ test("a card's description prop is read like its children", () => {
   assert.equal(reduced.trim(), '- [Modules](/modules/): Seventeen of them.');
 });
 
+/*
+ * An end tag is matched without regard to case and tolerates whitespace before
+ * its `>`, so holding only the lowercase form would let a transcript line end
+ * the block and put the rest of the sidecar on the page as markup.
+ */
+test('a stated block holds an end tag in whatever form it was written', () => {
+  const markdown = codeFence(
+    [
+      '$ cat page.html',
+      '</SCRIPT >',
+      '</script\t>',
+      '<!-- a comment -->',
+      '<\\/script>',
+    ].join('\n'),
+  );
+  const escaped = escapeRendition(markdown);
+
+  assert.ok(!/<\/script/i.test(escaped), 'an end tag survived the escape');
+  assert.ok(!escaped.includes('<!--'), 'a comment opener survived the escape');
+  assert.equal(unescapeRendition(escaped), markdown);
+  assert.deepEqual(
+    collectSidecars(builtPage(sidecarBlock('terminal', markdown))),
+    [{ kind: 'terminal', markdown }],
+  );
+});
+
+/* The children are dropped a pass later when they are an expression, so a link
+   made of them would reach a reader with nothing in its text. */
+test('a label that is still an expression is not read as a title', () => {
+  assert.equal(
+    reduceTags('<Button href="/start/">{cta.label}</Button>').trim(),
+    '{cta.label}',
+  );
+
+  const rendition = render('<Button href="/start/">{cta.label}</Button>');
+  assert.ok(!rendition.includes(']('), 'an empty link reached the rendition');
+});
+
 test('a link-bearing part takes its title from its children', () => {
   assert.equal(
     reduceTags('<Button href="/start/">Get started</Button>').trim(),

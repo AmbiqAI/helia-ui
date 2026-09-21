@@ -860,12 +860,16 @@ function reduceElement(
 
   /* A `title` prop that is an expression is a value this pass cannot have,
      and the children are the line rather than the name: only a part written
-     with no title at all is named by what is inside it. */
+     with no title at all is named by what is inside it, and only where those
+     children are text the source states outright. A label still carrying an
+     expression is not a name: `{cta.label}` is dropped a pass later, and a
+     link made of it would reach a reader as `[](href)`. */
   if (
     href !== undefined &&
     node.attributes['title'] === undefined &&
     LABELLED_BY_CHILDREN.has(node.name) &&
-    line !== ''
+    line !== '' &&
+    !line.includes('{')
   ) {
     return node.name === 'Button'
       ? { kind: 'inline', text: inlineLink(line, href) }
