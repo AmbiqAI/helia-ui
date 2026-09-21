@@ -15,8 +15,8 @@ consumer pinning a tag like any other site.
 | Field             | Value                                                                |
 | ----------------- | -------------------------------------------------------------------- |
 | Package           | `@ambiqai/helia-ui`                                                  |
-| Version           | 0.1.0-alpha.17                                                       |
-| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.17`. |
+| Version           | 0.1.0-alpha.18                                                       |
+| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.18`. |
 | License           | BSD-3-Clause (`LICENSE`)                                             |
 | Licensing tier    | Tier 1, ADR-0005                                                     |
 | Source repository | https://github.com/AmbiqAI/helia-ui                                  |
