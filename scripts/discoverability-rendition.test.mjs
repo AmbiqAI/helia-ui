@@ -991,3 +991,12 @@ test('a link-bearing part takes its title from its children', () => {
     '- [The card parts](/cards/)',
   );
 });
+
+test('a block sequence preserves ordered stages in Markdown', () => {
+  const source =
+    '<BlockDiagram flow="sequence"><Block label="Input" /><Block label="Compile"><Block label="Plan" /></Block><Block label="Output" /></BlockDiagram>';
+  const result = reduceTags(source);
+  assert.match(result, /1\. Input/);
+  assert.match(result, /2\. Compile\n   - Plan/);
+  assert.match(result, /3\. Output/);
+});

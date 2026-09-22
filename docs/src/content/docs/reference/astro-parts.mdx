@@ -267,15 +267,15 @@ Also accepts `HTMLAttributes<'li'>`.
 import BlockDiagram from '@ambiqai/helia-ui/astro/BlockDiagram';
 ```
 
-| Prop        | Type                                      | Default     | Description                                                                     |
-| ----------- | ----------------------------------------- | ----------- | ------------------------------------------------------------------------------- |
-| `title`     | `string`                                  | --          | The diagram's name, set over it as the first line of the caption.               |
-| `caption`   | `string`                                  | --          | A sentence under the title. What the diagram is of, not what it shows.          |
-| `flow`      | `'row' \| 'column' \| 'grid'`             | `'row'`     | How the top-level blocks are laid out. A row stacks below 42rem.                |
-| `columns`   | `2 \| 3 \| 4 \| 5`                        | `3`         | Columns at the wide end of the `grid` flow. Halves at 62rem, stacks at 42rem.   |
-| `density`   | `'compact' \| 'default' \| 'comfortable'` | `'default'` | The gap between the top-level blocks, and the tighter one inside them.          |
-| `tone`      | `'plain' \| 'muted'`                      | `'plain'`   | The ground under the diagram. `muted` frames it; `plain` lets the page through. |
-| `ariaLabel` | `string`                                  | --          | Accessible name for the figure when it carries no `title`.                      |
+| Prop        | Type                                        | Default     | Description                                                                                        |
+| ----------- | ------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| `title`     | `string`                                    | --          | The diagram's name, set over it as the first line of the caption.                                  |
+| `caption`   | `string`                                    | --          | A sentence under the title. What the diagram is of, not what it shows.                             |
+| `flow`      | `'row' \| 'column' \| 'grid' \| 'sequence'` | `'row'`     | Top-level layout. Row and sequence stack below 42rem; sequence adds ordered stages and connectors. |
+| `columns`   | `2 \| 3 \| 4 \| 5`                          | `3`         | Columns at the wide end of the `grid` flow. Halves at 62rem, stacks at 42rem.                      |
+| `density`   | `'compact' \| 'default' \| 'comfortable'`   | `'default'` | The gap between the top-level blocks, and the tighter one inside them.                             |
+| `tone`      | `'plain' \| 'muted'`                        | `'plain'`   | The ground under the diagram. `muted` frames it; `plain` lets the page through.                    |
+| `ariaLabel` | `string`                                    | --          | Accessible name for the figure when it carries no `title`.                                         |
 
 Also accepts `HTMLAttributes<'figure'>`.
 

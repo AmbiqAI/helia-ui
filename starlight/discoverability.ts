@@ -996,7 +996,19 @@ function reduceElement(
       .filter((value): value is string => value !== undefined)
       .map((value) => stripControl(value))
       .join(': ');
-    const body = children.text.trim();
+    let body = children.text.trim();
+    if (literal(node, 'flow') === 'sequence') {
+      let stage = 0;
+      body = body
+        .split('\n')
+        .map((line) => {
+          if (line.startsWith('- ')) return `${++stage}. ${line.slice(2)}`;
+          return line.startsWith('  ')
+            ? `${' '.repeat(String(stage).length)}${line}`
+            : line;
+        })
+        .join('\n');
+    }
     if (lead === '') return { kind: 'block', text: body };
     return { kind: 'block', text: body === '' ? lead : `${lead}\n\n${body}` };
   }

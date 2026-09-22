@@ -1,6 +1,6 @@
 ---
 title: Block diagrams
-description: BlockDiagram and Block draw the shape of a system as nested boxes, with no arrows and no runtime.
+description: BlockDiagram and Block draw the shape of a system as nested boxes, with optional ordered stages and no runtime.
 ---
 
 import Block from '@ambiqai/helia-ui/astro/Block';
@@ -10,14 +10,9 @@ import Callout from '@ambiqai/helia-ui/astro/Callout';
 Two parts: `BlockDiagram` is the canvas and `Block` is a node on it. A block
 holds blocks, so the diagram nests as deep as the thing it describes without a
 second component per level. Layout is CSS grid, the page ships no script, and
-the only relationship drawn is containment.
-
-<Callout title="No arrows, by design" tone="tip">
-  A box inside a box says what an arrow between two boxes says, and it says it
-  without a line that has to be routed, themed and printed. A diagram that
-  genuinely needs a branch or a loop is a mermaid fence instead; see
-  [Diagrams](/helia-ui/diagrams/).
-</Callout>
+containment is the default relationship. Use `flow="sequence"` for a short
+ordered process; its connectors turn downward when the stages stack on mobile.
+Branches and loops belong in [Diagrams](/helia-ui/diagrams/).
 
 ## A flat row
 
@@ -200,3 +195,18 @@ One to three words. The box was drawn to be taken in at a glance, and a block
 carrying a sentence is a card that has lost its frame. A qualifier that will
 not fit in the name goes in `sublabel`, on its own line and in the muted ink,
 where it stays out of the way of the shape.
+
+## Ordered stages
+
+`flow="sequence"` uses an ordered list and connects only its top-level stages.
+Keep labels short; nested blocks still describe what each stage contains.
+
+<BlockDiagram flow="sequence" title="Build workflow" data-example="sequence">
+  <Block label="Input" sublabel="Model and configuration" />
+  <Block label="Compile" sublabel="Plan and generate" />
+  <Block
+    label="Output"
+    sublabel="Integrate generated code"
+    href="/helia-ui/getting-started/"
+  />
+</BlockDiagram>
