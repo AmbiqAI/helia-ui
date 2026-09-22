@@ -3503,3 +3503,39 @@ draw.
     </div>
   </div>
 </Example>
+
+## Charts after tabular data
+
+Standalone plots keep the same separation as other prose blocks. A chart group
+owns the spacing between its plots.
+
+| Build   | Size |
+| ------- | ---- |
+| Example | 24   |
+
+<Chart
+  title="Size by build"
+  subtitle="Illustrative size units"
+  kind="bar"
+  data={[{ build: 'Example', size: 24 }]}
+  x="build"
+  y="size"
+  data-example="prose-chart"
+/>
+
+<ChartGroup columns={2} data-example="prose-chart-group">
+  <Chart
+    title="First grouped plot"
+    kind="bar"
+    data={[{ build: 'Example', size: 24 }]}
+    x="build"
+    y="size"
+  />
+  <Chart
+    title="Second grouped plot"
+    kind="bar"
+    data={[{ build: 'Example', size: 18 }]}
+    x="build"
+    y="size"
+  />
+</ChartGroup>

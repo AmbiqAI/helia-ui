@@ -725,3 +725,11 @@
     margin-inline-start: calc(var(--helia-space-3) * -1);
   }
 }
+
+/* Standalone figures join prose rhythm; nested layout components keep theirs. */
+:is(.sl-markdown-content, .helia-band__inner)
+  > :is(.helia-chart, .helia-chart-group, .helia-block-diagram):not(
+    :first-child
+  ) {
+  margin-block-start: var(--sl-content-gap-y);
+}

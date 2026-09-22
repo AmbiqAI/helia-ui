@@ -175,3 +175,20 @@ for (const width of [1440, 764, 390])
       ).not.toBe('none');
     });
   }
+
+test('section diagrams retain spacing after headings and prose', async ({
+  page,
+}) => {
+  await page.goto(page_);
+  for (const diagram of await page
+    .locator('[data-example="prose-diagrams"] .helia-block-diagram')
+    .all()) {
+    expect(
+      await diagram.evaluate(
+        (node) =>
+          node.getBoundingClientRect().top -
+          node.previousElementSibling!.getBoundingClientRect().bottom,
+      ),
+    ).toBeGreaterThanOrEqual(16);
+  }
+});

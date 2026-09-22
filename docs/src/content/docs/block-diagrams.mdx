@@ -210,3 +210,21 @@ Keep labels short; nested blocks still describe what each stage contains.
     href="/helia-ui/getting-started/"
   />
 </BlockDiagram>
+
+## Diagrams within a section
+
+import Band from '@ambiqai/helia-ui/astro/Band';
+
+<Band tone="muted" data-example="prose-diagrams">
+  <h2>Build stages</h2>
+  <BlockDiagram flow="sequence" ariaLabel="Build stages">
+    <Block label="Input" />
+    <Block label="Compile" />
+    <Block label="Output" />
+  </BlockDiagram>
+  <p>Choose an integration format.</p>
+  <BlockDiagram ariaLabel="Integration formats">
+    <Block label="CMake" />
+    <Block label="CMSIS-Pack" />
+  </BlockDiagram>
+</Band>
