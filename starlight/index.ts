@@ -609,7 +609,7 @@ export function heliaStarlight(
             accent,
             footer: {
               links: footer?.links ?? [],
-              tagline: footer?.tagline,
+              tagline: footer?.tagline ?? 'Part of the Ambiq HELIA AI platform',
               logo: footer?.logo ?? 'ambiq',
             },
             header: header

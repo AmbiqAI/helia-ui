@@ -2596,3 +2596,21 @@ a.helia-block__face:hover .helia-block__label {
 .helia-card-content a:not([class]):hover {
   color: var(--helia-product-accent);
 }
+
+.helia-hero--neutral {
+  --helia-product-accent: var(--helia-ink-primary);
+}
+
+.helia-hero--neutral .helia-hero__actions .helia-button--primary {
+  background: var(--helia-ink-primary);
+  border-color: var(--helia-ink-primary);
+  color: var(--sl-color-text-invert);
+}
+
+.helia-hero--neutral .helia-hero__actions .helia-button--primary:hover {
+  background: color-mix(
+    in srgb,
+    var(--helia-ink-primary) 88%,
+    var(--helia-surface-card)
+  );
+}

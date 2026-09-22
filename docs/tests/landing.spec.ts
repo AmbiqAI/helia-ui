@@ -92,3 +92,24 @@ for (const theme of ['light', 'dark']) {
     );
   });
 }
+
+for (const theme of ['light', 'dark']) {
+  test(`neutral hero keeps its primary action distinct in ${theme}`, async ({
+    page,
+  }) => {
+    await page.goto('/helia-ui/landing/');
+    await page.evaluate((theme) => {
+      document.documentElement.dataset.theme = theme;
+    }, theme);
+    const hero = page.locator('.helia-hero--neutral');
+    await expect(hero.locator('em')).toHaveCSS('color', 'rgb(255, 255, 255)');
+    const action = hero.getByRole('link', { name: 'Get started', exact: true });
+    await expect(action).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+    await expect(action).toHaveCSS('color', 'rgb(17, 19, 24)');
+    await page.keyboard.press('Tab');
+    await action.focus();
+    expect(
+      await action.evaluate((node) => getComputedStyle(node).outlineStyle),
+    ).not.toBe('none');
+  });
+}
