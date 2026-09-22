@@ -113,3 +113,22 @@ for (const theme of ['light', 'dark']) {
     ).not.toBe('none');
   });
 }
+
+for (const theme of ['light', 'dark']) {
+  test(`workflow ink cards differ from the band in ${theme}`, async ({
+    page,
+  }) => {
+    await page.goto('/helia-ui/landing/');
+    await page.evaluate((theme) => {
+      document.documentElement.dataset.theme = theme;
+    }, theme);
+    const card = page.locator('.helia-band--contrast .helia-card--ink');
+    const colors = await card.evaluate((node) => ({
+      card: getComputedStyle(node).backgroundColor,
+      band: getComputedStyle(node.closest('.helia-band')).backgroundColor,
+      border: getComputedStyle(node).borderTopColor,
+    }));
+    expect(colors.card).not.toBe(colors.band);
+    expect(colors.border).not.toBe('rgba(0, 0, 0, 0)');
+  });
+}

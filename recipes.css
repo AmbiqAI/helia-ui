@@ -2614,3 +2614,9 @@ a.helia-block__face:hover .helia-block__label {
     var(--helia-surface-card)
   );
 }
+
+/* Nested ink cards need a separate plane from the dark band's ground. */
+.helia-band--contrast .helia-card--ink {
+  background: var(--helia-surface-card);
+  border-color: var(--helia-surface-border);
+}

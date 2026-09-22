@@ -41,6 +41,11 @@ text, links, actions, and keyboard focus in either theme.
     foreground.
   </CardContent>
   <CardActions>
+    <Card tone="ink">
+      <CardContent>
+        <p>A nested ink card has a visible boundary.</p>
+      </CardContent>
+    </Card>
     <Button href="#surface-controls">Primary action</Button>
     <Button variant="secondary" href="#surface-controls">
       Secondary action
@@ -97,6 +102,11 @@ import Band from '@ambiqai/helia-ui/astro/Band';
     <CardContent>
       <p>A nested card remains readable.</p>
       <a href="#surface-controls">Read the surface examples</a>
+    </CardContent>
+  </Card>
+  <Card tone="ink">
+    <CardContent>
+      <p>A nested ink card has a visible boundary.</p>
     </CardContent>
   </Card>
   <Button href="#surface-controls">Primary action</Button>
