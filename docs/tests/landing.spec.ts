@@ -203,3 +203,23 @@ test('section hero uses the section heading scale', async ({ page }) => {
     await title.evaluate((node) => parseFloat(getComputedStyle(node).fontSize)),
   ).toBeGreaterThanOrEqual(24);
 });
+
+test('nonlinked feature titles survive the Markdown rendition', async ({
+  page,
+  request,
+}) => {
+  await page.goto('/helia-ui/gallery/');
+  await expect(
+    page.getByRole('heading', {
+      name: 'Planned before deployment',
+      exact: true,
+    }),
+  ).toBeVisible();
+  const response = await request.get('/helia-ui/gallery/index.md');
+  expect(response.ok()).toBe(true);
+  const markdown = await response.text();
+  expect(markdown).toContain('### Planned before deployment');
+  expect(markdown).toContain(
+    'A feature row can explain a capability without linking its whole surface.',
+  );
+});

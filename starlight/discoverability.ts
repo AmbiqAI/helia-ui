@@ -962,6 +962,17 @@ function reduceElement(
       : { kind: 'item', text: linkItem(line, href) };
   }
 
+  if (node.name === 'IconRow' && title !== undefined) {
+    const titleAs = literal(node, 'titleAs');
+    const level = titleAs === 'h2' ? 2 : titleAs === 'h4' ? 4 : 3;
+    const heading = `${'#'.repeat(level)} ${stripControl(title)}`;
+    const body = children.text.trim();
+    return {
+      kind: 'block',
+      text: body === '' ? heading : `${heading}\n\n${body}`,
+    };
+  }
+
   if (node.name === 'Card' && title !== undefined) {
     const body = children.text.trim();
     const heading = `${CARD_HEADING} ${stripControl(title)}`;

@@ -1000,3 +1000,31 @@ test('a block sequence preserves ordered stages in Markdown', () => {
   assert.match(result, /2\. Compile\n   - Plan/);
   assert.match(result, /3\. Output/);
 });
+
+test('nonlinked IconRow preserves its heading and body', () => {
+  assert.equal(
+    reduceTags(
+      '<IconRow title="Compiled.">Generate C before deployment.</IconRow>',
+    ).trim(),
+    '### Compiled.\n\nGenerate C before deployment.',
+  );
+  assert.equal(
+    reduceTags('<IconRow title="Optimized." titleAs="h2" />').trim(),
+    '## Optimized.',
+  );
+  assert.equal(
+    reduceTags(
+      '<IconRow title="In control." titleAs="h4">Choose placement.</IconRow>',
+    ).trim(),
+    '#### In control.\n\nChoose placement.',
+  );
+});
+
+test('linked IconRow retains its destination and description', () => {
+  assert.equal(
+    reduceTags(
+      '<IconRow title="Examples" href="/examples/">Try a model.</IconRow>',
+    ).trim(),
+    '- [Examples](/examples/): Try a model.',
+  );
+});
