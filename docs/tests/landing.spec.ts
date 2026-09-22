@@ -101,7 +101,7 @@ for (const theme of ['light', 'dark']) {
     await page.evaluate((theme) => {
       document.documentElement.dataset.theme = theme;
     }, theme);
-    const hero = page.locator('.helia-hero--neutral');
+    const hero = page.locator('.helia-hero--neutral').first();
     await expect(hero.locator('em')).toHaveCSS('color', 'rgb(255, 255, 255)');
     const action = hero.getByRole('link', { name: 'Get started', exact: true });
     await expect(action).toHaveCSS('background-color', 'rgb(255, 255, 255)');
@@ -130,5 +130,59 @@ for (const theme of ['light', 'dark']) {
     }));
     expect(colors.card).not.toBe(colors.band);
     expect(colors.border).not.toBe('rgba(0, 0, 0, 0)');
+  });
+}
+
+for (const theme of ['light', 'dark']) {
+  test(`fixed dark terminal and summary link own readable ink in ${theme}`, async ({
+    page,
+  }) => {
+    await page.goto('/helia-ui/landing/');
+    await page.evaluate((theme) => {
+      document.documentElement.dataset.theme = theme;
+    }, theme);
+    const hero = page.locator('.helia-hero--neutral').last();
+    await expect(hero.locator('.ascii-terminal__prompt')).toHaveCSS(
+      'color',
+      'rgb(245, 246, 247)',
+    );
+    const link = hero.getByRole('link', { name: 'setup guide' });
+    const ink = await hero.evaluate((node) =>
+      getComputedStyle(node).getPropertyValue('--helia-ink-primary').trim(),
+    );
+    expect(
+      await link.evaluate((node) => getComputedStyle(node).color),
+    ).not.toBe('rgb(0, 0, 238)');
+    expect(ink).toBeTruthy();
+    await page.keyboard.press('Tab');
+    await link.focus();
+    expect(
+      await link.evaluate((node) => getComputedStyle(node).outlineStyle),
+    ).not.toBe('none');
+  });
+}
+
+for (const theme of ['light', 'dark']) {
+  test(`ink band markdown links and authored hero casing in ${theme}`, async ({
+    page,
+  }) => {
+    await page.goto('/helia-ui/landing/');
+    await page.evaluate((theme) => {
+      document.documentElement.dataset.theme = theme;
+    }, theme);
+    const link = page.getByRole('link', { name: 'Compare surface choices' });
+    await expect(link).toHaveCSS('color', 'rgb(255, 255, 255)');
+    await link.hover();
+    await expect(link).toHaveCSS('color', 'rgb(255, 255, 255)');
+    await page.keyboard.press('Tab');
+    await link.focus();
+    await expect(link).toHaveCSS('outline-color', 'rgb(255, 255, 255)');
+    await expect(link).toHaveCSS('outline-style', 'solid');
+    await expect(link).toHaveCSS('outline-width', '2px');
+    const eyebrow = page
+      .locator('.helia-hero__eyebrow')
+      .filter({ hasText: 'heliaAOT' });
+    await expect(eyebrow).toHaveText('heliaAOT · Ahead-of-time inference');
+    await expect(eyebrow).toHaveCSS('text-transform', 'none');
   });
 }

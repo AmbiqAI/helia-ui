@@ -2104,6 +2104,7 @@ a.helia-chip--neutral:focus-visible {
  * it read as the same voice rather than as a highlight.
  */
 .helia-hero__eyebrow {
+  text-transform: none;
   align-items: center;
   display: inline-flex;
   gap: var(--helia-space-2);
@@ -2583,6 +2584,7 @@ a.helia-block__face:hover .helia-block__label {
 
 :is(.helia-card--ink, .helia-hero--contrast, .helia-band--contrast) {
   --sl-color-text-invert: var(--helia-ink-black);
+  --sl-color-text-accent: var(--helia-paper-white);
   --helia-focus-ring-color: var(--helia-paper-white);
 }
 
@@ -2619,4 +2621,35 @@ a.helia-block__face:hover .helia-block__label {
 .helia-band--contrast .helia-card--ink {
   background: var(--helia-surface-card);
   border-color: var(--helia-surface-border);
+}
+
+.helia-hero__summary a:not([class]),
+.helia-hero__summary a:not([class]):visited {
+  color: var(--helia-product-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.helia-hero__summary a:not([class]):hover {
+  color: var(--helia-ink-primary);
+}
+
+.helia-hero__summary a:not([class]):focus-visible {
+  outline: 2px solid var(--helia-ink-primary);
+  outline-offset: 2px;
+}
+
+/* Markdown links inherit the surface foreground, including keyboard focus. */
+:is(.helia-band--contrast, .helia-hero--contrast) a:not([class]),
+:is(.helia-band--contrast, .helia-hero--contrast) a:not([class]):visited,
+:is(.helia-band--contrast, .helia-hero--contrast) a:not([class]):hover {
+  color: var(--helia-ink-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+:is(.helia-band--contrast, .helia-hero--contrast, .helia-card--ink)
+  a:not([class]):focus-visible {
+  outline: 2px solid var(--helia-ink-primary);
+  outline-offset: 2px;
 }

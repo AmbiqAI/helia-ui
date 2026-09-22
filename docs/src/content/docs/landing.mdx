@@ -96,7 +96,7 @@ import Band from '@ambiqai/helia-ui/astro/Band';
   <h2>Keep control surfaces readable</h2>
   <p>
     A dark band supplies its own text, card and button colors in either page
-    theme.
+    theme. <a href="#surface-controls">Compare surface choices</a>.
   </p>
   <Card>
     <CardContent>
@@ -131,4 +131,26 @@ import Band from '@ambiqai/helia-ui/astro/Band';
   <Button slot="actions" href="#surface-controls" variant="secondary">
     Explore examples
   </Button>
+</Hero>
+
+## Neutral quickstart with fixed terminal tone
+
+<Hero
+  palette="neutral"
+  titleAs="h2"
+  eyebrow="heliaAOT · Ahead-of-time inference"
+>
+  Keep the command readable
+  <p slot="summary">
+    Read the <a href="#surface-controls">setup guide</a> before running the
+    command.
+  </p>
+  <AsciiTerminal
+    slot="aside"
+    tone="dark"
+    frame="window"
+    title="Build"
+    lines={[{ kind: 'command', text: 'tool build model' }]}
+    copy="commands"
+  />
 </Hero>
