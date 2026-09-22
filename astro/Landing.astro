@@ -1,0 +1,16 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/**
+ * Bounded composition for product landing pages shared by HPX and AOT.
+ * @slot default -- The product introduction and feature sections.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {}
+const { class: className, ...rest } = Astro.props;
+---
+
+<div class:list={['helia-landing', className]} {...rest}>
+  <slot />
+</div>

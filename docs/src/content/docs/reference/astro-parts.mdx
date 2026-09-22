@@ -707,14 +707,16 @@ Also accepts `HTMLAttributes<'p'>`.
 import Hero from '@ambiqai/helia-ui/astro/Hero';
 ```
 
-| Prop      | Type                    | Default     | Description                                                                                   |
-| --------- | ----------------------- | ----------- | --------------------------------------------------------------------------------------------- |
-| `variant` | `'plain' \| 'contrast'` | `'plain'`   | The ground. `contrast` is the inked card, `plain` the same layout with nothing behind it.     |
-| `eyebrow` | `string`                | --          | The label above the headline, rendered in an `Eyebrow` with the accent dot.                   |
-| `summary` | `string`                | --          | The claim under the headline: one sentence, not a paragraph. The `summary` slot wins over it. |
-| `badge`   | `string`                | --          | A short standing label under the headline, rendered as an accent `Badge`.                     |
-| `titleAs` | `'h1' \| 'h2'`          | `'h1'`      | Heading level for the headline. A page's own hero is the `h1`; a section hero is not.         |
-| `as`      | `'section' \| 'div'`    | `'section'` | Element to render. A hero that opens the page should stay a `section`.                        |
+| Prop      | Type                     | Default     | Description                                                                                   |
+| --------- | ------------------------ | ----------- | --------------------------------------------------------------------------------------------- |
+| `variant` | `'plain' \| 'contrast'`  | `'plain'`   | The ground. `contrast` is the inked card, `plain` the same layout with nothing behind it.     |
+| `align`   | `'start' \| 'center'`    | `'start'`   | Centers a standalone headline and its actions.                                                |
+| `size`    | `'default' \| 'compact'` | `'default'` | Compact uses the page heading scale for shorter landing introductions.                        |
+| `eyebrow` | `string`                 | --          | The label above the headline, rendered in an `Eyebrow` with the accent dot.                   |
+| `summary` | `string`                 | --          | The claim under the headline: one sentence, not a paragraph. The `summary` slot wins over it. |
+| `badge`   | `string`                 | --          | A short standing label under the headline, rendered as an accent `Badge`.                     |
+| `titleAs` | `'h1' \| 'h2'`           | `'h1'`      | Heading level for the headline. A page's own hero is the `h1`; a section hero is not.         |
+| `as`      | `'section' \| 'div'`     | `'section'` | Element to render. A hero that opens the page should stay a `section`.                        |
 
 Also accepts `HTMLAttributes<'section'>`.
 
@@ -797,6 +799,24 @@ Also accepts `HTMLAttributes<'span'>`.
 - `default` -- The glyph, when `name` is not the way to reach it: an inline `<svg>`, a brand mark, a numeral.
 
 [See it rendered on Gallery](/helia-ui/gallery/#icon-tiles)
+
+## Landing
+
+**Use it for:** Bounded composition for product landing pages shared by HPX and AOT.
+
+```ts
+import Landing from '@ambiqai/helia-ui/astro/Landing';
+```
+
+No props.
+
+Also accepts `HTMLAttributes<'div'>`.
+
+**Slots**
+
+- `default` -- The product introduction and feature sections.
+
+[See it rendered on Landing pages](/helia-ui/landing/)
 
 ## LinkCard
 

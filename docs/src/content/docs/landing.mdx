@@ -1,0 +1,52 @@
+---
+title: Landing pages
+description: Compose a bounded product introduction with shared layout and surface controls.
+---
+
+import Landing from '@ambiqai/helia-ui/astro/Landing';
+import Hero from '@ambiqai/helia-ui/astro/Hero';
+import Card from '@ambiqai/helia-ui/astro/Card';
+import CardHeader from '@ambiqai/helia-ui/astro/CardHeader';
+import CardContent from '@ambiqai/helia-ui/astro/CardContent';
+import CardActions from '@ambiqai/helia-ui/astro/CardActions';
+import Button from '@ambiqai/helia-ui/astro/Button';
+
+`Landing` bounds its content to the shared landing width and separates sections.
+Product pages own their headings, links, and composition.
+
+<Landing>
+  <Hero align="center" size="compact" titleAs="h2" summary="A centered, compact introduction with actions below it.">
+    <Fragment>Centered compact hero</Fragment>
+
+    <Button slot="actions" href="#surface-controls">Explore surface controls</Button>
+
+  </Hero>
+
+  <Hero align="start" size="default" titleAs="h2" summary="Existing start alignment and display size remain the defaults.">
+    <Fragment>Default hero</Fragment>
+  </Hero>
+</Landing>
+
+## Surface controls
+
+Switch the outer page between light and dark. The ink card retains readable
+text, links, actions, and keyboard focus in either theme.
+
+<Card tone="ink">
+  <CardHeader eyebrow="Ink surface" titleAs="h3">
+    A complete dark surface
+  </CardHeader>
+  <CardContent>
+    Body text and [a prose link](#surface-controls) use this surface's
+    foreground.
+  </CardContent>
+  <CardActions>
+    <Button href="#surface-controls">Primary action</Button>
+    <Button variant="secondary" href="#surface-controls">
+      Secondary action
+    </Button>
+    <Button variant="ghost" href="#surface-controls">
+      Ghost action
+    </Button>
+  </CardActions>
+</Card>

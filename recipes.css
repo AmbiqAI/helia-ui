@@ -2545,3 +2545,51 @@ a.helia-block__face:hover .helia-block__label {
     break-inside: avoid;
   }
 }
+
+.helia-landing {
+  max-width: var(--helia-landing-width);
+  margin-inline: auto;
+  min-width: 0;
+}
+
+.helia-landing > :is(section, h2, .helia-split-panel) {
+  margin-block-start: var(--helia-space-6);
+}
+
+.helia-hero.helia-hero--compact {
+  --helia-hero-headline: var(--helia-text-page);
+}
+
+.helia-hero--compact .helia-hero__headline {
+  max-width: var(--helia-hero-compact-measure);
+  text-wrap: balance;
+}
+
+.helia-hero--center .helia-hero__lede {
+  align-items: center;
+  text-align: center;
+}
+
+.helia-hero--center .helia-hero__actions {
+  justify-content: center;
+}
+
+.helia-hero--center .helia-hero__badge {
+  align-self: center;
+}
+
+:is(.helia-card--ink, .helia-hero--contrast) {
+  --sl-color-text-invert: var(--helia-ink-black);
+  --helia-focus-ring-color: var(--helia-paper-white);
+}
+
+.helia-card-content a:not([class]),
+.helia-card-content a:not([class]):visited {
+  color: var(--helia-ink-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.helia-card-content a:not([class]):hover {
+  color: var(--helia-product-accent);
+}

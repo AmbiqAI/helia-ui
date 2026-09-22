@@ -86,6 +86,7 @@ const CARD_FAMILY = [
  * build rather than producing a section with no way through to the thing.
  */
 const EXAMPLES = {
+  Landing: { page: 'landing', label: 'Landing pages' },
   AccordionGroup: { page: 'disclosure', label: 'Disclosure' },
   AsciiTerminal: { page: 'code', label: 'Code', anchor: 'ascii-terminal' },
   Badge: { page: 'cards', label: 'Cards', anchor: 'badge' },
