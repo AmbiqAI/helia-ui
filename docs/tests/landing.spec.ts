@@ -182,7 +182,7 @@ for (const theme of ['light', 'dark']) {
     const eyebrow = page
       .locator('.helia-hero__eyebrow')
       .filter({ hasText: 'heliaAOT' });
-    await expect(eyebrow).toHaveText('heliaAOT · Ahead-of-time inference');
+    await expect(eyebrow).toHaveText('heliaAOT · Ahead-of-time compiler');
     await expect(eyebrow).toHaveCSS('text-transform', 'none');
   });
 }
