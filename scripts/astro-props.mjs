@@ -150,6 +150,10 @@ const EXAMPLES = {
      and assert-docs-build holds the whole Astro lane, gallery included, to
      shipping no JavaScript. It is documented where the other hydrating
      components are. */
+  ReferenceBrowser: {
+    page: 'react/reference-browser',
+    label: 'Reference browser',
+  },
   RefIndex: {
     page: 'react/data-display',
     label: 'Data display',

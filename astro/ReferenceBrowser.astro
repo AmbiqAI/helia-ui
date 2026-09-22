@@ -1,0 +1,186 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+/** A compact reference index with consumer-owned rows and filters. All entries are present without JavaScript. */
+import { ReferenceBrowser } from '../react/reference-browser';
+import type { RefIndexRow, RefIndexFacet } from '../ref-index-model';
+import { escapeRendition, renditionAttributes, linkItem } from '../rendition';
+interface Props {
+  /** Consumer-owned reference entries, including their existing destinations. */
+  rows: readonly RefIndexRow[];
+  /** Ordered filters with consumer-defined meanings and values. */
+  filters?: readonly RefIndexFacet[];
+  /** Search field and region label. */
+  label: string;
+  /** First column heading. */
+  nameLabel?: string;
+  /** Plural noun in result counts and empty state. */
+  itemsLabel?: string;
+  /** Search hint. */
+  placeholder?: string;
+  /** Rows per page after hydration; without JavaScript all rows remain visible. */
+  pageSize?: number;
+}
+const markdown = Astro.props.rows
+  .map((row) =>
+    linkItem(
+      row.name,
+      row.href,
+      [
+        row.group,
+        row.summary,
+        ...Object.entries(row.facets).map(
+          ([id, values]) => `${id}: ${values.join(', ')}`,
+        ),
+      ]
+        .filter(Boolean)
+        .join(' — '),
+    ),
+  )
+  .join('\n');
+---
+
+<ReferenceBrowser client:load {...Astro.props} />
+<script
+  is:inline
+  {...renditionAttributes('reference-browser')}
+  set:html={escapeRendition(markdown)}
+/>
+
+<style is:global>
+  .helia-reference-browser {
+    margin-top: var(--helia-space-5);
+  }
+  .helia-reference-browser .helia-reference-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+    gap: var(--helia-space-4);
+  }
+  .helia-reference-browser label {
+    display: grid;
+    gap: var(--helia-space-2);
+    min-width: 0;
+    font-size: var(--helia-text-small);
+    font-weight: var(--helia-weight-semibold);
+  }
+  .helia-reference-browser :is(select, input) {
+    width: 100%;
+    min-width: 0;
+    min-height: var(--helia-control-md);
+    padding: var(--helia-space-2);
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: var(--helia-radius);
+    background: var(--sl-color-bg);
+    color: var(--sl-color-text);
+    font: inherit;
+  }
+  .helia-reference-browser button {
+    padding: var(--helia-space-2) var(--helia-space-4);
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: var(--helia-radius);
+    background: var(--sl-color-bg);
+    color: var(--sl-color-text);
+    font: inherit;
+    cursor: pointer;
+  }
+  .helia-reference-browser :is(select, button):focus-visible {
+    outline: 2px solid var(--sl-color-text-accent);
+    outline-offset: 2px;
+  }
+  .helia-reference-browser button:disabled {
+    opacity: var(--helia-opacity-disabled);
+    cursor: default;
+  }
+  .helia-reference-browser .helia-reference-results {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--helia-space-3);
+    margin-block: var(--helia-space-4);
+    font-size: var(--helia-text-small);
+  }
+  .helia-reference-browser p {
+    margin: 0;
+  }
+  .helia-reference-browser .helia-reference-table {
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: var(--helia-radius);
+    overflow: hidden;
+  }
+  .helia-reference-browser table {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    margin: 0;
+    border-collapse: collapse;
+    font-size: var(--helia-text-body);
+  }
+  .helia-reference-browser th,
+  .helia-reference-browser td {
+    padding: var(--helia-space-4);
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--sl-color-hairline);
+    overflow-wrap: anywhere;
+  }
+  .helia-reference-browser thead {
+    background: var(--sl-color-bg-sidebar);
+  }
+  .helia-reference-browser thead th:first-child {
+    width: 45%;
+  }
+  .helia-reference-browser tbody th a {
+    font-family: var(--sl-font-mono);
+    font-size: var(--helia-text-small);
+  }
+  .helia-reference-browser small {
+    display: block;
+    font-weight: var(--helia-weight-regular);
+    color: var(--sl-color-gray-2);
+    margin-top: var(--helia-space-1);
+  }
+  .helia-reference-browser .helia-reference-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--helia-space-4);
+    margin-top: var(--helia-space-5);
+  }
+  .helia-reference-browser .helia-reference-empty {
+    padding: var(--helia-space-6);
+    text-align: center;
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: var(--helia-radius);
+  }
+  .helia-reference-browser .helia-reference-empty button {
+    margin-top: var(--helia-space-4);
+  }
+  @media (max-width: 72rem) {
+    .helia-reference-browser .helia-reference-controls {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .helia-reference-browser .helia-reference-search {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 42rem) {
+    .helia-reference-browser .helia-reference-controls {
+      grid-template-columns: 1fr;
+    }
+    .helia-reference-browser th,
+    .helia-reference-browser td {
+      padding: var(--helia-space-2);
+    }
+  }
+
+  .helia-reference-browser [hidden] {
+    display: none;
+  }
+  .helia-reference-caption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+</style>

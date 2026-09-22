@@ -9,21 +9,20 @@
 /** The link back to the Dev Hub, at the end of the bar. */
 export interface HeliaHeaderHub {
   /**
-   * The whole line, with the word HELIA in it carrying the product accent.
-   * Defaults to `Part of HELIA Dev Hub`.
+   * @deprecated The shared product navigation uses the fixed label `HELIA DEV HUB`.
    */
   label?: string;
   href: string;
 }
 
 /** The wording a site that named none gets. */
-export const HUB_LABEL = 'Part of HELIA Dev Hub';
+export const HUB_LABEL = 'HELIA DEV HUB';
 
 /** `null` for a site that named no hub link, which is most of the option. */
 export function resolveHub(
   hub: HeliaHeaderHub | undefined,
 ): { label: string; href: string } | null {
-  return hub ? { label: hub.label ?? HUB_LABEL, href: hub.href } : null;
+  return hub ? { label: HUB_LABEL, href: hub.href } : null;
 }
 
 /** One run of the label: `accent` marks the name the family is known by. */

@@ -2228,7 +2228,8 @@ a.helia-chip--neutral:focus-visible {
  * on this ground is the color disappearing. Restating the mix against paper is
  * what keeps the product's color legible across the flip.
  */
-.helia-hero--contrast {
+.helia-hero--contrast,
+.helia-band--contrast {
   --helia-ink-adaptive: var(--helia-paper-white);
   --helia-ink-primary: var(--helia-paper-white);
   --helia-ink-secondary: color-mix(
@@ -2258,7 +2259,9 @@ a.helia-chip--neutral:focus-visible {
     var(--helia-paper-white) 14%,
     transparent
   );
+}
 
+.helia-hero--contrast {
   background: var(--helia-ink-black);
   border-radius: var(--helia-radius-lg);
   color: var(--helia-paper-white);
@@ -2578,7 +2581,7 @@ a.helia-block__face:hover .helia-block__label {
   align-self: center;
 }
 
-:is(.helia-card--ink, .helia-hero--contrast) {
+:is(.helia-card--ink, .helia-hero--contrast, .helia-band--contrast) {
   --sl-color-text-invert: var(--helia-ink-black);
   --helia-focus-ring-color: var(--helia-paper-white);
 }

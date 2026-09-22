@@ -50,3 +50,57 @@ text, links, actions, and keyboard focus in either theme.
     </Button>
   </CardActions>
 </Card>
+
+## Window transcript
+
+import AsciiTerminal from '@ambiqai/helia-ui/astro/AsciiTerminal';
+
+The optional `frame="window"` keeps transcript and commands-only copy behavior.
+The dots are decorative; the title belongs to the product using the terminal.
+
+<AsciiTerminal
+  frame="window"
+  title="Build a model"
+  copy="commands"
+  lines={[
+    { kind: 'command', text: 'tool build model' },
+    {
+      kind: 'output',
+      text: 'Inspect the generated files before integrating them.',
+    },
+  ]}
+/>
+
+<Card tone="ink">
+  <CardContent>
+    <AsciiTerminal
+      frame="window"
+      tone="dark"
+      title="Inspect results"
+      copy="commands"
+      lines={[{ kind: 'command', text: 'tool inspect results' }]}
+    />
+  </CardContent>
+</Card>
+
+## Contrast band controls
+
+import Band from '@ambiqai/helia-ui/astro/Band';
+
+<Band tone="contrast">
+  <h2>Keep control surfaces readable</h2>
+  <p>
+    A dark band supplies its own text, card and button colors in either page
+    theme.
+  </p>
+  <Card>
+    <CardContent>
+      <p>A nested card remains readable.</p>
+      <a href="#surface-controls">Read the surface examples</a>
+    </CardContent>
+  </Card>
+  <Button href="#surface-controls">Primary action</Button>
+  <Button href="#surface-controls" variant="secondary">
+    Secondary action
+  </Button>
+</Band>

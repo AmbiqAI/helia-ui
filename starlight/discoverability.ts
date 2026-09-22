@@ -877,6 +877,7 @@ function sidecarKind(
   ) {
     return null;
   }
+  if (node.name === 'ReferenceBrowser') return 'reference-browser';
   if (node.name === 'AsciiTerminal') return 'terminal';
   if (node.name === 'LinkCard') return 'link-card';
   const linked = node.attributes['href'] !== undefined;
@@ -914,6 +915,7 @@ function reduceElement(
   }
 
   if (stated !== null) {
+    if (kind === 'reference-browser') return { kind: 'block', text: stated };
     /* A button is a word in a sentence's place; a card is a line in a list. */
     return { kind: kind === 'button' ? 'inline' : 'item', text: stated };
   }

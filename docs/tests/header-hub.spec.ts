@@ -19,10 +19,13 @@ test('the bar carries the link, with the family name picked out', async ({
   const link = page.locator('.helia-site-header__hub');
   await expect(link).toBeVisible();
   await expect(link).toHaveAttribute('href', hub);
-  await expect(link).toHaveText('Part of HELIA Dev Hub');
-  await expect(link.locator('.helia-site-header__hub-name')).toHaveText(
-    'HELIA',
-  );
+  await expect(link).toHaveText('HELIA DEV HUB');
+  await expect(link.locator('svg')).toHaveCount(0);
+  const colors = await link.evaluate((node) => ({
+    color: getComputedStyle(node).color,
+    border: getComputedStyle(node).borderTopColor,
+  }));
+  expect(colors.color).toBe(colors.border);
 });
 
 test.describe('on a phone', () => {
@@ -40,6 +43,6 @@ test.describe('on a phone', () => {
     await page.locator('[data-helia-sidebar-toggle]').click();
     await expect(menuLink).toBeVisible();
     await expect(menuLink).toHaveAttribute('href', hub);
-    await expect(menuLink).toHaveText('Part of HELIA Dev Hub');
+    await expect(menuLink).toHaveText('HELIA DEV HUB');
   });
 });

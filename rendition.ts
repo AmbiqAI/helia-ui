@@ -17,7 +17,8 @@
  */
 
 /** What a sidecar stands for, which is what the splice matches it on. */
-export type RenditionKind = 'terminal' | 'link-card' | 'card' | 'button';
+export type RenditionKind =
+  'terminal' | 'link-card' | 'card' | 'button' | 'reference-browser';
 
 export const RENDITION_ATTRIBUTE = 'data-helia-rendition';
 

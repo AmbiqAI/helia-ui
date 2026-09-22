@@ -105,6 +105,7 @@ import AsciiTerminal from '@ambiqai/helia-ui/astro/AsciiTerminal';
 | Prop           | Type                                    | Default                     | Description                                                                                                                                                                                                           |
 | -------------- | --------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `lines` (req.) | `readonly AsciiTerminalLine[]`          | --                          | The transcript, in order.                                                                                                                                                                                             |
+| `frame`        | `'plain' \| 'window'`                   | `'plain'`                   | Optional decorative window frame; the default retains the plain transcript.                                                                                                                                           |
 | `title`        | `string`                                | `'Terminal'`                | The frame's caption.                                                                                                                                                                                                  |
 | `ariaLabel`    | `string`                                | `` `${title} transcript` `` | Accessible name for the frame. Defaults to the title plus `transcript`.                                                                                                                                               |
 | `animated`     | `boolean`                               | `false`                     | Types the command lines out on entry. Reduced motion shows them at once.                                                                                                                                              |
@@ -1095,6 +1096,28 @@ import RefSymbol from '@ambiqai/helia-ui/astro/RefSymbol';
 - `default` -- The body: description, parameter tables, examples, members.
 
 [See it rendered on Gallery](/helia-ui/gallery/#reference)
+
+## ReferenceBrowser
+
+**Use it for:** A compact reference index with consumer-owned rows and filters. All entries are present without JavaScript.
+
+```ts
+import ReferenceBrowser from '@ambiqai/helia-ui/astro/ReferenceBrowser';
+```
+
+| Prop           | Type                       | Default | Description                                                                |
+| -------------- | -------------------------- | ------- | -------------------------------------------------------------------------- |
+| `rows` (req.)  | `readonly RefIndexRow[]`   | --      | Consumer-owned reference entries, including their existing destinations.   |
+| `filters`      | `readonly RefIndexFacet[]` | --      | Ordered filters with consumer-defined meanings and values.                 |
+| `label` (req.) | `string`                   | --      | Search field and region label.                                             |
+| `nameLabel`    | `string`                   | --      | First column heading.                                                      |
+| `itemsLabel`   | `string`                   | --      | Plural noun in result counts and empty state.                              |
+| `placeholder`  | `string`                   | --      | Search hint.                                                               |
+| `pageSize`     | `number`                   | --      | Rows per page after hydration; without JavaScript all rows remain visible. |
+
+**Slots** -- none.
+
+[See it rendered on Reference browser](/helia-ui/react/reference-browser/)
 
 ## Reveal
 
