@@ -184,5 +184,22 @@ for (const theme of ['light', 'dark']) {
       .filter({ hasText: 'heliaAOT' });
     await expect(eyebrow).toHaveText('heliaAOT · Ahead-of-time compiler');
     await expect(eyebrow).toHaveCSS('text-transform', 'none');
+    expect(
+      await eyebrow.evaluate((node) =>
+        parseFloat(getComputedStyle(node).fontSize),
+      ),
+    ).toBeGreaterThanOrEqual(14);
   });
 }
+
+test('section hero uses the section heading scale', async ({ page }) => {
+  await page.goto('/helia-ui/landing/');
+  const title = page.locator('.helia-hero--section .helia-hero__headline');
+  expect(
+    await title.evaluate((node) => parseFloat(getComputedStyle(node).fontSize)),
+  ).toBeLessThanOrEqual(34);
+  await page.setViewportSize({ width: 390, height: 900 });
+  expect(
+    await title.evaluate((node) => parseFloat(getComputedStyle(node).fontSize)),
+  ).toBeGreaterThanOrEqual(24);
+});

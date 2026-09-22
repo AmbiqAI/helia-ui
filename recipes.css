@@ -2104,6 +2104,9 @@ a.helia-chip--neutral:focus-visible {
  * it read as the same voice rather than as a highlight.
  */
 .helia-hero__eyebrow {
+  color: var(--helia-ink-secondary);
+  font-size: var(--helia-text-body);
+  letter-spacing: var(--helia-tracking-label);
   text-transform: none;
   align-items: center;
   display: inline-flex;
@@ -2688,4 +2691,14 @@ a.helia-block__face:hover .helia-block__label {
     top: calc(-1 * (var(--helia-space-6) + var(--helia-space-2)) / 2);
     transform: translateX(-50%) rotate(45deg);
   }
+}
+
+/* Supporting sections keep the Hero layout without repeating the page headline. */
+.helia-hero.helia-hero--section {
+  --helia-hero-headline: var(--helia-text-section);
+}
+
+.helia-hero--section .helia-hero__headline {
+  max-width: var(--helia-hero-compact-measure);
+  text-wrap: balance;
 }

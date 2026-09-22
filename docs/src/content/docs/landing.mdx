@@ -133,12 +133,16 @@ import Band from '@ambiqai/helia-ui/astro/Band';
   </Button>
 </Hero>
 
-## Neutral quickstart with fixed terminal tone
+## Section-sized quickstart with fixed terminal tone
+
+`size="section"` keeps supporting content on the section heading scale. The
+`media` slot lets a window terminal retain its own frame.
 
 <Hero
   palette="neutral"
   titleAs="h2"
   eyebrow="heliaAOT · Ahead-of-time compiler"
+  size="section"
 >
   Keep the command readable
   <p slot="summary">
@@ -146,7 +150,7 @@ import Band from '@ambiqai/helia-ui/astro/Band';
     command.
   </p>
   <AsciiTerminal
-    slot="aside"
+    slot="media"
     tone="dark"
     frame="window"
     title="Build"

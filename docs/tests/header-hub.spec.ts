@@ -46,3 +46,36 @@ test.describe('on a phone', () => {
     await expect(menuLink).toHaveText('HELIA DEV HUB');
   });
 });
+
+for (const theme of ['light', 'dark'] as const) {
+  test(`desktop hub aligns with navigation in ${theme}`, async ({ page }) => {
+    await page.setViewportSize({ width: 1218, height: 900 });
+    await page.goto('/helia-ui/');
+    await page.evaluate(
+      (theme) => (document.documentElement.dataset.theme = theme),
+      theme,
+    );
+    const link = page.locator('.helia-site-header__hub');
+    const nav = page.locator('.helia-site-header__nav > a').first();
+    const box = await link.boundingBox();
+    const neighbor = await nav.boundingBox();
+    expect(Math.abs(box!.height - neighbor!.height)).toBeLessThanOrEqual(1);
+    expect(Math.abs(box!.y - neighbor!.y)).toBeLessThanOrEqual(1);
+    expect(box!.height).toBeGreaterThanOrEqual(24);
+    await page.keyboard.press('Tab');
+    await link.focus();
+    await expect(link).toHaveCSS('outline-style', 'solid');
+  });
+
+  test(`mobile hub retains its larger target in ${theme}`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 900 });
+    await page.goto('/helia-ui/');
+    await page.evaluate(
+      (theme) => (document.documentElement.dataset.theme = theme),
+      theme,
+    );
+    await page.locator('[data-helia-sidebar-toggle]').click();
+    const link = page.locator('.helia-sidebar-hub');
+    expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  });
+}

@@ -59,8 +59,8 @@ interface Props extends HTMLAttributes<'section'> {
   variant?: 'plain' | 'contrast';
   /** Centers a standalone headline and its actions. */
   align?: 'start' | 'center';
-  /** Compact uses the page heading scale for shorter landing introductions. */
-  size?: 'default' | 'compact';
+  /** Compact uses the page heading scale; section uses the smaller section heading scale. */
+  size?: 'default' | 'compact' | 'section';
   /** The label above the headline, rendered in an `Eyebrow` with the accent dot. */
   eyebrow?: string;
   /** The claim under the headline: one sentence, not a paragraph. The `summary` slot wins over it. */
@@ -107,7 +107,7 @@ const Summary = hasSummarySlot ? 'div' : 'p';
     'not-content',
     palette === 'neutral' && 'helia-hero--neutral',
     align === 'center' && 'helia-hero--center',
-    size === 'compact' && 'helia-hero--compact',
+    size !== 'default' && `helia-hero--${size}`,
     variant !== 'plain' && `helia-hero--${variant}`,
     className,
   ]}

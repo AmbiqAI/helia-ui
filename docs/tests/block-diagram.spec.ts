@@ -181,7 +181,9 @@ test('section diagrams retain spacing after headings and prose', async ({
 }) => {
   await page.goto(page_);
   for (const diagram of await page
-    .locator('[data-example="prose-diagrams"] .helia-block-diagram')
+    .locator(
+      '[data-example="prose-diagrams"] .helia-block-diagram, [data-example="native-section-diagram"] .helia-block-diagram',
+    )
     .all()) {
     expect(
       await diagram.evaluate(

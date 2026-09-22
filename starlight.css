@@ -353,6 +353,13 @@
   white-space: nowrap;
 }
 
+/* The desktop outline follows the neighboring links' text and padding. */
+.helia-site-header__hub {
+  line-height: 1;
+  min-height: calc(var(--helia-text-small) + 2 * var(--helia-space-2));
+  padding-block: calc(var(--helia-space-2) - 1px);
+}
+
 .helia-site-header__hub:hover,
 .helia-sidebar-hub:hover {
   background: var(--sl-color-bg-sidebar);
@@ -727,7 +734,7 @@
 }
 
 /* Standalone figures join prose rhythm; nested layout components keep theirs. */
-:is(.sl-markdown-content, .helia-band__inner)
+:is(.sl-markdown-content, .helia-band__inner, .helia-landing > section)
   > :is(.helia-chart, .helia-chart-group, .helia-block-diagram):not(
     :first-child
   ) {
