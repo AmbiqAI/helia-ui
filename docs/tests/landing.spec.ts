@@ -102,7 +102,7 @@ for (const theme of ['light', 'dark']) {
     await page.evaluate((theme) => {
       document.documentElement.dataset.theme = theme;
     }, theme);
-    const hero = page.locator('.helia-hero--neutral').first();
+    const hero = page.locator('.helia-hero--contrast.helia-hero--neutral');
     await expect(hero.locator('em')).toHaveCSS('color', 'rgb(255, 255, 255)');
     const action = hero.getByRole('link', { name: 'Get started', exact: true });
     await expect(action).toHaveCSS('background-color', 'rgb(255, 255, 255)');
