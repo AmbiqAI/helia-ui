@@ -40,9 +40,8 @@ export function ReferenceBrowser({
           Object.entries(selected).every(
             ([id, value]) =>
               !value ||
-              (id === 'group'
-                ? row.group === value
-                : row.facets[id]?.includes(value)),
+              (row.facets[id]?.includes(value) ??
+                (id === 'group' && row.group === value)),
           ) &&
           words.every((word) =>
             [

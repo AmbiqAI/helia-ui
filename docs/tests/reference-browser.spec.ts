@@ -34,21 +34,37 @@ test('all rows and links remain usable without JavaScript', async ({
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto(new URL(route, test.info().project.use.baseURL).href);
-  await expect(page.locator('.helia-reference-browser tbody tr')).toHaveCount(
-    32,
-  );
-  await expect(page.locator('.helia-reference-controls')).toBeHidden();
+  await expect(
+    page
+      .getByRole('region', { name: 'Find an operation', exact: true })
+      .locator('tbody tr'),
+  ).toHaveCount(32);
+  for (const controls of await page
+    .locator('.helia-reference-controls')
+    .all()) {
+    await expect(controls).toBeHidden();
+  }
+  await expect(
+    page
+      .getByRole('region', { name: 'Find an empty entry', exact: true })
+      .getByRole('button', { name: 'Clear filters' }),
+  ).toBeHidden();
   await page.getByRole('link', { name: 'Operation 32', exact: true }).click();
   await expect(page).toHaveURL(/#reference-details$/);
   await context.close();
 });
-test('Markdown retains the final entry and its restriction', async ({
+test('Markdown retains every destination and the final restriction', async ({
   request,
 }) => {
   const response = await request.get(`${route}index.md`);
   expect(response.ok()).toBeTruthy();
   const text = await response.text();
-  expect(text).toContain('Operation 32');
+  for (let index = 1; index <= 32; index++) {
+    const name = `Operation ${String(index).padStart(2, '0')}`;
+    expect(text).toContain(
+      `[${name}](https://ambiqai.github.io/helia-ui/react/reference-browser/#reference-details)`,
+    );
+  }
   expect(text).toContain('Check shape restrictions');
 });
 test('prose, callout and code share one content column', async ({ page }) => {
@@ -121,3 +137,24 @@ for (const width of [1440, 390]) {
     });
   }
 }
+
+test('consumer group facets override display groups, including empty facets', async ({
+  page,
+}) => {
+  await page.goto(route);
+  const region = page.getByRole('region', {
+    name: 'Find an overridden entry',
+    exact: true,
+  });
+  await expect(region).toHaveAttribute('data-ready', 'true');
+  await region
+    .getByLabel('Consumer family', { exact: true })
+    .selectOption('Consumer family');
+  await expect(region.getByRole('status')).toContainText('1 of 2');
+  await expect(
+    region.getByRole('link', { name: 'Overridden entry', exact: true }),
+  ).toBeVisible();
+  await expect(
+    region.getByRole('link', { name: 'Excluded entry', exact: true }),
+  ).toHaveCount(0);
+});

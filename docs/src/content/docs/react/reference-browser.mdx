@@ -47,3 +47,40 @@ ReferenceBrowser rows={rows} filters={filters} label="Find an operation"
 ## Reference details
 
 The destination of each row is supplied by its consumer. Existing page and section anchors remain unchanged.
+
+## Facet overrides
+
+A supplied facet value takes precedence over the display group. This preserves
+custom extractors and overlays from `buildRefIndex`. Rows without a `group`
+facet can still filter by their display group.
+
+<ReferenceBrowser
+  rows={[
+    {
+      ...rows[0],
+      id: 'override',
+      name: 'Overridden entry',
+      group: 'Display group',
+      facets: { group: ['Consumer family'] },
+    },
+    {
+      ...rows[1],
+      id: 'excluded',
+      name: 'Excluded entry',
+      group: 'Consumer family',
+      facets: { group: [] },
+    },
+  ]}
+  filters={[
+    { id: 'group', label: 'Consumer family', values: ['Consumer family'] },
+  ]}
+  label="Find an overridden entry"
+  pageSize={1}
+/>
+
+## Empty references
+
+An empty reference has no rows to browse. Enhancement controls stay hidden
+without JavaScript.
+
+<ReferenceBrowser rows={[]} label="Find an empty entry" />
