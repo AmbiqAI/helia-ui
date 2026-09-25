@@ -9,7 +9,7 @@
 /** The link back to the Dev Hub, at the end of the bar. */
 export interface HeliaHeaderHub {
   /**
-   * @deprecated The shared product navigation uses the fixed label `HELIA DEV HUB`.
+   * The destination label. Defaults to `HELIA DEV HUB`.
    */
   label?: string;
   href: string;
@@ -22,7 +22,7 @@ export const HUB_LABEL = 'HELIA DEV HUB';
 export function resolveHub(
   hub: HeliaHeaderHub | undefined,
 ): { label: string; href: string } | null {
-  return hub ? { label: HUB_LABEL, href: hub.href } : null;
+  return hub ? { label: hub.label ?? HUB_LABEL, href: hub.href } : null;
 }
 
 /** One run of the label: `accent` marks the name the family is known by. */

@@ -20,7 +20,6 @@
 import Search from '@astrojs/starlight/components/Search.astro';
 import config from 'virtual:helia-ui/starlight-config';
 
-import { HUB_LABEL } from './header-hub';
 import { matchSection } from './sections';
 import ThemeMenu from './ThemeMenu.astro';
 
@@ -82,7 +81,7 @@ const current = matchSection(
             href={header.hub.href}
             data-helia-hub-link
           >
-            {HUB_LABEL}
+            {header.hub.label}
           </a>
         )}
         {header.search && (

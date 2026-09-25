@@ -24,8 +24,8 @@ test('the default wording names the hub', () => {
   });
 });
 
-test('legacy labels use the shared destination name', () => {
-  assert.equal(resolveHub({ href, label: 'The hub' })?.label, 'HELIA DEV HUB');
+test('a site can word it itself', () => {
+  assert.equal(resolveHub({ href, label: 'The hub' })?.label, 'The hub');
 });
 
 test('the family name is the accented run of the default wording', () => {

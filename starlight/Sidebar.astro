@@ -27,7 +27,6 @@ import Default from '@astrojs/starlight/components/Sidebar.astro';
 import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
 import config from 'virtual:helia-ui/starlight-config';
 
-import { HUB_LABEL } from './header-hub';
 import { matchSection } from './sections';
 
 /*
@@ -90,7 +89,7 @@ const hub = config.header?.hub;
 {
   hub && (
     <a class="helia-sidebar-hub" href={hub.href} data-helia-hub-link>
-      {HUB_LABEL}
+      {hub.label}
     </a>
   )
 }

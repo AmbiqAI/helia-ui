@@ -11,9 +11,7 @@ import { expect, test } from '@playwright/test';
 const base = '/helia-ui';
 const hub = 'https://ambiqai.github.io/helia-developer-hub/';
 
-test('the bar carries the link, with the family name picked out', async ({
-  page,
-}) => {
+test('the bar carries the outlined hub destination', async ({ page }) => {
   await page.goto(`${base}/gallery/`);
 
   const link = page.locator('.helia-site-header__hub');

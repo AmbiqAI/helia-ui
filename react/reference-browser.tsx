@@ -137,7 +137,7 @@ export function ReferenceBrowser({
             ` · Showing ${currentPage * size + 1}–${Math.min((currentPage + 1) * size, filtered.length)}`}
         </p>
         {active && (
-          <button type="button" onClick={reset}>
+          <button type="button" onClick={reset} hidden={!ready}>
             Clear filters
           </button>
         )}
@@ -168,7 +168,7 @@ export function ReferenceBrowser({
       ) : (
         <div className="helia-reference-empty">
           <p>No matching {itemsLabel}.</p>
-          <button type="button" onClick={reset}>
+          <button type="button" onClick={reset} hidden={!ready}>
             Clear filters
           </button>
         </div>
