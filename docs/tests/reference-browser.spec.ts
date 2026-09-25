@@ -158,3 +158,24 @@ test('consumer group facets override display groups, including empty facets', as
     region.getByRole('link', { name: 'Excluded entry', exact: true }),
   ).toHaveCount(0);
 });
+
+test('internal layout keeps its own spacing inside Markdown', async ({
+  page,
+}) => {
+  await page.goto(route);
+  const browser = page.getByRole('region', {
+    name: 'Find an operation',
+    exact: true,
+  });
+  await expect(browser).toHaveAttribute('data-ready', 'true');
+  await expect(browser.locator('.helia-reference-table')).toHaveCSS(
+    'margin-top',
+    '0px',
+  );
+  const margins = await browser
+    .locator('.helia-reference-controls > *')
+    .evaluateAll((elements) =>
+      elements.map((element) => getComputedStyle(element).marginTop),
+    );
+  expect(new Set(margins).size).toBe(1);
+});

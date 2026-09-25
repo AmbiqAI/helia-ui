@@ -75,7 +75,7 @@ export function ReferenceBrowser({
   };
   return (
     <section
-      className="helia-reference-browser"
+      className="helia-reference-browser not-content"
       aria-label={label}
       data-ready={ready}
     >
