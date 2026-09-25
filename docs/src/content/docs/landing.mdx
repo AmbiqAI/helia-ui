@@ -12,10 +12,11 @@ import CardActions from '@ambiqai/helia-ui/astro/CardActions';
 import Button from '@ambiqai/helia-ui/astro/Button';
 
 `Landing` bounds its content to the shared landing width and separates sections.
-Product pages own their headings, links, and composition.
+Product pages own their headings, links, and composition. This centered example
+uses `palette="neutral"` for its action and `size="compact"` for its heading.
 
 <Landing>
-  <Hero align="center" size="compact" titleAs="h2" summary="A centered, compact introduction with actions below it.">
+  <Hero align="center" size="compact" palette="neutral" titleAs="h2" summary="A centered, compact introduction with actions below it.">
     <Fragment>Centered compact hero</Fragment>
 
     <Button slot="actions" href="#surface-controls">Explore surface controls</Button>

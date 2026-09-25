@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
 import { expect, test } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 for (const theme of ['light', 'dark']) {
   test(`ink card controls retain contrast on ${theme} pages`, async ({
@@ -223,3 +224,19 @@ test('nonlinked feature titles survive the Markdown rendition', async ({
     'A feature row can explain a capability without linking its whole surface.',
   );
 });
+
+for (const theme of ['light', 'dark'] as const) {
+  test(`landing Hero examples retain text contrast in ${theme}`, async ({
+    page,
+  }) => {
+    await page.goto('/helia-ui/landing/');
+    await page.evaluate((value) => {
+      document.documentElement.dataset.theme = value;
+    }, theme);
+    const results = await new AxeBuilder({ page })
+      .include('.helia-hero')
+      .withRules(['color-contrast'])
+      .analyze();
+    expect(results.violations).toEqual([]);
+  });
+}
