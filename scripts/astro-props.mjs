@@ -86,6 +86,7 @@ const CARD_FAMILY = [
  * build rather than producing a section with no way through to the thing.
  */
 const EXAMPLES = {
+  Landing: { page: 'landing', label: 'Landing pages' },
   AccordionGroup: { page: 'disclosure', label: 'Disclosure' },
   AsciiTerminal: { page: 'code', label: 'Code', anchor: 'ascii-terminal' },
   Badge: { page: 'cards', label: 'Cards', anchor: 'badge' },
@@ -149,6 +150,10 @@ const EXAMPLES = {
      and assert-docs-build holds the whole Astro lane, gallery included, to
      shipping no JavaScript. It is documented where the other hydrating
      components are. */
+  ReferenceBrowser: {
+    page: 'react/reference-browser',
+    label: 'Reference browser',
+  },
   RefIndex: {
     page: 'react/data-display',
     label: 'Data display',

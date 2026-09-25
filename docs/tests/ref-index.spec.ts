@@ -20,6 +20,10 @@ test('the index renders every row before anything is typed', async ({
   page,
 }) => {
   await page.goto(page_);
+  // Wait for handlers before using controls that already exist in server HTML.
+  await expect(
+    page.locator('astro-island').filter({ has: page.locator(index) }),
+  ).not.toHaveAttribute('ssr', '');
   await expect(page.locator(rows)).toHaveCount(14);
   await expect(
     page.locator(`${index} [data-slot="ref-index-count"]`),
@@ -28,6 +32,10 @@ test('the index renders every row before anything is typed', async ({
 
 test('search text narrows the rows and the count', async ({ page }) => {
   await page.goto(page_);
+  // Wait for handlers before using controls that already exist in server HTML.
+  await expect(
+    page.locator('astro-island').filter({ has: page.locator(index) }),
+  ).not.toHaveAttribute('ssr', '');
   const search = page.locator(`${index} [data-slot="ref-index-search"]`);
   await search.fill('depthwise');
 
@@ -42,6 +50,10 @@ test('a data type chip filters, and two chips in one facet are an or', async ({
   page,
 }) => {
   await page.goto(page_);
+  // Wait for handlers before using controls that already exist in server HTML.
+  await expect(
+    page.locator('astro-island').filter({ has: page.locator(index) }),
+  ).not.toHaveAttribute('ssr', '');
   const facet = page
     .locator(`${index} [data-slot="ref-index-facet"]`)
     .filter({ hasText: 'Data type' });
@@ -71,6 +83,10 @@ test('a row links to the symbol anchor on its generated page', async ({
   page,
 }) => {
   await page.goto(page_);
+  // Wait for handlers before using controls that already exist in server HTML.
+  await expect(
+    page.locator('astro-island').filter({ has: page.locator(index) }),
+  ).not.toHaveAttribute('ssr', '');
   const link = page.getByRole('link', { name: 'ex_convolve_s8', exact: true });
   await expect(link).toHaveAttribute(
     'href',
@@ -82,6 +98,10 @@ test('a contract row opens a detail panel from the keyboard', async ({
   page,
 }) => {
   await page.goto(page_);
+  // Wait for handlers before using controls that already exist in server HTML.
+  await expect(
+    page.locator('astro-island').filter({ has: page.locator(index) }),
+  ).not.toHaveAttribute('ssr', '');
   const toggle = page.getByRole('button', {
     name: 'Details for ex_convolve_s8',
   });
@@ -102,6 +122,10 @@ test('a contract row opens a detail panel from the keyboard', async ({
  */
 test('filtering moves nothing below the index', async ({ page }) => {
   await page.goto(page_);
+  // Wait for handlers before using controls that already exist in server HTML.
+  await expect(
+    page.locator('astro-island').filter({ has: page.locator(index) }),
+  ).not.toHaveAttribute('ssr', '');
   const frame = page.locator(index);
   const before = await frame.boundingBox();
 

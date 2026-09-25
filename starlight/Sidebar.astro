@@ -23,13 +23,10 @@
  * component is installed under the name, which here is this one, and a
  * component that renders itself renders until the stack runs out.
  */
-import { icon } from '@fortawesome/fontawesome-svg-core';
-import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import Default from '@astrojs/starlight/components/Sidebar.astro';
 import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
 import config from 'virtual:helia-ui/starlight-config';
 
-import { hubLabelParts } from './header-hub';
 import { matchSection } from './sections';
 
 /*
@@ -51,7 +48,6 @@ const sectionNav = Astro.locals.heliaSectionNav;
  * hides its copy at the width this one appears at.
  */
 const hub = config.header?.hub;
-const hubParts = hub ? hubLabelParts(hub.label) : [];
 ---
 
 {
@@ -93,18 +89,7 @@ const hubParts = hub ? hubLabelParts(hub.label) : [];
 {
   hub && (
     <a class="helia-sidebar-hub" href={hub.href} data-helia-hub-link>
-      {hubParts.map((part) =>
-        part.accent ? (
-          <span class="helia-sidebar-hub__name">{part.text}</span>
-        ) : (
-          part.text
-        ),
-      )}
-      <span
-        class="helia-hub-icon"
-        aria-hidden="true"
-        set:html={icon(faArrowUpRightFromSquare).html.join('')}
-      />
+      {hub.label}
     </a>
   )
 }

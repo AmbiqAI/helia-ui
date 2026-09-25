@@ -235,10 +235,6 @@
   margin-top: calc(var(--helia-space-6) * 2);
 }
 
-.sl-markdown-content > p {
-  max-width: 48rem;
-}
-
 .hero .tagline {
   max-width: 48rem;
 }
@@ -340,66 +336,45 @@
   margin-inline-start: auto;
 }
 
-/*
- * The Dev Hub link at the end of the bar. It names a place the reader is not,
- * so it is quiet: label weight, muted ink, and the family's name in the
- * product accent, which is the one word doing the work. The glyph says the
- * link leaves this site.
- */
+/* The hub is a destination link, with the same outline treatment in both navigation layouts. */
 .helia-site-header__hub,
 .helia-sidebar-hub {
   align-items: center;
-  color: var(--sl-color-gray-2);
-  display: flex;
+  border: 1px solid currentColor;
+  border-radius: var(--helia-radius);
+  color: var(--sl-color-text);
+  display: inline-flex;
   font-size: var(--helia-text-small);
+  font-weight: var(--helia-weight-semibold);
   gap: var(--helia-space-2);
+  min-height: var(--helia-control-md);
+  padding: var(--helia-space-2) var(--helia-space-3);
   text-decoration: none;
   white-space: nowrap;
 }
 
+/* The desktop outline follows the neighboring links' text and padding. */
+.helia-site-header__hub {
+  line-height: 1;
+  min-height: calc(var(--helia-text-small) + 2 * var(--helia-space-2));
+  padding-block: calc(var(--helia-space-2) - 1px);
+}
+
 .helia-site-header__hub:hover,
+.helia-sidebar-hub:hover {
+  background: var(--sl-color-bg-sidebar);
+  border-color: var(--sl-color-text);
+}
+
 .helia-site-header__hub:focus-visible,
-.helia-sidebar-hub:hover,
 .helia-sidebar-hub:focus-visible {
-  color: var(--sl-color-white);
-}
-
-/*
- * The accent is mixed for a card's ground and for body sizes; the bar's ground
- * is the canvas and this line is the small step, where the slate an unaccented
- * site falls back to reads at 3.8:1 in the dark theme. One step further toward
- * the ink the theme adapts to -- paper on the dark canvas, ink on light -- is
- * what clears AA without taking the word off the product's hue.
- */
-.helia-site-header__hub-name,
-.helia-sidebar-hub__name {
-  color: color-mix(
-    in oklab,
-    var(--helia-product-accent) 80%,
-    var(--helia-ink-adaptive)
-  );
-  font-weight: var(--helia-weight-semibold);
-}
-
-.helia-hub-icon {
-  display: inline-flex;
-  flex: none;
-  height: 1em;
-  width: 1em;
-}
-
-.helia-hub-icon svg {
-  display: block;
-  fill: currentColor;
-  height: 100%;
-  stroke: none;
-  width: 100%;
+  outline: 2px solid var(--sl-color-text-accent);
+  outline-offset: 2px;
 }
 
 /* One link, two places: the bar above the collapse point, the menu below it. */
 .helia-sidebar-hub {
-  border-top: 1px solid var(--sl-color-gray-6);
-  padding-block: var(--helia-space-3);
+  margin-top: var(--helia-space-3);
 }
 
 @media (width >= 62rem) {
@@ -756,4 +731,12 @@
     align-self: end;
     margin-inline-start: calc(var(--helia-space-3) * -1);
   }
+}
+
+/* Standalone figures join prose rhythm; nested layout components keep theirs. */
+:is(.sl-markdown-content, .helia-band__inner, .helia-landing > section)
+  > :is(.helia-chart, .helia-chart-group, .helia-block-diagram):not(
+    :first-child
+  ) {
+  margin-block-start: var(--sl-content-gap-y);
 }

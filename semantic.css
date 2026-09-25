@@ -57,6 +57,8 @@
 }
 
 :root {
+  --helia-landing-width: 72rem;
+  --helia-hero-compact-measure: 26ch;
   /* Spacing scale. Steps 1-6 are the rhythm; px is the hairline nudge. */
   --helia-space-px: 1px;
   --helia-space-1: 0.25rem;

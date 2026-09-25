@@ -877,6 +877,7 @@ function sidecarKind(
   ) {
     return null;
   }
+  if (node.name === 'ReferenceBrowser') return 'reference-browser';
   if (node.name === 'AsciiTerminal') return 'terminal';
   if (node.name === 'LinkCard') return 'link-card';
   const linked = node.attributes['href'] !== undefined;
@@ -914,6 +915,7 @@ function reduceElement(
   }
 
   if (stated !== null) {
+    if (kind === 'reference-browser') return { kind: 'block', text: stated };
     /* A button is a word in a sentence's place; a card is a line in a list. */
     return { kind: kind === 'button' ? 'inline' : 'item', text: stated };
   }
@@ -960,6 +962,17 @@ function reduceElement(
       : { kind: 'item', text: linkItem(line, href) };
   }
 
+  if (node.name === 'IconRow' && title !== undefined) {
+    const titleAs = literal(node, 'titleAs');
+    const level = titleAs === 'h2' ? 2 : titleAs === 'h4' ? 4 : 3;
+    const heading = `${'#'.repeat(level)} ${stripControl(title)}`;
+    const body = children.text.trim();
+    return {
+      kind: 'block',
+      text: body === '' ? heading : `${heading}\n\n${body}`,
+    };
+  }
+
   if (node.name === 'Card' && title !== undefined) {
     const body = children.text.trim();
     const heading = `${CARD_HEADING} ${stripControl(title)}`;
@@ -994,7 +1007,19 @@ function reduceElement(
       .filter((value): value is string => value !== undefined)
       .map((value) => stripControl(value))
       .join(': ');
-    const body = children.text.trim();
+    let body = children.text.trim();
+    if (literal(node, 'flow') === 'sequence') {
+      let stage = 0;
+      body = body
+        .split('\n')
+        .map((line) => {
+          if (line.startsWith('- ')) return `${++stage}. ${line.slice(2)}`;
+          return line.startsWith('  ')
+            ? `${' '.repeat(String(stage).length)}${line}`
+            : line;
+        })
+        .join('\n');
+    }
     if (lead === '') return { kind: 'block', text: body };
     return { kind: 'block', text: body === '' ? lead : `${lead}\n\n${body}` };
   }

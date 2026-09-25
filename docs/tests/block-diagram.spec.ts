@@ -118,3 +118,79 @@ for (const theme of ['light', 'dark'] as const) {
     expect(results.violations).toEqual([]);
   });
 }
+
+for (const width of [1440, 764, 390])
+  for (const theme of ['light', 'dark'] as const) {
+    test(`sequence direction and readable labels at ${width} in ${theme}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(page_);
+      await page.evaluate(
+        (theme) => (document.documentElement.dataset.theme = theme),
+        theme,
+      );
+      const diagram = page.locator('[data-example="sequence"]');
+      await expect(diagram.locator('ol > li')).toHaveCount(3);
+      const stages = diagram.locator('ol > li');
+      const first = await stages.nth(0).boundingBox();
+      const second = await stages.nth(1).boundingBox();
+      expect(first).not.toBeNull();
+      expect(second).not.toBeNull();
+      if (width < 672)
+        expect(second!.y).toBeGreaterThan(first!.y + first!.height);
+      else expect(second!.x).toBeGreaterThan(first!.x + first!.width);
+      const arrow = await stages.nth(1).evaluate((node) => {
+        const style = getComputedStyle(node, '::before');
+        return {
+          content: style.content,
+          border: style.borderRightStyle,
+          transform: style.transform,
+        };
+      });
+      expect(arrow.content).toBe('""');
+      expect(arrow.border).toBe('solid');
+      expect(arrow.transform).toContain(
+        width < 672 ? '0.707107, 0.707107' : '0.707107, -0.707107',
+      );
+      for (const label of await diagram
+        .locator('.helia-block__label, .helia-block__sub')
+        .all()) {
+        expect(
+          await label.evaluate((node) =>
+            parseFloat(getComputedStyle(node).fontSize),
+          ),
+        ).toBeGreaterThanOrEqual(14);
+      }
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth > innerWidth,
+        ),
+      ).toBe(false);
+      const link = diagram.getByRole('link');
+      await page.keyboard.press('Tab');
+      await link.focus();
+      expect(
+        await link.evaluate((node) => getComputedStyle(node).outlineStyle),
+      ).not.toBe('none');
+    });
+  }
+
+test('section diagrams retain spacing after headings and prose', async ({
+  page,
+}) => {
+  await page.goto(page_);
+  for (const diagram of await page
+    .locator(
+      '[data-example="prose-diagrams"] .helia-block-diagram, [data-example="native-section-diagram"] .helia-block-diagram',
+    )
+    .all()) {
+    expect(
+      await diagram.evaluate(
+        (node) =>
+          node.getBoundingClientRect().top -
+          node.previousElementSibling!.getBoundingClientRect().bottom,
+      ),
+    ).toBeGreaterThanOrEqual(16);
+  }
+});

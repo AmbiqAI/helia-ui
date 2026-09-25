@@ -9,15 +9,14 @@
 /** The link back to the Dev Hub, at the end of the bar. */
 export interface HeliaHeaderHub {
   /**
-   * The whole line, with the word HELIA in it carrying the product accent.
-   * Defaults to `Part of HELIA Dev Hub`.
+   * The destination label. Defaults to `HELIA DEV HUB`.
    */
   label?: string;
   href: string;
 }
 
 /** The wording a site that named none gets. */
-export const HUB_LABEL = 'Part of HELIA Dev Hub';
+export const HUB_LABEL = 'HELIA DEV HUB';
 
 /** `null` for a site that named no hub link, which is most of the option. */
 export function resolveHub(

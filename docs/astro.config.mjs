@@ -218,6 +218,7 @@ export default defineConfig({
             { label: 'Diagrams', slug: 'diagrams' },
             { label: 'Block diagrams', slug: 'block-diagrams' },
             { label: 'Layout', slug: 'layout' },
+            { label: 'Landing pages', slug: 'landing' },
           ],
         },
         {
@@ -244,6 +245,7 @@ export default defineConfig({
             { label: 'Overlays', slug: 'react/overlays' },
             { label: 'Feedback', slug: 'react/feedback' },
             { label: 'Data display', slug: 'react/data-display' },
+            { label: 'Reference browser', slug: 'react/reference-browser' },
             { label: 'Navigation', slug: 'react/navigation' },
             { label: 'Versioning', slug: 'react/versioning' },
             /* A decision page rather than a reference one, so it sits with

@@ -991,3 +991,40 @@ test('a link-bearing part takes its title from its children', () => {
     '- [The card parts](/cards/)',
   );
 });
+
+test('a block sequence preserves ordered stages in Markdown', () => {
+  const source =
+    '<BlockDiagram flow="sequence"><Block label="Input" /><Block label="Compile"><Block label="Plan" /></Block><Block label="Output" /></BlockDiagram>';
+  const result = reduceTags(source);
+  assert.match(result, /1\. Input/);
+  assert.match(result, /2\. Compile\n   - Plan/);
+  assert.match(result, /3\. Output/);
+});
+
+test('nonlinked IconRow preserves its heading and body', () => {
+  assert.equal(
+    reduceTags(
+      '<IconRow title="Compiled.">Generate C before deployment.</IconRow>',
+    ).trim(),
+    '### Compiled.\n\nGenerate C before deployment.',
+  );
+  assert.equal(
+    reduceTags('<IconRow title="Optimized." titleAs="h2" />').trim(),
+    '## Optimized.',
+  );
+  assert.equal(
+    reduceTags(
+      '<IconRow title="In control." titleAs="h4">Choose placement.</IconRow>',
+    ).trim(),
+    '#### In control.\n\nChoose placement.',
+  );
+});
+
+test('linked IconRow retains its destination and description', () => {
+  assert.equal(
+    reduceTags(
+      '<IconRow title="Examples" href="/examples/">Try a model.</IconRow>',
+    ).trim(),
+    '- [Examples](/examples/): Try a model.',
+  );
+});

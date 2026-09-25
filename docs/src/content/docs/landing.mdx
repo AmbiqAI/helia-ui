@@ -1,0 +1,161 @@
+---
+title: Landing pages
+description: Compose a bounded product introduction with shared layout and surface controls.
+---
+
+import Landing from '@ambiqai/helia-ui/astro/Landing';
+import Hero from '@ambiqai/helia-ui/astro/Hero';
+import Card from '@ambiqai/helia-ui/astro/Card';
+import CardHeader from '@ambiqai/helia-ui/astro/CardHeader';
+import CardContent from '@ambiqai/helia-ui/astro/CardContent';
+import CardActions from '@ambiqai/helia-ui/astro/CardActions';
+import Button from '@ambiqai/helia-ui/astro/Button';
+
+`Landing` bounds its content to the shared landing width and separates sections.
+Product pages own their headings, links, and composition. This centered example
+uses `palette="neutral"` for its action and `size="compact"` for its heading.
+
+<Landing>
+  <Hero align="center" size="compact" palette="neutral" titleAs="h2" summary="A centered, compact introduction with actions below it.">
+    <Fragment>Centered compact hero</Fragment>
+
+    <Button slot="actions" href="#surface-controls">Explore surface controls</Button>
+
+  </Hero>
+
+  <Hero align="start" size="default" titleAs="h2" summary="Existing start alignment and display size remain the defaults.">
+    <Fragment>Default hero</Fragment>
+  </Hero>
+</Landing>
+
+## Surface controls
+
+Switch the outer page between light and dark. The ink card retains readable
+text, links, actions, and keyboard focus in either theme.
+
+<Card tone="ink">
+  <CardHeader eyebrow="Ink surface" titleAs="h3">
+    A complete dark surface
+  </CardHeader>
+  <CardContent>
+    Body text and [a prose link](#surface-controls) use this surface's
+    foreground.
+  </CardContent>
+  <CardActions>
+    <Card tone="ink">
+      <CardContent>
+        <p>A nested ink card has a visible boundary.</p>
+      </CardContent>
+    </Card>
+    <Button href="#surface-controls">Primary action</Button>
+    <Button variant="secondary" href="#surface-controls">
+      Secondary action
+    </Button>
+    <Button variant="ghost" href="#surface-controls">
+      Ghost action
+    </Button>
+  </CardActions>
+</Card>
+
+## Window transcript
+
+import AsciiTerminal from '@ambiqai/helia-ui/astro/AsciiTerminal';
+
+The optional `frame="window"` keeps transcript and commands-only copy behavior.
+The dots are decorative; the title belongs to the product using the terminal.
+
+<AsciiTerminal
+  frame="window"
+  title="Build a model"
+  copy="commands"
+  lines={[
+    { kind: 'command', text: 'tool build model' },
+    {
+      kind: 'output',
+      text: 'Inspect the generated files before integrating them.',
+    },
+  ]}
+/>
+
+<Card tone="ink">
+  <CardContent>
+    <AsciiTerminal
+      frame="window"
+      tone="dark"
+      title="Inspect results"
+      copy="commands"
+      lines={[{ kind: 'command', text: 'tool inspect results' }]}
+    />
+  </CardContent>
+</Card>
+
+## Contrast band controls
+
+import Band from '@ambiqai/helia-ui/astro/Band';
+
+<Band tone="contrast">
+  <h2>Keep control surfaces readable</h2>
+  <p>
+    A dark band supplies its own text, card and button colors in either page
+    theme. <a href="#surface-controls">Compare surface choices</a>.
+  </p>
+  <Card>
+    <CardContent>
+      <p>A nested card remains readable.</p>
+      <a href="#surface-controls">Read the surface examples</a>
+    </CardContent>
+  </Card>
+  <Card tone="ink">
+    <CardContent>
+      <p>A nested ink card has a visible boundary.</p>
+    </CardContent>
+  </Card>
+  <Button href="#surface-controls">Primary action</Button>
+  <Button href="#surface-controls" variant="secondary">
+    Secondary action
+  </Button>
+</Band>
+
+## Neutral product hero
+
+<Hero
+  variant="contrast"
+  palette="neutral"
+  titleAs="h2"
+  badge="v1.0"
+  summary="Neutral emphasis leaves semantic success and terminal colors unchanged."
+>
+  Build with <em>clear choices</em>
+  <Button slot="actions" href="#surface-controls">
+    Get started
+  </Button>
+  <Button slot="actions" href="#surface-controls" variant="secondary">
+    Explore examples
+  </Button>
+</Hero>
+
+## Section-sized quickstart with fixed terminal tone
+
+`size="section"` keeps supporting content on the section heading scale. The
+`media` slot lets a window terminal retain its own frame.
+
+<Hero
+  palette="neutral"
+  titleAs="h2"
+  eyebrow="heliaAOT · Ahead-of-time compiler"
+  size="section"
+>
+  Keep the command readable
+  <p slot="summary">
+    Read the <a href="#surface-controls">setup guide</a> before running the
+    command.
+  </p>
+  <AsciiTerminal
+    slot="media"
+    tone="dark"
+    frame="window"
+    title="Build"
+    lines={[{ kind: 'command', text: 'tool build model' }]}
+    copy="commands"
+  />
+</Hero>

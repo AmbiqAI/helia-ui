@@ -57,10 +57,16 @@ import Eyebrow from './Eyebrow.astro';
 interface Props extends HTMLAttributes<'section'> {
   /** The ground. `contrast` is the inked card, `plain` the same layout with nothing behind it. */
   variant?: 'plain' | 'contrast';
+  /** Centers a standalone headline and its actions. */
+  align?: 'start' | 'center';
+  /** Compact uses the page heading scale; section uses the smaller section heading scale. */
+  size?: 'default' | 'compact' | 'section';
   /** The label above the headline, rendered in an `Eyebrow` with the accent dot. */
   eyebrow?: string;
   /** The claim under the headline: one sentence, not a paragraph. The `summary` slot wins over it. */
   summary?: string;
+  /** Neutral emphasis and filled primary action, without changing semantic colors elsewhere. */
+  palette?: 'product' | 'neutral';
   /** A short standing label under the headline, rendered as an accent `Badge`. */
   badge?: string;
   /** Heading level for the headline. A page's own hero is the `h1`; a section hero is not. */
@@ -71,6 +77,9 @@ interface Props extends HTMLAttributes<'section'> {
 
 const {
   variant = 'plain',
+  palette = 'product',
+  align = 'start',
+  size = 'default',
   eyebrow,
   summary,
   badge,
@@ -96,6 +105,9 @@ const Summary = hasSummarySlot ? 'div' : 'p';
   class:list={[
     'helia-hero',
     'not-content',
+    palette === 'neutral' && 'helia-hero--neutral',
+    align === 'center' && 'helia-hero--center',
+    size !== 'default' && `helia-hero--${size}`,
     variant !== 'plain' && `helia-hero--${variant}`,
     className,
   ]}

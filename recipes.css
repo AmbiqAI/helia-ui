@@ -2104,6 +2104,10 @@ a.helia-chip--neutral:focus-visible {
  * it read as the same voice rather than as a highlight.
  */
 .helia-hero__eyebrow {
+  color: var(--helia-ink-secondary);
+  font-size: var(--helia-text-body);
+  letter-spacing: var(--helia-tracking-label);
+  text-transform: none;
   align-items: center;
   display: inline-flex;
   gap: var(--helia-space-2);
@@ -2228,7 +2232,8 @@ a.helia-chip--neutral:focus-visible {
  * on this ground is the color disappearing. Restating the mix against paper is
  * what keeps the product's color legible across the flip.
  */
-.helia-hero--contrast {
+.helia-hero--contrast,
+.helia-band--contrast {
   --helia-ink-adaptive: var(--helia-paper-white);
   --helia-ink-primary: var(--helia-paper-white);
   --helia-ink-secondary: color-mix(
@@ -2258,7 +2263,9 @@ a.helia-chip--neutral:focus-visible {
     var(--helia-paper-white) 14%,
     transparent
   );
+}
 
+.helia-hero--contrast {
   background: var(--helia-ink-black);
   border-radius: var(--helia-radius-lg);
   color: var(--helia-paper-white);
@@ -2271,8 +2278,8 @@ a.helia-chip--neutral:focus-visible {
  * Both reach the same two classes because a set is the same object at every
  * depth, which is what lets the diagram nest without a component per level.
  *
- * No arrows and no connectors: containment is the relationship the part
- * draws, and a reader who needs a sequence gets it from the order of the set.
+ * The optional sequence connects only top-level stages; nested blocks still
+ * express containment.
  */
 .helia-block-diagram {
   /* The gap inside a block, held apart from the gap between the top-level
@@ -2324,7 +2331,8 @@ a.helia-chip--neutral:focus-visible {
   margin-block-start: 0;
 }
 
-.helia-block-set--row {
+.helia-block-set--row,
+.helia-block-set--sequence {
   grid-auto-columns: minmax(0, 1fr);
   grid-auto-flow: column;
 }
@@ -2499,7 +2507,7 @@ a.helia-block__face:hover .helia-block__label {
 }
 
 .helia-block__label {
-  font-size: var(--helia-text-label);
+  font-size: var(--helia-text-body);
   font-weight: var(--helia-weight-semibold);
   line-height: var(--helia-leading-tight);
   overflow-wrap: anywhere;
@@ -2507,7 +2515,7 @@ a.helia-block__face:hover .helia-block__label {
 
 .helia-block__sub {
   color: var(--helia-block-sub-ink);
-  font-size: var(--helia-text-caption);
+  font-size: var(--helia-text-body);
   line-height: var(--helia-leading-tight);
   overflow-wrap: anywhere;
 }
@@ -2544,4 +2552,153 @@ a.helia-block__face:hover .helia-block__label {
   .helia-block-diagram {
     break-inside: avoid;
   }
+}
+
+.helia-landing {
+  max-width: var(--helia-landing-width);
+  margin-inline: auto;
+  min-width: 0;
+}
+
+.helia-landing > :is(section, h2, .helia-split-panel) {
+  margin-block-start: var(--helia-space-6);
+}
+
+.helia-hero.helia-hero--compact {
+  --helia-hero-headline: var(--helia-text-page);
+}
+
+.helia-hero--compact .helia-hero__headline {
+  max-width: var(--helia-hero-compact-measure);
+  text-wrap: balance;
+}
+
+.helia-hero--center .helia-hero__lede {
+  align-items: center;
+  text-align: center;
+}
+
+.helia-hero--center .helia-hero__actions {
+  justify-content: center;
+}
+
+.helia-hero--center .helia-hero__badge {
+  align-self: center;
+}
+
+:is(.helia-card--ink, .helia-hero--contrast, .helia-band--contrast) {
+  --sl-color-text-invert: var(--helia-ink-black);
+  --sl-color-text-accent: var(--helia-paper-white);
+  --helia-focus-ring-color: var(--helia-paper-white);
+}
+
+.helia-card-content a:not([class]),
+.helia-card-content a:not([class]):visited {
+  color: var(--helia-ink-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.helia-card-content a:not([class]):hover {
+  color: var(--helia-product-accent);
+}
+
+.helia-hero--neutral {
+  --helia-product-accent: var(--helia-ink-primary);
+}
+
+.helia-hero--neutral .helia-hero__actions .helia-button--primary {
+  background: var(--helia-ink-primary);
+  border-color: var(--helia-ink-primary);
+  color: var(--sl-color-text-invert);
+}
+
+.helia-hero--neutral .helia-hero__actions .helia-button--primary:hover {
+  background: color-mix(
+    in srgb,
+    var(--helia-ink-primary) 88%,
+    var(--helia-surface-card)
+  );
+}
+
+/* Nested ink cards need a separate plane from the dark band's ground. */
+.helia-band--contrast .helia-card--ink {
+  background: var(--helia-surface-card);
+  border-color: var(--helia-surface-border);
+}
+
+.helia-hero__summary a:not([class]),
+.helia-hero__summary a:not([class]):visited {
+  color: var(--helia-product-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.helia-hero__summary a:not([class]):hover {
+  color: var(--helia-ink-primary);
+}
+
+.helia-hero__summary a:not([class]):focus-visible {
+  outline: 2px solid var(--helia-ink-primary);
+  outline-offset: 2px;
+}
+
+/* Markdown links inherit the surface foreground, including keyboard focus. */
+:is(.helia-band--contrast, .helia-hero--contrast) a:not([class]),
+:is(.helia-band--contrast, .helia-hero--contrast) a:not([class]):visited,
+:is(.helia-band--contrast, .helia-hero--contrast) a:not([class]):hover {
+  color: var(--helia-ink-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+:is(.helia-band--contrast, .helia-hero--contrast, .helia-card--ink)
+  a:not([class]):focus-visible {
+  outline: 2px solid var(--helia-ink-primary);
+  outline-offset: 2px;
+}
+
+/* Empty pseudo-elements keep connectors out of the spoken stage labels. */
+.helia-block-set--sequence {
+  gap: var(--helia-space-6);
+}
+
+.helia-block-set--sequence > .helia-block {
+  position: relative;
+}
+
+.helia-block-set--sequence > .helia-block + .helia-block::before {
+  border-bottom: 2px solid var(--helia-ink-secondary);
+  border-right: 2px solid var(--helia-ink-secondary);
+  content: '';
+  height: var(--helia-space-2);
+  left: calc(-1 * (var(--helia-space-6) + var(--helia-space-2)) / 2);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) rotate(-45deg);
+  width: var(--helia-space-2);
+}
+
+@media (width < 42rem) {
+  .helia-block-set--sequence {
+    grid-auto-columns: auto;
+    grid-auto-flow: row;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .helia-block-set--sequence > .helia-block + .helia-block::before {
+    left: 50%;
+    top: calc(-1 * (var(--helia-space-6) + var(--helia-space-2)) / 2);
+    transform: translateX(-50%) rotate(45deg);
+  }
+}
+
+/* Supporting sections keep the Hero layout without repeating the page headline. */
+.helia-hero.helia-hero--section {
+  --helia-hero-headline: var(--helia-text-section);
+}
+
+.helia-hero--section .helia-hero__headline {
+  max-width: var(--helia-hero-compact-measure);
+  text-wrap: balance;
 }

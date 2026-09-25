@@ -34,6 +34,8 @@ import { codeFence, escapeRendition, renditionAttributes } from '../rendition';
 interface Props {
   /** The transcript, in order. */
   lines: readonly AsciiTerminalLine[];
+  /** Optional decorative window frame; the default retains the plain transcript. */
+  frame?: 'plain' | 'window';
   /** The frame's caption. */
   title?: string;
   /** Accessible name for the frame. Defaults to the title plus `transcript`. */
@@ -61,6 +63,7 @@ interface Props {
 const {
   lines,
   title = 'Terminal',
+  frame = 'plain',
   ariaLabel = `${title} transcript`,
   animated = false,
   autoplay = true,
@@ -348,6 +351,7 @@ const transcript = normalizedLines
     'helia-surface',
     'not-content',
     `tone-${tone}`,
+    `frame-${frame}`,
   ]}
   data-animate={animated ? 'true' : 'false'}
   data-autoplay={autoplay ? 'true' : 'false'}
@@ -356,6 +360,17 @@ const transcript = normalizedLines
   role="region"
 >
   <div class="ascii-terminal__toolbar">
+    {
+      frame === 'window' && (
+        <span class="ascii-terminal__lights" aria-hidden="true">
+          <>
+            <i />
+            <i />
+            <i />
+          </>
+        </span>
+      )
+    }
     <span class="ascii-terminal__title">{title}</span>
     <div class="ascii-terminal__actions">
       {
@@ -452,11 +467,67 @@ const transcript = normalizedLines
     overflow: hidden;
   }
 
+  .frame-window {
+    border-radius: var(--helia-radius-lg);
+    box-shadow: var(--helia-shadow-1);
+    padding: var(--helia-space-4);
+    position: relative;
+  }
+
+  .frame-window .ascii-terminal__toolbar {
+    background: transparent;
+    border: 0;
+    gap: var(--helia-space-3);
+    padding: 0 0 var(--helia-space-4);
+  }
+
+  .frame-window .ascii-terminal__title {
+    margin-inline-start: auto;
+    overflow-wrap: anywhere;
+    text-align: end;
+  }
+
+  .frame-window .ascii-terminal__viewport {
+    background: var(--ascii-toolbar-bg, var(--helia-surface-card-muted));
+    border: 1px solid var(--ascii-border);
+    border-radius: var(--helia-radius);
+  }
+
+  .frame-window pre {
+    background: transparent;
+  }
+
+  .frame-window button {
+    color: var(--ascii-ink);
+  }
+
+  .ascii-terminal__lights {
+    display: flex;
+    flex: none;
+    gap: var(--helia-space-2);
+  }
+
+  .ascii-terminal__lights i {
+    background: var(--helia-tone-critical-ink);
+    border-radius: var(--helia-radius-pill);
+    height: var(--helia-space-3);
+    width: var(--helia-space-3);
+  }
+
+  .ascii-terminal__lights i:nth-child(2) {
+    background: var(--helia-tone-warning-ink);
+  }
+
+  .ascii-terminal__lights i:nth-child(3) {
+    background: var(--helia-tone-success-ink);
+  }
+
   /* The status inks restate the theme tokens rather than reading them: a
      pinned backdrop keeps its palette when the reader switches themes, and a
      theme-following ink on it would slide to the pair meant for the other
      surface and lose its contrast. */
   .tone-dark {
+    --ascii-prompt: var(--ascii-ink);
     --ascii-bg: #0d1017;
     --ascii-border: #2b303b;
     --ascii-toolbar-bg: #11151d;
@@ -468,6 +539,7 @@ const transcript = normalizedLines
   }
 
   .tone-light {
+    --ascii-prompt: var(--ascii-ink);
     --ascii-bg: var(--helia-paper-white);
     --ascii-border: #d7dade;
     --ascii-toolbar-bg: #f5f5f7;

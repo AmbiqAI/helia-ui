@@ -105,6 +105,7 @@ import AsciiTerminal from '@ambiqai/helia-ui/astro/AsciiTerminal';
 | Prop           | Type                                    | Default                     | Description                                                                                                                                                                                                           |
 | -------------- | --------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `lines` (req.) | `readonly AsciiTerminalLine[]`          | --                          | The transcript, in order.                                                                                                                                                                                             |
+| `frame`        | `'plain' \| 'window'`                   | `'plain'`                   | Optional decorative window frame; the default retains the plain transcript.                                                                                                                                           |
 | `title`        | `string`                                | `'Terminal'`                | The frame's caption.                                                                                                                                                                                                  |
 | `ariaLabel`    | `string`                                | `` `${title} transcript` `` | Accessible name for the frame. Defaults to the title plus `transcript`.                                                                                                                                               |
 | `animated`     | `boolean`                               | `false`                     | Types the command lines out on entry. Reduced motion shows them at once.                                                                                                                                              |
@@ -266,15 +267,15 @@ Also accepts `HTMLAttributes<'li'>`.
 import BlockDiagram from '@ambiqai/helia-ui/astro/BlockDiagram';
 ```
 
-| Prop        | Type                                      | Default     | Description                                                                     |
-| ----------- | ----------------------------------------- | ----------- | ------------------------------------------------------------------------------- |
-| `title`     | `string`                                  | --          | The diagram's name, set over it as the first line of the caption.               |
-| `caption`   | `string`                                  | --          | A sentence under the title. What the diagram is of, not what it shows.          |
-| `flow`      | `'row' \| 'column' \| 'grid'`             | `'row'`     | How the top-level blocks are laid out. A row stacks below 42rem.                |
-| `columns`   | `2 \| 3 \| 4 \| 5`                        | `3`         | Columns at the wide end of the `grid` flow. Halves at 62rem, stacks at 42rem.   |
-| `density`   | `'compact' \| 'default' \| 'comfortable'` | `'default'` | The gap between the top-level blocks, and the tighter one inside them.          |
-| `tone`      | `'plain' \| 'muted'`                      | `'plain'`   | The ground under the diagram. `muted` frames it; `plain` lets the page through. |
-| `ariaLabel` | `string`                                  | --          | Accessible name for the figure when it carries no `title`.                      |
+| Prop        | Type                                        | Default     | Description                                                                                        |
+| ----------- | ------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| `title`     | `string`                                    | --          | The diagram's name, set over it as the first line of the caption.                                  |
+| `caption`   | `string`                                    | --          | A sentence under the title. What the diagram is of, not what it shows.                             |
+| `flow`      | `'row' \| 'column' \| 'grid' \| 'sequence'` | `'row'`     | Top-level layout. Row and sequence stack below 42rem; sequence adds ordered stages and connectors. |
+| `columns`   | `2 \| 3 \| 4 \| 5`                          | `3`         | Columns at the wide end of the `grid` flow. Halves at 62rem, stacks at 42rem.                      |
+| `density`   | `'compact' \| 'default' \| 'comfortable'`   | `'default'` | The gap between the top-level blocks, and the tighter one inside them.                             |
+| `tone`      | `'plain' \| 'muted'`                        | `'plain'`   | The ground under the diagram. `muted` frames it; `plain` lets the page through.                    |
+| `ariaLabel` | `string`                                    | --          | Accessible name for the figure when it carries no `title`.                                         |
 
 Also accepts `HTMLAttributes<'figure'>`.
 
@@ -707,14 +708,17 @@ Also accepts `HTMLAttributes<'p'>`.
 import Hero from '@ambiqai/helia-ui/astro/Hero';
 ```
 
-| Prop      | Type                    | Default     | Description                                                                                   |
-| --------- | ----------------------- | ----------- | --------------------------------------------------------------------------------------------- |
-| `variant` | `'plain' \| 'contrast'` | `'plain'`   | The ground. `contrast` is the inked card, `plain` the same layout with nothing behind it.     |
-| `eyebrow` | `string`                | --          | The label above the headline, rendered in an `Eyebrow` with the accent dot.                   |
-| `summary` | `string`                | --          | The claim under the headline: one sentence, not a paragraph. The `summary` slot wins over it. |
-| `badge`   | `string`                | --          | A short standing label under the headline, rendered as an accent `Badge`.                     |
-| `titleAs` | `'h1' \| 'h2'`          | `'h1'`      | Heading level for the headline. A page's own hero is the `h1`; a section hero is not.         |
-| `as`      | `'section' \| 'div'`    | `'section'` | Element to render. A hero that opens the page should stay a `section`.                        |
+| Prop      | Type                                  | Default     | Description                                                                                   |
+| --------- | ------------------------------------- | ----------- | --------------------------------------------------------------------------------------------- |
+| `variant` | `'plain' \| 'contrast'`               | `'plain'`   | The ground. `contrast` is the inked card, `plain` the same layout with nothing behind it.     |
+| `align`   | `'start' \| 'center'`                 | `'start'`   | Centers a standalone headline and its actions.                                                |
+| `size`    | `'default' \| 'compact' \| 'section'` | `'default'` | Compact uses the page heading scale; section uses the smaller section heading scale.          |
+| `eyebrow` | `string`                              | --          | The label above the headline, rendered in an `Eyebrow` with the accent dot.                   |
+| `summary` | `string`                              | --          | The claim under the headline: one sentence, not a paragraph. The `summary` slot wins over it. |
+| `palette` | `'product' \| 'neutral'`              | `'product'` | Neutral emphasis and filled primary action, without changing semantic colors elsewhere.       |
+| `badge`   | `string`                              | --          | A short standing label under the headline, rendered as an accent `Badge`.                     |
+| `titleAs` | `'h1' \| 'h2'`                        | `'h1'`      | Heading level for the headline. A page's own hero is the `h1`; a section hero is not.         |
+| `as`      | `'section' \| 'div'`                  | `'section'` | Element to render. A hero that opens the page should stay a `section`.                        |
 
 Also accepts `HTMLAttributes<'section'>`.
 
@@ -797,6 +801,24 @@ Also accepts `HTMLAttributes<'span'>`.
 - `default` -- The glyph, when `name` is not the way to reach it: an inline `<svg>`, a brand mark, a numeral.
 
 [See it rendered on Gallery](/helia-ui/gallery/#icon-tiles)
+
+## Landing
+
+**Use it for:** Bounded composition for product landing pages shared by HPX and AOT.
+
+```ts
+import Landing from '@ambiqai/helia-ui/astro/Landing';
+```
+
+No props.
+
+Also accepts `HTMLAttributes<'div'>`.
+
+**Slots**
+
+- `default` -- The product introduction and feature sections.
+
+[See it rendered on Landing pages](/helia-ui/landing/)
 
 ## LinkCard
 
@@ -1075,6 +1097,28 @@ import RefSymbol from '@ambiqai/helia-ui/astro/RefSymbol';
 - `default` -- The body: description, parameter tables, examples, members.
 
 [See it rendered on Gallery](/helia-ui/gallery/#reference)
+
+## ReferenceBrowser
+
+**Use it for:** A compact reference index with consumer-owned rows and filters. All entries are present without JavaScript.
+
+```ts
+import ReferenceBrowser from '@ambiqai/helia-ui/astro/ReferenceBrowser';
+```
+
+| Prop           | Type                       | Default | Description                                                                |
+| -------------- | -------------------------- | ------- | -------------------------------------------------------------------------- |
+| `rows` (req.)  | `readonly RefIndexRow[]`   | --      | Consumer-owned reference entries, including their existing destinations.   |
+| `filters`      | `readonly RefIndexFacet[]` | --      | Ordered filters with consumer-defined meanings and values.                 |
+| `label` (req.) | `string`                   | --      | Search field and region label.                                             |
+| `nameLabel`    | `string`                   | --      | First column heading.                                                      |
+| `itemsLabel`   | `string`                   | --      | Plural noun in result counts and empty state.                              |
+| `placeholder`  | `string`                   | --      | Search hint.                                                               |
+| `pageSize`     | `number`                   | --      | Rows per page after hydration; without JavaScript all rows remain visible. |
+
+**Slots** -- none.
+
+[See it rendered on Reference browser](/helia-ui/react/reference-browser/)
 
 ## Reveal
 
