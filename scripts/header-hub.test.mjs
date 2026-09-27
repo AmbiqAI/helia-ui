@@ -19,7 +19,7 @@ test('a site that named no hub link carries none', () => {
 
 test('the default wording names the hub', () => {
   assert.deepEqual(resolveHub({ href }), {
-    label: 'HELIA DEV HUB',
+    label: 'HELIA HUB',
     href,
   });
 });

@@ -105,8 +105,7 @@ for (const width of [1440, 390]) {
       await expect(region.locator('tbody tr')).toHaveCount(5);
       await page.keyboard.press('Tab');
       await expect(region.getByLabel('Family', { exact: true })).toBeFocused();
-      await page.keyboard.press('Home');
-      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('a');
       await page.keyboard.press('Enter');
       await expect(region.getByLabel('Family', { exact: true })).toHaveValue(
         'Arithmetic',

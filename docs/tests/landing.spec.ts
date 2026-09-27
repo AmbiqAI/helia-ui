@@ -240,3 +240,27 @@ for (const theme of ['light', 'dark'] as const) {
     expect(results.violations).toEqual([]);
   });
 }
+
+for (const width of [390, 1440, 1920]) {
+  test(`landing bands align with their bounded content at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/helia-ui/landing/');
+    const landing = await page.locator('.helia-landing').boundingBox();
+    const band = await page
+      .locator('.helia-landing .helia-band__inner')
+      .evaluate((node) => {
+        const rect = node.getBoundingClientRect();
+        const style = getComputedStyle(node);
+        return {
+          left: rect.left + parseFloat(style.paddingLeft),
+          right: rect.right - parseFloat(style.paddingRight),
+        };
+      });
+    expect(Math.abs(band.left - landing!.x)).toBeLessThanOrEqual(1);
+    expect(
+      Math.abs(band.right - landing!.x - landing!.width),
+    ).toBeLessThanOrEqual(1);
+  });
+}

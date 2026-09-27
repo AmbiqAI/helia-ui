@@ -2555,6 +2555,8 @@ a.helia-block__face:hover .helia-block__label {
 }
 
 .helia-landing {
+  --sl-content-width: var(--helia-landing-width);
+  container-type: inline-size;
   max-width: var(--helia-landing-width);
   margin-inline: auto;
   min-width: 0;

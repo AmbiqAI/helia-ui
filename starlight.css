@@ -302,6 +302,10 @@
   white-space: nowrap;
 }
 
+.helia-site-header__prefix {
+  font-weight: var(--helia-weight-regular);
+}
+
 .helia-site-header__nav {
   align-items: center;
   display: flex;
