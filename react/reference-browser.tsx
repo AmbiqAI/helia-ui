@@ -58,7 +58,9 @@ export function ReferenceBrowser({
       .sort((a, b) =>
         sort === 'reverse'
           ? b.name.localeCompare(a.name)
-          : a.name.localeCompare(b.name),
+          : sort === 'group'
+            ? a.group.localeCompare(b.group) || a.name.localeCompare(b.name)
+            : a.name.localeCompare(b.name),
       );
   }, [rows, query, selected, sort]);
   const pages = Math.max(1, Math.ceil(filtered.length / size));
@@ -125,6 +127,7 @@ export function ReferenceBrowser({
           >
             <option value="name">Name: A–Z</option>
             <option value="reverse">Name: Z–A</option>
+            <option value="group">Group</option>
           </select>
         </label>
       </div>

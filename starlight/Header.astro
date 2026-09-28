@@ -58,7 +58,14 @@ const current = matchSection(
       )}
 
       <a class="helia-site-header__title" href={siteTitleHref}>
-        {header.title}
+        {header.title.match(/^helia(?=[A-Z])/) ? (
+          <>
+            <span class="helia-site-header__prefix">helia</span>
+            {header.title.slice(5)}
+          </>
+        ) : (
+          header.title
+        )}
       </a>
 
       {header.links.length > 0 && (

@@ -53,8 +53,15 @@ const markdown = Astro.props.rows
   }
   .helia-reference-browser .helia-reference-controls {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--helia-space-4);
+    padding: var(--helia-space-4);
+    background: var(--helia-surface-card-muted);
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: var(--helia-radius-md);
+  }
+  .helia-reference-browser .helia-reference-search {
+    grid-column: 1 / -1;
   }
   .helia-reference-browser label {
     display: grid;
@@ -73,6 +80,33 @@ const markdown = Astro.props.rows
     background: var(--sl-color-bg);
     color: var(--sl-color-text);
     font: inherit;
+  }
+  .helia-reference-browser label:has(select) {
+    position: relative;
+  }
+  .helia-reference-browser label:has(select)::after {
+    content: '';
+    position: absolute;
+    right: var(--helia-space-4);
+    bottom: var(--helia-space-4);
+    width: var(--helia-space-2);
+    height: var(--helia-space-2);
+    border-right: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    transform: rotate(45deg);
+    pointer-events: none;
+  }
+  .helia-reference-browser select {
+    appearance: none;
+    padding-inline-end: var(--helia-space-8);
+  }
+  .helia-reference-browser tbody th a {
+    color: var(--helia-ink-primary);
+    text-decoration: none;
+  }
+  .helia-reference-browser tbody th a:hover {
+    color: var(--sl-color-text-accent);
+    text-decoration: underline;
   }
   .helia-reference-browser button {
     padding: var(--helia-space-2) var(--helia-space-4);

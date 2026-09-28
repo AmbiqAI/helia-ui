@@ -105,8 +105,7 @@ for (const width of [1440, 390]) {
       await expect(region.locator('tbody tr')).toHaveCount(5);
       await page.keyboard.press('Tab');
       await expect(region.getByLabel('Family', { exact: true })).toBeFocused();
-      await page.keyboard.press('Home');
-      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('a');
       await page.keyboard.press('Enter');
       await expect(region.getByLabel('Family', { exact: true })).toHaveValue(
         'Arithmetic',
@@ -178,4 +177,16 @@ test('internal layout keeps its own spacing inside Markdown', async ({
       elements.map((element) => getComputedStyle(element).marginTop),
     );
   expect(new Set(margins).size).toBe(1);
+});
+
+test('group sorting orders families before names', async ({ page }) => {
+  await page.goto(route);
+  const region = page.getByRole('region', {
+    name: 'Find an operation',
+    exact: true,
+  });
+  await expect(region).toHaveAttribute('data-ready', 'true');
+  await region.getByLabel('Sort by', { exact: true }).selectOption('group');
+  const groups = await region.locator('tbody tr small').allTextContents();
+  expect(groups).toEqual([...groups].sort((a, b) => a.localeCompare(b)));
 });

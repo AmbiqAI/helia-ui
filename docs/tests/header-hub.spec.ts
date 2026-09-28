@@ -17,7 +17,7 @@ test('the bar carries the outlined hub destination', async ({ page }) => {
   const link = page.locator('.helia-site-header__hub');
   await expect(link).toBeVisible();
   await expect(link).toHaveAttribute('href', hub);
-  await expect(link).toHaveText('HELIA DEV HUB');
+  await expect(link).toHaveText('HELIA HUB');
   await expect(link.locator('svg')).toHaveCount(0);
   const colors = await link.evaluate((node) => ({
     color: getComputedStyle(node).color,
@@ -41,7 +41,7 @@ test.describe('on a phone', () => {
     await page.locator('[data-helia-sidebar-toggle]').click();
     await expect(menuLink).toBeVisible();
     await expect(menuLink).toHaveAttribute('href', hub);
-    await expect(menuLink).toHaveText('HELIA DEV HUB');
+    await expect(menuLink).toHaveText('HELIA HUB');
   });
 });
 
@@ -77,3 +77,19 @@ for (const theme of ['light', 'dark'] as const) {
     expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
   });
 }
+
+test('theme controls agree between the header and mobile navigation', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.goto('/helia-ui/gallery/');
+  const trigger = page.locator('.helia-site-header [data-theme-trigger]');
+  await trigger.click();
+  await page.locator('.helia-site-header [data-theme-choice="light"]').click();
+  await page.locator('[data-helia-sidebar-toggle]').click();
+  const sidebar = page.locator('#starlight__sidebar [data-theme-trigger]');
+  await expect(sidebar).toHaveAttribute(
+    'aria-label',
+    'Color theme: light. Choose color theme',
+  );
+});
