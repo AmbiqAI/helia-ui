@@ -2562,6 +2562,14 @@ a.helia-block__face:hover .helia-block__label {
   min-width: 0;
 }
 
+.helia-landing .helia-band {
+  --helia-band-inset: 0px;
+
+  margin-inline: 0;
+  padding-inline: 0;
+  width: 100%;
+}
+
 .helia-landing > :is(section, h2, .helia-split-panel) {
   margin-block-start: var(--helia-space-6);
 }

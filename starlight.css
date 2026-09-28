@@ -642,27 +642,24 @@
   justify-content: space-between;
 }
 
-/*
- * The negative inline margin is the hover padding given back, so the eyebrow
- * and the title still start on the content measure rather than inset from it.
- */
 .pagination-links a {
-  align-items: end;
-  border: 0;
-  border-radius: var(--helia-radius-sm);
+  align-items: center;
+  border: 1px solid var(--helia-surface-border);
+  border-radius: var(--helia-radius-md);
   box-shadow: none;
   color: var(--helia-ink-muted);
   display: flex;
   flex: 0 1 auto;
   gap: var(--helia-space-2);
   justify-content: flex-start;
-  margin-inline: calc(var(--helia-space-3) * -1);
+  margin-inline: 0;
+  min-height: var(--helia-control-lg);
   max-width: 48%;
   overflow-wrap: anywhere;
-  padding: var(--helia-space-2) var(--helia-space-3);
+  padding: var(--helia-space-4);
   text-decoration: none;
   transition: background-color var(--helia-motion-fast) var(--helia-ease-out);
-  width: auto;
+  width: 20rem;
 }
 
 /* The auto margin is what holds the end edge when there is no previous link. */
@@ -733,7 +730,7 @@
 
   .pagination-links a[rel='next'] {
     align-self: end;
-    margin-inline-start: calc(var(--helia-space-3) * -1);
+    margin-inline-start: auto;
   }
 }
 

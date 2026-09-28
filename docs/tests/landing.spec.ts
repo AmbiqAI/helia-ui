@@ -248,9 +248,10 @@ for (const width of [390, 1440, 1920]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/helia-ui/landing/');
     const landing = await page.locator('.helia-landing').boundingBox();
-    const band = await page
+    for (const inner of await page
       .locator('.helia-landing .helia-band__inner')
-      .evaluate((node) => {
+      .all()) {
+      const band = await inner.evaluate((node) => {
         const rect = node.getBoundingClientRect();
         const style = getComputedStyle(node);
         return {
@@ -258,9 +259,10 @@ for (const width of [390, 1440, 1920]) {
           right: rect.right - parseFloat(style.paddingRight),
         };
       });
-    expect(Math.abs(band.left - landing!.x)).toBeLessThanOrEqual(1);
-    expect(
-      Math.abs(band.right - landing!.x - landing!.width),
-    ).toBeLessThanOrEqual(1);
+      expect(Math.abs(band.left - landing!.x)).toBeLessThanOrEqual(1);
+      expect(
+        Math.abs(band.right - landing!.x - landing!.width),
+      ).toBeLessThanOrEqual(1);
+    }
   });
 }

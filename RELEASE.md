@@ -80,6 +80,9 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 - Product headers render the helia prefix at regular weight and keep the product suffix emphasized. The default developer-hub link reads HELIA HUB with the shared neutral outline.
 - Header and mobile navigation theme controls keep their selected state and accessible labels synchronized.
 - Landing containers bound nested bands to the same content measure as their heroes.
+- Footers group the Ambiq logo, tagline and copyright, with responsive product navigation. Previous/next links use equal-width outlined controls.
+- ReferenceBrowser uses a full-width search field, aligned filters and group sorting.
+- The heliaRT accent uses teal #53BBB5.
 - Includes the recovered Landing, ReferenceBrowser and layout/rendition components from #175.
 
 Refs #177, #175.

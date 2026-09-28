@@ -178,3 +178,15 @@ test('internal layout keeps its own spacing inside Markdown', async ({
     );
   expect(new Set(margins).size).toBe(1);
 });
+
+test('group sorting orders families before names', async ({ page }) => {
+  await page.goto(route);
+  const region = page.getByRole('region', {
+    name: 'Find an operation',
+    exact: true,
+  });
+  await expect(region).toHaveAttribute('data-ready', 'true');
+  await region.getByLabel('Sort by', { exact: true }).selectOption('group');
+  const groups = await region.locator('tbody tr small').allTextContents();
+  expect(groups).toEqual([...groups].sort((a, b) => a.localeCompare(b)));
+});
