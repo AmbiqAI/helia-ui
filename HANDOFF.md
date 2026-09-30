@@ -6,7 +6,7 @@ Implement the mobile section dropdown in shared HELIA UI and adopt it across pro
 
 ## State
 
-Worktree: /Users/adam.page/Ambiq/helia/helia-ui-mobile. Branch: codex/mobile-section-dropdown. Base: origin/main 3692215 (alpha.20). Primary checkout untouched. Shared UI PR publication approved; release and deployment remain pending.
+Worktree: /Users/adam.page/Ambiq/helia/helia-ui-mobile. Branch: codex/mobile-section-dropdown. Base: origin/main 3692215 (alpha.20). Primary checkout untouched. Published PR: https://github.com/AmbiqAI/helia-ui/pull/183 (implementation commit 8e34075). Release and deployment remain pending.
 
 Shared header now exposes a native mobile section disclosure. Selecting a section navigates to its landing page; the hamburger shows only that section's pages. Desktop navigation is preserved. Keyboard, Escape, outside click, focus dismissal and desktop breakpoint closure are covered. Sites without header configuration retain sidebar section switching. Fixed two gallery section landing URLs exposed by the dropdown.
 

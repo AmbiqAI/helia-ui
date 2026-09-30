@@ -75,6 +75,15 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 }
 ```
 
+## What changed in 0.1.0-alpha.21
+
+- Mobile headers provide a section dropdown, while the sidebar lists only the selected section's pages.
+- Section switching supports keyboard navigation, Escape with focus return, outside-click dismissal and desktop breakpoint changes.
+- Narrow header spacing preserves the product title alongside the section selector.
+- Sites without header configuration retain sidebar section switching; desktop navigation is unchanged.
+
+Refs #182.
+
 ## What changed in 0.1.0-alpha.20
 
 - Product headers render the helia prefix at regular weight and keep the product suffix emphasized. The default developer-hub link reads HELIA HUB with the shared neutral outline.
