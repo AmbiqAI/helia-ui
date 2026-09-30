@@ -1,25 +1,23 @@
-# HELIA product consistency
+# Mobile section navigation
 
-## Goal and state
+## Goal and scope
 
-Issue AmbiqAI/helia-ui#177, branch codex/product-site-consistency, base335859a. Consumers: AOT#515, RT#322, CORE#572. User approved issues and local implementation. No new PR, release, or deployment yet. Prior admin merge authorization applied only to AOT#473/#514.
+Implement the mobile section dropdown in shared HELIA UI and adopt it across product docs. Approved issue: https://github.com/AmbiqAI/helia-ui/issues/182.
 
-## Implemented
+## State
 
-- Shared product wordmark uses regular helia and bold suffix; default hub label HELIA HUB. Neutral navigation retained.
-- Landing bounds nested bands to its own inline width.
-- Header and mobile-sidebar theme controls synchronize labels and selected states.
-- Gallery regression tests for bounded bands and theme synchronization. Reference dropdown keyboard test uses native type-ahead, avoiding platform-dependent Home/ArrowDown behavior.
-- Alpha.20 release notes prepared. Manifest version remains alpha.19 until release workflow.
+Worktree: /Users/adam.page/Ambiq/helia/helia-ui-mobile. Branch: codex/mobile-section-dropdown. Base: origin/main 3692215 (alpha.20). Primary checkout untouched. Published PR: https://github.com/AmbiqAI/helia-ui/pull/183 (implementation commit 8e34075). Release and deployment remain pending.
 
-## Evidence
+Shared header now exposes a native mobile section disclosure. Selecting a section navigates to its landing page; the hamburger shows only that section's pages. Desktop navigation is preserved. Keyboard, Escape, outside click, focus dismissal and desktop breakpoint closure are covered. Sites without header configuration retain sidebar section switching. Fixed two gallery section landing URLs exposed by the dropdown.
 
-Validation passes with271unit tests. Gallery build and semantic assertions pass. Full gallery browser suite: 214 passed. Log: /tmp/helia-consistency-browser-final.log. Installable tarball verified147files/11bins in isolated consumer. AOT122browser tests pass; RT build/type/link/reference checks pass; CORE9browser tests and API Markdown coverage pass. Actual consumer screenshots inspected desktop/mobile light/dark.
+## Validation
 
-## Next
+Package validation and 271 unit tests passed. Gallery build and 215 browser tests passed. Final spacing refinement reduces narrow-header gaps and preserves the product title. Style/format checks, heartKIT build and seven browser tests pass; a focused title-clipping regression also passes. Phone screenshot confirmed section switching and a sidebar containing only Getting started pages. Screenshot: /tmp/heartkit-mobile-sections.png.
 
-Review local diff, obtain GitHub publication approval, open shared PR. After merge, use Prepare release for alpha.20 bump PR, then Publish release only after exact main CI passes. Update all consumer manifests/locks to immutable tag and revalidate before consumer PRs. Never commit temporary tarball pins.
+## Candidate integration
 
-## Workspaces
+heartKIT worktree: /Users/adam.page/Ambiq/adks/heartkit-docs, issue AmbiqAI/heartkit#43. Removed local sidebar override in favor of shared behavior and updated mobile browser regression. Local node_modules uses /tmp/ambiqai-helia-ui-0.1.0-alpha.20.tgz packed from this worktree. This is an unpublished candidate, not the published alpha.20. package.json and lockfile pins remain unchanged; npm ci restores the published dependency. Preview: http://127.0.0.1:8777/heartkit/.
 
-All under /Users/adam.page/Ambiq/helia/: helia-ui-consistency, helia-aot-docs, helia-rt-consistency, helia-core-consistency. Preview ports8744/8751/8752. Primary checkouts and AOT prototype untouched. Consumer handoffs carry details. CORE DeploymentPaths nested-card Markdown omission is pre-existing and separately recorded, not repaired here.
+## Rollout and next steps
+
+CORE, RT, AOT, HPX, EDGE, sleepKIT and heartKIT use alpha.20 or equivalent 3692215 pin. Shared release and immutable consumer pin updates remain. CORE/RT/AOT/HPX origin/main were inspected; primary checkouts can contain unrelated branches and must not be edited. Publish the approved shared UI PR, then follow the release process. Land heartKIT before updating the other documentation sites. Update and test each consumer in its own task worktree. Release, merge and deployment remain separate steps.

@@ -22,8 +22,15 @@ import config from 'virtual:helia-ui/starlight-config';
 
 import { matchSection } from './sections';
 import ThemeMenu from './ThemeMenu.astro';
+import SectionDropdown from './SectionDropdown.astro';
 
 const header = config.header;
+const activeSection = matchSection(
+  config.sections,
+  Astro.url.pathname,
+  import.meta.env.BASE_URL,
+);
+const mobileLinks = activeSection ? config.sections : (header?.links ?? []);
 const { hasSidebar, siteTitleHref } = Astro.locals.starlightRoute;
 
 /*
@@ -79,6 +86,13 @@ const current = matchSection(
             </a>
           ))}
         </nav>
+      )}
+
+      {mobileLinks.length > 0 && (
+        <SectionDropdown
+          links={mobileLinks}
+          current={activeSection ?? current}
+        />
       )}
 
       <div class="helia-site-header__actions">
