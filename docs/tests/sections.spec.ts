@@ -4,8 +4,7 @@
  * The `sections` option: the left sidebar carries the current section's pages
  * and nothing else, under the section's name, and the top bar marks the
  * section the page is in. A section that declared `sidebar: false` has no pane
- * at all, and below the bar's collapse point the menu button carries every
- * section instead of the bar. The fixture is the three demo sections under
+ * at all. On mobile, the header dropdown switches sections. The fixture is the three demo sections under
  * `starlight-plugin/sections/`; everything else on this site is outside them,
  * which is what the last wide-screen test reads.
  * See AmbiqAI/helia-ui#95 and AmbiqAI/helia-ui#97.
@@ -89,44 +88,47 @@ test('a page in no section keeps the site sidebar', async ({ page }) => {
 
 test.describe('on a phone', () => {
   test.use({ viewport: { width: 375, height: 812 } });
-
-  test('the menu button opens the list of sections', async ({ page }) => {
+  test('dropdown changes sections and keeps the sidebar scoped', async ({
+    page,
+  }) => {
     await page.goto(`${fixture}/`);
-
-    await page.locator('[data-helia-sidebar-toggle]').click();
-    const menu = sectionMenu(page);
-    await expect(menu).toBeVisible();
-
-    /* Every section, whether or not it has a pane of its own: the bar's links
-       are gone at this width, so this is the only way to the rest of the
-       site. */
-    await expect(menu.locator('> ul > li')).toHaveCount(3);
-    await expect(menu.locator('a[aria-current="page"]')).toHaveText(
+    const dropdown = page.locator('[data-helia-section-dropdown]');
+    await dropdown.locator('summary').click();
+    await expect(dropdown.locator('a')).toHaveText([
       'Demo home',
-    );
-    await expect(menu.locator('summary')).toHaveText([
       'Demo guide',
       'Demo reference',
     ]);
-
-    /* Expandable, with the section's pages under it. */
-    await expect(menu.getByRole('link', { name: 'First steps' })).toBeHidden();
-    await menu.locator('summary', { hasText: 'Demo guide' }).click();
-    await expect(menu.getByRole('link', { name: 'First steps' })).toBeVisible();
-  });
-
-  test('the section pane gives way to the section list', async ({ page }) => {
-    await page.goto(`${fixture}/guide/first-steps/`);
-
+    await dropdown
+      .getByRole('link', { name: 'Demo guide', exact: true })
+      .click();
     await page.locator('[data-helia-sidebar-toggle]').click();
-    await expect(sectionMenu(page)).toBeVisible();
-    /* One navigation at a time: the section-scoped pane is the wide-screen
-       one, and it is not drawn under the list of every section. */
-    await expect(heading(page)).toBeHidden();
-    await expect(entries(page).first()).toBeHidden();
-    /* The current section opens with the page it is on marked. */
+    await expect(heading(page)).toHaveText('Demo guide');
+    await expect(entries(page)).toHaveText(['First steps', 'Next steps']);
+    await expect(sectionMenu(page)).toHaveCount(0);
+  });
+  test('disclosure supports keyboard, dismissal and breakpoint changes', async ({
+    page,
+  }) => {
+    await page.goto(`${fixture}/guide/first-steps/`);
+    const dropdown = page.locator('[data-helia-section-dropdown]');
+    const trigger = dropdown.locator('summary');
+    await trigger.focus();
+    await page.keyboard.press('Enter');
+    await expect(dropdown).toHaveAttribute('open', '');
+    await page.keyboard.press('Tab');
     await expect(
-      sectionMenu(page).locator('a[aria-current="page"]'),
-    ).toHaveText('First steps');
+      dropdown.getByRole('link', { name: 'Demo home', exact: true }),
+    ).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(dropdown).not.toHaveAttribute('open');
+    await expect(trigger).toBeFocused();
+    await trigger.click();
+    await page.mouse.click(5, 400);
+    await expect(dropdown).not.toHaveAttribute('open');
+    await trigger.click();
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await expect(dropdown).toBeHidden();
+    await expect(dropdown).not.toHaveAttribute('open');
   });
 });
