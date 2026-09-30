@@ -45,14 +45,22 @@
 
 /*
  * A terminal frame always draws a title bar, which with no title is an empty
- * strip the package's terminal part does not have. Hiding it puts back the top
+ * strip the package's terminal part does not have. Tabs already label their
+ * terminal content, so their nested frames omit this bar too. Hiding it restores the top
  * edge and the button offset the frame stylesheet gives away to the bar.
  */
-.expressive-code .frame.is-terminal:not(.has-title) > .header {
+:is(
+    .expressive-code .frame.is-terminal:not(.has-title),
+    [role='tabpanel'] .expressive-code .frame.is-terminal
+  )
+  > .header {
   display: none;
 }
 
-.expressive-code .frame.is-terminal:not(.has-title) {
+:is(
+  .expressive-code .frame.is-terminal:not(.has-title),
+  [role='tabpanel'] .expressive-code .frame.is-terminal
+) {
   --button-spacing: 0.4rem;
 }
 
@@ -60,7 +68,11 @@
  * `--header-border-radius` is the frame's own `--helia-radius-md` plus its
  * border width, which is what the untitled corners have to match.
  */
-.expressive-code .frame.is-terminal:not(.has-title) pre {
+:is(
+    .expressive-code .frame.is-terminal:not(.has-title),
+    [role='tabpanel'] .expressive-code .frame.is-terminal
+  )
+  pre {
   border-start-end-radius: var(--header-border-radius);
   border-start-start-radius: var(--header-border-radius);
   border-top: 1px solid var(--helia-surface-border);
