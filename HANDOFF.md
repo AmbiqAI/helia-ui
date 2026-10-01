@@ -1,11 +1,9 @@
-# Compact tab terminals
+# Muted code backgrounds
 
-Goal: shared compact terminal framing inside tab panels, requested during heartKIT #44 review. Tracked under existing shared tab-layout issue AmbiqAI/helia-ui#140. Worktree helia-ui-tab-terminals, branch codex/compact-tab-terminals, base alpha.21 (6cdbea0).
+Issue: AmbiqAI/helia-ui#187. Branch: codex/muted-code-backgrounds.
 
-Implementation: extend shared untitled terminal styling to terminal frames within tab panels. Hide redundant title bars, restore top corners and copy-button spacing. Standalone terminal frames and nonterminal file titles retain existing rendering. Gallery covers fenced terminal, CodeBlock terminal and file example. Browser tests cover light/dark at390/1280px. Package validation passed (271 unit tests); 215 existing gallery tests passed; all four added light/dark and phone/desktop cases passed after fixing Markdown fence layout in the gallery fixture. Gallery build passes. heartKIT candidate build and all eight browser tests pass. Screenshot inspected and saved at /tmp/heartkit-compact-tab-terminal.png.
+Implemented per-block `tone="muted"` / `tone="default"` and site-wide `code: { tone: 'muted' }`. Existing defaults and explicit site frame overrides are preserved. Gallery and generated prop reference updated.
 
-PR publication approved. Merge/release remain pending. Preview heartKIT through a temporary candidate package after validation; keep released alpha.21 pin intact until release. heartKIT #44 remains unmerged.
+Verified: package validation, 271 unit checks, gallery build, all 221 browser checks. Separate site-default build verified Markdown backgrounds in both themes; screenshots inspected. Gallery config restored after that check.
 
-Published PR: https://github.com/AmbiqAI/helia-ui/pull/185, head5d55545. CI started. No merge or release yet.
-
-User approved remaining shared release and heartKIT adoption steps. Adding alpha.22 release notes before merge; heartKIT final merge remains pending approval.
+Next: PR/CI review, release through RELEASE.md after approval, then update compressionKIT's immutable dependency and enable muted tone. No package release or consumer patch yet.

@@ -149,8 +149,9 @@ export interface HeliaStarlightOptions {
    * than replacing them: `styleOverrides` and its `frames` and `textMarkers`
    * maps are merged key by key, and any other key the site names wins
    * outright. A site that sets `expressiveCode: false` keeps it switched off.
+   * Set `tone: 'muted'` for neutral gray code surfaces in both themes.
    */
-  code?: boolean;
+  code?: boolean | { tone?: 'default' | 'muted' };
   /**
    * The product whose identity color the site carries. The Head override puts
    * it on the document element as `data-helia-accent`, which is what
@@ -392,7 +393,7 @@ const CODE_FRAME_OVERRIDES: NonNullable<CodeStyleOverrides['frames']> = {
  * are merged a level at a time here; every other key the site names replaces
  * ours.
  */
-function mergeExpressiveCode(site: ExpressiveCodeOptions) {
+function mergeExpressiveCode(site: ExpressiveCodeOptions, tone = 'default') {
   const { styleOverrides = {}, ...rest } = site;
   const { frames, textMarkers, ...otherOverrides } = styleOverrides;
 
@@ -408,7 +409,16 @@ function mergeExpressiveCode(site: ExpressiveCodeOptions) {
     styleOverrides: {
       ...CODE_STYLE_OVERRIDES,
       ...otherOverrides,
-      frames: { ...CODE_FRAME_OVERRIDES, ...frames },
+      frames: {
+        ...CODE_FRAME_OVERRIDES,
+        ...(tone === 'muted'
+          ? {
+              editorBackground: 'var(--helia-surface-card-muted)',
+              terminalBackground: 'var(--helia-surface-card-muted)',
+            }
+          : {}),
+        ...frames,
+      },
       textMarkers: { ...CODE_MARKER_OVERRIDES, ...textMarkers },
     },
   } satisfies ExpressiveCodeOptions;
@@ -579,6 +589,7 @@ export function heliaStarlight(
                 typeof config.expressiveCode === 'object'
                   ? config.expressiveCode
                   : {},
+                typeof code === 'object' ? code.tone : 'default',
               )
             : config.expressiveCode;
 
