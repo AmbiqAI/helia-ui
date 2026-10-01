@@ -28,6 +28,8 @@ type CodeLanguage =
 interface Props {
   /** The source, verbatim. It is also what the copy control puts on the clipboard. */
   code: string;
+  /** Background surface, independent of the frame variant. Omit to inherit the site default. */
+  tone?: 'default' | 'muted';
   /** Grammar to highlight with. */
   language?: CodeLanguage;
   /** Path shown in the frame's title. Takes precedence over `label`. */
@@ -48,6 +50,7 @@ interface Props {
 
 const {
   code,
+  tone,
   language = 'plaintext',
   filename,
   label,
@@ -64,7 +67,11 @@ const FRAMES = { bare: 'none', code: 'code', terminal: 'terminal' } as const;
  * not depend on. The class hands the job to the counter rule in starlight.css,
  * which fills the gutter column the core stylesheet already lays out.
  */
-const classes = [className, lineNumbers && 'helia-code-lines']
+const classes = [
+  className,
+  tone && `helia-code-tone-${tone}`,
+  lineNumbers && 'helia-code-lines',
+]
   .filter(Boolean)
   .join(' ');
 ---
