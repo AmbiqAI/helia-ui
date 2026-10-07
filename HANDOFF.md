@@ -6,6 +6,8 @@ State: implemented on `codex/header-title-prefix` with review fixes. `regularTit
 
 Decision: product sites must pin an immutable published helia-ui tag before their KIT title styling is complete. Do not pin this branch or a local package. The four KIT landing-page worktrees can be reviewed in parallel, but their shared-header dependency remains open until release.
 
-Next: open the shared PR, obtain reviews and green CI, resolve findings, then ask for approval. After merge and release, update heartKIT, sleepKIT, compressionKIT and physioKIT pins, rebuild and visually inspect each home page. Do not merge product PRs against an unreleased dependency.
+Next: complete final PR #193 reviews and CI, resolve findings, then ask for approval. After merge and release, update heartKIT, sleepKIT, compressionKIT and physioKIT pins, rebuild and visually inspect each home page. Do not merge product PRs against an unreleased dependency.
 
 References: AmbiqAI/helia-ui#192; `starlight/Header.astro`, `starlight/header-title.ts`, `starlight.css`, `docs/tests/header-hub.spec.ts`.
+
+Publication: final review fixes are pushed. Fresh CI and Copilot re-reviews requested; verify the final head before approval. Product PRs remain draft pending shared helia-ui approval, release and immutable dependency pins.
