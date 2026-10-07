@@ -38,7 +38,10 @@ const mobileLinks = activeSection ? config.sections : (header?.links ?? []);
 const { hasSidebar, siteTitleHref } = Astro.locals.starlightRoute;
 const showSidebarToggle = hasSidebar && activeSection?.sidebar !== false;
 const dropdownLinks = header?.hub
-  ? [...mobileLinks, { ...header.hub, label: 'HELIA AI Developer Hub' }]
+  ? [
+      ...mobileLinks,
+      { ...header.hub, label: 'HELIA AI DEV Hub', external: true },
+    ]
   : mobileLinks;
 
 /*

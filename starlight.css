@@ -807,7 +807,10 @@
   z-index: var(--helia-layer-menu);
 }
 .helia-section-dropdown nav a {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--helia-space-3);
   padding: var(--helia-space-2) var(--helia-space-3);
   border-radius: var(--helia-radius-sm);
   color: var(--helia-ink-primary);

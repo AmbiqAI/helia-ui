@@ -100,7 +100,7 @@ test.describe('on a phone', () => {
       'Demo home',
       'Demo guide',
       'Demo reference',
-      'HELIA AI Developer Hub',
+      'HELIA AI DEV Hub',
     ]);
     await dropdown
       .getByRole('link', { name: 'Demo guide', exact: true })

@@ -14,3 +14,7 @@ Next: review shared PR, release via RELEASE.md, pin consumers, complete product 
 
 PR: https://github.com/AmbiqAI/helia-ui/pull/197
 Two independent reviews found and resolved headerless section navigation and false data-attribute Hub hiding. Plugin prose updated; headerless middleware regression tests added. Release notes for alpha.25 included.
+
+Final verification: latest shared docs build and 230 browser tests pass at 77794a1. All ten consumer draft PRs are attached to this chat. Four existing KIT browser tabs refreshed. Shared CI browser job still pending at last check; consumer pins await shared publication.
+
+User follow-up: shared dropdown Hub label shortened to HELIA AI DEV Hub with a decorative external-site arrow. Applies to all ten consumers via the shared release.

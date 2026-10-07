@@ -77,7 +77,7 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 
 ## What changed in 0.1.0-alpha.25
 
-- Sections with `sidebar: false` omit the sidebar and mobile toggle when using the shared header. The mobile section dropdown remains available and includes a HELIA AI Developer Hub destination.
+- Sections with `sidebar: false` omit the sidebar and mobile toggle when using the shared header. The mobile section dropdown remains available and includes a HELIA AI DEV Hub destination.
 - Buttons space labels and trailing icons consistently.
 - `Hero.eyebrowIcon` replaces the decorative dot with a supplied official product mark, while retaining the eyebrow text as the label.
 

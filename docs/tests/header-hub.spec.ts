@@ -171,9 +171,10 @@ for (const theme of ['light', 'dark'] as const) {
     await page.locator('[data-helia-section-dropdown] summary').click();
     const link = page
       .locator('[data-helia-section-dropdown]')
-      .getByRole('link', { name: 'HELIA AI Developer Hub' });
+      .getByRole('link', { name: 'HELIA AI DEV Hub' });
     await expect(link).toBeVisible();
     await expect(link).toHaveAttribute('href', hub);
+    await expect(link.locator('svg[aria-hidden="true"]')).toBeVisible();
     await link.focus();
     await expect(link).toBeFocused();
     expect(
