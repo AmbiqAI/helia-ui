@@ -151,3 +151,30 @@ test('theme controls agree between the header and mobile navigation', async ({
     'Color theme: light. Choose color theme',
   );
 });
+
+for (const theme of ['light', 'dark'] as const) {
+  test(`hub remains reachable in the no-sidebar layout on a phone in ${theme}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(`${base}/gallery/`);
+    await page.evaluate(() => {
+      document.documentElement.removeAttribute('data-has-sidebar');
+      document.querySelector('#starlight__sidebar')?.remove();
+      document.querySelector('[data-helia-sidebar-toggle]')?.remove();
+    });
+    await page.evaluate(
+      (value) => (document.documentElement.dataset.theme = value),
+      theme,
+    );
+    await expect(page.locator('[data-helia-sidebar-toggle]')).toHaveCount(0);
+    const link = page.locator('.helia-site-header__hub');
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('href', hub);
+    await link.focus();
+    await expect(link).toBeFocused();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(375);
+  });
+}

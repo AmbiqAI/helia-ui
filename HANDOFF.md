@@ -2,7 +2,7 @@
 
 Goal: issue #192, provide a shared Starlight header option that renders a regular product prefix and bold KIT suffix, and retain the HELIA hub link through compact desktop widths.
 
-State: implemented on `codex/header-title-prefix` with review fixes. `regularTitlePrefix` defaults HELIA names and accepts an explicit KIT prefix. The hub link remains in the header at widths of at least 42rem, then moves to the mobile sidebar. Package validation, docs build and 226 browser tests pass. PR #193 is open in draft. Review fixes restore the existing hero width, exercise the configured title prefix in the gallery and browser suite, and remove an obsolete breakpoint comment. The branch is not merged or released.
+State: implemented on `codex/header-title-prefix` with review fixes. `regularTitlePrefix` defaults HELIA names and accepts an explicit KIT prefix. The hub link remains in the header at widths of at least 42rem, then moves to the mobile sidebar when present. Routes without a sidebar retain the header link. Package validation, docs build and 228 browser tests pass. PR #193 is open in draft. Review fixes restore the existing hero width, exercise the configured title prefix in the gallery and browser suite, and remove an obsolete breakpoint comment. The branch is not merged or released.
 
 Decision: product sites must pin an immutable published helia-ui tag before their KIT title styling is complete. Do not pin this branch or a local package. The four KIT landing-page worktrees can be reviewed in parallel, but their shared-header dependency remains open until release.
 

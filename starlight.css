@@ -400,7 +400,7 @@
 }
 
 @media (width < 42rem) {
-  .helia-site-header__hub {
+  html[data-has-sidebar] .helia-site-header__hub {
     display: none;
   }
 }
