@@ -75,6 +75,13 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 }
 ```
 
+## What changed in 0.1.0-alpha.24
+
+- `header.titleRegularPrefix` renders a regular-weight product prefix with a bold suffix, including KIT product names. The complete title remains the accessible link name.
+- The HELIA hub link stays in the header while section navigation uses its dropdown, down to 42rem. Below that width it moves to the mobile sidebar when one exists; pages without a sidebar retain the header link.
+
+Refs #192, #193.
+
 ## What changed in 0.1.0-alpha.23
 
 - Product footers use the supplied official blue Ambiq artwork in light mode and official white artwork in dark mode. The two SVGs share trimmed canvas bounds so they display at the same size.
