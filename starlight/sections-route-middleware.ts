@@ -95,7 +95,8 @@ export const onRequest = defineRouteMiddleware((context) => {
   });
 
   if (current.sidebar === false) {
-    route.hasSidebar = false;
+    // Without the shared header, section switching lives in the mobile pane.
+    route.hasSidebar = !config.header;
     route.sidebar = [];
     return;
   }

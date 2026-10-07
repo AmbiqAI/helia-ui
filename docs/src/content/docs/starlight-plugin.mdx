@@ -109,8 +109,9 @@ heliaStarlight({
 The outlined link uses the navigation foreground in either theme. `label`
 replaces the wording, which defaults to `HELIA HUB`. The link stays in
 the bar when the section links become a dropdown below `62rem`. Below `42rem`,
-the menu pane carries the link at the end with a larger touch target. Pages
-without a sidebar keep the link in the header at narrower widths.
+the section dropdown includes a HELIA AI Developer Hub destination and the
+duplicate header link is hidden. A header with no section links keeps the Hub
+link visible. Documentation sidebars also carry the Hub link on narrow screens.
 
 Search and the theme menu sit at the end of the bar, and either can be dropped
 with `header.search: false` or `header.themeToggle: false`. What Starlight
@@ -181,10 +182,11 @@ as sidebar config; nothing about them is resolved here.
   reserved for one, whatever `sidebar: 'always'` says, since that option is
   about a template rather than about a section. The section still lists in the
   bar and in the narrow-width menu, as a link rather than an expandable item.
-- **Narrow screens.** The bar's sections give way to the menu button below
-  `62rem`, so the pane it opens is every section, each one expandable to its
-  pages, with the current section open. The section-scoped pane is the
-  wide-screen one; the two are never drawn at once.
+- **Narrow screens.** With a configured header, the section dropdown replaces
+  the bar's links below `62rem`. Documentation pages retain a menu button for
+  the current section's sidebar. Sections with `sidebar: false` have no menu
+  button or sidebar. Without a configured header, section switching remains
+  available through Starlight's mobile sidebar.
 - **Which section a page is in.** The longest matching prefix wins, so a
   section nested under another one takes its own pages. A page under no section
   keeps the sidebar the site declared in `sidebar`, or the whole navigation if

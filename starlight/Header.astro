@@ -58,7 +58,9 @@ const current = matchSection(
   header && (
     <div
       class="helia-site-header"
-      data-helia-hub-in-dropdown={Boolean(header.hub && mobileLinks.length > 0)}
+      data-helia-hub-in-dropdown={
+        header.hub && mobileLinks.length > 0 ? '' : undefined
+      }
     >
       {showSidebarToggle && (
         <button
