@@ -45,6 +45,36 @@ test.describe('on a phone', () => {
   });
 });
 
+test('hub stays in the bar after sections become a dropdown', async ({
+  page,
+}) => {
+  const hubLink = page.locator('.helia-site-header__hub');
+  const dropdown = page.locator('.helia-section-dropdown');
+  for (const width of [800, 672]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(`${base}/gallery/`);
+    await expect(page.locator('.helia-site-header__nav')).toBeHidden();
+    await expect(dropdown).toBeVisible();
+    await expect(hubLink).toBeVisible();
+    await expect(
+      page.locator('#starlight__sidebar .helia-sidebar-hub'),
+    ).toBeHidden();
+    const dropdownBox = await dropdown.boundingBox();
+    const hubBox = await hubLink.boundingBox();
+    expect(dropdownBox!.x + dropdownBox!.width).toBeLessThan(hubBox!.x);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(width);
+  }
+
+  await page.setViewportSize({ width: 671, height: 900 });
+  await expect(hubLink).toBeHidden();
+  await page.locator('[data-helia-sidebar-toggle]').click();
+  await expect(
+    page.locator('#starlight__sidebar .helia-sidebar-hub'),
+  ).toBeVisible();
+});
+
 for (const theme of ['light', 'dark'] as const) {
   test(`desktop hub aligns with navigation in ${theme}`, async ({ page }) => {
     await page.setViewportSize({ width: 1218, height: 900 });
