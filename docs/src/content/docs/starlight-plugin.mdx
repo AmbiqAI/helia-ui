@@ -118,15 +118,12 @@ with `header.search: false` or `header.themeToggle: false`. What Starlight
 draws there by default and this bar does not is the social icon row: a site
 that wants those links keeps them by naming them in `links`.
 
-Below `62rem` the links give way to a button that opens the left sidebar, which
-is where a narrow screen reads the navigation from. On a site with `sections`
-the pane the button opens is the list of sections rather than the current
-section's pages, because the bar the sections were in is what the button
-replaced. The button is the one entry point to it, because the plugin's
-`MobileMenuToggle` override takes Starlight's own button off the frame. It
-opens the pane through Starlight's own menu state, so the overlay and the
-scroll lock behind it are one thing at every width. This site sets the option,
-so the bar at the top of this page is the one it installs.
+Below `62rem`, the section links move into a dropdown in the shared header.
+Documentation pages also have a separate button for the current section's
+sidebar pages. Landing sections declaring `sidebar: false` keep the dropdown
+and omit that button. The sidebar button uses Starlight's menu state so its
+overlay and scroll lock stay synchronized. This site uses the shared header,
+so the bar above this page demonstrates that behavior.
 
 ## Sections
 
