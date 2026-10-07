@@ -95,14 +95,7 @@ export const onRequest = defineRouteMiddleware((context) => {
   });
 
   if (current.sidebar === false) {
-    /*
-     * No pane, and the layout column with it: the Sidebar override marks the
-     * route so the frame gives the width back to the content, which is what
-     * `sidebar: 'always'` cannot be allowed to undo. The flag stays set all
-     * the same, because the pane is also the menu the narrow-width button
-     * opens, and a route without one has nothing for the button to open.
-     */
-    route.hasSidebar = true;
+    route.hasSidebar = false;
     route.sidebar = [];
     return;
   }

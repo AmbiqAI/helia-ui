@@ -400,7 +400,8 @@
 }
 
 @media (width < 42rem) {
-  html[data-has-sidebar] .helia-site-header__hub {
+  html[data-has-sidebar] .helia-site-header__hub,
+  .helia-site-header[data-helia-hub-in-dropdown] .helia-site-header__hub {
     display: none;
   }
 }

@@ -122,3 +122,32 @@ test('the side column stacks under the lede on a narrow viewport', async ({
   );
   expect(Math.abs(narrowSide!.x - narrowLede!.x)).toBeLessThanOrEqual(1);
 });
+
+test('product eyebrow icon replaces the decorative dot', async ({ page }) => {
+  await page.goto('/helia-ui/landing/');
+  const label = page.locator('.helia-hero__eyebrow--icon');
+  await expect(label).toHaveText('Official product mark');
+  const image = label.locator('img');
+  await expect(image).toHaveAttribute('alt', '');
+  expect(
+    await image.evaluate(
+      (element: HTMLImageElement) =>
+        element.complete && element.naturalWidth > 0,
+    ),
+  ).toBe(true);
+  expect(
+    await label.evaluate(
+      (element) => getComputedStyle(element, '::before').content,
+    ),
+  ).toBe('none');
+});
+
+test('buttons separate labels from trailing icons', async ({ page }) => {
+  await page.goto('/helia-ui/starlight-plugin/hero-page/');
+  const button = page.locator('.helia-hero__actions .helia-button').first();
+  expect(
+    await button.evaluate((element) =>
+      parseFloat(getComputedStyle(element).columnGap),
+    ),
+  ).toBeGreaterThanOrEqual(8);
+});
