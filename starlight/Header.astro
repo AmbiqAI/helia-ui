@@ -21,10 +21,14 @@ import Search from '@astrojs/starlight/components/Search.astro';
 import config from 'virtual:helia-ui/starlight-config';
 
 import { matchSection } from './sections';
+import { regularTitlePrefix } from './header-title';
 import ThemeMenu from './ThemeMenu.astro';
 import SectionDropdown from './SectionDropdown.astro';
 
 const header = config.header;
+const titleRegularPrefix = header
+  ? regularTitlePrefix(header.title, header.titleRegularPrefix)
+  : '';
 const activeSection = matchSection(
   config.sections,
   Astro.url.pathname,
@@ -65,10 +69,10 @@ const current = matchSection(
       )}
 
       <a class="helia-site-header__title" href={siteTitleHref}>
-        {header.title.match(/^helia(?=[A-Z])/) ? (
+        {titleRegularPrefix ? (
           <>
-            <span class="helia-site-header__prefix">helia</span>
-            {header.title.slice(5)}
+            <span class="helia-site-header__prefix">{titleRegularPrefix}</span>
+            {header.title.slice(titleRegularPrefix.length)}
           </>
         ) : (
           header.title

@@ -78,6 +78,8 @@ export interface HeliaHeaderLink {
 export interface HeliaHeaderOptions {
   /** The name at the top-left. Defaults to the site's own title. */
   title?: string;
+  /** Initial title text to render at regular weight. Defaults to "helia" for HELIA product names. */
+  titleRegularPrefix?: string;
   /** The sections beside the name. */
   links?: HeliaHeaderLink[];
   /**
@@ -217,6 +219,7 @@ export interface HeliaStarlightConfig {
   /** `null` when the site asked for no package header. */
   header: {
     title: string;
+    titleRegularPrefix: string | undefined;
     links: HeliaHeaderLink[];
     search: boolean;
     themeToggle: boolean;
@@ -619,6 +622,7 @@ export function heliaStarlight(
             header: header
               ? {
                   title: header.title ?? site.title,
+                  titleRegularPrefix: header.titleRegularPrefix,
                   /* One nav definition: the bar lists the sections unless the
                      site states a bar of its own, which it does when the bar
                      carries something that is not a section. */
