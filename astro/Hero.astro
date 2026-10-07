@@ -65,6 +65,8 @@ interface Props extends HTMLAttributes<'section'> {
   eyebrow?: string;
   /** Decorative product mark replacing the eyebrow accent dot. */
   eyebrowIcon?: string;
+  /** Product identity uses the landing brand scale; labels keep compact eyebrow type. */
+  eyebrowStyle?: 'label' | 'brand';
   /** The claim under the headline: one sentence, not a paragraph. The `summary` slot wins over it. */
   summary?: string;
   /** Neutral emphasis and filled primary action, without changing semantic colors elsewhere. */
@@ -84,6 +86,7 @@ const {
   size = 'default',
   eyebrow,
   eyebrowIcon,
+  eyebrowStyle = 'label',
   summary,
   badge,
   titleAs: Title = 'h1',
@@ -122,6 +125,7 @@ const Summary = hasSummarySlot ? 'div' : 'p';
         <Eyebrow
           class:list={[
             'helia-hero__eyebrow',
+            eyebrowStyle === 'brand' && 'helia-hero__brand',
             eyebrowIcon && 'helia-hero__eyebrow--icon',
           ]}
         >

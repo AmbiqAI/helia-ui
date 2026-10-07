@@ -75,6 +75,13 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 }
 ```
 
+## What changed in 0.1.0-alpha.26
+
+- `Hero.eyebrowStyle="brand"` uses a responsive product-name scale and a 32px official product icon. Ordinary eyebrow labels keep their compact defaults.
+- Custom hero compositions can use the shared `helia-hero__brand` recipe and its foreground override.
+
+Refs #199.
+
 ## What changed in 0.1.0-alpha.25
 
 - Sections with `sidebar: false` omit the sidebar and mobile toggle when using the shared header. The mobile section dropdown remains available and includes a HELIA AI DEV Hub destination.
