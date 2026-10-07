@@ -92,12 +92,15 @@ test.describe('on a phone', () => {
     page,
   }) => {
     await page.goto(`${fixture}/`);
+    await expect(page.locator('[data-helia-sidebar-toggle]')).toHaveCount(0);
     const dropdown = page.locator('[data-helia-section-dropdown]');
+    await expect(dropdown).toBeVisible();
     await dropdown.locator('summary').click();
     await expect(dropdown.locator('a')).toHaveText([
       'Demo home',
       'Demo guide',
       'Demo reference',
+      'HELIA AI DEV Hub',
     ]);
     await dropdown
       .getByRole('link', { name: 'Demo guide', exact: true })

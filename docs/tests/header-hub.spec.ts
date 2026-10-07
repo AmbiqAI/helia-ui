@@ -168,9 +168,13 @@ for (const theme of ['light', 'dark'] as const) {
       theme,
     );
     await expect(page.locator('[data-helia-sidebar-toggle]')).toHaveCount(0);
-    const link = page.locator('.helia-site-header__hub');
+    await page.locator('[data-helia-section-dropdown] summary').click();
+    const link = page
+      .locator('[data-helia-section-dropdown]')
+      .getByRole('link', { name: 'HELIA AI DEV Hub' });
     await expect(link).toBeVisible();
     await expect(link).toHaveAttribute('href', hub);
+    await expect(link.locator('svg[aria-hidden="true"]')).toBeVisible();
     await link.focus();
     await expect(link).toBeFocused();
     expect(

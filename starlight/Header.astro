@@ -36,6 +36,13 @@ const activeSection = matchSection(
 );
 const mobileLinks = activeSection ? config.sections : (header?.links ?? []);
 const { hasSidebar, siteTitleHref } = Astro.locals.starlightRoute;
+const showSidebarToggle = hasSidebar && activeSection?.sidebar !== false;
+const dropdownLinks = header?.hub
+  ? [
+      ...mobileLinks,
+      { ...header.hub, label: 'HELIA AI DEV Hub', external: true },
+    ]
+  : mobileLinks;
 
 /*
  * A prefix rather than an equality, so a link stays current on every page
@@ -52,8 +59,13 @@ const current = matchSection(
 
 {
   header && (
-    <div class="helia-site-header">
-      {hasSidebar && (
+    <div
+      class="helia-site-header"
+      data-helia-hub-in-dropdown={
+        header.hub && mobileLinks.length > 0 ? '' : undefined
+      }
+    >
+      {showSidebarToggle && (
         <button
           class="helia-site-header__toggle"
           type="button"
@@ -94,7 +106,7 @@ const current = matchSection(
 
       {mobileLinks.length > 0 && (
         <SectionDropdown
-          links={mobileLinks}
+          links={dropdownLinks}
           current={activeSection ?? current}
         />
       )}

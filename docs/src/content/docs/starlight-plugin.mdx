@@ -109,23 +109,21 @@ heliaStarlight({
 The outlined link uses the navigation foreground in either theme. `label`
 replaces the wording, which defaults to `HELIA HUB`. The link stays in
 the bar when the section links become a dropdown below `62rem`. Below `42rem`,
-the menu pane carries the link at the end with a larger touch target. Pages
-without a sidebar keep the link in the header at narrower widths.
+the section dropdown includes a HELIA AI DEV Hub destination and the
+duplicate header link is hidden. A header with no section links keeps the Hub
+link visible. Documentation sidebars also carry the Hub link on narrow screens.
 
 Search and the theme menu sit at the end of the bar, and either can be dropped
 with `header.search: false` or `header.themeToggle: false`. What Starlight
 draws there by default and this bar does not is the social icon row: a site
 that wants those links keeps them by naming them in `links`.
 
-Below `62rem` the links give way to a button that opens the left sidebar, which
-is where a narrow screen reads the navigation from. On a site with `sections`
-the pane the button opens is the list of sections rather than the current
-section's pages, because the bar the sections were in is what the button
-replaced. The button is the one entry point to it, because the plugin's
-`MobileMenuToggle` override takes Starlight's own button off the frame. It
-opens the pane through Starlight's own menu state, so the overlay and the
-scroll lock behind it are one thing at every width. This site sets the option,
-so the bar at the top of this page is the one it installs.
+Below `62rem`, the section links move into a dropdown in the shared header.
+Documentation pages also have a separate button for the current section's
+sidebar pages. Landing sections declaring `sidebar: false` keep the dropdown
+and omit that button. The sidebar button uses Starlight's menu state so its
+overlay and scroll lock stay synchronized. This site uses the shared header,
+so the bar above this page demonstrates that behavior.
 
 ## Sections
 
@@ -181,10 +179,11 @@ as sidebar config; nothing about them is resolved here.
   reserved for one, whatever `sidebar: 'always'` says, since that option is
   about a template rather than about a section. The section still lists in the
   bar and in the narrow-width menu, as a link rather than an expandable item.
-- **Narrow screens.** The bar's sections give way to the menu button below
-  `62rem`, so the pane it opens is every section, each one expandable to its
-  pages, with the current section open. The section-scoped pane is the
-  wide-screen one; the two are never drawn at once.
+- **Narrow screens.** With a configured header, the section dropdown replaces
+  the bar's links below `62rem`. Documentation pages retain a menu button for
+  the current section's sidebar. Sections with `sidebar: false` have no menu
+  button or sidebar. Without a configured header, section switching remains
+  available through Starlight's mobile sidebar.
 - **Which section a page is in.** The longest matching prefix wins, so a
   section nested under another one takes its own pages. A page under no section
   keeps the sidebar the site declared in `sidebar`, or the whole navigation if
