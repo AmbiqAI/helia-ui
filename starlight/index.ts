@@ -61,6 +61,8 @@ export interface HeliaFooterOptions {
   tagline?: string;
   /** `false` drops the brand lockup and renders the tagline on its own. */
   logo?: 'ambiq' | false;
+  /** Light-mode artwork color; dark mode uses white. Defaults to blue. */
+  logoLightTone?: 'blue' | 'black';
 }
 
 export interface HeliaHeaderLink {
@@ -210,6 +212,7 @@ export interface HeliaStarlightConfig {
     links: HeliaFooterLink[];
     tagline: string | undefined;
     logo: 'ambiq' | false;
+    logoLightTone: 'blue' | 'black';
   };
   /** `null` when the site asked for no package header. */
   header: {
@@ -611,6 +614,7 @@ export function heliaStarlight(
               links: footer?.links ?? [],
               tagline: footer?.tagline ?? 'Part of the Ambiq HELIA AI platform',
               logo: footer?.logo ?? 'ambiq',
+              logoLightTone: footer?.logoLightTone ?? 'blue',
             },
             header: header
               ? {

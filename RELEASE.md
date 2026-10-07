@@ -75,6 +75,13 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 }
 ```
 
+## What changed in 0.1.0-alpha.23
+
+- Product footers use official blue Ambiq artwork in light mode and official white artwork in dark mode.
+- `footer.logoLightTone` selects blue or black for light mode. Explicit fixed-color logo tones remain available.
+
+Refs #189.
+
 ## What changed in 0.1.0-alpha.22
 
 - Terminal code blocks inside tab panels use compact frames without a redundant title bar. Copy controls remain available.
