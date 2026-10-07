@@ -309,7 +309,22 @@ belong to.
 
 The plugin's footer renders the approved Ambiq wordmark, and the component is
 available on its own at `@ambiqai/helia-ui/starlight/AmbiqLogo.astro`. It keeps
-the source artwork intact while exposing only the three approved treatments.
+the supplied official vector artwork, with empty canvas trimmed for layout.
+
+The footer defaults to blue in light mode and white in dark mode. Set
+`footer: { links: [], logoLightTone: 'black' }` in `heliaStarlight()` to use
+black in light mode instead. Direct component users can select
+`tone="adaptive" lightTone="blue"` or `tone="adaptive" lightTone="black"`.
+Explicit `blue`, `black`, and `white` tones remain fixed colors.
+
+<div className="logo-grid not-content">
+  <div data-logo-example="blue">
+    <AmbiqLogo tone="adaptive" lightTone="blue" />
+  </div>
+  <div data-logo-example="black">
+    <AmbiqLogo tone="adaptive" lightTone="black" />
+  </div>
+</div>
 
 <div className="logo-grid not-content">
   <div className="logo-swatch logo-swatch--light">
