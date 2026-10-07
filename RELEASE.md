@@ -15,8 +15,8 @@ consumer pinning a tag like any other site.
 | Field             | Value                                                                |
 | ----------------- | -------------------------------------------------------------------- |
 | Package           | `@ambiqai/helia-ui`                                                  |
-| Version           | 0.1.0-alpha.22                                                       |
-| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.22`. |
+| Version           | 0.1.0-alpha.23                                                       |
+| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.23`. |
 | License           | BSD-3-Clause (`LICENSE`)                                             |
 | Licensing tier    | Tier 1, ADR-0005                                                     |
 | Source repository | https://github.com/AmbiqAI/helia-ui                                  |
@@ -77,7 +77,7 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
 
 ## What changed in 0.1.0-alpha.23
 
-- Product footers use official blue Ambiq artwork in light mode and official white artwork in dark mode.
+- Product footers use the supplied official blue Ambiq artwork in light mode and official white artwork in dark mode. The two SVGs share trimmed canvas bounds so they display at the same size.
 - `footer.logoLightTone` selects blue or black for light mode. Explicit fixed-color logo tones remain available.
 
 Refs #189.
