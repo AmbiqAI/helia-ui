@@ -59,6 +59,7 @@ export default defineConfig({
              end to end. The bar stands in place of Starlight's header, which
              is where the social row renders, so GitHub is a link here. */
           header: {
+            titleRegularPrefix: 'helia',
             links: [
               { label: 'Foundations', href: `${basePath}foundations/` },
               { label: 'Gallery', href: `${basePath}gallery/` },

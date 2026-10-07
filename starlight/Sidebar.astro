@@ -23,11 +23,7 @@ const section = matchSection(
 
 const sectionNav = Astro.locals.heliaSectionNav;
 
-/*
- * The Dev Hub link lives at the end of the bar, which below 62rem is this
- * pane. It is the same link rather than a second definition of one: the bar
- * hides its copy at the width this one appears at.
- */
+/* Share the configured destination so narrow and wide navigation cannot diverge. */
 const hub = config.header?.hub;
 ---
 

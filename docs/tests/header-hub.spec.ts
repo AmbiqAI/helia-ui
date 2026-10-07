@@ -11,6 +11,34 @@ import { expect, test } from '@playwright/test';
 const base = '/helia-ui';
 const hub = 'https://ambiqai.github.io/helia-developer-hub/';
 
+for (const width of [375, 1440]) {
+  for (const theme of ['light', 'dark'] as const) {
+    test(`configured title prefix keeps the complete link name at ${width} in ${theme}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(`${base}/gallery/`);
+      await page.evaluate(
+        (value) => (document.documentElement.dataset.theme = value),
+        theme,
+      );
+      const title = page.getByRole('link', { name: 'helia-ui', exact: true });
+      await expect(title).toBeVisible();
+      await expect(title).toHaveText('helia-ui');
+      const prefix = title.locator('.helia-site-header__prefix');
+      await expect(prefix).toHaveText('helia');
+      const weights = await title.evaluate((node) => ({
+        title: Number(getComputedStyle(node).fontWeight),
+        prefix: Number(
+          getComputedStyle(node.querySelector('.helia-site-header__prefix')!)
+            .fontWeight,
+        ),
+      }));
+      expect(weights.prefix).toBeLessThan(weights.title);
+    });
+  }
+}
+
 test('the bar carries the outlined hub destination', async ({ page }) => {
   await page.goto(`${base}/gallery/`);
 
@@ -43,6 +71,36 @@ test.describe('on a phone', () => {
     await expect(menuLink).toHaveAttribute('href', hub);
     await expect(menuLink).toHaveText('HELIA HUB');
   });
+});
+
+test('hub stays in the bar after sections become a dropdown', async ({
+  page,
+}) => {
+  const hubLink = page.locator('.helia-site-header__hub');
+  const dropdown = page.locator('.helia-section-dropdown');
+  for (const width of [800, 672]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(`${base}/gallery/`);
+    await expect(page.locator('.helia-site-header__nav')).toBeHidden();
+    await expect(dropdown).toBeVisible();
+    await expect(hubLink).toBeVisible();
+    await expect(
+      page.locator('#starlight__sidebar .helia-sidebar-hub'),
+    ).toBeHidden();
+    const dropdownBox = await dropdown.boundingBox();
+    const hubBox = await hubLink.boundingBox();
+    expect(dropdownBox!.x + dropdownBox!.width).toBeLessThan(hubBox!.x);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(width);
+  }
+
+  await page.setViewportSize({ width: 671, height: 900 });
+  await expect(hubLink).toBeHidden();
+  await page.locator('[data-helia-sidebar-toggle]').click();
+  await expect(
+    page.locator('#starlight__sidebar .helia-sidebar-hub'),
+  ).toBeVisible();
 });
 
 for (const theme of ['light', 'dark'] as const) {
@@ -93,3 +151,30 @@ test('theme controls agree between the header and mobile navigation', async ({
     'Color theme: light. Choose color theme',
   );
 });
+
+for (const theme of ['light', 'dark'] as const) {
+  test(`hub remains reachable in the no-sidebar layout on a phone in ${theme}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(`${base}/gallery/`);
+    await page.evaluate(() => {
+      document.documentElement.removeAttribute('data-has-sidebar');
+      document.querySelector('#starlight__sidebar')?.remove();
+      document.querySelector('[data-helia-sidebar-toggle]')?.remove();
+    });
+    await page.evaluate(
+      (value) => (document.documentElement.dataset.theme = value),
+      theme,
+    );
+    await expect(page.locator('[data-helia-sidebar-toggle]')).toHaveCount(0);
+    const link = page.locator('.helia-site-header__hub');
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('href', hub);
+    await link.focus();
+    await expect(link).toBeFocused();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(375);
+  });
+}
