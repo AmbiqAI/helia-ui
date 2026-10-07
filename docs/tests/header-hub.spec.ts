@@ -11,6 +11,34 @@ import { expect, test } from '@playwright/test';
 const base = '/helia-ui';
 const hub = 'https://ambiqai.github.io/helia-developer-hub/';
 
+for (const width of [375, 1440]) {
+  for (const theme of ['light', 'dark'] as const) {
+    test(`configured title prefix keeps the complete link name at ${width} in ${theme}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(`${base}/gallery/`);
+      await page.evaluate(
+        (value) => (document.documentElement.dataset.theme = value),
+        theme,
+      );
+      const title = page.getByRole('link', { name: 'helia-ui', exact: true });
+      await expect(title).toBeVisible();
+      await expect(title).toHaveText('helia-ui');
+      const prefix = title.locator('.helia-site-header__prefix');
+      await expect(prefix).toHaveText('helia');
+      const weights = await title.evaluate((node) => ({
+        title: Number(getComputedStyle(node).fontWeight),
+        prefix: Number(
+          getComputedStyle(node.querySelector('.helia-site-header__prefix')!)
+            .fontWeight,
+        ),
+      }));
+      expect(weights.prefix).toBeLessThan(weights.title);
+    });
+  }
+}
+
 test('the bar carries the outlined hub destination', async ({ page }) => {
   await page.goto(`${base}/gallery/`);
 
