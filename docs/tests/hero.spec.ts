@@ -151,3 +151,43 @@ test('buttons separate labels from trailing icons', async ({ page }) => {
     ),
   ).toBeGreaterThanOrEqual(8);
 });
+
+for (const theme of ['light', 'dark']) {
+  test(`brand eyebrows follow the responsive identity scale in ${theme}`, async ({
+    page,
+  }) => {
+    await page.goto('/helia-ui/landing/');
+    await page.evaluate((value) => {
+      document.documentElement.dataset.theme = value;
+    }, theme);
+    const brand = page.locator('.helia-hero__brand');
+    for (const [width, fontSize] of [
+      [390, 28],
+      [1280, 38.4],
+    ]) {
+      await page.setViewportSize({ width, height: 900 });
+      const dimensions = await brand.evaluate((element) => ({
+        fontSize: parseFloat(getComputedStyle(element).fontSize),
+        iconWidth: element.querySelector('img')!.getBoundingClientRect().width,
+        iconHeight: element.querySelector('img')!.getBoundingClientRect()
+          .height,
+        scrollWidth: element.scrollWidth,
+        width: element.getBoundingClientRect().width,
+      }));
+      expect(dimensions.fontSize).toBeCloseTo(fontSize, 1);
+      expect(dimensions.iconWidth).toBe(32);
+      expect(dimensions.iconHeight).toBe(32);
+      expect(dimensions.scrollWidth).toBeLessThanOrEqual(
+        Math.ceil(dimensions.width),
+      );
+    }
+    await page.goto(gallery);
+    const label = page.locator(`${contrast} .helia-hero__eyebrow`);
+    await expect(label).not.toHaveClass(/helia-hero__brand/);
+    expect(
+      await label.evaluate((element) =>
+        parseFloat(getComputedStyle(element).fontSize),
+      ),
+    ).toBeLessThan(20);
+  });
+}
