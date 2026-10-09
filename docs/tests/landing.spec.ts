@@ -126,7 +126,7 @@ for (const theme of ['light', 'dark']) {
     const card = page.locator('.helia-band--contrast .helia-card--ink');
     const colors = await card.evaluate((node) => ({
       card: getComputedStyle(node).backgroundColor,
-      band: getComputedStyle(node.closest('.helia-band')).backgroundColor,
+      band: getComputedStyle(node.closest('.helia-band')!).backgroundColor,
       border: getComputedStyle(node).borderTopColor,
     }));
     expect(colors.card).not.toBe(colors.band);
