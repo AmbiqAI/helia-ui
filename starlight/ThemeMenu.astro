@@ -56,15 +56,25 @@
           : 'dark';
 
       const updateChoices = (theme: Theme) => {
-        for (const choice of choices) {
-          const checked = choice.dataset.themeChoice === theme;
-          choice.setAttribute('aria-checked', String(checked));
-        }
-        trigger.dataset.theme = theme;
-        trigger.setAttribute(
-          'aria-label',
-          `Color theme: ${theme}. Choose color theme`,
-        );
+        document
+          .querySelectorAll<HTMLButtonElement>('theme-menu [data-theme-choice]')
+          .forEach((choice) => {
+            choice.setAttribute(
+              'aria-checked',
+              String(choice.dataset.themeChoice === theme),
+            );
+          });
+        document
+          .querySelectorAll<HTMLButtonElement>(
+            'theme-menu [data-theme-trigger]',
+          )
+          .forEach((button) => {
+            button.dataset.theme = theme;
+            button.setAttribute(
+              'aria-label',
+              `Color theme: ${theme}. Choose color theme`,
+            );
+          });
       };
 
       const applyTheme = (theme: Theme) => {
