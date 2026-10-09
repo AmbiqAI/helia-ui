@@ -151,6 +151,13 @@ const current = matchSection(
     document.querySelector<HTMLButtonElement>('[data-helia-sidebar-toggle]');
 
   const setExpanded = (expanded: boolean) => {
+    const pane = document.getElementById('starlight__sidebar');
+    if (
+      pane?.hasAttribute('popover') &&
+      pane.matches(':popover-open') !== expanded
+    ) {
+      pane.togglePopover(expanded);
+    }
     document.body.toggleAttribute(EXPANDED, expanded);
     document
       .querySelectorAll<HTMLElement>('.main-frame, .sl-skip-link')
@@ -171,6 +178,19 @@ const current = matchSection(
        leaves the page it goes to readable. */
     if (target.closest('#starlight__sidebar a')) setExpanded(false);
   });
+
+  document.addEventListener(
+    'toggle',
+    (event) => {
+      if (
+        !(event.target instanceof HTMLElement) ||
+        event.target.id !== 'starlight__sidebar'
+      )
+        return;
+      setExpanded((event as ToggleEvent).newState === 'open');
+    },
+    true,
+  );
 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;

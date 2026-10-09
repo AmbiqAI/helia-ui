@@ -32,7 +32,10 @@
     "docs:dev": "npm --prefix docs run dev",
     "docs:build": "npm --prefix docs run build",
     "docs:test": "npm --prefix docs run test",
-    "test": "node --test \"scripts/**/*.test.mjs\""
+    "test": "node --test \"scripts/**/*.test.mjs\"",
+    "typecheck": "tsc --noEmit",
+    "docs:check": "npm --prefix docs run check",
+    "hooks:check": "node scripts/git-hooks.mjs pre-commit"
   },
   "bin": {
     "helia-ui-check-spelling": "./scripts/check-spelling.mjs",
@@ -120,7 +123,7 @@
     "@astrojs/starlight-tailwind": "^5.0.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-table": "^8.21.3",
-    "astro": "^7.0.2",
+    "astro": "^7.2.10",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "cn": "^0.3.0",
@@ -182,6 +185,9 @@
     "@astrojs/starlight-tailwind": "^5.0.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-table": "^8.21.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "astro": "7.3.5",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "cn": "^0.3.0",

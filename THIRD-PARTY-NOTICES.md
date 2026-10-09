@@ -168,11 +168,11 @@ SOFTWARE.
 
 Supplied by the consuming site, not distributed with this package. License names only.
 
-- **@astrojs/starlight** ^0.41.5 — MIT
+- **@astrojs/starlight** ^0.42.2 — MIT
 - **@astrojs/starlight-tailwind** ^5.0.0 — MIT
 - **@tailwindcss/vite** ^4.3.3 — MIT
 - **@tanstack/react-table** ^8.21.3 — MIT
-- **astro** ^7.0.2 — MIT
+- **astro** ^7.2.10 — MIT
 - **class-variance-authority** ^0.7.1 — Apache-2.0
 - **cmdk** ^1.1.1 — MIT
 - **cn** ^0.3.0 — MIT
