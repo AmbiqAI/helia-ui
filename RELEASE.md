@@ -15,8 +15,8 @@ consumer pinning a tag like any other site.
 | Field             | Value                                                                |
 | ----------------- | -------------------------------------------------------------------- |
 | Package           | `@ambiqai/helia-ui`                                                  |
-| Version           | 0.1.0-alpha.13                                                       |
-| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.13`. |
+| Version           | 0.1.0-alpha.26                                                       |
+| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.26`. |
 | License           | BSD-3-Clause (`LICENSE`)                                             |
 | Licensing tier    | Tier 1, ADR-0005                                                     |
 | Source repository | https://github.com/AmbiqAI/helia-ui                                  |
@@ -74,6 +74,163 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
   "dependencies": { "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v<version>" }
 }
 ```
+
+## What changed in 0.1.0-alpha.26
+
+- `Hero.eyebrowStyle="brand"` uses a responsive product-name scale and a 32px official product icon. Ordinary eyebrow labels keep their compact defaults.
+- Custom hero compositions can use the shared `helia-hero__brand` recipe and its foreground override.
+
+Refs #199.
+
+## What changed in 0.1.0-alpha.25
+
+- Sections with `sidebar: false` omit the sidebar and mobile toggle when using the shared header. The mobile section dropdown remains available and includes a HELIA AI DEV Hub destination.
+- Buttons space labels and trailing icons consistently.
+- `Hero.eyebrowIcon` replaces the decorative dot with a supplied official product mark, while retaining the eyebrow text as the label.
+
+Refs #196, #197.
+
+## What changed in 0.1.0-alpha.24
+
+- `header.titleRegularPrefix` renders a regular-weight product prefix with a bold suffix, including KIT product names. The complete title remains the accessible link name.
+- The HELIA hub link stays in the header while section navigation uses its dropdown, down to 42rem. Below that width it moves to the mobile sidebar when one exists; pages without a sidebar retain the header link.
+
+Refs #192, #193.
+
+## What changed in 0.1.0-alpha.23
+
+- Product footers use the supplied official blue Ambiq artwork in light mode and official white artwork in dark mode. The two SVGs share trimmed canvas bounds so they display at the same size.
+- `footer.logoLightTone` selects blue or black for light mode. Explicit fixed-color logo tones remain available.
+
+Refs #189.
+
+## What changed in 0.1.0-alpha.22
+
+- Terminal code blocks inside tab panels use compact frames without a redundant title bar. Copy controls remain available.
+- Standalone terminal headers and file titles retain their existing presentation.
+
+Refs #140.
+
+## What changed in 0.1.0-alpha.21
+
+- Mobile headers provide a section dropdown, while the sidebar lists only the selected section's pages.
+- Section switching supports keyboard navigation, Escape with focus return, outside-click dismissal and desktop breakpoint changes.
+- Narrow header spacing preserves the product title alongside the section selector.
+- Sites without header configuration retain sidebar section switching; desktop navigation is unchanged.
+
+Refs #182.
+
+## What changed in 0.1.0-alpha.20
+
+- Product headers render the helia prefix at regular weight and keep the product suffix emphasized. The default developer-hub link reads HELIA HUB with the shared neutral outline.
+- Header and mobile navigation theme controls keep their selected state and accessible labels synchronized.
+- Landing containers bound nested bands to the same content measure as their heroes.
+- Footers group the Ambiq logo, tagline and copyright, with responsive product navigation. Previous/next links use equal-width outlined controls.
+- ReferenceBrowser uses a full-width search field, aligned filters and group sorting.
+- The heliaRT accent uses teal #53BBB5.
+- Includes the recovered Landing, ReferenceBrowser and layout/rendition components from #175.
+
+Refs #177, #175.
+
+## What changed in 0.1.0-alpha.19
+
+- A `LinkCard`, `CardHeader` or `Button` whose child text wraps across lines in
+  the source states it with the space the page renders at the break. The line
+  break used to go with the other control characters, joining the words either
+  side of it in the Markdown twin and in `llms-full.txt`. A transcript is
+  unaffected: `AsciiTerminal` states a fence, whose line breaks are its
+  content.
+
+Refs #171.
+
+## What changed in 0.1.0-alpha.18
+
+- Carry component content into the Markdown renditions and `llms-full.txt`
+  through a build-time sidecar. `AsciiTerminal`, `LinkCard`, a `Card` whose
+  `CardHeader` carries the link, and a linked `Button` each write their own
+  Markdown into a hidden block in the built page, and the discoverability pass
+  splices it in where the component sits, so a transcript whose lines are
+  imported, a card built from a record and a button whose label is an
+  expression reach a reader as the fence and the links the page shows. The
+  block renders nothing, is skipped by Pagefind and is not in the JSON-LD. A
+  kind is spliced only where the page rendered as many of them as the source
+  has occurrences, and the build says so when one turns itself off, naming the
+  route and the kind; a site that composes its own rendition for a generated
+  table should keep doing so. A tag imported from another package, such as
+  Starlight's own `LinkCard`, is left to the source pass.
+  `CardHeader` gains `rendition`, for a part that wraps it and states the whole
+  card itself, and `@ambiqai/helia-ui/rendition` is a new export carrying the
+  builders and the escaping a site's own part needs to state one.
+- A card's `description` prop is read like its children, and a link-bearing
+  `Button`, `LinkCard`, `Card` or `CardHeader` written with no `title` takes
+  its title from its children. Both shapes used to reach a reader as prose with
+  no link.
+
+Refs #156, #167.
+
+- `AsciiTerminal` takes `copy="commands"`, which copies only the `command`
+  lines, newline-joined and without prompts: what a reader pastes into a shell
+  when a transcript also shows the output between the commands. `copy` and
+  `copy="transcript"` keep copying the whole transcript, and the control's
+  accessible name follows the mode ("Copy commands", "Commands copied").
+
+## What changed in 0.1.0-alpha.17
+
+- `ShowcaseCarousel` keeps a give at either end once its cards overflow, so
+  the rail never rests on a scroll boundary: the first card snaps to the left
+  edge, the last to the right, a card whose snap position would clamp onto a
+  boundary snaps by neither edge, and a gesture into the give latches,
+  rubber-bands, and snaps back. Safari turned a horizontal swipe that began on
+  a boundary into history navigation, and `overscroll-behavior` did not stop
+  it. A rail that fits keeps no give. The controls and the tab strip read the
+  rests rather than the boundaries.
+
+## What changed in 0.1.0-alpha.16
+
+- Make Markdown renditions and llms output faithful for MDX pages: multi-line
+  `import` and `export` statements, MDX comments and expressions are removed
+  from the rendition; `LinkCard`, `Card` and `AsciiTerminal` content is
+  rendered to Markdown instead of dropped; card titles and targets are escaped
+  so text from another repository cannot forge a link.
+- Escape JSON-LD strings.
+- `renderMarkdown` gains an `mdx` option, and the rendition helpers are exported
+  from `starlight/discoverability.ts`.
+
+- Set up every `AsciiTerminal` on a page, not only the first: instances parsed
+  after the element definition waited for children that had not been parsed
+  yet. Readiness is an instance field, an element connected empty is retried
+  once, and the element exposes `play()`, which resolves when the run ends.
+
+Refs #143, #135, #136, #146, #149, #150.
+
+## What changed in 0.1.0-alpha.15
+
+- Render Starlight Markdown asides (`:::note`, `:::tip`, `:::caution`,
+  `:::danger`) as `Callout` in `.md` and `.mdx`, on both the Sätteri and the
+  unified Markdown processors, through the new `markdownCallouts` plugin option
+  (default on). Markdown renditions and llms output keep the aside as plain
+  Markdown.
+- Move the Callout recipe into `recipes.css` so the component and the transform
+  share one set of global rules; a site that overrode the previously scoped
+  Callout rules loses that override.
+- Callout carries `aria-label` from its title and no longer sets `role`; the
+  icon SVG no longer carries FontAwesome classes, `role="img"` or `data-icon`.
+- Export the tone table as `@ambiqai/helia-ui/callout-tones` and add the
+  `check:callout-tones` validation step.
+
+Refs #124, #128.
+
+## What changed in 0.1.0-alpha.14
+
+- Preserve C++ class and function template declarations, including defaults, in
+  generated API signatures.
+- Preserve pure virtual method markers and class inheritance declarations.
+- Use stable Doxygen member identities for C++ overloads, without allowing
+  excluded private members to change public anchors. C identities are unchanged.
+- Diagnose incomplete template declarators in Doxygen XML and exercise real
+  C++ fixtures, rendered signatures and overload links.
+
+Refs #112.
 
 ## What changed in 0.1.0-alpha.13
 

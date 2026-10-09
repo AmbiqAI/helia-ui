@@ -33,6 +33,12 @@
  * @slot action -- A trailing control, aligned to the top right of the header.
  */
 import type { HTMLAttributes } from 'astro/types';
+import {
+  escapeRendition,
+  linkItem,
+  renditionAttributes,
+  renditionText,
+} from '../rendition';
 import type { PaddingStep } from './Surface.astro';
 import Eyebrow from './Eyebrow.astro';
 
@@ -54,6 +60,13 @@ interface Props extends HTMLAttributes<'div'> {
   step?: number | string;
   /** `display` takes the title and eyebrow up a step, for a card standing in for a hero. */
   scale?: 'default' | 'display';
+  /**
+   * Whether the header states the card's line for the page's markdown
+   * rendition. Set it false in a part that wraps this one and states the whole
+   * card itself, the way `LinkCard` does; a card stated twice reaches an agent
+   * as two cards.
+   */
+  rendition?: boolean;
 }
 
 const {
@@ -63,6 +76,7 @@ const {
   eyebrow,
   step,
   scale = 'default',
+  rendition = true,
   class: className,
   ...rest
 } = Astro.props;
@@ -81,6 +95,12 @@ const rendered = async (name: string) =>
 const icon = await rendered('icon');
 const meta = await rendered('meta');
 const action = await rendered('action');
+/*
+ * The title is the children, so a card whose title comes from a record states
+ * nothing about itself in the source a rendition is reduced from. Rendered
+ * once here and written back, for the same reason the regions above are.
+ */
+const title = await rendered('default');
 
 const hasTitle = Astro.slots.has('default');
 const hasEyebrow = eyebrow !== undefined || Astro.slots.has('eyebrow');
@@ -88,6 +108,10 @@ const hasMeta = meta.trim() !== '';
 const hasAction = action.trim() !== '';
 const hasIcon = icon.trim() !== '';
 const hasStep = !hasIcon && step !== undefined;
+/* A header with no title states nothing rather than an empty link; the block
+   is still written, because what anchors a sidecar to the component it came
+   from is the count of them matching the source's. */
+const stated = renditionText(title);
 ---
 
 <div
@@ -121,10 +145,10 @@ const hasStep = !hasIcon && step !== undefined;
         <Title class="helia-card-header__title">
           {href ? (
             <a class="helia-card-header__link" href={href}>
-              <slot />
+              <Fragment set:html={title} />
             </a>
           ) : (
-            <slot />
+            <Fragment set:html={title} />
           )}
         </Title>
       )
@@ -142,6 +166,15 @@ const hasStep = !hasIcon && step !== undefined;
       <div class="helia-card-header__action">
         <Fragment set:html={action} />
       </div>
+    )
+  }
+  {
+    href !== undefined && rendition && (
+      <script
+        is:inline
+        {...renditionAttributes('card')}
+        set:html={escapeRendition(stated === '' ? '' : linkItem(stated, href))}
+      />
     )
   }
 </div>

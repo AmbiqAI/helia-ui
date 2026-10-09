@@ -9,6 +9,12 @@
  * @slot default -- The label, and the accessible name of the control.
  */
 import type { HTMLAttributes } from 'astro/types';
+import {
+  escapeRendition,
+  inlineLink,
+  renditionAttributes,
+  renditionText,
+} from '../rendition';
 
 interface ButtonBase {
   /** `primary` is the filled ink pill, `secondary` outlined, `ghost` bare, `danger` the destructive fill. */
@@ -40,6 +46,20 @@ const { href, type, ...attrs } = rest as Omit<HTMLAttributes<'a'>, 'href'> &
   HTMLAttributes<'button'> & { href?: string };
 
 const Element = href ? 'a' : 'button';
+
+/*
+ * The label is the children, so a button whose label comes from a record says
+ * nothing in the source the rendition is reduced from. Rendered once and
+ * written back with `set:html`, because reading it twice would render whatever
+ * the label is made of twice. See AmbiqAI/helia-ui#167.
+ */
+const label = Astro.slots.has('default')
+  ? await Astro.slots.render('default')
+  : '';
+/* An unlabeled control states nothing rather than an empty link; the block is
+   still written, because what anchors a sidecar to the component it came from
+   is the count of them matching the source's. */
+const stated = renditionText(label);
 ---
 
 <Element
@@ -54,5 +74,16 @@ const Element = href ? 'a' : 'button';
   type={href ? undefined : (type ?? 'button')}
   {...attrs}
 >
-  <slot />
+  <Fragment set:html={label} />
+  {
+    href && (
+      <script
+        is:inline
+        {...renditionAttributes('button')}
+        set:html={escapeRendition(
+          stated === '' ? '' : inlineLink(stated, href),
+        )}
+      />
+    )
+  }
 </Element>
