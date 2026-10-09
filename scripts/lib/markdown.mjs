@@ -19,9 +19,27 @@
 export function escapeMdx(text) {
   return text
     .replace(/[{}]/g, (c) => `\\${c}`)
-    .replace(/<(\/?)([A-Za-z][\w.-]*)?/g, (m, slash, name) =>
-      name && isElementName(name) ? m : `&lt;${slash}${name ?? ''}`,
+    .replace(/<(\/?)([A-Za-z][\w.-]*)?/g, (m, slash, name, offset, whole) =>
+      name && isTagIn(whole, name, offset) ? m : `&lt;${slash}${name ?? ''}`,
     );
+}
+
+/*
+ * A capitalized name is a component only where the text closes it. A
+ * placeholder such as `init_<N>_f32` has the shape of a component and is never
+ * closed, and MDX fails the page on it with "Expected a closing tag for <N>".
+ */
+function isTagIn(text, name, offset) {
+  if (HTML_TAGS.has(name.toLowerCase())) return true;
+  if (!/^[A-Z]/.test(name)) return false;
+  const quoted = name.replace(/\./g, '\\.');
+  if (new RegExp(`^<${quoted}\\b[^<>]*/>`).test(text.slice(offset))) {
+    return true;
+  }
+  return (
+    new RegExp(`<${quoted}(?![\\w.-])`).test(text) &&
+    new RegExp(`</${quoted}\\s*>`).test(text)
+  );
 }
 
 export function mapOutsideCode(text, fn) {

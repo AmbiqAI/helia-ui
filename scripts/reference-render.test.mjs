@@ -197,6 +197,42 @@ test('prose that MDX would read as syntax is escaped', () => {
   assert.match(mdx, /Prose with \\\{braces\\\} and a &lt;placeholder> in it\./);
 });
 
+test('a capitalized placeholder is escaped unless the prose closes it', () => {
+  const comment =
+    'Example. The per-length initializers are named helia_example_init_<N>_f32().';
+  const placeholder = {
+    name: 'example',
+    language: 'c',
+    generatedFrom: { tool: 'doxyref', version: '1.17.0' },
+    modules: [
+      {
+        path: 'example',
+        name: 'example.h',
+        summary: 'Example.',
+        description: `${comment}\n\nA <Badge text="kept" /> and <Kbd>kept</Kbd>.`,
+        symbols: [
+          symbol({
+            id: 'helia_example_f32',
+            name: 'helia_example_f32',
+            language: 'c',
+            signature: 'void helia_example_f32(void)',
+            summary: 'Example.',
+            description: comment,
+          }),
+        ],
+        submodules: [],
+      },
+    ],
+  };
+  const { mdx } = pageFor(
+    renderReference(placeholder, options),
+    'example/index.mdx',
+  );
+  assert.doesNotMatch(mdx, /<N>/);
+  assert.equal(mdx.match(/helia_example_init_&lt;N>_f32\(\)/g)?.length, 2);
+  assert.match(mdx, /A <Badge text="kept" \/> and <Kbd>kept<\/Kbd>\./);
+});
+
 test('every page links to its own module JSON', () => {
   const { pages } = render();
   assert.match(
