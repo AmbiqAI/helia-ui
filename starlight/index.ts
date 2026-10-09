@@ -14,20 +14,21 @@
 
 import type { AstroIntegration } from 'astro';
 import type { HookParameters, StarlightPlugin } from '@astrojs/starlight/types';
-import type { HeliaSectionLink } from './sections';
-import { resolveHub, type HeliaHeaderHub } from './header-hub';
+import type { HeliaSectionLink } from './sections.ts';
+import { resolveHub, type HeliaHeaderHub } from './header-hub.ts';
 import {
   discoverabilityIntegration,
   resolveDiscoverability,
   type HeliaDiscoverabilityOptions,
   type ResolvedDiscoverability,
-} from './discoverability';
+} from './discoverability.ts';
+import { markdownCalloutsIntegration } from './markdown-callouts.ts';
 
-export type { HeliaDiscoverabilityOptions } from './discoverability';
-export { heliaFrontmatterSchema } from './schema';
-export type { HeliaFrontmatter } from './schema';
-export type { HeliaSectionLink } from './sections';
-export type { HeliaHeaderHub } from './header-hub';
+export type { HeliaDiscoverabilityOptions } from './discoverability.ts';
+export { heliaFrontmatterSchema } from './schema.ts';
+export type { HeliaFrontmatter } from './schema.ts';
+export type { HeliaSectionLink } from './sections.ts';
+export type { HeliaHeaderHub } from './header-hub.ts';
 
 type StarlightConfigInput = HookParameters<'config:setup'>['config'];
 
@@ -60,6 +61,8 @@ export interface HeliaFooterOptions {
   tagline?: string;
   /** `false` drops the brand lockup and renders the tagline on its own. */
   logo?: 'ambiq' | false;
+  /** Light-mode artwork color; dark mode uses white. Defaults to blue. */
+  logoLightTone?: 'blue' | 'black';
 }
 
 export interface HeliaHeaderLink {
@@ -75,6 +78,8 @@ export interface HeliaHeaderLink {
 export interface HeliaHeaderOptions {
   /** The name at the top-left. Defaults to the site's own title. */
   title?: string;
+  /** Initial title text to render at regular weight. Defaults to "helia" for HELIA product names. */
+  titleRegularPrefix?: string;
   /** The sections beside the name. */
   links?: HeliaHeaderLink[];
   /**
@@ -158,6 +163,14 @@ export interface HeliaStarlightOptions {
    * installed; with scripting off the accent stays the default slate.
    */
   accent?: HeliaProductAccent;
+  /**
+   * Renders Starlight's markdown asides -- `:::note`, `:::tip`, `:::caution`
+   * and `:::danger` -- as the package `Callout`, in `.md` and `.mdx` alike, so
+   * a page written in plain markdown needs no import. A directive label
+   * becomes the title and Starlight's own default title stands without one.
+   * Default `true`; `false` leaves Starlight's asides as they are.
+   */
+  markdownCallouts?: boolean;
   /** Per-component opt-out of the shell overrides. Each defaults to `true`. */
   shell?: HeliaShellOptions;
   footer?: HeliaFooterOptions;
@@ -201,10 +214,12 @@ export interface HeliaStarlightConfig {
     links: HeliaFooterLink[];
     tagline: string | undefined;
     logo: 'ambiq' | false;
+    logoLightTone: 'blue' | 'black';
   };
   /** `null` when the site asked for no package header. */
   header: {
     title: string;
+    titleRegularPrefix: string | undefined;
     links: HeliaHeaderLink[];
     search: boolean;
     themeToggle: boolean;
@@ -468,6 +483,7 @@ export function heliaStarlight(
   const {
     styles = true,
     code = true,
+    markdownCallouts = true,
     shell = {},
     footer,
     header,
@@ -592,17 +608,21 @@ export function heliaStarlight(
           expressiveCode,
           ...(sections.length > 0 ? { sidebar: sectionSidebar } : {}),
         });
+        if (markdownCallouts) addIntegration(markdownCalloutsIntegration());
+
         addIntegration(
           configModule({
             accent,
             footer: {
               links: footer?.links ?? [],
-              tagline: footer?.tagline,
+              tagline: footer?.tagline ?? 'Part of the Ambiq HELIA AI platform',
               logo: footer?.logo ?? 'ambiq',
+              logoLightTone: footer?.logoLightTone ?? 'blue',
             },
             header: header
               ? {
                   title: header.title ?? site.title,
+                  titleRegularPrefix: header.titleRegularPrefix,
                   /* One nav definition: the bar lists the sections unless the
                      site states a bar of its own, which it does when the bar
                      carries something that is not a section. */

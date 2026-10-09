@@ -12,8 +12,9 @@ This page is the Demo home section, and that section has no pages of its own,
 so there is no pane beside it and the page is read at the full width of the
 frame. Open Demo guide or Demo reference and the pane is that section's pages
 alone, under the section's name. Narrow the window past `62rem` and the bar's
-sections move into the menu button, which opens all three with their pages
-under them. The site's own navigation, which every other page on this site has,
+sections move into a dropdown showing the selected section. Choose a section
+to navigate to its landing page, then open the hamburger menu for only its
+pages. The dropdown supports Tab, Enter, Escape and outside-click dismissal. The site's own navigation, which every other page on this site has,
 is back as soon as you leave the fixture.
 
 - [Why sections](/helia-ui/starlight-plugin/sections/why/)

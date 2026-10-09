@@ -83,6 +83,7 @@ jobs:
       # is what rehype-mermaid renders diagrams with at build time. They are
       # separate downloads.
       - name: Install browsers
+        working-directory: docs
         run: npx playwright install --with-deps chromium chromium-headless-shell
 
       - name: Build docs site

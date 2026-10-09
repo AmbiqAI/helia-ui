@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="runtime_8hpp" kind="file" language="C++">
+    <compoundname>runtime.hpp</compoundname>
+    <innerclass refid="classruntime_1_1_resolver" prot="public">runtime::Resolver</innerclass>
+    <innerclass refid="classruntime_1_1_callback" prot="public">runtime::Callback</innerclass>
+    <innerclass refid="classruntime_1_1_array_holder" prot="public">runtime::ArrayHolder</innerclass>
+    <innerclass refid="classruntime_1_1_abstract" prot="public">runtime::Abstract</innerclass>
+    <innerclass refid="classruntime_1_1_utility" prot="public">runtime::Utility</innerclass>
+    <innerclass refid="classruntime_1_1_detail" prot="public">runtime::Detail</innerclass>
+    <innerclass refid="classruntime_1_1_derived" prot="public">runtime::Derived</innerclass>
+    <innerclass refid="classruntime_1_1_derived_resolver" prot="public">runtime::DerivedResolver</innerclass>
+    <innernamespace refid="namespaceruntime">runtime</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/runtime.hpp"/>
+  </compounddef>
+</doxygen>

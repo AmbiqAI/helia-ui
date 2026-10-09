@@ -8,25 +8,38 @@
  * all, so a site that had not been told simply had no wordmark.
  */
 import logoUrl from './ambiq-logo.svg?url';
+import whiteLogoUrl from './ambiq-logo-white.svg?url';
 
 export type AmbiqLogoTone = 'adaptive' | 'blue' | 'black' | 'white';
 
 interface Props {
   tone?: AmbiqLogoTone;
+  lightTone?: 'blue' | 'black';
   label?: string;
   class?: string;
 }
 
-const { tone = 'blue', label = 'Ambiq', class: className } = Astro.props;
+const {
+  tone = 'blue',
+  lightTone = 'black',
+  label = 'Ambiq',
+  class: className,
+} = Astro.props;
 ---
 
 <span
-  class:list={['ambiq-logo', `ambiq-logo--${tone}`, className]}
-  style={`--ambiq-logo-image: url("${logoUrl}")`}
+  class:list={[
+    'ambiq-logo',
+    `ambiq-logo--${tone}`,
+    `ambiq-logo--light-${lightTone}`,
+    className,
+  ]}
+  style={`--ambiq-logo-image: url("${logoUrl}"); --ambiq-logo-white-image: url("${whiteLogoUrl}")`}
   role="img"
   aria-label={label}></span>
 
 <style>
+  /* style-lint: allow-file global -- the document theme selects the official dark-mode artwork */
   /*
    * The width is a default, not a decision, and it has to be settable from
    * outside without a specificity contest. A consumer that writes `width` on
@@ -35,7 +48,7 @@ const { tone = 'blue', label = 'Ambiq', class: className } = Astro.props;
    * consumer asked for. `--ambiq-logo-width` inherits and always wins.
    */
   .ambiq-logo {
-    aspect-ratio: 1280 / 366;
+    aspect-ratio: 1280 / 368.633667;
     background: currentColor;
     display: inline-block;
     flex: none;
@@ -56,6 +69,19 @@ const { tone = 'blue', label = 'Ambiq', class: className } = Astro.props;
   }
 
   .ambiq-logo--adaptive {
-    color: var(--helia-ink-adaptive);
+    color: var(--helia-ink-black);
+  }
+
+  .ambiq-logo--adaptive.ambiq-logo--light-blue {
+    color: var(--helia-brand-ambiq-blue);
+  }
+
+  .ambiq-logo--white {
+    mask-image: var(--ambiq-logo-white-image);
+  }
+
+  :global([data-theme='dark']) .ambiq-logo--adaptive {
+    color: var(--helia-paper-white);
+    mask-image: var(--ambiq-logo-white-image);
   }
 </style>

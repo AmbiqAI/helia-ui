@@ -6,159 +6,40 @@
  * implies.
  *
  * The tone picks the icon and the tint together, so a consumer never chooses
- * an icon that contradicts the color. Only `critical` is announced: it is the
- * one tone that means the reader loses something by reading past it.
+ * an icon that contradicts the color. The title is the aside's accessible
+ * name; no explicit role is set, so the implicit `complementary` landmark
+ * stands, the way Starlight's own asides do. Nothing here announces itself:
+ * the content is built into the page rather than arriving in response to
+ * something the reader did.
+ *
+ * The recipe is `.helia-callout` in `recipes.css` rather than a scoped block
+ * here, because the Starlight plugin builds the same markup out of a `:::note`
+ * directive and a scoped class would not reach it.
  *
  * @slot default -- The body of the aside. Prose, not a bare sentence fragment.
  */
-import { icon } from '@fortawesome/fontawesome-svg-core';
 import {
-  faCircleInfo,
-  faCircleCheck,
-  faCircleExclamation,
-  faArrowRight,
-  faClockRotateLeft,
-  faCodeBranch,
-  faLink,
-  faTriangleExclamation,
-} from '@fortawesome/free-solid-svg-icons';
+  calloutClasses,
+  calloutIconMarkup,
+  type CalloutTone,
+} from '../callout-tones';
 import Surface from './Surface.astro';
 
-type CalloutTone =
-  | 'note'
-  | 'tip'
-  | 'success'
-  | 'important'
-  | 'warning'
-  | 'critical'
-  | 'compatibility'
-  | 'experimental'
-  | 'deprecated';
-
 interface Props {
-  /** The heading of the aside. Required: an untitled aside is a paragraph. */
+  /** The heading of the aside, and its accessible name. */
   title: string;
   /** What the aside means. Picks the tint and the icon together. */
   tone?: CalloutTone;
 }
 
 const { title, tone = 'note' } = Astro.props;
-const role = tone === 'critical' ? 'alert' : 'note';
-const iconDefinition =
-  tone === 'tip'
-    ? faArrowRight
-    : tone === 'success'
-      ? faCircleCheck
-      : tone === 'experimental'
-        ? faCodeBranch
-        : tone === 'compatibility'
-          ? faLink
-          : tone === 'warning' || tone === 'critical'
-            ? faTriangleExclamation
-            : tone === 'deprecated'
-              ? faClockRotateLeft
-              : tone === 'important'
-                ? faCircleExclamation
-                : faCircleInfo;
-const iconMarkup = icon(iconDefinition).html.join('');
+const iconMarkup = calloutIconMarkup(tone);
 ---
 
-<Surface
-  as="aside"
-  class:list={['helia-callout', `helia-callout--${tone}`]}
-  role={role}
->
+<Surface as="aside" class:list={calloutClasses(tone)} aria-label={title}>
   <span class="helia-callout__icon" aria-hidden="true" set:html={iconMarkup} />
   <div class="helia-callout__content">
     <strong>{title}</strong>
     <div class="helia-callout__body"><slot /></div>
   </div>
 </Surface>
-
-<style>
-  /* style-lint: allow-file global -- the icon is set:html from Font Awesome and the body holds slotted markdown */
-  /* Tints the shared surface border toward the advisory tone. */
-  .helia-callout {
-    --callout-accent: var(--sl-color-gray-3);
-    --helia-surface-border-color: color-mix(
-      in oklab,
-      var(--callout-accent) 38%,
-      var(--helia-surface-border)
-    );
-
-    display: grid;
-    gap: var(--helia-space-3);
-    grid-template-columns: 1.35rem minmax(0, 1fr);
-  }
-
-  .helia-callout--tip {
-    --callout-accent: var(--helia-tone-tip);
-  }
-
-  /* Distinct from tip: tip leans teal, success leans grass, so a page that
-     uses both still reads as two different things. */
-  .helia-callout--success {
-    --callout-accent: var(--helia-tone-success);
-  }
-
-  .helia-callout--important {
-    --callout-accent: var(--helia-tone-important);
-  }
-
-  .helia-callout--warning {
-    --callout-accent: var(--helia-tone-warning);
-  }
-
-  .helia-callout--critical {
-    --callout-accent: var(--helia-tone-critical);
-  }
-
-  .helia-callout--compatibility {
-    --callout-accent: var(--helia-tone-compatibility);
-  }
-
-  .helia-callout--experimental {
-    --callout-accent: var(--helia-tone-experimental);
-  }
-
-  .helia-callout--deprecated {
-    --callout-accent: var(--helia-tone-deprecated);
-  }
-
-  .helia-callout__icon {
-    color: var(--callout-accent);
-    display: flex;
-    padding-top: var(--helia-space-px);
-  }
-
-  .helia-callout__icon :global(svg) {
-    display: block;
-    height: 1rem;
-    width: 1rem;
-  }
-
-  .helia-callout__content {
-    min-width: 0;
-  }
-
-  .helia-callout__content > strong {
-    display: block;
-    font-size: var(--helia-text-body);
-    line-height: var(--helia-leading-heading);
-  }
-
-  .helia-callout__body {
-    color: var(--helia-ink-secondary);
-    font-size: var(--helia-text-body);
-    line-height: var(--helia-leading-body);
-    margin-top: var(--helia-space-1);
-  }
-
-  :global(.helia-callout__body > :first-child) {
-    margin-top: 0;
-  }
-
-  :global(.helia-callout__body > :last-child) {
-    margin-bottom: 0;
-  }
-</style>

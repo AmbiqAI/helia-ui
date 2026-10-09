@@ -21,6 +21,7 @@
  */
 
 import { spawnSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import {
   existsSync,
   readFileSync,
@@ -103,6 +104,22 @@ for (const [subpath, value] of Object.entries(manifest.exports ?? {})) {
     } else if (!existsSync(join(INSTALLED, clean))) {
       fail(`exports "${label}" points at ${clean}, which did not ship.`);
     }
+  }
+}
+
+/* Wildcards alone cannot prove that a consumer's named entry point shipped. */
+const consumerRequire = createRequire(
+  join(resolve(values.consumer), 'package.json'),
+);
+for (const subpath of [
+  'astro/ReferenceBrowser',
+  'react/reference-browser',
+  'astro/Landing',
+]) {
+  try {
+    consumerRequire.resolve(`${PACKAGE_NAME}/${subpath}`);
+  } catch {
+    fail(`Required consumer entry point "${subpath}" did not ship.`);
   }
 }
 

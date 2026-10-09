@@ -273,6 +273,97 @@
   background: var(--helia-surface-paper);
 }
 
+/*
+ * The callout. It lives here rather than scoped inside Callout.astro because
+ * the Starlight plugin rewrites a `:::note` directive into this same markup
+ * at build, and a scoped class would leave those asides unstyled.
+ */
+.helia-callout {
+  --callout-accent: var(--sl-color-gray-3);
+
+  /* Tints the shared surface border toward the advisory tone. */
+  --helia-surface-border-color: color-mix(
+    in oklab,
+    var(--callout-accent) 38%,
+    var(--helia-surface-border)
+  );
+
+  display: grid;
+  gap: var(--helia-space-3);
+  grid-template-columns: 1.35rem minmax(0, 1fr);
+}
+
+.helia-callout--tip {
+  --callout-accent: var(--helia-tone-tip);
+}
+
+/* Distinct from tip: tip leans teal, success leans grass, so a page that
+   uses both still reads as two different things. */
+.helia-callout--success {
+  --callout-accent: var(--helia-tone-success);
+}
+
+.helia-callout--important {
+  --callout-accent: var(--helia-tone-important);
+}
+
+.helia-callout--warning {
+  --callout-accent: var(--helia-tone-warning);
+}
+
+.helia-callout--critical {
+  --callout-accent: var(--helia-tone-critical);
+}
+
+.helia-callout--compatibility {
+  --callout-accent: var(--helia-tone-compatibility);
+}
+
+.helia-callout--experimental {
+  --callout-accent: var(--helia-tone-experimental);
+}
+
+.helia-callout--deprecated {
+  --callout-accent: var(--helia-tone-deprecated);
+}
+
+.helia-callout__icon {
+  color: var(--callout-accent);
+  display: flex;
+  padding-top: var(--helia-space-px);
+}
+
+.helia-callout__icon svg {
+  display: block;
+  height: 1rem;
+  width: 1rem;
+}
+
+.helia-callout__content {
+  min-width: 0;
+}
+
+.helia-callout__content > strong {
+  display: block;
+  font-size: var(--helia-text-body);
+  line-height: var(--helia-leading-heading);
+}
+
+.helia-callout__body {
+  color: var(--helia-ink-secondary);
+  font-size: var(--helia-text-body);
+  line-height: var(--helia-leading-body);
+  margin-top: var(--helia-space-1);
+}
+
+.helia-callout__body > :first-child {
+  margin-top: 0;
+}
+
+.helia-callout__body > :last-child {
+  margin-bottom: 0;
+}
+
 .helia-chip {
   align-items: center;
   border: 1px solid var(--helia-chip-border, var(--helia-surface-border));
@@ -327,6 +418,7 @@ a.helia-chip--neutral:focus-visible {
 
 .helia-button {
   align-items: center;
+  gap: var(--helia-space-2);
   border: 1px solid transparent;
   border-radius: var(--helia-radius-pill);
   cursor: pointer;
@@ -2013,12 +2105,46 @@ a.helia-chip--neutral:focus-visible {
  * it read as the same voice rather than as a highlight.
  */
 .helia-hero__eyebrow {
+  color: var(--helia-ink-secondary);
+  font-size: var(--helia-text-body);
+  letter-spacing: var(--helia-tracking-label);
+  text-transform: none;
   align-items: center;
   display: inline-flex;
   gap: var(--helia-space-2);
 }
 
-.helia-hero__eyebrow::before {
+.helia-hero__eyebrow--icon::before {
+  content: none;
+}
+
+.helia-hero__icon {
+  flex-shrink: 0;
+  height: 1.75rem;
+  width: 1.75rem;
+  object-fit: contain;
+}
+
+.helia-hero__brand {
+  align-items: center;
+  color: var(--helia-hero-brand-ink, var(--helia-ink-primary));
+  display: inline-flex;
+  font-size: var(--helia-text-hero-brand);
+  font-weight: var(--helia-weight-bold);
+  gap: var(--helia-space-3);
+  letter-spacing: var(--helia-tracking-wordmark);
+  line-height: var(--helia-leading-heading);
+  text-transform: none;
+}
+
+.helia-hero__brand img {
+  flex-shrink: 0;
+  height: 2rem;
+  object-fit: contain;
+  width: 2rem;
+}
+
+.helia-hero__eyebrow:not(.helia-hero__eyebrow--icon)::before {
   background: var(--helia-product-accent);
   border-radius: 50%;
   content: '';
@@ -2137,7 +2263,8 @@ a.helia-chip--neutral:focus-visible {
  * on this ground is the color disappearing. Restating the mix against paper is
  * what keeps the product's color legible across the flip.
  */
-.helia-hero--contrast {
+.helia-hero--contrast,
+.helia-band--contrast {
   --helia-ink-adaptive: var(--helia-paper-white);
   --helia-ink-primary: var(--helia-paper-white);
   --helia-ink-secondary: color-mix(
@@ -2167,9 +2294,452 @@ a.helia-chip--neutral:focus-visible {
     var(--helia-paper-white) 14%,
     transparent
   );
+}
 
+.helia-hero--contrast {
   background: var(--helia-ink-black);
   border-radius: var(--helia-radius-lg);
   color: var(--helia-paper-white);
   padding: clamp(1.5rem, 5vw, 4rem);
+}
+
+/*
+ * Block diagram. `BlockDiagram` draws the figure and the outermost set;
+ * `Block` draws a node and, when it holds other blocks, the set inside it.
+ * Both reach the same two classes because a set is the same object at every
+ * depth, which is what lets the diagram nest without a component per level.
+ *
+ * The optional sequence connects only top-level stages; nested blocks still
+ * express containment.
+ */
+.helia-block-diagram {
+  /* The gap inside a block, held apart from the gap between the top-level
+     blocks so a nested set reads as contained rather than as a second row. */
+  --helia-block-nest-gap: var(--helia-space-2);
+
+  margin: 0;
+  min-width: 0;
+}
+
+.helia-block-diagram.helia-layout--compact {
+  --helia-block-nest-gap: var(--helia-space-1);
+}
+
+.helia-block-diagram.helia-layout--comfortable {
+  --helia-block-nest-gap: var(--helia-space-3);
+}
+
+.helia-block-diagram--muted {
+  background: var(--helia-surface-card-muted);
+  border-radius: var(--helia-radius-lg);
+  padding: var(--helia-space-4);
+}
+
+.helia-block-diagram__caption {
+  display: grid;
+  gap: var(--helia-space-1);
+  margin-block-end: var(--helia-space-3);
+}
+
+.helia-block-diagram__note {
+  color: var(--helia-ink-muted);
+  font-size: var(--helia-text-caption);
+  line-height: var(--helia-leading-tight);
+}
+
+.helia-block-set {
+  display: grid;
+  gap: var(--helia-layout-gap, var(--helia-space-4));
+  list-style: none;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+/* The gap is the only spacing a block gets, whatever the markdown container
+   around it hands its children. */
+.helia-block-set > * {
+  margin-block-start: 0;
+}
+
+.helia-block-set--row,
+.helia-block-set--sequence {
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+}
+
+.helia-block-set--column {
+  grid-auto-flow: row;
+}
+
+.helia-block-set--grid {
+  grid-template-columns: repeat(var(--helia-block-columns, 3), minmax(0, 1fr));
+}
+
+.helia-block-set--cols-2 {
+  --helia-block-columns: 2;
+}
+
+.helia-block-set--cols-3 {
+  --helia-block-columns: 3;
+}
+
+.helia-block-set--cols-4 {
+  --helia-block-columns: 4;
+}
+
+.helia-block-set--cols-5 {
+  --helia-block-columns: 5;
+}
+
+.helia-block .helia-block-set {
+  gap: var(--helia-block-nest-gap, var(--helia-space-2));
+}
+
+.helia-block {
+  /*
+   * How far the ground is carried off the card, in ink. The named surfaces are
+   * not the ladder to climb here: the light theme resolves the muted card and
+   * paper to one paint, so three named surfaces would be two grounds and the
+   * middle level of a diagram would vanish. Mixing ink moves in the same
+   * direction in both themes, which is the argument `--helia-surface-hover`
+   * already makes.
+   */
+  --helia-block-level-mix: 0%;
+  --helia-block-mix: var(--helia-block-level-mix);
+  /*
+   * A tone or emphasis sets these on its own block. Left alone they would
+   * inherit, and a subtree under an accent block would take the accent edge
+   * and a filled block's children would lose theirs. `initial` is the
+   * guaranteed-invalid value, so var() falls through to the fallback below and
+   * each block starts from the ladder again; the tone rules are later in the
+   * sheet at equal specificity, so they still win on their own element.
+   */
+  --helia-block-ground: initial;
+  --helia-block-edge: initial;
+  /* The second line keeps its distance from the label as the ground darkens
+     with depth, which a fixed muted ink does not: three levels down in the
+     dark theme it drops under the contrast floor for caption-sized text. */
+  --helia-block-sub-ink: color-mix(
+    in srgb,
+    var(--helia-ink-primary) calc(var(--helia-block-mix) * 3),
+    var(--helia-ink-muted)
+  );
+
+  background: var(
+    --helia-block-ground,
+    color-mix(
+      in srgb,
+      var(--helia-ink-primary) var(--helia-block-mix),
+      var(--helia-surface-card)
+    )
+  );
+  border: 1px solid var(--helia-block-edge, var(--helia-surface-border));
+  border-radius: var(--helia-radius-md);
+  display: grid;
+  gap: var(--helia-block-nest-gap, var(--helia-space-2));
+  min-width: 0;
+  padding: var(--helia-space-3);
+}
+
+/*
+ * The step from one level to the next. Depth is read off the selector rather
+ * than declared by the caller, so a subtree moved a level in or out takes the
+ * ground of where it lands. A fourth level inherits the third's: past three
+ * the diagram is the thing to redraw, not the palette.
+ */
+.helia-block .helia-block {
+  --helia-block-level-mix: 6%;
+}
+
+.helia-block .helia-block .helia-block {
+  --helia-block-level-mix: 12%;
+}
+
+.helia-block--muted {
+  --helia-block-ground: var(--helia-surface-card-muted);
+}
+
+/*
+ * The accent ground is a wash rather than the accent itself, and the edge
+ * carries the color on all four sides: a single colored rule on one edge is
+ * the brim this system does not draw.
+ */
+.helia-block--accent {
+  --helia-block-edge: var(--helia-product-accent);
+  --helia-block-ground: color-mix(
+    in srgb,
+    var(--helia-product-accent) 8%,
+    var(--helia-surface-paper)
+  );
+}
+
+/* Filled trades the edge for the ground, which is how a leaf stays a block
+   once it sits three levels deep and every edge around it is a border. The
+   step is taken from the level it lands on rather than from the card, so a
+   filled leaf reads as filled at every depth. */
+.helia-block--filled {
+  --helia-block-edge: transparent;
+  --helia-block-mix: calc(var(--helia-block-level-mix) + 7%);
+}
+
+.helia-block--accent.helia-block--filled {
+  --helia-block-ground: color-mix(
+    in srgb,
+    var(--helia-product-accent) 18%,
+    var(--helia-surface-paper)
+  );
+}
+
+/* Dashed is for a block that is proposed rather than built. It says so in the
+   edge because the alternative is a word in the label doing it. */
+.helia-block--dashed {
+  border-style: dashed;
+}
+
+.helia-block--span-2 {
+  grid-column: span 2;
+}
+
+.helia-block--span-3 {
+  grid-column: span 3;
+}
+
+.helia-block--span-4 {
+  grid-column: span 4;
+}
+
+.helia-block__face {
+  align-items: center;
+  display: flex;
+  gap: var(--helia-space-2);
+  min-width: 0;
+}
+
+a.helia-block__face {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* The underline is the whole hover: a block that moved or lifted would be a
+   card, and a diagram of them would never settle. */
+a.helia-block__face:hover .helia-block__label {
+  text-decoration: underline;
+}
+
+.helia-block__icon {
+  color: var(--helia-ink-muted);
+  flex: none;
+}
+
+.helia-block__text {
+  display: grid;
+  min-width: 0;
+}
+
+.helia-block__label {
+  font-size: var(--helia-text-body);
+  font-weight: var(--helia-weight-semibold);
+  line-height: var(--helia-leading-tight);
+  overflow-wrap: anywhere;
+}
+
+.helia-block__sub {
+  color: var(--helia-block-sub-ink);
+  font-size: var(--helia-text-body);
+  line-height: var(--helia-leading-tight);
+  overflow-wrap: anywhere;
+}
+
+/*
+ * A row of blocks is a row for as long as the labels fit. Below the reading
+ * breakpoint it stacks, and the spans come off with it: a cell told to cover
+ * two columns of a single column grid is an empty column beside it.
+ */
+@media (width < 62rem) {
+  .helia-block-set--grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width < 42rem) {
+  .helia-block-set--row,
+  .helia-block-set--grid {
+    grid-auto-columns: auto;
+    grid-auto-flow: row;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .helia-block--span-2,
+  .helia-block--span-3,
+  .helia-block--span-4 {
+    grid-column: auto;
+  }
+}
+
+/* A block split across a page break is a diagram that has to be read twice. */
+@media print {
+  .helia-block,
+  .helia-block-diagram {
+    break-inside: avoid;
+  }
+}
+
+.helia-landing {
+  --sl-content-width: var(--helia-landing-width);
+  container-type: inline-size;
+  max-width: var(--helia-landing-width);
+  margin-inline: auto;
+  min-width: 0;
+}
+
+.helia-landing .helia-band {
+  --helia-band-inset: 0px;
+
+  margin-inline: 0;
+  padding-inline: 0;
+  width: 100%;
+}
+
+.helia-landing > :is(section, h2, .helia-split-panel) {
+  margin-block-start: var(--helia-space-6);
+}
+
+.helia-hero.helia-hero--compact {
+  --helia-hero-headline: var(--helia-text-page);
+}
+
+.helia-hero--compact .helia-hero__headline {
+  max-width: var(--helia-hero-compact-measure);
+  text-wrap: balance;
+}
+
+.helia-hero--center .helia-hero__lede {
+  align-items: center;
+  text-align: center;
+}
+
+.helia-hero--center .helia-hero__actions {
+  justify-content: center;
+}
+
+.helia-hero--center .helia-hero__badge {
+  align-self: center;
+}
+
+:is(.helia-card--ink, .helia-hero--contrast, .helia-band--contrast) {
+  --sl-color-text-invert: var(--helia-ink-black);
+  --sl-color-text-accent: var(--helia-paper-white);
+  --helia-focus-ring-color: var(--helia-paper-white);
+}
+
+.helia-card-content a:not([class]),
+.helia-card-content a:not([class]):visited {
+  color: var(--helia-ink-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.helia-card-content a:not([class]):hover {
+  color: var(--helia-product-accent);
+}
+
+.helia-hero--neutral {
+  --helia-product-accent: var(--helia-ink-primary);
+}
+
+.helia-hero--neutral .helia-hero__actions .helia-button--primary {
+  background: var(--helia-ink-primary);
+  border-color: var(--helia-ink-primary);
+  color: var(--sl-color-text-invert);
+}
+
+.helia-hero--neutral .helia-hero__actions .helia-button--primary:hover {
+  background: color-mix(
+    in srgb,
+    var(--helia-ink-primary) 88%,
+    var(--helia-surface-card)
+  );
+}
+
+/* Nested ink cards need a separate plane from the dark band's ground. */
+.helia-band--contrast .helia-card--ink {
+  background: var(--helia-surface-card);
+  border-color: var(--helia-surface-border);
+}
+
+.helia-hero__summary a:not([class]),
+.helia-hero__summary a:not([class]):visited {
+  color: var(--helia-product-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.helia-hero__summary a:not([class]):hover {
+  color: var(--helia-ink-primary);
+}
+
+.helia-hero__summary a:not([class]):focus-visible {
+  outline: 2px solid var(--helia-ink-primary);
+  outline-offset: 2px;
+}
+
+/* Markdown links inherit the surface foreground, including keyboard focus. */
+:is(.helia-band--contrast, .helia-hero--contrast) a:not([class]),
+:is(.helia-band--contrast, .helia-hero--contrast) a:not([class]):visited,
+:is(.helia-band--contrast, .helia-hero--contrast) a:not([class]):hover {
+  color: var(--helia-ink-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+:is(.helia-band--contrast, .helia-hero--contrast, .helia-card--ink)
+  a:not([class]):focus-visible {
+  outline: 2px solid var(--helia-ink-primary);
+  outline-offset: 2px;
+}
+
+/* Empty pseudo-elements keep connectors out of the spoken stage labels. */
+.helia-block-set--sequence {
+  gap: var(--helia-space-6);
+}
+
+.helia-block-set--sequence > .helia-block {
+  position: relative;
+}
+
+.helia-block-set--sequence > .helia-block + .helia-block::before {
+  border-bottom: 2px solid var(--helia-ink-secondary);
+  border-right: 2px solid var(--helia-ink-secondary);
+  content: '';
+  height: var(--helia-space-2);
+  left: calc(-1 * (var(--helia-space-6) + var(--helia-space-2)) / 2);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) rotate(-45deg);
+  width: var(--helia-space-2);
+}
+
+@media (width < 42rem) {
+  .helia-block-set--sequence {
+    grid-auto-columns: auto;
+    grid-auto-flow: row;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .helia-block-set--sequence > .helia-block + .helia-block::before {
+    left: 50%;
+    top: calc(-1 * (var(--helia-space-6) + var(--helia-space-2)) / 2);
+    transform: translateX(-50%) rotate(45deg);
+  }
+}
+
+/* Supporting sections keep the Hero layout without repeating the page headline. */
+.helia-hero.helia-hero--section {
+  --helia-hero-headline: var(--helia-text-section);
+}
+
+.helia-hero--section .helia-hero__headline {
+  max-width: var(--helia-hero-compact-measure);
+  text-wrap: balance;
 }
