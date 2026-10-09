@@ -57,10 +57,20 @@ import Eyebrow from './Eyebrow.astro';
 interface Props extends HTMLAttributes<'section'> {
   /** The ground. `contrast` is the inked card, `plain` the same layout with nothing behind it. */
   variant?: 'plain' | 'contrast';
+  /** Centers a standalone headline and its actions. */
+  align?: 'start' | 'center';
+  /** Compact uses the page heading scale; section uses the smaller section heading scale. */
+  size?: 'default' | 'compact' | 'section';
   /** The label above the headline, rendered in an `Eyebrow` with the accent dot. */
   eyebrow?: string;
+  /** Decorative product mark replacing the eyebrow accent dot. */
+  eyebrowIcon?: string;
+  /** Product identity uses the landing brand scale; labels keep compact eyebrow type. */
+  eyebrowStyle?: 'label' | 'brand';
   /** The claim under the headline: one sentence, not a paragraph. The `summary` slot wins over it. */
   summary?: string;
+  /** Neutral emphasis and filled primary action, without changing semantic colors elsewhere. */
+  palette?: 'product' | 'neutral';
   /** A short standing label under the headline, rendered as an accent `Badge`. */
   badge?: string;
   /** Heading level for the headline. A page's own hero is the `h1`; a section hero is not. */
@@ -71,7 +81,12 @@ interface Props extends HTMLAttributes<'section'> {
 
 const {
   variant = 'plain',
+  palette = 'product',
+  align = 'start',
+  size = 'default',
   eyebrow,
+  eyebrowIcon,
+  eyebrowStyle = 'label',
   summary,
   badge,
   titleAs: Title = 'h1',
@@ -96,13 +111,37 @@ const Summary = hasSummarySlot ? 'div' : 'p';
   class:list={[
     'helia-hero',
     'not-content',
+    palette === 'neutral' && 'helia-hero--neutral',
+    align === 'center' && 'helia-hero--center',
+    size !== 'default' && `helia-hero--${size}`,
     variant !== 'plain' && `helia-hero--${variant}`,
     className,
   ]}
   {...rest}
 >
   <div class="helia-hero__lede">
-    {eyebrow && <Eyebrow class="helia-hero__eyebrow">{eyebrow}</Eyebrow>}
+    {
+      eyebrow && (
+        <Eyebrow
+          class:list={[
+            'helia-hero__eyebrow',
+            eyebrowStyle === 'brand' && 'helia-hero__brand',
+            eyebrowIcon && 'helia-hero__eyebrow--icon',
+          ]}
+        >
+          {eyebrowIcon && (
+            <img
+              class="helia-hero__icon"
+              src={eyebrowIcon}
+              alt=""
+              width="28"
+              height="28"
+            />
+          )}
+          {eyebrow}
+        </Eyebrow>
+      )
+    }
     <Title class="helia-hero__headline"><slot /></Title>
     {
       badge && (
