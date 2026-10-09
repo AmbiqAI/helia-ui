@@ -48,30 +48,24 @@ const Wrapper = depth === 0 ? 'nav' : 'div';
   aria-label={depth === 0 ? label : undefined}
 >
   <ul class="helia-ref-nav__list">
-    {
-      items.map((item) => (
-        <li>
-          {item.href ? (
-            <a
-              class="helia-focus-ring"
-              href={item.href}
-              aria-current={item.href === current ? 'page' : undefined}
-            >
-              {item.label}
-            </a>
-          ) : (
-            <span class="helia-ref-nav__group">{item.label}</span>
-          )}
-          {item.items && item.items.length > 0 && (
-            <Astro.self
-              items={item.items}
-              current={current}
-              depth={depth + 1}
-            />
-          )}
-        </li>
-      ))
-    }
+    {items.map((item) => (
+      <li>
+        {item.href ? (
+          <a
+            class="helia-focus-ring"
+            href={item.href}
+            aria-current={item.href === current ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ) : (
+          <span class="helia-ref-nav__group">{item.label}</span>
+        )}
+        {item.items && item.items.length > 0 && (
+          <Astro.self items={item.items} current={current} depth={depth + 1} />
+        )}
+      </li>
+    ))}
   </ul>
 </Wrapper>
 

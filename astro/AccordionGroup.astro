@@ -29,21 +29,19 @@ const chevronMarkup = icon(faChevronDown).html.join('');
 ---
 
 <div class="accordion-group helia-surface">
-  {
-    items.map((item, index) => (
-      <details open={index === 0}>
-        <summary class="helia-focus-ring helia-focus-ring--inset">
-          {item.title}
-          <span
-            class="accordion-chevron"
-            aria-hidden="true"
-            set:html={chevronMarkup}
-          />
-        </summary>
-        <p>{item.content}</p>
-      </details>
-    ))
-  }
+  {items.map((item, index) => (
+    <details open={index === 0}>
+      <summary class="helia-focus-ring helia-focus-ring--inset">
+        {item.title}
+        <span
+          class="accordion-chevron"
+          aria-hidden="true"
+          set:html={chevronMarkup}
+        />
+      </summary>
+      <p>{item.content}</p>
+    </details>
+  ))}
 </div>
 
 <style>

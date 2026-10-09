@@ -55,68 +55,66 @@ const themes = [
 ---
 
 <div class="site-theme-examples not-content">
-  {
-    themes.map((theme) => (
-      <section
-        class:list={['site-theme-example', theme.scope]}
-        data-helia-theme={theme.scope}
-        data-helia-density={theme.density}
-        aria-label={`${theme.label}: the same cards under its own theme`}
-      >
-        <div class="site-theme-example__hero">
-          <SectionHeader
-            eyebrow={theme.label}
-            title="Start building"
-            description="Three cards, one section header, and nothing else changed."
-          />
-        </div>
+  {themes.map((theme) => (
+    <section
+      class:list={['site-theme-example', theme.scope]}
+      data-helia-theme={theme.scope}
+      data-helia-density={theme.density}
+      aria-label={`${theme.label}: the same cards under its own theme`}
+    >
+      <div class="site-theme-example__hero">
+        <SectionHeader
+          eyebrow={theme.label}
+          title="Start building"
+          description="Three cards, one section header, and nothing else changed."
+        />
+      </div>
 
-        <div class="site-theme-example__cards">
-          <Card>
-            <CardMedia>
-              <Media
-                treatment="color-field"
-                style="--accent: var(--helia-product-accent)"
-              />
-            </CardMedia>
-            <CardHeader eyebrow="Guide" titleAs="h4">
-              Install the toolchain
-            </CardHeader>
-          </Card>
+      <div class="site-theme-example__cards">
+        <Card>
+          <CardMedia>
+            <Media
+              treatment="color-field"
+              style="--accent: var(--helia-product-accent)"
+            />
+          </CardMedia>
+          <CardHeader eyebrow="Guide" titleAs="h4">
+            Install the toolchain
+          </CardHeader>
+        </Card>
 
-          <Card tone="filled">
-            <CardHeader eyebrow="Tutorial" titleAs="h4">
-              Run the first example
-            </CardHeader>
-            <CardActions>
-              <Button href="/helia-ui/foundations/site-theme/" size="sm">
-                <span>Open</span>
-              </Button>
-              <Badge tone="info">15 min</Badge>
-              <Badge tone="secondary">Paired</Badge>
-            </CardActions>
-          </Card>
+        <Card tone="filled">
+          <CardHeader eyebrow="Tutorial" titleAs="h4">
+            Run the first example
+          </CardHeader>
+          <CardActions>
+            <Button href="/helia-ui/foundations/site-theme/" size="sm">
+              <span>Open</span>
+            </Button>
+            <Badge tone="info">15 min</Badge>
+            <Badge tone="secondary">Paired</Badge>
+          </CardActions>
+        </Card>
 
-          <Card tone="elevated" lift>
-            <CardHeader eyebrow="Reference" titleAs="h4">
-              Read the API
-            </CardHeader>
-            <CardContent>
-              Every symbol, with the units and the error behavior.
-            </CardContent>
-          </Card>
-        </div>
+        <Card tone="elevated" lift>
+          <CardHeader eyebrow="Reference" titleAs="h4">
+            Read the API
+          </CardHeader>
+          <CardContent>
+            Every symbol, with the units and the error behavior.
+          </CardContent>
+        </Card>
+      </div>
 
-        <ul class="site-theme-example__dials">
-          {theme.dials.map((dial) => (
-            <li>
-              <code>{dial}</code>
-            </li>
-          ))}
-        </ul>
-      </section>
-    ))
-  }
+      <ul class="site-theme-example__dials">
+        {theme.dials.map((dial) => (
+          <li>
+            <code>{dial}</code>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
 </div>
 
 <style>

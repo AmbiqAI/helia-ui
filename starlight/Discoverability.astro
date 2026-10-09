@@ -170,42 +170,36 @@ if (discoverability.jsonLd && !isNotFound) {
 <meta name="twitter:title" content={entry.data.title} />
 {description && <meta name="twitter:description" content={description} />}
 
-{
-  discoverability.ogImage && ogImage && (
-    <>
-      <meta property="og:image" content={ogImage} />
-      <meta property="og:image:type" content="image/svg+xml" />
-      <meta property="og:image:width" content={String(OG_IMAGE_SIZE.width)} />
-      <meta property="og:image:height" content={String(OG_IMAGE_SIZE.height)} />
-      <meta
-        property="og:image:alt"
-        content={`${entry.data.title} — ${siteTitle}`}
-      />
-      <meta name="twitter:image" content={ogImage} />
-    </>
-  )
-}
-
-{
-  discoverability.markdown && !isNotFound && (
-    <link
-      rel="alternate"
-      type="text/markdown"
-      href={markdown}
-      title={`${entry.data.title} as markdown`}
+{discoverability.ogImage && ogImage && (
+  <>
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/svg+xml" />
+    <meta property="og:image:width" content={String(OG_IMAGE_SIZE.width)} />
+    <meta property="og:image:height" content={String(OG_IMAGE_SIZE.height)} />
+    <meta
+      property="og:image:alt"
+      content={`${entry.data.title} — ${siteTitle}`}
     />
-  )
-}
+    <meta name="twitter:image" content={ogImage} />
+  </>
+)}
 
-{
-  graph.length > 0 && (
-    <script
-      type="application/ld+json"
-      is:inline
-      set:html={serializeJsonLd({
-        '@context': 'https://schema.org',
-        '@graph': graph,
-      })}
-    />
-  )
-}
+{discoverability.markdown && !isNotFound && (
+  <link
+    rel="alternate"
+    type="text/markdown"
+    href={markdown}
+    title={`${entry.data.title} as markdown`}
+  />
+)}
+
+{graph.length > 0 && (
+  <script
+    type="application/ld+json"
+    is:inline
+    set:html={serializeJsonLd({
+      '@context': 'https://schema.org',
+      '@graph': graph,
+    })}
+  />
+)}

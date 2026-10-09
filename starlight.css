@@ -838,3 +838,15 @@
     max-width: 6rem;
   }
 }
+
+/* The class sits on the Expressive Code wrapper; frame and copy behavior stay owned by Expressive Code. */
+.expressive-code.helia-code-tone-muted {
+  --ec-frm-edBg: var(--helia-surface-card-muted);
+  --ec-frm-trmBg: var(--helia-surface-card-muted);
+  --ec-codeBg: var(--helia-surface-card-muted);
+}
+.expressive-code.helia-code-tone-default {
+  --ec-frm-edBg: var(--helia-surface-card);
+  --ec-frm-trmBg: var(--helia-surface-card);
+  --ec-codeBg: var(--helia-surface-card);
+}

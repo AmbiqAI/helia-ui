@@ -54,21 +54,17 @@ const {
     <Eyebrow>{label}</Eyebrow>
     <p class="value">
       <slot />
-      {
-        delta !== undefined && (
-          <Badge tone={deltaTone} size="sm">
-            {delta}
-          </Badge>
-        )
-      }
+      {delta !== undefined && (
+        <Badge tone={deltaTone} size="sm">
+          {delta}
+        </Badge>
+      )}
     </p>
-    {
-      Astro.slots.has('sparkline') && (
-        <div class="spark">
-          <slot name="sparkline" />
-        </div>
-      )
-    }
+    {Astro.slots.has('sparkline') && (
+      <div class="spark">
+        <slot name="sparkline" />
+      </div>
+    )}
   </CardContent>
 </Card>
 

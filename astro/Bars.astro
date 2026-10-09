@@ -63,27 +63,27 @@ const share = (value: number) =>
 
 <div class:list={['helia-bars', 'not-content', className]} {...rest}>
   <ol class="helia-bars__rows">
-    {
-      rows.map((row) => (
-        <li class="helia-bars__row">
-          <span class="helia-bars__label">{row.label}</span>
-          <span class="helia-bars__track">
-            <span
-              class:list={[
-                'helia-bars__fill',
-                row.accent && 'helia-bars__fill--accent',
-              ]}
-              style={`--helia-bars-share: ${share(row.value)}%`}
-            />
-          </span>
-          <span class="helia-bars__value">{row.display ?? row.value}</span>
-        </li>
-      ))
-    }
+    {rows.map((row) => (
+      <li class="helia-bars__row">
+        <span class="helia-bars__label">{row.label}</span>
+        <span class="helia-bars__track">
+          <span
+            class:list={[
+              'helia-bars__fill',
+              row.accent && 'helia-bars__fill--accent',
+            ]}
+            style={`--helia-bars-share: ${share(row.value)}%`}
+          />
+        </span>
+        <span class="helia-bars__value">{row.display ?? row.value}</span>
+      </li>
+    ))}
   </ol>
   <p class="helia-bars__axis" aria-hidden="true">
     <span class="helia-bars__ticks">
-      {ticks?.map((tick) => <span>{tick}</span>)}
+      {ticks?.map((tick) => (
+        <span>{tick}</span>
+      ))}
     </span>
   </p>
   {caption && <p class="helia-bars__caption">{caption}</p>}

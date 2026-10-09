@@ -123,58 +123,46 @@ const stated = renditionText(title);
   ]}
   {...rest}
 >
-  {
-    hasIcon && (
-      <span class="helia-card-mark helia-card-mark--icon">
-        <Fragment set:html={icon} />
-      </span>
-    )
-  }
+  {hasIcon && (
+    <span class="helia-card-mark helia-card-mark--icon">
+      <Fragment set:html={icon} />
+    </span>
+  )}
   {hasStep && <span class="helia-card-mark helia-card-mark--text">{step}</span>}
   <div class="helia-card-header__text">
-    {
-      hasEyebrow && (
-        <Eyebrow>
-          {eyebrow}
-          <slot name="eyebrow" />
-        </Eyebrow>
-      )
-    }
-    {
-      hasTitle && (
-        <Title class="helia-card-header__title">
-          {href ? (
-            <a class="helia-card-header__link" href={href}>
-              <Fragment set:html={title} />
-            </a>
-          ) : (
+    {hasEyebrow && (
+      <Eyebrow>
+        {eyebrow}
+        <slot name="eyebrow" />
+      </Eyebrow>
+    )}
+    {hasTitle && (
+      <Title class="helia-card-header__title">
+        {href ? (
+          <a class="helia-card-header__link" href={href}>
             <Fragment set:html={title} />
-          )}
-        </Title>
-      )
-    }
-    {
-      hasMeta && (
-        <div class="helia-card-header__meta">
-          <Fragment set:html={meta} />
-        </div>
-      )
-    }
-  </div>
-  {
-    hasAction && (
-      <div class="helia-card-header__action">
-        <Fragment set:html={action} />
+          </a>
+        ) : (
+          <Fragment set:html={title} />
+        )}
+      </Title>
+    )}
+    {hasMeta && (
+      <div class="helia-card-header__meta">
+        <Fragment set:html={meta} />
       </div>
-    )
-  }
-  {
-    href !== undefined && rendition && (
-      <script
-        is:inline
-        {...renditionAttributes('card')}
-        set:html={escapeRendition(stated === '' ? '' : linkItem(stated, href))}
-      />
-    )
-  }
+    )}
+  </div>
+  {hasAction && (
+    <div class="helia-card-header__action">
+      <Fragment set:html={action} />
+    </div>
+  )}
+  {href !== undefined && rendition && (
+    <script
+      is:inline
+      {...renditionAttributes('card')}
+      set:html={escapeRendition(stated === '' ? '' : linkItem(stated, href))}
+    />
+  )}
 </div>

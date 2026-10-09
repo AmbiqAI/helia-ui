@@ -52,16 +52,14 @@ const tinted = tone !== 'neutral' && tone !== 'accent';
 const hasLabel = Astro.slots.has('default');
 ---
 
-{
-  hasLabel && (
-    <Chip
-      tone={tone === 'accent' ? 'accent' : 'static'}
-      size={size}
-      class:list={['helia-badge', tinted && `helia-badge--${tone}`, className]}
-      {...rest}
-    >
-      {dot && <span class="helia-badge__dot" aria-hidden="true" />}
-      <slot />
-    </Chip>
-  )
-}
+{hasLabel && (
+  <Chip
+    tone={tone === 'accent' ? 'accent' : 'static'}
+    size={size}
+    class:list={['helia-badge', tinted && `helia-badge--${tone}`, className]}
+    {...rest}
+  >
+    {dot && <span class="helia-badge__dot" aria-hidden="true" />}
+    <slot />
+  </Chip>
+)}

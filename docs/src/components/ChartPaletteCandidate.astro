@@ -43,47 +43,45 @@ const separation = (['dark', 'light'] as const).map((ground) => ({
       </tr>
     </thead>
     <tbody>
-      {
-        palette.steps.map((step, index) => (
-          <tr>
-            <th scope="row">
-              <code>--helia-chart-{index + 1}</code>
-            </th>
-            <td>{step.role}</td>
-            <td>
-              <span class="palette-steps__value">
-                <span
-                  class="palette-steps__swatch"
-                  style={`background: ${step.dark}`}
-                />
-                <code>{step.dark}</code>
-              </span>
-            </td>
-            <td>
-              <span class="palette-steps__value">
-                <span
-                  class="palette-steps__swatch"
-                  style={`background: ${step.light}`}
-                />
-                <code>{step.light}</code>
-              </span>
-            </td>
-          </tr>
-        ))
-      }
+      {palette.steps.map((step, index) => (
+        <tr>
+          <th scope="row">
+            <code>--helia-chart-{index + 1}</code>
+          </th>
+          <td>{step.role}</td>
+          <td>
+            <span class="palette-steps__value">
+              <span
+                class="palette-steps__swatch"
+                style={`background: ${step.dark}`}
+              />
+              <code>{step.dark}</code>
+            </span>
+          </td>
+          <td>
+            <span class="palette-steps__value">
+              <span
+                class="palette-steps__swatch"
+                style={`background: ${step.light}`}
+              />
+              <code>{step.light}</code>
+            </span>
+          </td>
+        </tr>
+      ))}
     </tbody>
   </table>
 
   <p class="palette-candidate__separation">
-    Closest pair, CIEDE2000: {
-      separation.map((entry, index) => (
-        <>
-          {index > 0 && ', '}
-          <b data-separation={entry.ground}>{entry.delta.toFixed(1)}</b>
-          {` on ${entry.label.toLowerCase()}, between steps ${entry.between[0]} and ${entry.between[1]}`}
-        </>
-      ))
-    }.
+    Closest pair, CIEDE2000:{' '}
+    {separation.map((entry, index) => (
+      <>
+        {index > 0 && ', '}
+        <b data-separation={entry.ground}>{entry.delta.toFixed(1)}</b>
+        {` on ${entry.label.toLowerCase()}, between steps ${entry.between[0]} and ${entry.between[1]}`}
+      </>
+    ))}
+    .
   </p>
 </div>
 

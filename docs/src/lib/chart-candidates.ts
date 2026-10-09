@@ -98,9 +98,9 @@ export const candidates: ChartCandidate[] = [
     id: 'mui',
     name: 'MUI X Charts',
     pkg: '@mui/x-charts',
-    version: '9.13.0',
+    version: '9.14.0',
     license: 'MIT',
-    bytes: 498035,
+    bytes: 498925,
     serverRender:
       'In part. The surface and the legend are in the HTML; the marks wait to be measured.',
     theming:
@@ -132,7 +132,7 @@ export const candidates: ChartCandidate[] = [
     pkg: 'recharts',
     version: '3.8.0',
     license: 'MIT',
-    bytes: 408895,
+    bytes: 439005,
     serverRender:
       'No. ResponsiveContainer has nothing to measure, so the HTML holds an empty container.',
     theming:
@@ -167,7 +167,7 @@ export const candidates: ChartCandidate[] = [
     pkg: '@observablehq/plot',
     version: '0.6.17',
     license: 'ISC',
-    bytes: 312330,
+    bytes: 304182,
     serverRender:
       'No. Plot.plot builds against a document, so the island is client only.',
     theming: 'One color scale and one style object per figure.',
@@ -204,7 +204,7 @@ export const candidates: ChartCandidate[] = [
     pkg: 'echarts',
     version: '6.1.0',
     license: 'Apache-2.0',
-    bytes: 668335,
+    bytes: 682950,
     serverRender:
       'Yes. echarts.init(null, ...) with ssr lays the figure out with no document, so the SVG is in the HTML; the island then replaces it with a live instance, and the interactions arrive with that.',
     theming:

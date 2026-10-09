@@ -80,18 +80,19 @@ const hasLine = line.trim() !== '';
 <Card interactive class:list={['helia-link-card', className]} {...rest}>
   <CardHeader titleAs={titleAs} href={href} eyebrow={eyebrow} rendition={false}>
     <slot name="icon" slot="icon" />
-    <span class="title"
-      >{title}<span class="helia-motion-cue" aria-hidden="true">→</span></span
-    >
+    <span class="title">
+      {title}
+      <span class="helia-motion-cue" aria-hidden="true">
+        →
+      </span>
+    </span>
     <Fragment slot="meta">{meta}</Fragment>
   </CardHeader>
-  {
-    hasLine && (
-      <CardContent>
-        <Fragment set:html={line} />
-      </CardContent>
-    )
-  }
+  {hasLine && (
+    <CardContent>
+      <Fragment set:html={line} />
+    </CardContent>
+  )}
   <script
     is:inline
     {...renditionAttributes('link-card')}

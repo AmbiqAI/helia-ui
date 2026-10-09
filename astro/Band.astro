@@ -47,13 +47,11 @@ const {
   {...rest}
 >
   <div class="helia-band__inner">
-    {
-      Astro.slots.has('header') && (
-        <div class="helia-band__header">
-          <slot name="header" />
-        </div>
-      )
-    }
+    {Astro.slots.has('header') && (
+      <div class="helia-band__header">
+        <slot name="header" />
+      </div>
+    )}
     <slot />
   </div>
 </section>

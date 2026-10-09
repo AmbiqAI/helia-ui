@@ -62,14 +62,12 @@ const Set = flow === 'sequence' ? 'ol' : 'ul';
   aria-label={named ? undefined : ariaLabel}
   {...rest}
 >
-  {
-    named && (
-      <figcaption class="helia-block-diagram__caption">
-        {title && <Eyebrow as="span">{title}</Eyebrow>}
-        {caption && <span class="helia-block-diagram__note">{caption}</span>}
-      </figcaption>
-    )
-  }
+  {named && (
+    <figcaption class="helia-block-diagram__caption">
+      {title && <Eyebrow as="span">{title}</Eyebrow>}
+      {caption && <span class="helia-block-diagram__note">{caption}</span>}
+    </figcaption>
+  )}
   <Set
     class:list={[
       'helia-block-set',

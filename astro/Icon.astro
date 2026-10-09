@@ -59,26 +59,24 @@ const markup = renderIcon(definition).html.join('');
 const sizing = size && `helia-icon--${size}`;
 ---
 
-{
-  text === undefined ? (
-    <span
-      class:list={['helia-icon', sizing, className]}
-      {...(label
-        ? { role: 'img', 'aria-label': label }
-        : { 'aria-hidden': 'true' })}
-      {...rest}
-      set:html={markup}
-    />
-  ) : (
-    <span
-      class:list={['helia-icon', 'helia-icon--pair', sizing, className]}
-      {...rest}
-    >
-      <span class="helia-icon__glyph" aria-hidden="true" set:html={markup} />
-      <span class="helia-icon__text">{text}</span>
-    </span>
-  )
-}
+{text === undefined ? (
+  <span
+    class:list={['helia-icon', sizing, className]}
+    {...(label
+      ? { role: 'img', 'aria-label': label }
+      : { 'aria-hidden': 'true' })}
+    {...rest}
+    set:html={markup}
+  />
+) : (
+  <span
+    class:list={['helia-icon', 'helia-icon--pair', sizing, className]}
+    {...rest}
+  >
+    <span class="helia-icon__glyph" aria-hidden="true" set:html={markup} />
+    <span class="helia-icon__text">{text}</span>
+  </span>
+)}
 
 <style>
   /* style-lint: allow-file global -- the SVG arrives through set:html */

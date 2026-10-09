@@ -360,61 +360,54 @@ const transcript = normalizedLines
   role="region"
 >
   <div class="ascii-terminal__toolbar">
-    {
-      frame === 'window' && (
-        <span class="ascii-terminal__lights" aria-hidden="true">
-          <>
-            <i />
-            <i />
-            <i />
-          </>
-        </span>
-      )
-    }
+    {frame === 'window' && (
+      <span class="ascii-terminal__lights" aria-hidden="true">
+        <>
+          <i />
+          <i />
+          <i />
+        </>
+      </span>
+    )}
     <span class="ascii-terminal__title">{title}</span>
     <div class="ascii-terminal__actions">
-      {
-        replay && (
-          <button
-            aria-label="Replay terminal animation"
-            class="helia-focus-ring"
-            title="Replay terminal animation"
-            type="button"
-            data-replay-button
-          >
-            <svg aria-hidden="true" viewBox="0 0 20 20">
-              <path d="M16.5 7.25A7 7 0 1 0 17 11" />
-              <path d="M16.5 3.5v3.75h-3.75" />
-            </svg>
-          </button>
-        )
-      }
-      {
-        hasCopy && (
-          <button
-            aria-label={copyLabel}
-            class="helia-focus-ring"
-            title={copyLabel}
-            type="button"
-            data-copy-button
-            data-copy-mode={copyMode}
-          >
-            <svg aria-hidden="true" class="copy-icon" viewBox="0 0 20 20">
-              <path d="M6.25 6.25V4.5A1.75 1.75 0 0 1 8 2.75h7.5a1.75 1.75 0 0 1 1.75 1.75V12A1.75 1.75 0 0 1 15.5 13.75h-1.75" />
-              <rect x="2.75" y="6.25" width="11" height="11" rx="1.75" />
-            </svg>
-            <svg aria-hidden="true" class="check-icon" viewBox="0 0 20 20">
-              <path d="m4.25 10.25 3.5 3.5 8-8" />
-            </svg>
-          </button>
-        )
-      }
+      {replay && (
+        <button
+          aria-label="Replay terminal animation"
+          class="helia-focus-ring"
+          title="Replay terminal animation"
+          type="button"
+          data-replay-button
+        >
+          <svg aria-hidden="true" viewBox="0 0 20 20">
+            <path d="M16.5 7.25A7 7 0 1 0 17 11" />
+            <path d="M16.5 3.5v3.75h-3.75" />
+          </svg>
+        </button>
+      )}
+      {hasCopy && (
+        <button
+          aria-label={copyLabel}
+          class="helia-focus-ring"
+          title={copyLabel}
+          type="button"
+          data-copy-button
+          data-copy-mode={copyMode}
+        >
+          <svg aria-hidden="true" class="copy-icon" viewBox="0 0 20 20">
+            <path d="M6.25 6.25V4.5A1.75 1.75 0 0 1 8 2.75h7.5a1.75 1.75 0 0 1 1.75 1.75V12A1.75 1.75 0 0 1 15.5 13.75h-1.75" />
+            <rect x="2.75" y="6.25" width="11" height="11" rx="1.75" />
+          </svg>
+          <svg aria-hidden="true" class="check-icon" viewBox="0 0 20 20">
+            <path d="m4.25 10.25 3.5 3.5 8-8" />
+          </svg>
+        </button>
+      )}
     </div>
   </div>
 
   <div class="ascii-terminal__viewport">
-    <pre
-      aria-hidden="true"><code>{normalizedLines.map((line) => (
+    <pre aria-hidden="true"><code>{normalizedLines.map((line) => (
       <span class:list={['ascii-terminal__line', `is-${line.kind}`]} data-kind={line.kind} data-line data-text={line.text}>
         {line.kind === 'command' && (
           <span class="ascii-terminal__prompt" data-prompt>{line.prompt}</span>
@@ -424,24 +417,21 @@ const transcript = normalizedLines
     ))}</code></pre>
   </div>
 
-  {
-    /* The <pre> is aria-hidden so the caret and per-line reveal are not
+  {/* The <pre> is aria-hidden so the caret and per-line reveal are not
   announced; this carries the reading order instead, and doubles as the
-  clipboard source. */
-  }
-  <span class="helia-sr-only" data-transcript>{transcript}</span>
+  clipboard source. */}
+  <span class="helia-sr-only" data-transcript>
+    {transcript}
+  </span>
   {interactive && <span class="helia-sr-only" aria-live="polite" data-status />}
 
-  {
-    /* The transcript is the whole of what this part is worth to a reader, and
-       a page that imports its lines states none of it in its source. */
-  }
+  {/* The transcript is the whole of what this part is worth to a reader, and
+       a page that imports its lines states none of it in its source. */}
   <script
     is:inline
     {...renditionAttributes('terminal')}
     set:html={escapeRendition(codeFence(transcript))}
   />
-
   {interactive && <script is:inline set:html={BEHAVIOR} />}
 </helia-ascii-terminal>
 

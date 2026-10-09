@@ -55,73 +55,62 @@ const paragraph =
 
 <div class="ramp not-content" data-type-ramp>
   <section class="ramp__group" aria-label="Type sizes">
-    {
-      sizes.map((size) => (
-        <div class="ramp__row" data-type-size={size.token}>
-          <div class="ramp__meta">
-            <code>{size.token}</code>
-            <span>{size.role}</span>
-          </div>
-          <p class="ramp__specimen" style={`font-size: var(${size.token})`}>
-            {specimen}
-          </p>
+    {sizes.map((size) => (
+      <div class="ramp__row" data-type-size={size.token}>
+        <div class="ramp__meta">
+          <code>{size.token}</code>
+          <span>{size.role}</span>
         </div>
-      ))
-    }
+        <p class="ramp__specimen" style={`font-size: var(${size.token})`}>
+          {specimen}
+        </p>
+      </div>
+    ))}
   </section>
 
   <section class="ramp__group" aria-label="Type weights">
-    {
-      weights.map((weight) => (
-        <div class="ramp__row" data-type-weight={weight.token}>
-          <div class="ramp__meta">
-            <code>{weight.token}</code>
-            <span>{weight.role}</span>
-          </div>
-          <p class="ramp__weight" style={`font-weight: var(${weight.token})`}>
-            {specimen}
-          </p>
+    {weights.map((weight) => (
+      <div class="ramp__row" data-type-weight={weight.token}>
+        <div class="ramp__meta">
+          <code>{weight.token}</code>
+          <span>{weight.role}</span>
         </div>
-      ))
-    }
+        <p class="ramp__weight" style={`font-weight: var(${weight.token})`}>
+          {specimen}
+        </p>
+      </div>
+    ))}
   </section>
 
   <section class="ramp__group" aria-label="Leading">
-    {
-      leadings.map((leading) => (
-        <div class="ramp__row" data-type-leading={leading.token}>
-          <div class="ramp__meta">
-            <code>{leading.token}</code>
-            <span>{leading.role}</span>
-          </div>
-          <p
-            class="ramp__paragraph"
-            style={`line-height: var(${leading.token})`}
-          >
-            {paragraph}
-          </p>
+    {leadings.map((leading) => (
+      <div class="ramp__row" data-type-leading={leading.token}>
+        <div class="ramp__meta">
+          <code>{leading.token}</code>
+          <span>{leading.role}</span>
         </div>
-      ))
-    }
+        <p class="ramp__paragraph" style={`line-height: var(${leading.token})`}>
+          {paragraph}
+        </p>
+      </div>
+    ))}
   </section>
 
   <section class="ramp__group" aria-label="Tracking">
-    {
-      trackings.map((tracking) => (
-        <div class="ramp__row" data-type-tracking={tracking.token}>
-          <div class="ramp__meta">
-            <code>{tracking.token}</code>
-            <span>{tracking.role}</span>
-          </div>
-          <p
-            class="ramp__tracking"
-            style={`letter-spacing: var(${tracking.token})`}
-          >
-            {specimen}
-          </p>
+    {trackings.map((tracking) => (
+      <div class="ramp__row" data-type-tracking={tracking.token}>
+        <div class="ramp__meta">
+          <code>{tracking.token}</code>
+          <span>{tracking.role}</span>
         </div>
-      ))
-    }
+        <p
+          class="ramp__tracking"
+          style={`letter-spacing: var(${tracking.token})`}
+        >
+          {specimen}
+        </p>
+      </div>
+    ))}
   </section>
 </div>
 

@@ -66,40 +66,30 @@ const hasCode = Astro.slots.has('code');
   {...rest}
 >
   <div class="helia-split-panel__text">
-    {
-      Astro.slots.has('eyebrow') && (
-        <Eyebrow>
-          <slot name="eyebrow" />
-        </Eyebrow>
-      )
-    }
-    {
-      Astro.slots.has('title') && (
-        <Title class="helia-split-panel__title">
-          <slot name="title" />
-        </Title>
-      )
-    }
-    {
-      Astro.slots.has('body') && (
-        <div class="helia-split-panel__body">
-          <slot name="body" />
-        </div>
-      )
-    }
-    {
-      Astro.slots.has('actions') && (
-        <div class="helia-split-panel__actions">
-          <slot name="actions" />
-        </div>
-      )
-    }
-  </div>
-  {
-    hasCode && (
-      <div class="helia-split-panel__code">
-        <slot name="code" />
+    {Astro.slots.has('eyebrow') && (
+      <Eyebrow>
+        <slot name="eyebrow" />
+      </Eyebrow>
+    )}
+    {Astro.slots.has('title') && (
+      <Title class="helia-split-panel__title">
+        <slot name="title" />
+      </Title>
+    )}
+    {Astro.slots.has('body') && (
+      <div class="helia-split-panel__body">
+        <slot name="body" />
       </div>
-    )
-  }
+    )}
+    {Astro.slots.has('actions') && (
+      <div class="helia-split-panel__actions">
+        <slot name="actions" />
+      </div>
+    )}
+  </div>
+  {hasCode && (
+    <div class="helia-split-panel__code">
+      <slot name="code" />
+    </div>
+  )}
 </Element>

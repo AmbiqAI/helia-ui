@@ -79,37 +79,31 @@ const {
 >
   {labelPosition === 'above' && <Eyebrow>{label}</Eyebrow>}
   <p class="figure">
-    {
-      /* The unit is inside the quantity, not beside it: a figure whose column
+    {/* The unit is inside the quantity, not beside it: a figure whose column
         is narrow enough to wrap must break before the delta and never between
-        the number and what it is measured in. */
-    }
+        the number and what it is measured in. */}
     <span class="quantity">
-      <span class="value"><slot /></span>
-      {
-        unit && (
-          <span class:list={['unit', accent && 'unit--accent']}>{unit}</span>
-        )
-      }
+      <span class="value">
+        <slot />
+      </span>
+      {unit && (
+        <span class:list={['unit', accent && 'unit--accent']}>{unit}</span>
+      )}
     </span>
-    {
-      delta !== undefined && (
-        <span class="delta" data-direction={direction} data-tone={deltaTone}>
-          <span aria-hidden="true">{DIRECTION_GLYPH[direction]}</span>
-          <span class="helia-sr-only">{DIRECTION_WORD[direction]}</span>
-          {delta}
-        </span>
-      )
-    }
+    {delta !== undefined && (
+      <span class="delta" data-direction={direction} data-tone={deltaTone}>
+        <span aria-hidden="true">{DIRECTION_GLYPH[direction]}</span>
+        <span class="helia-sr-only">{DIRECTION_WORD[direction]}</span>
+        {delta}
+      </span>
+    )}
   </p>
   {labelPosition === 'below' && <Eyebrow>{label}</Eyebrow>}
-  {
-    Astro.slots.has('sparkline') && (
-      <span class="spark">
-        <slot name="sparkline" />
-      </span>
-    )
-  }
+  {Astro.slots.has('sparkline') && (
+    <span class="spark">
+      <slot name="sparkline" />
+    </span>
+  )}
   {caption && <p class="caption">{caption}</p>}
 </div>
 

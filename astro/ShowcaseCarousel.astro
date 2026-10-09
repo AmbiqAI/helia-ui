@@ -45,35 +45,34 @@ const { tabs, variant = 'feature' } = Astro.props;
 >
   <div class="carousel-header">
     <div class="slide-tabs" role="group" aria-label="Choose a showcase">
-      {
-        tabs.map((label, index) => (
-          <button
-            type="button"
-            data-slide-index={index}
-            aria-pressed={index === 0 ? 'true' : 'false'}
-          >
-            {label}
-          </button>
-        ))
-      }
+      {tabs.map((label, index) => (
+        <button
+          type="button"
+          data-slide-index={index}
+          aria-pressed={index === 0 ? 'true' : 'false'}
+        >
+          {label}
+        </button>
+      ))}
     </div>
     <div class="controls">
       <button type="button" data-previous disabled>
         <span aria-hidden="true">←</span> Previous
       </button>
       <button type="button" data-next>
-        Next <span class="helia-motion-cue" aria-hidden="true">→</span>
+        Next{' '}
+        <span class="helia-motion-cue" aria-hidden="true">
+          →
+        </span>
       </button>
     </div>
   </div>
 
-  {
-    /*
-     * The track is a scroll container, so it is a tab stop: without one the only
-     * way to reach the cards past the first is a pointer, whenever the cards
-     * themselves carry nothing focusable. The focus ring is the shared recipe's.
-     */
-  }
+  {/*
+   * The track is a scroll container, so it is a tab stop: without one the only
+   * way to reach the cards past the first is a pointer, whenever the cards
+   * themselves carry nothing focusable. The focus ring is the shared recipe's.
+   */}
   <div
     class="track helia-focus-ring helia-focus-ring--inset"
     data-carousel-track

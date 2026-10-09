@@ -49,16 +49,14 @@ const {
     <Title class="title">{title}</Title>
     {description && <p class="description">{description}</p>}
   </div>
-  {
-    href && (
-      <a href={href}>
-        {linkLabel}{' '}
-        <span class="helia-motion-cue" aria-hidden="true">
-          →
-        </span>
-      </a>
-    )
-  }
+  {href && (
+    <a href={href}>
+      {linkLabel}{' '}
+      <span class="helia-motion-cue" aria-hidden="true">
+        →
+      </span>
+    </a>
+  )}
 </header>
 
 <style>

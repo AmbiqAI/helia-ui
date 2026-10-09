@@ -55,32 +55,30 @@ const { layers, ariaLabel = 'Stack', class: className, ...rest } = Astro.props;
   aria-label={ariaLabel}
   {...rest}
 >
-  {
-    layers.map((layer) => (
-      <li
-        class:list={[
-          'helia-stack__layer',
-          layer.accent && 'helia-stack__layer--accent',
-        ]}
-      >
-        <Eyebrow as="span">{layer.label}</Eyebrow>
-        {layer.chips && layer.chips.length > 0 && (
-          <span class="helia-stack__chips">
-            {layer.chips.map((chip) => (
-              <span
-                class:list={[
-                  'helia-stack__chip',
-                  chip.accent && 'helia-stack__chip--accent',
-                ]}
-              >
-                <Chip>{chip.label}</Chip>
-              </span>
-            ))}
-          </span>
-        )}
-      </li>
-    ))
-  }
+  {layers.map((layer) => (
+    <li
+      class:list={[
+        'helia-stack__layer',
+        layer.accent && 'helia-stack__layer--accent',
+      ]}
+    >
+      <Eyebrow as="span">{layer.label}</Eyebrow>
+      {layer.chips && layer.chips.length > 0 && (
+        <span class="helia-stack__chips">
+          {layer.chips.map((chip) => (
+            <span
+              class:list={[
+                'helia-stack__chip',
+                chip.accent && 'helia-stack__chip--accent',
+              ]}
+            >
+              <Chip>{chip.label}</Chip>
+            </span>
+          ))}
+        </span>
+      )}
+    </li>
+  ))}
 </ol>
 
 <style>

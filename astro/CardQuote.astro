@@ -52,26 +52,23 @@ const hasAttribution =
   ]}
   {...rest}
 >
-  <blockquote class="helia-card-quote__text"><slot /></blockquote>
-  {
-    hasAttribution && (
-      <figcaption class="helia-card-quote__attribution">
-        {initials !== undefined && (
-          <span
-            class="helia-card-mark helia-card-mark--text"
-            aria-hidden="true"
-          >
-            {initials}
-          </span>
-        )}
-        <span class="helia-card-quote__who">
-          {attribution}
-          <slot name="attribution" />
-          {detail !== undefined && (
-            <span class="helia-card-quote__detail">{detail}</span>
-          )}
+  <blockquote class="helia-card-quote__text">
+    <slot />
+  </blockquote>
+  {hasAttribution && (
+    <figcaption class="helia-card-quote__attribution">
+      {initials !== undefined && (
+        <span class="helia-card-mark helia-card-mark--text" aria-hidden="true">
+          {initials}
         </span>
-      </figcaption>
-    )
-  }
+      )}
+      <span class="helia-card-quote__who">
+        {attribution}
+        <slot name="attribution" />
+        {detail !== undefined && (
+          <span class="helia-card-quote__detail">{detail}</span>
+        )}
+      </span>
+    </figcaption>
+  )}
 </figure>
