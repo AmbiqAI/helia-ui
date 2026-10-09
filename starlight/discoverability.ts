@@ -1,22 +1,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
 /*
- * Search-engine and agent discoverability for a HELIA Starlight site.
- *
- * Two halves. The per-page tags are emitted in the head override, because only
- * a component knows which route is rendering; everything site-wide is written
- * here, from an integration that runs once after the build.
- *
- * The site-wide half reads the content collection's source files off disk
- * rather than through `astro:content`. An integration hook has no collection
- * API, and the renditions have to be the authored markdown rather than the
- * rendered HTML read backwards, so the source is the only input that can give
- * a byte-stable answer. The one thing source cannot see is a value a component
- * was handed: those come back from the rendition sidecars each part writes
- * into the built page, which is markdown a part stated rather than markup read
- * backwards. Everything below is a pure function of the file tree, the
- * sidebar and those sidecars, so two runs on one commit produce identical
- * bytes.
+ * The head override emits per-page metadata; this build integration writes
+ * site-wide artifacts. Integration hooks cannot read astro:content, so rendition
+ * text comes from authored files and explicit component sidecars. Outputs depend
+ * only on source, sidebar and sidecars to remain byte-stable across builds.
  */
 
 import { execFileSync } from 'node:child_process';
