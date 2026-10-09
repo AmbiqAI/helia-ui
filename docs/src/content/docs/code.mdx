@@ -274,3 +274,36 @@ npm install example-package
     />
   </TabItem>
 </Tabs>
+
+## Muted backgrounds
+
+Use `tone="muted"` for a neutral gray surface that follows the page theme. The frame, syntax highlighting and copy control work the same way. Omit `tone` to inherit the site setting, or use `tone="default"` to select the ordinary card surface.
+
+<CodeBlock
+  tone="muted"
+  language="python"
+  code={'import numpy as np\nframe = np.zeros(320, dtype=np.float32)'}
+/>
+
+<CodeBlock
+  tone="muted"
+  variant="terminal"
+  language="bash"
+  code="python --version"
+/>
+
+<CodeBlock tone="muted" variant="bare" language="python" code="value = 42" />
+
+Set the site default for Markdown fences and component blocks in the Starlight plugin:
+
+```js
+heliaStarlight({ code: { tone: 'muted' } });
+```
+
+The existing `code: true` and `code: false` options keep their behavior. A site's explicit Expressive Code frame backgrounds still take precedence over the plugin default.
+
+<CodeBlock
+  tone="default"
+  language="python"
+  code={'print("ordinary surface")'}
+/>
