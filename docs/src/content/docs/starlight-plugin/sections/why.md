@@ -9,4 +9,4 @@ where the other parts are.
 
 This page is in the same section as the fixture's landing page, and that
 section declared `sidebar: false`, so this page has no pane either: the
-sections are in the bar above, and in the menu button on a narrow screen.
+sections are in the bar above, and in the section dropdown on a narrow screen.

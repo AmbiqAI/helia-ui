@@ -19,7 +19,7 @@ lists inherited attributes forwards them to its root element.
 | ------------- | ---------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
 | `Card`        | `.helia-card`          | `as`, `tone`, `media`, `density`, `lift`, `interactive`                                          | `default`                                      |
 | `CardMedia`   | `.helia-card-media`    | `ratio`, `fit`                                                                                   | `default`                                      |
-| `CardHeader`  | `.helia-card-header`   | `titleAs`, `padding`, `href`, `eyebrow`, `step`, `scale`                                         | `default`, `icon`, `eyebrow`, `meta`, `action` |
+| `CardHeader`  | `.helia-card-header`   | `titleAs`, `padding`, `href`, `eyebrow`, `step`, `scale`, `rendition`                            | `default`, `icon`, `eyebrow`, `meta`, `action` |
 | `CardContent` | `.helia-card-content`  | `padding`, `variant`                                                                             | `default`                                      |
 | `CardActions` | `.helia-card-actions`  | `align`, `padding`                                                                               | `default`                                      |
 | `CardList`    | `.helia-card-list`     | `items`, `marker`, `icon`, `padding`                                                             | none                                           |
@@ -69,6 +69,7 @@ lists inherited attributes forwards them to its root element.
 | `BigNumber`   | `labelPosition` | `above`, `below`                                                           | `above`       |
 | `BigNumber`   | `step`          | `display`, `heading`                                                       | `display`     |
 | `BigNumber`   | `direction`     | `up`, `down`, `flat`                                                       | `flat`        |
+| `Sparkline`   | `kind`          | `line`, `area`                                                             | `line`        |
 
 ## AccordionGroup
 
@@ -101,18 +102,19 @@ import AccordionGroup from '@ambiqai/helia-ui/astro/AccordionGroup';
 import AsciiTerminal from '@ambiqai/helia-ui/astro/AsciiTerminal';
 ```
 
-| Prop           | Type                              | Default                     | Description                                                              |
-| -------------- | --------------------------------- | --------------------------- | ------------------------------------------------------------------------ |
-| `lines` (req.) | `readonly AsciiTerminalLine[]`    | --                          | The transcript, in order.                                                |
-| `title`        | `string`                          | `'Terminal'`                | The frame's caption.                                                     |
-| `ariaLabel`    | `string`                          | `` `${title} transcript` `` | Accessible name for the frame. Defaults to the title plus `transcript`.  |
-| `animated`     | `boolean`                         | `false`                     | Types the command lines out on entry. Reduced motion shows them at once. |
-| `autoplay`     | `boolean`                         | `true`                      | Starts the animation when the frame scrolls into view. Needs `animated`. |
-| `copy`         | `boolean`                         | `false`                     | Adds the copy control, which copies the whole transcript as plain text.  |
-| `replay`       | `boolean`                         | `animated`                  | Adds the replay control. Defaults to whatever `animated` is.             |
-| `tone`         | `'adaptive' \| 'light' \| 'dark'` | `'adaptive'`                | `adaptive` follows the site theme; `light` and `dark` are fixed.         |
-| `typingSpeed`  | `number`                          | `28`                        | Milliseconds per typed character. 0 types a command line instantly.      |
-| `lineDelay`    | `number`                          | `130`                       | Milliseconds of pause after each line. 0 runs the lines together.        |
+| Prop           | Type                                    | Default                     | Description                                                                                                                                                                                                           |
+| -------------- | --------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lines` (req.) | `readonly AsciiTerminalLine[]`          | --                          | The transcript, in order.                                                                                                                                                                                             |
+| `frame`        | `'plain' \| 'window'`                   | `'plain'`                   | Optional decorative window frame; the default retains the plain transcript.                                                                                                                                           |
+| `title`        | `string`                                | `'Terminal'`                | The frame's caption.                                                                                                                                                                                                  |
+| `ariaLabel`    | `string`                                | `` `${title} transcript` `` | Accessible name for the frame. Defaults to the title plus `transcript`.                                                                                                                                               |
+| `animated`     | `boolean`                               | `false`                     | Types the command lines out on entry. Reduced motion shows them at once.                                                                                                                                              |
+| `autoplay`     | `boolean`                               | `true`                      | Starts the animation when the frame scrolls into view. Needs `animated`.                                                                                                                                              |
+| `copy`         | `boolean \| 'transcript' \| 'commands'` | `false`                     | Adds the copy control. `true` or `'transcript'` copies the whole transcript as plain text, prompts included; `'commands'` copies only the command lines, without prompts, which is what a reader pastes into a shell. |
+| `replay`       | `boolean`                               | `animated`                  | Adds the replay control. Defaults to whatever `animated` is.                                                                                                                                                          |
+| `tone`         | `'adaptive' \| 'light' \| 'dark'`       | `'adaptive'`                | `adaptive` follows the site theme; `light` and `dark` are fixed.                                                                                                                                                      |
+| `typingSpeed`  | `number`                                | `28`                        | Milliseconds per typed character. 0 types a command line instantly.                                                                                                                                                   |
+| `lineDelay`    | `number`                                | `130`                       | Milliseconds of pause after each line. 0 runs the lines together.                                                                                                                                                     |
 
 **AsciiTerminalLine**
 
@@ -229,6 +231,60 @@ Also accepts `HTMLAttributes<'div'>`.
 
 [See it rendered on Gallery](/helia-ui/gallery/#figures)
 
+## Block
+
+**Use it for:** One node of a `BlockDiagram`: a label, an optional second line, and, when it is given children, the set of blocks inside it.
+
+```ts
+import Block from '@ambiqai/helia-ui/astro/Block';
+```
+
+| Prop           | Type                                | Default     | Description                                                                            |
+| -------------- | ----------------------------------- | ----------- | -------------------------------------------------------------------------------------- |
+| `label` (req.) | `string`                            | --          | What the block is. One to three words.                                                 |
+| `sublabel`     | `string`                            | --          | A second line under the label: a qualifier, a count, a unit.                           |
+| `tone`         | `'neutral' \| 'muted' \| 'accent'`  | `'neutral'` | The ground. `accent` takes the product color of whatever subtree it sits in.           |
+| `emphasis`     | `'outline' \| 'filled' \| 'dashed'` | `'outline'` | The edge. `filled` drops it for a stronger ground, `dashed` marks a block as proposed. |
+| `span`         | `2 \| 3 \| 4`                       | --          | Columns the block covers in a `row` or `grid` set. Dropped when the set stacks.        |
+| `flow`         | `'row' \| 'column' \| 'grid'`       | `'column'`  | How the blocks inside this one are laid out.                                           |
+| `columns`      | `2 \| 3 \| 4 \| 5`                  | `3`         | Columns at the wide end of the `grid` flow.                                            |
+| `href`         | `string`                            | --          | Makes the label a link. The block itself stays a list item.                            |
+| `icon`         | `IconName`                          | --          | Font Awesome solid name, drawn before the label as decoration.                         |
+
+Also accepts `HTMLAttributes<'li'>`.
+
+**Slots**
+
+- `default` -- The blocks inside this one. A block with no slot is a leaf.
+
+[See it rendered on Block diagrams](/helia-ui/block-diagrams/#nesting)
+
+## BlockDiagram
+
+**Use it for:** The canvas a set of `Block`s is drawn on: a figure, an optional caption, and the arrangement of the blocks directly inside it.
+
+```ts
+import BlockDiagram from '@ambiqai/helia-ui/astro/BlockDiagram';
+```
+
+| Prop        | Type                                        | Default     | Description                                                                                        |
+| ----------- | ------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| `title`     | `string`                                    | --          | The diagram's name, set over it as the first line of the caption.                                  |
+| `caption`   | `string`                                    | --          | A sentence under the title. What the diagram is of, not what it shows.                             |
+| `flow`      | `'row' \| 'column' \| 'grid' \| 'sequence'` | `'row'`     | Top-level layout. Row and sequence stack below 42rem; sequence adds ordered stages and connectors. |
+| `columns`   | `2 \| 3 \| 4 \| 5`                          | `3`         | Columns at the wide end of the `grid` flow. Halves at 62rem, stacks at 42rem.                      |
+| `density`   | `'compact' \| 'default' \| 'comfortable'`   | `'default'` | The gap between the top-level blocks, and the tighter one inside them.                             |
+| `tone`      | `'plain' \| 'muted'`                        | `'plain'`   | The ground under the diagram. `muted` frames it; `plain` lets the page through.                    |
+| `ariaLabel` | `string`                                    | --          | Accessible name for the figure when it carries no `title`.                                         |
+
+Also accepts `HTMLAttributes<'figure'>`.
+
+**Slots**
+
+- `default` -- The top-level blocks, in reading order.
+
+[See it rendered on Block diagrams](/helia-ui/block-diagrams/#a-flat-row)
+
 ## Button
 
 **Use it for:** The call to action: a pill-shaped link or button.
@@ -259,10 +315,10 @@ Also accepts `Omit<HTMLAttributes<'a'>, 'href'>`, `HTMLAttributes<'button'>`.
 import Callout from '@ambiqai/helia-ui/astro/Callout';
 ```
 
-| Prop           | Type                                                                                                                             | Default  | Description                                                           |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------- |
-| `title` (req.) | `string`                                                                                                                         | --       | The heading of the aside. Required: an untitled aside is a paragraph. |
-| `tone`         | `\| 'note' \| 'tip' \| 'success' \| 'important' \| 'warning' \| 'critical' \| 'compatibility' \| 'experimental' \| 'deprecated'` | `'note'` | What the aside means. Picks the tint and the icon together.           |
+| Prop           | Type                                                                                                                             | Default  | Description                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------- |
+| `title` (req.) | `string`                                                                                                                         | --       | The heading of the aside, and its accessible name.          |
+| `tone`         | `\| 'note' \| 'tip' \| 'success' \| 'important' \| 'warning' \| 'critical' \| 'compatibility' \| 'experimental' \| 'deprecated'` | `'note'` | What the aside means. Picks the tint and the icon together. |
 
 **Slots**
 
@@ -369,14 +425,15 @@ Also accepts `HTMLAttributes<'div'>`.
 import CardHeader from '@ambiqai/helia-ui/astro/CardHeader';
 ```
 
-| Prop      | Type                     | Default     | Description                                                                                                                                                                                                                                                                                     |
-| --------- | ------------------------ | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `titleAs` | `'h2' \| 'h3' \| 'h4'`   | `'h3'`      | Heading level for the title. Pick the one the page outline needs.                                                                                                                                                                                                                               |
-| `padding` | `PaddingStep`            | `'card'`    | Inner padding, named by spacing step. `card` follows the density dial; `none` leaves the part to own its gaps.                                                                                                                                                                                  |
-| `href`    | `string`                 | --          | Links the title, and stretches that link over the whole card.                                                                                                                                                                                                                                   |
-| `eyebrow` | `string`                 | --          | The eyebrow text. Prefer this to the `eyebrow` slot in MDX: MDX merges a slotted element and the title text that follows it into one paragraph, which drops the `slot` attribute and folds the eyebrow into the heading's accessible name. The slot stays for markup an attribute cannot carry. |
-| `step`    | `number \| string`       | --          | The position in an ordered flow, rendered as a numeral in the leading disc.                                                                                                                                                                                                                     |
-| `scale`   | `'default' \| 'display'` | `'default'` | `display` takes the title and eyebrow up a step, for a card standing in for a hero.                                                                                                                                                                                                             |
+| Prop        | Type                     | Default     | Description                                                                                                                                                                                                                                                                                     |
+| ----------- | ------------------------ | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `titleAs`   | `'h2' \| 'h3' \| 'h4'`   | `'h3'`      | Heading level for the title. Pick the one the page outline needs.                                                                                                                                                                                                                               |
+| `padding`   | `PaddingStep`            | `'card'`    | Inner padding, named by spacing step. `card` follows the density dial; `none` leaves the part to own its gaps.                                                                                                                                                                                  |
+| `href`      | `string`                 | --          | Links the title, and stretches that link over the whole card.                                                                                                                                                                                                                                   |
+| `eyebrow`   | `string`                 | --          | The eyebrow text. Prefer this to the `eyebrow` slot in MDX: MDX merges a slotted element and the title text that follows it into one paragraph, which drops the `slot` attribute and folds the eyebrow into the heading's accessible name. The slot stays for markup an attribute cannot carry. |
+| `step`      | `number \| string`       | --          | The position in an ordered flow, rendered as a numeral in the leading disc.                                                                                                                                                                                                                     |
+| `scale`     | `'default' \| 'display'` | `'default'` | `display` takes the title and eyebrow up a step, for a card standing in for a hero.                                                                                                                                                                                                             |
+| `rendition` | `boolean`                | `true`      | Whether the header states the card's line for the page's markdown rendition. Set it false in a part that wraps this one and states the whole card itself, the way `LinkCard` does; a card stated twice reaches an agent as two cards.                                                           |
 
 Also accepts `HTMLAttributes<'div'>`.
 
@@ -464,26 +521,26 @@ Also accepts `HTMLAttributes<'figure'>`.
 import Chart from '@ambiqai/helia-ui/astro/Chart';
 ```
 
-| Prop             | Type                            | Default        | Description                                                                                                                                                      |
-| ---------------- | ------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `title` (req.)   | `string`                        | --             | The chart's heading. Also the accessible name of the SVG.                                                                                                        |
-| `subtitle`       | `string`                        | --             | What is plotted against what. Stands in for the axis titles.                                                                                                     |
-| `caption`        | `string`                        | --             | A note under the chart: provenance, units, a caveat.                                                                                                             |
-| `kind`           | `ChartKind`                     | `'line'`       | Which marks to draw. `dot` and `scatter` draw the same mark; only `scatter` grids both axes.                                                                     |
-| `data` (req.)    | `readonly ChartRecord[]`        | --             | The rows. Every row carries the `x`, `y` and `series` keys.                                                                                                      |
-| `x` (req.)       | `string`                        | --             | Key on each row for the horizontal position.                                                                                                                     |
-| `y` (req.)       | `string`                        | --             | Key on each row for the vertical position.                                                                                                                       |
-| `series`         | `string`                        | --             | Key whose distinct values split the rows into series. Omit it for one series.                                                                                    |
-| `height`         | `number`                        | `CHART_HEIGHT` | The height, in pixels, Plot lays the chart out at.                                                                                                               |
-| `width`          | `number`                        | `CHART_WIDTH`  | The width, in pixels, Plot lays the chart out at. The SVG then scales to its container and keeps that aspect ratio, so pick a width near the one it is shown at. |
-| `density`        | `ChartDensity`                  | `'default'`    | Moves the margins and the tick count.                                                                                                                            |
-| `legend`         | `ChartLegend`                   | `'auto'`       | `auto` names the series when there is more than one; `none` never does.                                                                                          |
-| `orientation`    | `ChartOrientation`              | `'vertical'`   | Which way the bars run. `horizontal` puts the categories on the y axis and takes the left margin from the longest label.                                         |
-| `scale`          | `ChartScale`                    | --             | The measure's scale. A `log` axis over a value at or below zero is drawn linear, and the build says so.                                                          |
-| `axis`           | `ChartAxisTitles`               | --             | Axis titles, for the chart whose unit will not fit in the subtitle.                                                                                              |
-| `valueLabels`    | `boolean`                       | `false`        | Writes each bar's value at its end, where the bands leave room for it.                                                                                           |
-| `valueFormat`    | `(value: number) => string`     | --             | How a value is written, on a bar and on a titled or logarithmic axis.                                                                                            |
-| `referenceLines` | `readonly ChartReferenceLine[]` | --             | Rules across the measure: a baseline, a target, a budget.                                                                                                        |
+| Prop             | Type                                              | Default        | Description                                                                                                                                                      |
+| ---------------- | ------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `title` (req.)   | `string`                                          | --             | The chart's heading. Also the accessible name of the SVG.                                                                                                        |
+| `subtitle`       | `string`                                          | --             | What is plotted against what. Stands in for the axis titles.                                                                                                     |
+| `caption`        | `string`                                          | --             | A note under the chart: provenance, units, a caveat.                                                                                                             |
+| `kind`           | `'line' \| 'area' \| 'bar' \| 'scatter' \| 'dot'` | `'line'`       | Which marks to draw. `dot` and `scatter` draw the same mark; only `scatter` grids both axes.                                                                     |
+| `data` (req.)    | `readonly ChartRecord[]`                          | --             | The rows. Every row carries the `x`, `y` and `series` keys.                                                                                                      |
+| `x` (req.)       | `string`                                          | --             | Key on each row for the horizontal position.                                                                                                                     |
+| `y` (req.)       | `string`                                          | --             | Key on each row for the vertical position.                                                                                                                       |
+| `series`         | `string`                                          | --             | Key whose distinct values split the rows into series. Omit it for one series.                                                                                    |
+| `height`         | `number`                                          | `CHART_HEIGHT` | The height, in pixels, Plot lays the chart out at.                                                                                                               |
+| `width`          | `number`                                          | `CHART_WIDTH`  | The width, in pixels, Plot lays the chart out at. The SVG then scales to its container and keeps that aspect ratio, so pick a width near the one it is shown at. |
+| `density`        | `'default' \| 'compact' \| 'comfortable'`         | `'default'`    | Moves the margins and the tick count.                                                                                                                            |
+| `legend`         | `'auto' \| 'none'`                                | `'auto'`       | `auto` names the series when there is more than one; `none` never does.                                                                                          |
+| `orientation`    | `'vertical' \| 'horizontal'`                      | `'vertical'`   | Which way the bars run. `horizontal` puts the categories on the y axis and takes the left margin from the longest label.                                         |
+| `scale`          | `ChartScale`                                      | --             | The measure's scale. A `log` axis over a value at or below zero is drawn linear, and the build says so.                                                          |
+| `axis`           | `ChartAxisTitles`                                 | --             | Axis titles, for the chart whose unit will not fit in the subtitle.                                                                                              |
+| `valueLabels`    | `boolean`                                         | `false`        | Writes each bar's value at its end, where the bands leave room for it.                                                                                           |
+| `valueFormat`    | `(value: number) => string`                       | --             | How a value is written, on a bar and on a titled or logarithmic axis.                                                                                            |
+| `referenceLines` | `readonly ChartReferenceLine[]`                   | --             | Rules across the measure: a baseline, a target, a budget.                                                                                                        |
 
 Also accepts `HTMLAttributes<'figure'>`.
 
@@ -651,14 +708,19 @@ Also accepts `HTMLAttributes<'p'>`.
 import Hero from '@ambiqai/helia-ui/astro/Hero';
 ```
 
-| Prop      | Type                    | Default     | Description                                                                                   |
-| --------- | ----------------------- | ----------- | --------------------------------------------------------------------------------------------- |
-| `variant` | `'plain' \| 'contrast'` | `'plain'`   | The ground. `contrast` is the inked card, `plain` the same layout with nothing behind it.     |
-| `eyebrow` | `string`                | --          | The label above the headline, rendered in an `Eyebrow` with the accent dot.                   |
-| `summary` | `string`                | --          | The claim under the headline: one sentence, not a paragraph. The `summary` slot wins over it. |
-| `badge`   | `string`                | --          | A short standing label under the headline, rendered as an accent `Badge`.                     |
-| `titleAs` | `'h1' \| 'h2'`          | `'h1'`      | Heading level for the headline. A page's own hero is the `h1`; a section hero is not.         |
-| `as`      | `'section' \| 'div'`    | `'section'` | Element to render. A hero that opens the page should stay a `section`.                        |
+| Prop           | Type                                  | Default     | Description                                                                                   |
+| -------------- | ------------------------------------- | ----------- | --------------------------------------------------------------------------------------------- |
+| `variant`      | `'plain' \| 'contrast'`               | `'plain'`   | The ground. `contrast` is the inked card, `plain` the same layout with nothing behind it.     |
+| `align`        | `'start' \| 'center'`                 | `'start'`   | Centers a standalone headline and its actions.                                                |
+| `size`         | `'default' \| 'compact' \| 'section'` | `'default'` | Compact uses the page heading scale; section uses the smaller section heading scale.          |
+| `eyebrow`      | `string`                              | --          | The label above the headline, rendered in an `Eyebrow` with the accent dot.                   |
+| `eyebrowIcon`  | `string`                              | --          | Decorative product mark replacing the eyebrow accent dot.                                     |
+| `eyebrowStyle` | `'label' \| 'brand'`                  | `'label'`   | Product identity uses the landing brand scale; labels keep compact eyebrow type.              |
+| `summary`      | `string`                              | --          | The claim under the headline: one sentence, not a paragraph. The `summary` slot wins over it. |
+| `palette`      | `'product' \| 'neutral'`              | `'product'` | Neutral emphasis and filled primary action, without changing semantic colors elsewhere.       |
+| `badge`        | `string`                              | --          | A short standing label under the headline, rendered as an accent `Badge`.                     |
+| `titleAs`      | `'h1' \| 'h2'`                        | `'h1'`      | Heading level for the headline. A page's own hero is the `h1`; a section hero is not.         |
+| `as`           | `'section' \| 'div'`                  | `'section'` | Element to render. A hero that opens the page should stay a `section`.                        |
 
 Also accepts `HTMLAttributes<'section'>`.
 
@@ -741,6 +803,24 @@ Also accepts `HTMLAttributes<'span'>`.
 - `default` -- The glyph, when `name` is not the way to reach it: an inline `<svg>`, a brand mark, a numeral.
 
 [See it rendered on Gallery](/helia-ui/gallery/#icon-tiles)
+
+## Landing
+
+**Use it for:** Bounded composition for product landing pages shared by HPX and AOT.
+
+```ts
+import Landing from '@ambiqai/helia-ui/astro/Landing';
+```
+
+No props.
+
+Also accepts `HTMLAttributes<'div'>`.
+
+**Slots**
+
+- `default` -- The product introduction and feature sections.
+
+[See it rendered on Landing pages](/helia-ui/landing/)
 
 ## LinkCard
 
@@ -1020,6 +1100,28 @@ import RefSymbol from '@ambiqai/helia-ui/astro/RefSymbol';
 
 [See it rendered on Gallery](/helia-ui/gallery/#reference)
 
+## ReferenceBrowser
+
+**Use it for:** A compact reference index with consumer-owned rows and filters. All entries are present without JavaScript.
+
+```ts
+import ReferenceBrowser from '@ambiqai/helia-ui/astro/ReferenceBrowser';
+```
+
+| Prop           | Type                       | Default | Description                                                                |
+| -------------- | -------------------------- | ------- | -------------------------------------------------------------------------- |
+| `rows` (req.)  | `readonly RefIndexRow[]`   | --      | Consumer-owned reference entries, including their existing destinations.   |
+| `filters`      | `readonly RefIndexFacet[]` | --      | Ordered filters with consumer-defined meanings and values.                 |
+| `label` (req.) | `string`                   | --      | Search field and region label.                                             |
+| `nameLabel`    | `string`                   | --      | First column heading.                                                      |
+| `itemsLabel`   | `string`                   | --      | Plural noun in result counts and empty state.                              |
+| `placeholder`  | `string`                   | --      | Search hint.                                                               |
+| `pageSize`     | `number`                   | --      | Rows per page after hydration; without JavaScript all rows remain visible. |
+
+**Slots** -- none.
+
+[See it rendered on Reference browser](/helia-ui/react/reference-browser/)
+
 ## Reveal
 
 **Use it for:** Entry animation for whatever it wraps: a short fade and rise the first time the element reaches the viewport.
@@ -1095,7 +1197,7 @@ import Sparkline from '@ambiqai/helia-ui/astro/Sparkline';
 | ------------------ | ------------------- | ------------------ | -------------------------------------------------------------------------------------- |
 | `values` (req.)    | `readonly number[]` | --                 | The series, in order. The index is the horizontal position.                            |
 | `ariaLabel` (req.) | `string`            | --                 | What the trend says, as one sentence. The accessible name of the SVG.                  |
-| `kind`             | `SparklineKind`     | `'line'`           | `line` draws the stroke alone; `area` fills under it as well.                          |
+| `kind`             | `'line' \| 'area'`  | `'line'`           | `line` draws the stroke alone; `area` fills under it as well.                          |
 | `width`            | `number`            | `SPARKLINE_WIDTH`  | The width, in pixels, Plot lays the sparkline out at. It ships at that size.           |
 | `height`           | `number`            | `SPARKLINE_HEIGHT` | The height, in pixels, Plot lays the sparkline out at.                                 |
 | `marker`           | `boolean`           | `false`            | Draws a dot on the last point, where a reader looks first.                             |
