@@ -1,23 +1,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
 /*
- * A reference model in, a published reference out: MDX pages that compose the
- * `Ref*` parts, the JSON the model itself is, and the two text artifacts an
- * agent reads instead of the pages.
- *
- * Nothing here knows a language. Every input is a field of `reference-model.ts`
- * and every output is a function of it, so the Python, C and TypeScript
- * references are the same pages with different content rather than three
- * renderers that drifted.
- *
- * The JSON is the source of truth and the pages are a view of it. That ordering
- * is why the model is written out whole and per module, with sorted keys and no
- * timestamp: an artifact that changes when nothing changed is one nobody can
- * diff, and a reference whose consumer has to scrape HTML is one that breaks
- * every time the design moves.
- *
- * The renderer is a pure function of the model and the options: no filesystem,
- * no process, so the CLI and the tests exercise the same code.
+ * Language extractors share this renderer and reference-model.ts. JSON and text
+ * artifacts use sorted keys and omit timestamps to remain reproducible.
+ * Rendering has no filesystem or process dependencies, so the CLI and tests
+ * exercise the same model-to-output contract.
  */
 
 import { escapeMdx, mapOutsideCode, mapProse, table } from './markdown.mjs';

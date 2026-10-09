@@ -1,20 +1,15 @@
-# Landing polish
+# helia-ui maintainability pass
 
-Goal: shared Button icon spacing, sidebar-free landing navigation, official Hero icons.
-Issue: https://github.com/AmbiqAI/helia-ui/issues/196
-Branch: codex/landing-polish, based on origin/main alpha.24.
+Goal: improve architecture, CI/CD, hooks, organization and comment quality. Focused local tooling pass tracks AmbiqAI/helia-ui#38; wider refactor tracks #204.
 
-Implemented: Button spacing; sidebar:false sections render no sidebar or hamburger; mobile section dropdown includes HELIA AI Developer Hub; narrow header hides duplicate Hub button; Hero eyebrowIcon URL replaces decorative dot while preserving text.
+Worktree: /Users/adam.page/Ambiq/helia/helia-ui-maintainability. Branch: codex/helia-ui-maintainability. Base: a4b774b5f48dfc769aff1e90fcf65bd0d7c7b5c4. Other checkouts and preview ports preserved.
 
-Verified: npm run validate (275 unit tests), gallery build and assertions, 230 gallery browser tests. Derived Astro prop reference regenerated. No dependency changes.
+Implemented locally: explicit-install tracked hooks with staged formatting/syntax checks, conventional commit checks and pre-push validation; regression coverage for partial staging. React/gallery type dependencies and actual type checks; corrected dataset/test types. Root Astro/Zod aligned with gallery. CI gate, timeouts, pinned npm, duplicate unit execution removed. Release-prepare explicitly dispatches CI because GITHUB_TOKEN PRs do not trigger ordinary PR workflows. Targeted comment cleanup and CONTRIBUTING.md.
 
-Consumers: isolated branches at /Users/adam.page/Ambiq/landing-polish/*; four KIT home TOCs disabled; six product hero marks updated. Consumer integration checks use temporary packed local package; committed pins remain immutable released tags. New shared release is needed before consumer pins and PR validation can be finalized.
+Verified: fresh root/gallery installs; 277 unit tests; React and gallery types (zero gallery diagnostics); gallery build; 232 browser tests; isolated packed consumer (150 files, 11 bins); workflow YAML/shell syntax and CI gate failure handling. Latest evidence: /tmp/ui-hardening-final-validation.log, /tmp/ui-hardening-final-gallery.log, /tmp/ui-hardening-build.log, /tmp/ui-hardening-browser.log. No GitHub workflow execution for these changes yet. User approved publishing this PR and follow-up issue.
 
-Next: review shared PR, release via RELEASE.md, pin consumers, complete product rendered validation and PRs. GitHub CLI writes failed with empty/server responses; authenticated REST succeeded for issues. No merge authorized for this follow-up yet.
+Findings: main ruleset requires one review but no CI checks, stale approvals not dismissed, unresolved threads allowed; workflow defaults allow writes/PR approvals. No remote settings changed. Discoverability module mixes source parsing, reduction, reconciliation, artifacts and integration. Preserve public contracts and byte-identical artifacts when splitting. Shared Astro type coverage is still incomplete.
 
-PR: https://github.com/AmbiqAI/helia-ui/pull/197
-Two independent reviews found and resolved headerless section navigation and false data-attribute Hub hiding. Plugin prose updated; headerless middleware regression tests added. Release notes for alpha.25 included.
+Reviewable report and follow-up issue draft: docs/maintenance-audit.md. Follow-up issue published: https://github.com/AmbiqAI/helia-ui/issues/204. Hardening PR published: https://github.com/AmbiqAI/helia-ui/pull/205 (commit 97241ca). CI run: https://github.com/AmbiqAI/helia-ui/actions/runs/37985903138, initially running. Next: inspect CI results. Then verify GitHub CI, propose enabling required CI gate after a successful run, and carry out small architecture changes with regression coverage. No merge or release authorized in this scope.
 
-Final verification: latest shared docs build and 230 browser tests pass at 77794a1. All ten consumer draft PRs are attached to this chat. Four existing KIT browser tabs refreshed. Shared CI browser job still pending at last check; consumer pins await shared publication.
-
-User follow-up: shared dropdown Hub label shortened to HELIA AI DEV Hub with a decorative external-site arrow. Applies to all ten consumers via the shared release.
+Runtime: Node 24.12.0 and npm 11.19.0; cached pinned npm at /Users/adam.page/.npm/_npx/81d468605400e209/node_modules/.bin. Node's bundled npm is older. Hooks not enabled because local Git hook configuration is shared across worktrees. Gallery install changes executable modes of root bin files; those install side effects were restored. Do not hand-edit lockfiles.
