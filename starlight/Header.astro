@@ -21,10 +21,14 @@ import Search from '@astrojs/starlight/components/Search.astro';
 import config from 'virtual:helia-ui/starlight-config';
 
 import { matchSection } from './sections';
+import { regularTitlePrefix } from './header-title';
 import ThemeMenu from './ThemeMenu.astro';
 import SectionDropdown from './SectionDropdown.astro';
 
 const header = config.header;
+const titleRegularPrefix = header
+  ? regularTitlePrefix(header.title, header.titleRegularPrefix)
+  : '';
 const activeSection = matchSection(
   config.sections,
   Astro.url.pathname,
@@ -32,6 +36,13 @@ const activeSection = matchSection(
 );
 const mobileLinks = activeSection ? config.sections : (header?.links ?? []);
 const { hasSidebar, siteTitleHref } = Astro.locals.starlightRoute;
+const showSidebarToggle = hasSidebar && activeSection?.sidebar !== false;
+const dropdownLinks = header?.hub
+  ? [
+      ...mobileLinks,
+      { ...header.hub, label: 'HELIA AI DEV Hub', external: true },
+    ]
+  : mobileLinks;
 
 /*
  * A prefix rather than an equality, so a link stays current on every page
@@ -48,8 +59,13 @@ const current = matchSection(
 
 {
   header && (
-    <div class="helia-site-header">
-      {hasSidebar && (
+    <div
+      class="helia-site-header"
+      data-helia-hub-in-dropdown={
+        header.hub && mobileLinks.length > 0 ? '' : undefined
+      }
+    >
+      {showSidebarToggle && (
         <button
           class="helia-site-header__toggle"
           type="button"
@@ -65,10 +81,10 @@ const current = matchSection(
       )}
 
       <a class="helia-site-header__title" href={siteTitleHref}>
-        {header.title.match(/^helia(?=[A-Z])/) ? (
+        {titleRegularPrefix ? (
           <>
-            <span class="helia-site-header__prefix">helia</span>
-            {header.title.slice(5)}
+            <span class="helia-site-header__prefix">{titleRegularPrefix}</span>
+            {header.title.slice(titleRegularPrefix.length)}
           </>
         ) : (
           header.title
@@ -90,7 +106,7 @@ const current = matchSection(
 
       {mobileLinks.length > 0 && (
         <SectionDropdown
-          links={mobileLinks}
+          links={dropdownLinks}
           current={activeSection ?? current}
         />
       )}

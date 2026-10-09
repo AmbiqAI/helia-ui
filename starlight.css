@@ -388,13 +388,20 @@
   outline-offset: 2px;
 }
 
-/* One link, two places: the bar above the collapse point, the menu below it. */
+/* Keep the hub in the bar after section links collapse, until the bar itself gets tight. */
 .helia-sidebar-hub {
   margin-top: var(--helia-space-3);
 }
 
-@media (width >= 62rem) {
+@media (width >= 42rem) {
   .helia-sidebar-hub {
+    display: none;
+  }
+}
+
+@media (width < 42rem) {
+  html[data-has-sidebar] .helia-site-header__hub,
+  .helia-site-header[data-helia-hub-in-dropdown] .helia-site-header__hub {
     display: none;
   }
 }
@@ -433,8 +440,7 @@
     display: flex;
   }
 
-  .helia-site-header__nav,
-  .helia-site-header__hub {
+  .helia-site-header__nav {
     display: none;
   }
 }
@@ -801,7 +807,10 @@
   z-index: var(--helia-layer-menu);
 }
 .helia-section-dropdown nav a {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--helia-space-3);
   padding: var(--helia-space-2) var(--helia-space-3);
   border-radius: var(--helia-radius-sm);
   color: var(--helia-ink-primary);

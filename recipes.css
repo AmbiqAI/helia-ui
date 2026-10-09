@@ -418,6 +418,7 @@ a.helia-chip--neutral:focus-visible {
 
 .helia-button {
   align-items: center;
+  gap: var(--helia-space-2);
   border: 1px solid transparent;
   border-radius: var(--helia-radius-pill);
   cursor: pointer;
@@ -2113,7 +2114,37 @@ a.helia-chip--neutral:focus-visible {
   gap: var(--helia-space-2);
 }
 
-.helia-hero__eyebrow::before {
+.helia-hero__eyebrow--icon::before {
+  content: none;
+}
+
+.helia-hero__icon {
+  flex-shrink: 0;
+  height: 1.75rem;
+  width: 1.75rem;
+  object-fit: contain;
+}
+
+.helia-hero__brand {
+  align-items: center;
+  color: var(--helia-hero-brand-ink, var(--helia-ink-primary));
+  display: inline-flex;
+  font-size: var(--helia-text-hero-brand);
+  font-weight: var(--helia-weight-bold);
+  gap: var(--helia-space-3);
+  letter-spacing: var(--helia-tracking-wordmark);
+  line-height: var(--helia-leading-heading);
+  text-transform: none;
+}
+
+.helia-hero__brand img {
+  flex-shrink: 0;
+  height: 2rem;
+  object-fit: contain;
+  width: 2rem;
+}
+
+.helia-hero__eyebrow:not(.helia-hero__eyebrow--icon)::before {
   background: var(--helia-product-accent);
   border-radius: 50%;
   content: '';

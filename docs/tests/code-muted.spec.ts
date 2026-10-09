@@ -27,6 +27,20 @@ for (const theme of ['light', 'dark']) {
       expect(colors.actual).toBe(colors.expected);
       await expect(block.locator('button')).toBeVisible();
     }
+    const reset = page.locator('.helia-code-tone-default');
+    await expect(reset).toHaveCount(1);
+    const resetColors = await reset.evaluate((node) => {
+      const probe = document.createElement('span');
+      probe.style.backgroundColor = 'var(--helia-surface-card)';
+      node.append(probe);
+      const expected = getComputedStyle(probe).backgroundColor;
+      probe.remove();
+      return {
+        expected,
+        actual: getComputedStyle(node.querySelector('pre')!).backgroundColor,
+      };
+    });
+    expect(resetColors.actual).toBe(resetColors.expected);
     await expect(blocks.first()).toContainText('import numpy as np');
     await blocks.first().locator('button').click();
   });
