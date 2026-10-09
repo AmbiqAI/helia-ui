@@ -133,18 +133,9 @@ const current = matchSection(
 }
 
 <script>
-  /*
-   * Starlight's own mobile menu state, driven from here rather than mirrored:
-   * the attribute it keys the overlay and the scroll lock on, `inert` on the
-   * frame behind the pane, and the button's `aria-expanded`. One state is what
-   * keeps the lock and the pane from disagreeing, and a lock held over a pane
-   * that never opened is what disagreement looks like.
-   * See AmbiqAI/helia-ui#88.
-   *
-   * The listeners are delegated and bound at module scope, which a document
-   * runs once: a view transition swaps the bar out from under them and they
-   * stay bound, and bound once.
-   */
+  /* Native popover dismissal and the wider HELIA collapse point share state.
+     Delegated listeners survive a header replacement during view transitions.
+     See AmbiqAI/helia-ui#88. */
   const EXPANDED = 'data-mobile-menu-expanded';
 
   const button = () =>
