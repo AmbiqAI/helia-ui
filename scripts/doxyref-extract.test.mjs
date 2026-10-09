@@ -272,6 +272,20 @@ test('a summary is the first sentence, trimmed to fit a description tag', () => 
   assert.equal(summarize(`${'a '.repeat(120)}.`).length, 160);
 });
 
+test('a summary keeps the underscores of the identifiers it names', () => {
+  assert.equal(
+    summarize(
+      'Runs the Helium implementation unless built with `ARM_MATH_AUTOVECTORIZE`.',
+    ),
+    'Runs the Helium implementation unless built with ARM_MATH_AUTOVECTORIZE.',
+  );
+  assert.equal(
+    summarize('Sets HELIA_DSP_VERSION_MAJOR, *not* _the_ __patch__.'),
+    'Sets HELIA_DSP_VERSION_MAJOR, not the patch.',
+  );
+  assert.equal(summarize('Reads `_x_` and `` a`b ``.'), 'Reads _x_ and a`b.');
+});
+
 /* -------------------------------------------------------------------------
  * Through the shared renderer
  * ---------------------------------------------------------------------- */
