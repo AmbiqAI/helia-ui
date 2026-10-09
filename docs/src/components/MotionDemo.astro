@@ -27,14 +27,12 @@ const tokens = [
 
 <div class="motion not-content">
   <ul class="motion__tokens">
-    {
-      tokens.map((entry) => (
-        <li data-motion-token={entry.token}>
-          <code>{entry.token}</code>
-          <span>{entry.role}</span>
-        </li>
-      ))
-    }
+    {tokens.map((entry) => (
+      <li data-motion-token={entry.token}>
+        <code>{entry.token}</code>
+        <span>{entry.role}</span>
+      </li>
+    ))}
   </ul>
 
   <div class="motion__stage">

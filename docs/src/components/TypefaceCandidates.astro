@@ -51,61 +51,59 @@ const candidates: Candidate[] = [
   here and push each row out of line with the first.
 -->
 <div class="candidates not-content">
-  {
-    candidates.map((candidate) => (
-      <section class="candidate" data-typeface={candidate.id}>
-        <header class="candidate__head">
-          <h2 class="candidate__name">{candidate.name}</h2>
-          <p class="candidate__note">
-            <span>{candidate.license}</span>
-            <span>{candidate.size}</span>
-          </p>
-        </header>
+  {candidates.map((candidate) => (
+    <section class="candidate" data-typeface={candidate.id}>
+      <header class="candidate__head">
+        <h2 class="candidate__name">{candidate.name}</h2>
+        <p class="candidate__note">
+          <span>{candidate.license}</span>
+          <span>{candidate.size}</span>
+        </p>
+      </header>
 
-        <div class="specimen">
-          <p class="specimen__label">Display · 650 · two trackings</p>
-          <div class="tracking">
-            <div class="tracking__column">
-              <p class="tracking__value">-0.055em</p>
-              <p class="display display--tight">Intelligence at the edge</p>
-            </div>
-            <div class="tracking__column">
-              <p class="tracking__value">-0.02em</p>
-              <p class="display display--token">Intelligence at the edge</p>
-            </div>
+      <div class="specimen">
+        <p class="specimen__label">Display · 650 · two trackings</p>
+        <div class="tracking">
+          <div class="tracking__column">
+            <p class="tracking__value">-0.055em</p>
+            <p class="display display--tight">Intelligence at the edge</p>
+          </div>
+          <div class="tracking__column">
+            <p class="tracking__value">-0.02em</p>
+            <p class="display display--token">Intelligence at the edge</p>
           </div>
         </div>
+      </div>
 
-        <div class="specimen">
-          <p class="specimen__label">H2 role · 650</p>
-          {/* An h3 element carrying the H2 type role, so four candidate blocks
+      <div class="specimen">
+        <p class="specimen__label">H2 role · 650</p>
+        {/* An h3 element carrying the H2 type role, so four candidate blocks
               do not add sixteen headings to the page outline. */}
-          <h3 class="heading">Profiling a model on device</h3>
-        </div>
+        <h3 class="heading">Profiling a model on device</h3>
+      </div>
 
-        <div class="specimen">
-          <p class="specimen__label">Body</p>
-          <p class="body">
-            A specimen is only useful at the size and the measure the real page
-            uses, so this paragraph runs at the body role and the standard
-            reading width. Look at the rhythm of the lowercase, the spacing
-            either side of a comma, and the way numbers such as 0.94 and 510 sit
-            against the letters around them. Then read it twice.
-          </p>
-        </div>
+      <div class="specimen">
+        <p class="specimen__label">Body</p>
+        <p class="body">
+          A specimen is only useful at the size and the measure the real page
+          uses, so this paragraph runs at the body role and the standard reading
+          width. Look at the rhythm of the lowercase, the spacing either side of
+          a comma, and the way numbers such as 0.94 and 510 sit against the
+          letters around them. Then read it twice.
+        </p>
+      </div>
 
-        <div class="specimen">
-          <p class="specimen__label">UI</p>
-          <div class="ui-row">
-            <span class="ui-button">Get started</span>
-            <span class="ui-badge">Variable</span>
-            <span class="ui-eyebrow">Foundations</span>
-            <code class="ui-mono">helia-aot compile model.onnx</code>
-          </div>
+      <div class="specimen">
+        <p class="specimen__label">UI</p>
+        <div class="ui-row">
+          <span class="ui-button">Get started</span>
+          <span class="ui-badge">Variable</span>
+          <span class="ui-eyebrow">Foundations</span>
+          <code class="ui-mono">helia-aot compile model.onnx</code>
         </div>
-      </section>
-    ))
-  }
+      </div>
+    </section>
+  ))}
 </div>
 
 <style>

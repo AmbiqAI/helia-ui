@@ -75,15 +75,11 @@ const stated = renditionText(label);
   {...attrs}
 >
   <Fragment set:html={label} />
-  {
-    href && (
-      <script
-        is:inline
-        {...renditionAttributes('button')}
-        set:html={escapeRendition(
-          stated === '' ? '' : inlineLink(stated, href),
-        )}
-      />
-    )
-  }
+  {href && (
+    <script
+      is:inline
+      {...renditionAttributes('button')}
+      set:html={escapeRendition(stated === '' ? '' : inlineLink(stated, href))}
+    />
+  )}
 </Element>

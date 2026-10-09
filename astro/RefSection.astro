@@ -26,7 +26,9 @@ const { title, id, class: className } = Astro.props;
 
 <section class:list={['helia-ref-section', className]} id={id}>
   <p class="helia-ref-section__label">{title}</p>
-  <div class="helia-ref-section__body"><slot /></div>
+  <div class="helia-ref-section__body">
+    <slot />
+  </div>
 </section>
 
 <style>

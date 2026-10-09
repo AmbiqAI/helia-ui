@@ -141,21 +141,19 @@ const entries = chartLegendEntries({ data, series }, legend);
     <p class="helia-chart__title">{title}</p>
     {subtitle && <p class="helia-chart__subtitle">{subtitle}</p>}
   </div>
-  {
-    entries.length > 0 && (
-      <ul class="helia-chart__legend">
-        {entries.map((entry) => (
-          <li>
-            <span
-              class="helia-chart__swatch"
-              style={`--helia-chart-swatch: ${entry.color}`}
-            />
-            {entry.label}
-          </li>
-        ))}
-      </ul>
-    )
-  }
+  {entries.length > 0 && (
+    <ul class="helia-chart__legend">
+      {entries.map((entry) => (
+        <li>
+          <span
+            class="helia-chart__swatch"
+            style={`--helia-chart-swatch: ${entry.color}`}
+          />
+          {entry.label}
+        </li>
+      ))}
+    </ul>
+  )}
   <div class="helia-chart__plot" set:html={svg} />
   <slot />
   {caption && <figcaption class="helia-chart__caption">{caption}</figcaption>}

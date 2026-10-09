@@ -48,39 +48,37 @@ const groupId = `code-tabs-${crypto.randomUUID()}`;
   class:list={['code-tabs', 'helia-surface', `variant-${variant}`]}
 >
   <div class="tabs-toolbar">
-    {
-      variant === 'tabs' ? (
-        <div class="tab-list" role="tablist" aria-label={ariaLabel}>
-          {tabs.map((tab, index) => (
-            <button
-              class="helia-focus-ring helia-focus-ring--inset"
-              id={`${groupId}-tab-${index}`}
-              type="button"
-              role="tab"
-              aria-controls={`${groupId}-panel-${index}`}
-              aria-selected={index === 0 ? 'true' : 'false'}
-              tabindex={index === 0 ? 0 : -1}
-              data-tab-index={index}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      ) : (
-        <label class="select-control">
-          <span>Language</span>
-          <select
-            class="helia-focus-ring"
-            aria-label={ariaLabel}
-            data-code-select
+    {variant === 'tabs' ? (
+      <div class="tab-list" role="tablist" aria-label={ariaLabel}>
+        {tabs.map((tab, index) => (
+          <button
+            class="helia-focus-ring helia-focus-ring--inset"
+            id={`${groupId}-tab-${index}`}
+            type="button"
+            role="tab"
+            aria-controls={`${groupId}-panel-${index}`}
+            aria-selected={index === 0 ? 'true' : 'false'}
+            tabindex={index === 0 ? 0 : -1}
+            data-tab-index={index}
           >
-            {tabs.map((tab, index) => (
-              <option value={index}>{tab.label}</option>
-            ))}
-          </select>
-        </label>
-      )
-    }
+            {tab.label}
+          </button>
+        ))}
+      </div>
+    ) : (
+      <label class="select-control">
+        <span>Language</span>
+        <select
+          class="helia-focus-ring"
+          aria-label={ariaLabel}
+          data-code-select
+        >
+          {tabs.map((tab, index) => (
+            <option value={index}>{tab.label}</option>
+          ))}
+        </select>
+      </label>
+    )}
     <button
       aria-label="Copy code"
       class="copy-button helia-focus-ring helia-focus-ring--inset"
@@ -89,9 +87,7 @@ const groupId = `code-tabs-${crypto.randomUUID()}`;
       data-copy-button
     >
       <svg aria-hidden="true" class="copy-icon" viewBox="0 0 20 20">
-        <path
-          d="M6.25 6.25V4.5A1.75 1.75 0 0 1 8 2.75h7.5a1.75 1.75 0 0 1 1.75 1.75V12A1.75 1.75 0 0 1 15.5 13.75h-1.75"
-        ></path>
+        <path d="M6.25 6.25V4.5A1.75 1.75 0 0 1 8 2.75h7.5a1.75 1.75 0 0 1 1.75 1.75V12A1.75 1.75 0 0 1 15.5 13.75h-1.75"></path>
         <rect x="2.75" y="6.25" width="11" height="11" rx="1.75"></rect>
       </svg>
       <svg aria-hidden="true" class="check-icon" viewBox="0 0 20 20">
@@ -99,33 +95,31 @@ const groupId = `code-tabs-${crypto.randomUUID()}`;
       </svg>
     </button>
   </div>
-  {
-    tabs.map((tab, index) => (
-      <div
-        id={`${groupId}-panel-${index}`}
-        role={variant === 'tabs' ? 'tabpanel' : 'region'}
-        aria-labelledby={
-          variant === 'tabs' ? `${groupId}-tab-${index}` : undefined
-        }
-        aria-label={
-          variant === 'select' ? `${tab.label} code example` : undefined
-        }
-        data-code-panel
-        data-code={tab.code}
-        hidden={index !== 0}
-      >
-        <Code
-          code={tab.code}
-          lang={tab.language}
-          themes={{
-            light: 'github-light-high-contrast',
-            dark: 'github-dark-high-contrast',
-          }}
-          defaultColor={false}
-        />
-      </div>
-    ))
-  }
+  {tabs.map((tab, index) => (
+    <div
+      id={`${groupId}-panel-${index}`}
+      role={variant === 'tabs' ? 'tabpanel' : 'region'}
+      aria-labelledby={
+        variant === 'tabs' ? `${groupId}-tab-${index}` : undefined
+      }
+      aria-label={
+        variant === 'select' ? `${tab.label} code example` : undefined
+      }
+      data-code-panel
+      data-code={tab.code}
+      hidden={index !== 0}
+    >
+      <Code
+        code={tab.code}
+        lang={tab.language}
+        themes={{
+          light: 'github-light-high-contrast',
+          dark: 'github-dark-high-contrast',
+        }}
+        defaultColor={false}
+      />
+    </div>
+  ))}
   <span class="sr-status" aria-live="polite" data-copy-status></span>
 </helia-code-tabs>
 

@@ -18,26 +18,21 @@ const { links, current } = Astro.props;
     aria-label={`Current section: ${current?.label ?? 'Sections'}. Choose section`}
   >
     <span>{current?.label ?? 'Sections'}</span>
-    <svg viewBox="0 0 24 24" aria-hidden="true"
-      ><path d="m7 10 5 5 5-5"></path></svg
-    >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m7 10 5 5 5-5"></path>
+    </svg>
   </summary>
   <nav aria-label="Choose section">
-    {
-      links.map((link) => (
-        <a
-          href={link.href}
-          aria-current={link === current ? 'page' : undefined}
-        >
-          <span>{link.label}</span>
-          {link.external && (
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M7 17 17 7M7 7h10v10" />
-            </svg>
-          )}
-        </a>
-      ))
-    }
+    {links.map((link) => (
+      <a href={link.href} aria-current={link === current ? 'page' : undefined}>
+        <span>{link.label}</span>
+        {link.external && (
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 17 17 7M7 7h10v10" />
+          </svg>
+        )}
+      </a>
+    ))}
   </nav>
 </details>
 <script>

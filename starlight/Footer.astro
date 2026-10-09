@@ -26,23 +26,19 @@ const year = new Date().getFullYear();
 
   <div class="brand-footer">
     <div class="brand-lockup">
-      {
-        logo === 'ambiq' && (
-          <a
-            class="ambiq-link"
-            href="https://ambiq.com/"
-            aria-label="Ambiq home"
-          >
-            <AmbiqLogo tone="adaptive" lightTone={logoLightTone} />
-          </a>
-        )
-      }
+      {logo === 'ambiq' && (
+        <a class="ambiq-link" href="https://ambiq.com/" aria-label="Ambiq home">
+          <AmbiqLogo tone="adaptive" lightTone={logoLightTone} />
+        </a>
+      )}
       {tagline && <p>{tagline}</p>}
       <p class="copyright">© {year} Ambiq Micro, Inc.</p>
     </div>
 
     <nav class="footer-links" aria-label="Footer">
-      {links.map((link) => <a href={link.href}>{link.label}</a>)}
+      {links.map((link) => (
+        <a href={link.href}>{link.label}</a>
+      ))}
     </nav>
   </div>
 </footer>

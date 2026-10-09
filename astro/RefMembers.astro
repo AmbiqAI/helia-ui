@@ -51,21 +51,17 @@ const { items, label, layout = 'grid', class: className } = Astro.props;
   class:list={['helia-ref-members', `helia-ref-members--${layout}`, className]}
 >
   <ul aria-label={label}>
-    {
-      items.map((item) => (
-        <li>
-          <a class="helia-focus-ring" href={item.href ?? `#${item.id}`}>
-            <code>{item.name}</code>
-          </a>
-          {item.kind && (
-            <span class="helia-ref-members__kind">{item.kind}</span>
-          )}
-          {item.summary && (
-            <span class="helia-ref-members__summary">{item.summary}</span>
-          )}
-        </li>
-      ))
-    }
+    {items.map((item) => (
+      <li>
+        <a class="helia-focus-ring" href={item.href ?? `#${item.id}`}>
+          <code>{item.name}</code>
+        </a>
+        {item.kind && <span class="helia-ref-members__kind">{item.kind}</span>}
+        {item.summary && (
+          <span class="helia-ref-members__summary">{item.summary}</span>
+        )}
+      </li>
+    ))}
   </ul>
 </div>
 

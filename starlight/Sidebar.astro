@@ -27,13 +27,11 @@ const sectionNav = Astro.locals.heliaSectionNav;
 const hub = config.header?.hub;
 ---
 
-{
-  !config.header && sectionNav && sectionNav.length > 0 && (
-    <div class="helia-sidebar-sections" data-helia-sidebar-sections>
-      <SidebarSublist sublist={sectionNav} />
-    </div>
-  )
-}
+{!config.header && sectionNav && sectionNav.length > 0 && (
+  <div class="helia-sidebar-sections" data-helia-sidebar-sections>
+    <SidebarSublist sublist={sectionNav} />
+  </div>
+)}
 
 {
   /*
@@ -52,21 +50,19 @@ const hub = config.header?.hub;
 }
 
 <div class="helia-sidebar-scoped" data-helia-sidebar-scoped>
-  {
-    section && (
-      <p class="helia-sidebar-heading" data-helia-sidebar-heading>
-        {section.label}
-      </p>
-    )
-  }
+  {section && (
+    <p class="helia-sidebar-heading" data-helia-sidebar-heading>
+      {section.label}
+    </p>
+  )}
 
-  <Default {...Astro.props}><slot /></Default>
+  <Default {...Astro.props}>
+    <slot />
+  </Default>
 </div>
 
-{
-  hub && (
-    <a class="helia-sidebar-hub" href={hub.href} data-helia-hub-link>
-      {hub.label}
-    </a>
-  )
-}
+{hub && (
+  <a class="helia-sidebar-hub" href={hub.href} data-helia-hub-link>
+    {hub.label}
+  </a>
+)}

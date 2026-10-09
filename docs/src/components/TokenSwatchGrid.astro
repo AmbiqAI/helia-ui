@@ -31,28 +31,26 @@ const { group, tokens } = Astro.props;
 ---
 
 <div class="token-grid not-content" data-token-group={group}>
-  {
-    tokens.map((token) => (
-      <figure class="token-card" data-token-swatch={token.name}>
-        <div class="token-card__chips">
-          <span class="token-card__chip" style={`background: ${token.light}`} />
-          <span class="token-card__chip" style={`background: ${token.dark}`} />
-        </div>
-        <figcaption>
-          <code>{token.name}</code>
-          <span class="token-card__values">
-            <span>
-              <abbr title="Light theme">L</abbr> {token.light}
-            </span>
-            <span>
-              <abbr title="Dark theme">D</abbr> {token.dark}
-            </span>
+  {tokens.map((token) => (
+    <figure class="token-card" data-token-swatch={token.name}>
+      <div class="token-card__chips">
+        <span class="token-card__chip" style={`background: ${token.light}`} />
+        <span class="token-card__chip" style={`background: ${token.dark}`} />
+      </div>
+      <figcaption>
+        <code>{token.name}</code>
+        <span class="token-card__values">
+          <span>
+            <abbr title="Light theme">L</abbr> {token.light}
           </span>
-          <span class="token-card__file">{token.file}</span>
-        </figcaption>
-      </figure>
-    ))
-  }
+          <span>
+            <abbr title="Dark theme">D</abbr> {token.dark}
+          </span>
+        </span>
+        <span class="token-card__file">{token.file}</span>
+      </figcaption>
+    </figure>
+  ))}
 </div>
 
 <style>

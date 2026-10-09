@@ -120,65 +120,57 @@ const Summary = hasSummarySlot ? 'div' : 'p';
   {...rest}
 >
   <div class="helia-hero__lede">
-    {
-      eyebrow && (
-        <Eyebrow
-          class:list={[
-            'helia-hero__eyebrow',
-            eyebrowStyle === 'brand' && 'helia-hero__brand',
-            eyebrowIcon && 'helia-hero__eyebrow--icon',
-          ]}
-        >
-          {eyebrowIcon && (
-            <img
-              class="helia-hero__icon"
-              src={eyebrowIcon}
-              alt=""
-              width="28"
-              height="28"
-            />
-          )}
-          {eyebrow}
-        </Eyebrow>
-      )
-    }
-    <Title class="helia-hero__headline"><slot /></Title>
-    {
-      badge && (
-        <Badge class="helia-hero__badge" tone="accent" size="md">
-          {badge}
-        </Badge>
-      )
-    }
-    {
-      (hasSummarySlot || summary) && (
-        <Summary class="helia-hero__summary">
-          {hasSummarySlot ? <slot name="summary" /> : summary}
-        </Summary>
-      )
-    }
-    {
-      Astro.slots.has('actions') && (
-        <div class="helia-hero__actions">
-          <slot name="actions" />
-        </div>
-      )
-    }
-  </div>
-  {
-    (hasAside || hasMedia) && (
-      <div class="helia-hero__side">
-        {hasAside && (
-          <div class="helia-hero__aside">
-            <slot name="aside" />
-          </div>
+    {eyebrow && (
+      <Eyebrow
+        class:list={[
+          'helia-hero__eyebrow',
+          eyebrowStyle === 'brand' && 'helia-hero__brand',
+          eyebrowIcon && 'helia-hero__eyebrow--icon',
+        ]}
+      >
+        {eyebrowIcon && (
+          <img
+            class="helia-hero__icon"
+            src={eyebrowIcon}
+            alt=""
+            width="28"
+            height="28"
+          />
         )}
-        {hasMedia && (
-          <div class="helia-hero__media">
-            <slot name="media" />
-          </div>
-        )}
+        {eyebrow}
+      </Eyebrow>
+    )}
+    <Title class="helia-hero__headline">
+      <slot />
+    </Title>
+    {badge && (
+      <Badge class="helia-hero__badge" tone="accent" size="md">
+        {badge}
+      </Badge>
+    )}
+    {(hasSummarySlot || summary) && (
+      <Summary class="helia-hero__summary">
+        {hasSummarySlot ? <slot name="summary" /> : summary}
+      </Summary>
+    )}
+    {Astro.slots.has('actions') && (
+      <div class="helia-hero__actions">
+        <slot name="actions" />
       </div>
-    )
-  }
+    )}
+  </div>
+  {(hasAside || hasMedia) && (
+    <div class="helia-hero__side">
+      {hasAside && (
+        <div class="helia-hero__aside">
+          <slot name="aside" />
+        </div>
+      )}
+      {hasMedia && (
+        <div class="helia-hero__media">
+          <slot name="media" />
+        </div>
+      )}
+    </div>
+  )}
 </Element>

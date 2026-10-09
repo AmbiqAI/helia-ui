@@ -24,10 +24,8 @@ const { entry } = Astro.locals.starlightRoute;
 const { helia } = entry.data as typeof entry.data & HeliaFrontmatter;
 ---
 
-{
-  helia?.pageTitle === false ? (
-    <div id={PAGE_TITLE_ID} class="helia-page-title-anchor" tabindex="-1" />
-  ) : (
-    <DefaultPageTitle />
-  )
-}
+{helia?.pageTitle === false ? (
+  <div id={PAGE_TITLE_ID} class="helia-page-title-anchor" tabindex="-1" />
+) : (
+  <DefaultPageTitle />
+)}

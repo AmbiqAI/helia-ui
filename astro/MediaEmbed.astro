@@ -60,22 +60,20 @@ const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&r
     data-embed-url={embedUrl}
     data-title={title}
   >
-    {
-      resolvedPoster ? (
-        <img
-          src={resolvedPoster}
-          alt={posterAlt}
-          loading="lazy"
-          decoding="async"
-        />
-      ) : (
-        <div class="media-embed__abstract" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-        </div>
-      )
-    }
+    {resolvedPoster ? (
+      <img
+        src={resolvedPoster}
+        alt={posterAlt}
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <div class="media-embed__abstract" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </div>
+    )}
     <button
       class="helia-focus-ring"
       type="button"
@@ -91,14 +89,12 @@ const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&r
       <a href={href}>Watch {title} on YouTube</a>
     </noscript>
   </youtube-embed>
-  {
-    caption && (
-      <figcaption>
-        <span>{caption}</span>
-        <a href={href}>Watch on YouTube ↗</a>
-      </figcaption>
-    )
-  }
+  {caption && (
+    <figcaption>
+      <span>{caption}</span>
+      <a href={href}>Watch on YouTube ↗</a>
+    </figcaption>
+  )}
 </figure>
 
 <script>

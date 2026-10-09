@@ -24,37 +24,30 @@ const elevations = [
 
 <div class="tones not-content">
   <div class="tones__row" data-surface-tones>
-    {
-      surfaces.map((surface) => (
-        <figure class="tone" data-surface-tone={surface.token}>
-          <div
-            class="tone__panel"
-            style={`background: var(${surface.token})`}
-          />
-          <figcaption>
-            <code>{surface.token}</code>
-            <span>{surface.role}</span>
-          </figcaption>
-        </figure>
-      ))
-    }
+    {surfaces.map((surface) => (
+      <figure class="tone" data-surface-tone={surface.token}>
+        <div class="tone__panel" style={`background: var(${surface.token})`} />
+        <figcaption>
+          <code>{surface.token}</code>
+          <span>{surface.role}</span>
+        </figcaption>
+      </figure>
+    ))}
   </div>
 
   <div class="tones__row" data-elevation-steps>
-    {
-      elevations.map((elevation) => (
-        <figure class="tone" data-elevation-step={elevation.token}>
-          <div
-            class="tone__panel tone__panel--raised"
-            style={`box-shadow: var(${elevation.token})`}
-          />
-          <figcaption>
-            <code>{elevation.token}</code>
-            <span>{elevation.role}</span>
-          </figcaption>
-        </figure>
-      ))
-    }
+    {elevations.map((elevation) => (
+      <figure class="tone" data-elevation-step={elevation.token}>
+        <div
+          class="tone__panel tone__panel--raised"
+          style={`box-shadow: var(${elevation.token})`}
+        />
+        <figcaption>
+          <code>{elevation.token}</code>
+          <span>{elevation.role}</span>
+        </figcaption>
+      </figure>
+    ))}
   </div>
 </div>
 

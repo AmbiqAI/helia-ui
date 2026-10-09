@@ -55,14 +55,12 @@ const glyph = icon ?? (marker === 'check' ? 'check' : 'circle');
   ]}
   {...rest}
 >
-  {
-    items.map((item, index) => (
-      <li class="helia-card-list__item">
-        <span class="helia-card-list__marker" aria-hidden="true">
-          {marker === 'number' ? index + 1 : <Icon name={glyph} />}
-        </span>
-        <span>{item}</span>
-      </li>
-    ))
-  }
+  {items.map((item, index) => (
+    <li class="helia-card-list__item">
+      <span class="helia-card-list__marker" aria-hidden="true">
+        {marker === 'number' ? index + 1 : <Icon name={glyph} />}
+      </span>
+      <span>{item}</span>
+    </li>
+  ))}
 </List>

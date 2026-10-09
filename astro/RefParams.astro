@@ -84,18 +84,16 @@ const showDefault = rows.some((row) => row.default);
       </tr>
     </thead>
     <tbody>
-      {
-        rows.map((row) => (
-          <tr>
-            {showName && (
-              <th scope="row">{row.name && <code>{row.name}</code>}</th>
-            )}
-            {showType && <td>{row.type && <code>{row.type}</code>}</td>}
-            {showDefault && <td class="default">{row.default}</td>}
-            <td>{row.description}</td>
-          </tr>
-        ))
-      }
+      {rows.map((row) => (
+        <tr>
+          {showName && (
+            <th scope="row">{row.name && <code>{row.name}</code>}</th>
+          )}
+          {showType && <td>{row.type && <code>{row.type}</code>}</td>}
+          {showDefault && <td class="default">{row.default}</td>}
+          <td>{row.description}</td>
+        </tr>
+      ))}
     </tbody>
   </table>
 </div>

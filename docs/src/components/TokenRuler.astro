@@ -19,24 +19,22 @@ const { kind, tokens } = Astro.props;
 ---
 
 <div class={`ruler ruler--${kind} not-content`} data-ruler={kind}>
-  {
-    tokens.map((token) => (
-      <div class="ruler__step" data-ruler-step={token}>
-        <code>{token}</code>
-        {kind === 'space' && (
-          <span class="ruler__bar" style={`width: var(${token})`} />
-        )}
-        {kind === 'radius' && (
-          <span class="ruler__corner" style={`border-radius: var(${token})`} />
-        )}
-        {kind === 'control' && (
-          <span class="ruler__control" style={`height: var(${token})`}>
-            Button
-          </span>
-        )}
-      </div>
-    ))
-  }
+  {tokens.map((token) => (
+    <div class="ruler__step" data-ruler-step={token}>
+      <code>{token}</code>
+      {kind === 'space' && (
+        <span class="ruler__bar" style={`width: var(${token})`} />
+      )}
+      {kind === 'radius' && (
+        <span class="ruler__corner" style={`border-radius: var(${token})`} />
+      )}
+      {kind === 'control' && (
+        <span class="ruler__control" style={`height: var(${token})`}>
+          Button
+        </span>
+      )}
+    </div>
+  ))}
 </div>
 
 <style>

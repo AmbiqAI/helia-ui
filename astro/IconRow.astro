@@ -70,21 +70,18 @@ const hasLine = Astro.slots.has('default');
     <slot name="icon" />
   </IconTile>
   <div class="helia-icon-row__text">
-    <Title class="helia-icon-row__title"
-      >{title}{
-        href && (
-          <span class="helia-motion-cue" aria-hidden="true">
-            →
-          </span>
-        )
-      }</Title
-    >
-    {
-      hasLine && (
-        <div class="helia-icon-row__line">
-          <slot />
-        </div>
-      )
-    }
+    <Title class="helia-icon-row__title">
+      {title}
+      {href && (
+        <span class="helia-motion-cue" aria-hidden="true">
+          →
+        </span>
+      )}
+    </Title>
+    {hasLine && (
+      <div class="helia-icon-row__line">
+        <slot />
+      </div>
+    )}
   </div>
 </Root>

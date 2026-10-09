@@ -64,79 +64,73 @@ const {
   class:list={['timeline', `timeline-${variant}`]}
   aria-label={ariaLabel}
 >
-  {
-    (heading || (actionLabel && actionHref)) && (
-      <header class="timeline-header">
-        {heading && <h2>{heading}</h2>}
-        {actionLabel && actionHref && (
-          <a class="timeline-action helia-focus-ring" href={actionHref}>
-            <span>{actionLabel}</span>
-            <svg
-              aria-hidden="true"
-              class="timeline-arrow helia-motion-cue"
-              fill="none"
-              viewBox="0 0 20 20"
-            >
-              <path d="M4 10h11m-4-4 4 4-4 4" />
-            </svg>
-          </a>
-        )}
-      </header>
-    )
-  }
+  {(heading || (actionLabel && actionHref)) && (
+    <header class="timeline-header">
+      {heading && <h2>{heading}</h2>}
+      {actionLabel && actionHref && (
+        <a class="timeline-action helia-focus-ring" href={actionHref}>
+          <span>{actionLabel}</span>
+          <svg
+            aria-hidden="true"
+            class="timeline-arrow helia-motion-cue"
+            fill="none"
+            viewBox="0 0 20 20"
+          >
+            <path d="M4 10h11m-4-4 4 4-4 4" />
+          </svg>
+        </a>
+      )}
+    </header>
+  )}
 
   <ol class="timeline-groups">
-    {
-      groups.map((group) => (
-        <li class:list={['timeline-group', `tone-${group.tone ?? 'neutral'}`]}>
-          <div class="timeline-label">
-            {group.datetime ? (
-              <time datetime={group.datetime}>{group.label}</time>
-            ) : (
-              group.label
-            )}
-          </div>
+    {groups.map((group) => (
+      <li class:list={['timeline-group', `tone-${group.tone ?? 'neutral'}`]}>
+        <div class="timeline-label">
+          {group.datetime ? (
+            <time datetime={group.datetime}>{group.label}</time>
+          ) : (
+            group.label
+          )}
+        </div>
 
-          <div class="timeline-rail" aria-hidden="true">
-            <span class="timeline-node" />
-          </div>
+        <div class="timeline-rail" aria-hidden="true">
+          <span class="timeline-node" />
+        </div>
 
-          <div class="timeline-items">
-            {group.items.map((item) => (
-              <article class="timeline-item">
-                {item.href ? (
-                  <a class="timeline-item-link" href={item.href}>
-                    <span class="timeline-copy">
-                      {item.meta && (
-                        <span class="timeline-meta">{item.meta}</span>
-                      )}
-                      <h3>{item.title}</h3>
-                      {item.description && <p>{item.description}</p>}
-                    </span>
-                    <svg
-                      aria-hidden="true"
-                      class="timeline-arrow helia-motion-cue"
-                      fill="none"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M4 10h11m-4-4 4 4-4 4" />
-                    </svg>
-                  </a>
-                ) : (
-                  <div class="timeline-item-static">
+        <div class="timeline-items">
+          {group.items.map((item) => (
+            <article class="timeline-item">
+              {item.href ? (
+                <a class="timeline-item-link" href={item.href}>
+                  <span class="timeline-copy">
                     {item.meta && (
                       <span class="timeline-meta">{item.meta}</span>
                     )}
                     <h3>{item.title}</h3>
                     {item.description && <p>{item.description}</p>}
-                  </div>
-                )}
-              </article>
-            ))}
-          </div>
-        </li>
-      ))
-    }
+                  </span>
+                  <svg
+                    aria-hidden="true"
+                    class="timeline-arrow helia-motion-cue"
+                    fill="none"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M4 10h11m-4-4 4 4-4 4" />
+                  </svg>
+                </a>
+              ) : (
+                <div class="timeline-item-static">
+                  {item.meta && <span class="timeline-meta">{item.meta}</span>}
+                  <h3>{item.title}</h3>
+                  {item.description && <p>{item.description}</p>}
+                </div>
+              )}
+            </article>
+          ))}
+        </div>
+      </li>
+    ))}
   </ol>
 </section>
 

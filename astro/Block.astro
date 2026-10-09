@@ -78,17 +78,15 @@ const Face = href ? 'a' : 'div';
       {sublabel && <span class="helia-block__sub">{sublabel}</span>}
     </span>
   </Face>
-  {
-    Astro.slots.has('default') && (
-      <ul
-        class:list={[
-          'helia-block-set',
-          `helia-block-set--${flow}`,
-          flow === 'grid' && `helia-block-set--cols-${columns}`,
-        ]}
-      >
-        <slot />
-      </ul>
-    )
-  }
+  {Astro.slots.has('default') && (
+    <ul
+      class:list={[
+        'helia-block-set',
+        `helia-block-set--${flow}`,
+        flow === 'grid' && `helia-block-set--cols-${columns}`,
+      ]}
+    >
+      <slot />
+    </ul>
+  )}
 </li>

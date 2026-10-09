@@ -41,33 +41,33 @@ const columns = rows[0]?.cells.map(label) ?? [];
     <thead>
       <tr>
         <th scope="col">Ink</th>
-        {columns.map((column) => <th scope="col">{column}</th>)}
+        {columns.map((column) => (
+          <th scope="col">{column}</th>
+        ))}
       </tr>
     </thead>
     <tbody>
-      {
-        rows.map((row) => (
-          <tr data-contrast-row={row.name}>
-            <th scope="row">
-              <code>{row.name}</code>
-            </th>
-            {row.cells.map((cell) => (
-              <td>
-                <span
-                  class="contrast__sample"
-                  style={`background: ${cell.background}; color: ${cell.ink}`}
-                >
-                  Aa
-                </span>
-                <span class="contrast__ratio">
-                  {cell.ratio.toFixed(2)}
-                  {cell.passes ? <b>AA</b> : null}
-                </span>
-              </td>
-            ))}
-          </tr>
-        ))
-      }
+      {rows.map((row) => (
+        <tr data-contrast-row={row.name}>
+          <th scope="row">
+            <code>{row.name}</code>
+          </th>
+          {row.cells.map((cell) => (
+            <td>
+              <span
+                class="contrast__sample"
+                style={`background: ${cell.background}; color: ${cell.ink}`}
+              >
+                Aa
+              </span>
+              <span class="contrast__ratio">
+                {cell.ratio.toFixed(2)}
+                {cell.passes ? <b>AA</b> : null}
+              </span>
+            </td>
+          ))}
+        </tr>
+      ))}
     </tbody>
   </table>
 </div>

@@ -57,80 +57,78 @@ const current = matchSection(
 );
 ---
 
-{
-  header && (
-    <div
-      class="helia-site-header"
-      data-helia-hub-in-dropdown={
-        header.hub && mobileLinks.length > 0 ? '' : undefined
-      }
-    >
-      {showSidebarToggle && (
-        <button
-          class="helia-site-header__toggle"
-          type="button"
-          aria-label="Open navigation"
-          aria-controls="starlight__sidebar"
-          aria-expanded="false"
-          data-helia-sidebar-toggle
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 7h16M4 12h16M4 17h16" />
-          </svg>
-        </button>
+{header && (
+  <div
+    class="helia-site-header"
+    data-helia-hub-in-dropdown={
+      header.hub && mobileLinks.length > 0 ? '' : undefined
+    }
+  >
+    {showSidebarToggle && (
+      <button
+        class="helia-site-header__toggle"
+        type="button"
+        aria-label="Open navigation"
+        aria-controls="starlight__sidebar"
+        aria-expanded="false"
+        data-helia-sidebar-toggle
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+      </button>
+    )}
+
+    <a class="helia-site-header__title" href={siteTitleHref}>
+      {titleRegularPrefix ? (
+        <>
+          <span class="helia-site-header__prefix">{titleRegularPrefix}</span>
+          {header.title.slice(titleRegularPrefix.length)}
+        </>
+      ) : (
+        header.title
       )}
+    </a>
 
-      <a class="helia-site-header__title" href={siteTitleHref}>
-        {titleRegularPrefix ? (
-          <>
-            <span class="helia-site-header__prefix">{titleRegularPrefix}</span>
-            {header.title.slice(titleRegularPrefix.length)}
-          </>
-        ) : (
-          header.title
-        )}
-      </a>
-
-      {header.links.length > 0 && (
-        <nav class="helia-site-header__nav" aria-label="Primary">
-          {header.links.map((link) => (
-            <a
-              href={link.href}
-              aria-current={link === current ? 'page' : undefined}
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
-      )}
-
-      {mobileLinks.length > 0 && (
-        <SectionDropdown
-          links={dropdownLinks}
-          current={activeSection ?? current}
-        />
-      )}
-
-      <div class="helia-site-header__actions">
-        {header.hub && (
+    {header.links.length > 0 && (
+      <nav class="helia-site-header__nav" aria-label="Primary">
+        {header.links.map((link) => (
           <a
-            class="helia-site-header__hub"
-            href={header.hub.href}
-            data-helia-hub-link
+            href={link.href}
+            aria-current={link === current ? 'page' : undefined}
           >
-            {header.hub.label}
+            {link.label}
           </a>
-        )}
-        {header.search && (
-          <div class="helia-site-header__search">
-            <Search />
-          </div>
-        )}
-        {header.themeToggle && <ThemeMenu />}
-      </div>
+        ))}
+      </nav>
+    )}
+
+    {mobileLinks.length > 0 && (
+      <SectionDropdown
+        links={dropdownLinks}
+        current={activeSection ?? current}
+      />
+    )}
+
+    <div class="helia-site-header__actions">
+      {header.hub && (
+        <a
+          class="helia-site-header__hub"
+          href={header.hub.href}
+          data-helia-hub-link
+        >
+          {header.hub.label}
+        </a>
+      )}
+      {header.search && (
+        <div class="helia-site-header__search">
+          <Search />
+        </div>
+      )}
+      {header.themeToggle && <ThemeMenu />}
     </div>
-  )
-}
+  </div>
+)}
 
 <script>
   /* Native popover dismissal and the wider HELIA collapse point share state.

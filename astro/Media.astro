@@ -74,14 +74,12 @@ const {
   aria-hidden="true"
   {...rest}
 >
-  {
-    TREATMENTS[treatment].map((modifiers) => (
-      <span
-        class:list={[
-          'helia-media__form',
-          ...modifiers.map((modifier) => `helia-media__form--${modifier}`),
-        ]}
-      />
-    ))
-  }
+  {TREATMENTS[treatment].map((modifiers) => (
+    <span
+      class:list={[
+        'helia-media__form',
+        ...modifiers.map((modifier) => `helia-media__form--${modifier}`),
+      ]}
+    />
+  ))}
 </div>

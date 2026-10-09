@@ -110,7 +110,9 @@ const sourceLabel = source
 
     <div class="helia-ref-symbol__title">
       <Heading class="helia-ref-symbol__name">
-        <a class="helia-focus-ring" href={`#${id}`}>{name}</a>
+        <a class="helia-focus-ring" href={`#${id}`}>
+          {name}
+        </a>
       </Heading>
       <Chip tone="static" class="helia-ref-symbol__language">
         {LANGUAGE_LABELS[language]}
@@ -119,28 +121,24 @@ const sourceLabel = source
 
     {summary && <p class="helia-ref-symbol__summary">{summary}</p>}
 
-    {
-      sourceLabel && (
-        <p class="helia-ref-symbol__source">
-          {source?.url ? (
-            <a class="helia-focus-ring" href={source.url}>
-              <code>{sourceLabel}</code>
-            </a>
-          ) : (
+    {sourceLabel && (
+      <p class="helia-ref-symbol__source">
+        {source?.url ? (
+          <a class="helia-focus-ring" href={source.url}>
             <code>{sourceLabel}</code>
-          )}
-        </p>
-      )
-    }
+          </a>
+        ) : (
+          <code>{sourceLabel}</code>
+        )}
+      </p>
+    )}
   </header>
 
-  {
-    deprecated && (
-      <p class="helia-ref-symbol__deprecated">
-        <span>Deprecated.</span> {deprecated}
-      </p>
-    )
-  }
+  {deprecated && (
+    <p class="helia-ref-symbol__deprecated">
+      <span>Deprecated.</span> {deprecated}
+    </p>
+  )}
 
   <div class="helia-ref-symbol__signature">
     <CodeBlock
@@ -150,7 +148,9 @@ const sourceLabel = source
     />
   </div>
 
-  <div class="helia-ref-symbol__body"><slot /></div>
+  <div class="helia-ref-symbol__body">
+    <slot />
+  </div>
 </article>
 
 <style>
