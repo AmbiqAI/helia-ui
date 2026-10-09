@@ -1,0 +1,197 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="classruntime_1_1_resolver" kind="class" language="C++" prot="public">
+    <compoundname>runtime::Resolver</compoundname>
+    <includes refid="runtime_8hpp" local="no">runtime.hpp</includes>
+    <templateparamlist>
+      <param>
+        <type>unsigned</type>
+        <declname>Capacity</declname>
+        <defname>Capacity</defname>
+      </param>
+      <param>
+        <type>typename Value</type>
+        <defval>int</defval>
+      </param>
+    </templateparamlist>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classruntime_1_1_resolver_1aaba9e31a780fde70d3ab91fcc99a37d6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>runtime::Resolver&lt; Capacity, Value &gt;::Resolver</definition>
+        <argsstring>(unsigned char *arena, unsigned size)</argsstring>
+        <name>Resolver</name>
+        <qualifiedname>runtime::Resolver::Resolver</qualifiedname>
+        <param>
+          <type>unsigned char *</type>
+          <declname>arena</declname>
+        </param>
+        <param>
+          <type>unsigned</type>
+          <declname>size</declname>
+        </param>
+        <briefdescription>
+<para>The caller retains ownership of the borrowed arena. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/runtime.hpp" line="9" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classruntime_1_1_resolver_1aba02a63e7ef5a45bab5afbb7126e058a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>runtime::Resolver&lt; Capacity, Value &gt;::Resolver</definition>
+        <argsstring>(void *allocator)</argsstring>
+        <name>Resolver</name>
+        <qualifiedname>runtime::Resolver::Resolver</qualifiedname>
+        <param>
+          <type>void *</type>
+          <declname>allocator</declname>
+        </param>
+        <briefdescription>
+<para>The caller retains ownership of the allocator. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/runtime.hpp" line="11" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classruntime_1_1_resolver_1a7a73dc9b4b67aec50ea261e37189b121" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>Value *</type>
+        <definition>Value * runtime::Resolver&lt; Capacity, Value &gt;::Find</definition>
+        <argsstring>(int code) const</argsstring>
+        <name>Find</name>
+        <qualifiedname>runtime::Resolver::Find</qualifiedname>
+        <param>
+          <type>int</type>
+          <declname>code</declname>
+        </param>
+        <briefdescription>
+<para>Find an operation by numeric code. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/runtime.hpp" line="13" column="9"/>
+      </memberdef>
+      <memberdef kind="function" id="classruntime_1_1_resolver_1ae90665892ae2d63a1c465ad5dd8788ad" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>Value *</type>
+        <definition>Value * runtime::Resolver&lt; Capacity, Value &gt;::Find</definition>
+        <argsstring>(const char *name) const</argsstring>
+        <name>Find</name>
+        <qualifiedname>runtime::Resolver::Find</qualifiedname>
+        <param>
+          <type>const char *</type>
+          <declname>name</declname>
+        </param>
+        <briefdescription>
+<para>Find an operation by name. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/runtime.hpp" line="15" column="9"/>
+      </memberdef>
+      <memberdef kind="function" id="classruntime_1_1_resolver_1aff9fe078444dc6c1e0a3642a6eeeb603" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>Value *</type>
+        <definition>Value * runtime::Resolver&lt; Capacity, Value &gt;::Find</definition>
+        <argsstring>(int code, int version) const</argsstring>
+        <name>Find</name>
+        <qualifiedname>runtime::Resolver::Find</qualifiedname>
+        <param>
+          <type>int</type>
+          <declname>code</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>version</declname>
+        </param>
+        <briefdescription>
+<para>Find an operation by code and version. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/runtime.hpp" line="17" column="9"/>
+      </memberdef>
+      <memberdef kind="function" id="classruntime_1_1_resolver_1aff8cdb045e16336c511161cd857e9c11" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>typename T</type>
+          </param>
+        </templateparamlist>
+        <type>T *</type>
+        <definition>T * runtime::Resolver&lt; Capacity, Value &gt;::input</definition>
+        <argsstring>(int index)</argsstring>
+        <name>input</name>
+        <qualifiedname>runtime::Resolver::input</qualifiedname>
+        <param>
+          <type>int</type>
+          <declname>index</declname>
+        </param>
+        <briefdescription>
+<para>Return null if the tensor type differs from T. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/runtime.hpp" line="20" column="5"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classruntime_1_1_resolver_1a6d35647ea6271c05ba1bd705963671b3" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void runtime::Resolver&lt; Capacity, Value &gt;::hidden</definition>
+        <argsstring>()</argsstring>
+        <name>hidden</name>
+        <qualifiedname>runtime::Resolver::hidden</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/runtime.hpp" line="22" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classruntime_1_1_resolver_1ae2fe59d4e6847ded2fc01fdc60ff5756" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void runtime::Resolver&lt; Capacity, Value &gt;::input</definition>
+        <argsstring>(double index)</argsstring>
+        <name>input</name>
+        <qualifiedname>runtime::Resolver::input</qualifiedname>
+        <param>
+          <type>double</type>
+          <declname>index</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/runtime.hpp" line="23" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+<para>Fixed-capacity resolver. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/runtime.hpp" line="6" column="1" bodyfile="src/runtime.hpp" bodystart="6" bodyend="24"/>
+    <listofallmembers>
+      <member refid="classruntime_1_1_resolver_1a7a73dc9b4b67aec50ea261e37189b121" prot="public" virt="non-virtual"><scope>runtime::Resolver</scope><name>Find</name></member>
+      <member refid="classruntime_1_1_resolver_1ae90665892ae2d63a1c465ad5dd8788ad" prot="public" virt="non-virtual"><scope>runtime::Resolver</scope><name>Find</name></member>
+      <member refid="classruntime_1_1_resolver_1aff9fe078444dc6c1e0a3642a6eeeb603" prot="public" virt="non-virtual"><scope>runtime::Resolver</scope><name>Find</name></member>
+      <member refid="classruntime_1_1_resolver_1a6d35647ea6271c05ba1bd705963671b3" prot="private" virt="non-virtual"><scope>runtime::Resolver</scope><name>hidden</name></member>
+      <member refid="classruntime_1_1_resolver_1aff8cdb045e16336c511161cd857e9c11" prot="public" virt="non-virtual"><scope>runtime::Resolver</scope><name>input</name></member>
+      <member refid="classruntime_1_1_resolver_1ae2fe59d4e6847ded2fc01fdc60ff5756" prot="private" virt="non-virtual"><scope>runtime::Resolver</scope><name>input</name></member>
+      <member refid="classruntime_1_1_resolver_1aaba9e31a780fde70d3ab91fcc99a37d6" prot="public" virt="non-virtual"><scope>runtime::Resolver</scope><name>Resolver</name></member>
+      <member refid="classruntime_1_1_resolver_1aba02a63e7ef5a45bab5afbb7126e058a" prot="public" virt="non-virtual"><scope>runtime::Resolver</scope><name>Resolver</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
