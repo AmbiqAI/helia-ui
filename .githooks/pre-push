@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+cd "$(git rev-parse --show-toplevel)"
+npm run validate
+npm run typecheck
+npm run docs:check

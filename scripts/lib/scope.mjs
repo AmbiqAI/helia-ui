@@ -1,19 +1,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
 /*
- * The scan scope the package checks share, so that one copy of each check runs
- * from two roots.
- *
- * Without `--root` the root is this package, which is what it is once the
- * package is the root of its own repository. With `--root <dir>` the root is
- * the workspace that contains the package -- the hub passes `--root .` -- and
- * the same check covers the hub's own tree as well.
- *
- * Every path a check reports is relative to `ROOT`, and the package sits at
- * `PACKAGE_DIR` inside it. That is the empty string when the package is the
- * root, so joins go through `joinRel` and containment through `isUnder`
- * rather than through string concatenation, which would produce a leading
- * slash and a path that matches nothing.
+ * Checks run against this package or a containing workspace supplied with
+ * --root. Reported paths are relative to ROOT. PACKAGE_DIR is empty for a
+ * standalone package, so containment and joins must handle that case without
+ * adding a leading slash.
  */
 
 import path from 'node:path';

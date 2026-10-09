@@ -108,11 +108,7 @@ test('the mosaic feature takes two columns and two rows', async ({ page }) => {
    ancestors have to lose it too or the rule under test is never asked. */
 async function inMarkdownFlow(part: Locator) {
   await part.evaluate((element) => {
-    for (
-      let node: HTMLElement | null = element;
-      node;
-      node = node.parentElement
-    ) {
+    for (let node: Element | null = element; node; node = node.parentElement) {
       node.classList.remove('not-content');
     }
   });
