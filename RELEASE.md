@@ -15,8 +15,8 @@ consumer pinning a tag like any other site.
 | Field             | Value                                                                |
 | ----------------- | -------------------------------------------------------------------- |
 | Package           | `@ambiqai/helia-ui`                                                  |
-| Version           | 0.1.0-alpha.20                                                       |
-| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.20`. |
+| Version           | 0.1.0-alpha.26                                                       |
+| Status            | Not published. Private, consumed from the git tag `v0.1.0-alpha.26`. |
 | License           | BSD-3-Clause (`LICENSE`)                                             |
 | Licensing tier    | Tier 1, ADR-0005                                                     |
 | Source repository | https://github.com/AmbiqAI/helia-ui                                  |
@@ -74,6 +74,51 @@ version, never fixed by moving `v<version>`. Consumers pin the tag:
   "dependencies": { "@ambiqai/helia-ui": "github:AmbiqAI/helia-ui#v<version>" }
 }
 ```
+
+## What changed in 0.1.0-alpha.26
+
+- `Hero.eyebrowStyle="brand"` uses a responsive product-name scale and a 32px official product icon. Ordinary eyebrow labels keep their compact defaults.
+- Custom hero compositions can use the shared `helia-hero__brand` recipe and its foreground override.
+
+Refs #199.
+
+## What changed in 0.1.0-alpha.25
+
+- Sections with `sidebar: false` omit the sidebar and mobile toggle when using the shared header. The mobile section dropdown remains available and includes a HELIA AI DEV Hub destination.
+- Buttons space labels and trailing icons consistently.
+- `Hero.eyebrowIcon` replaces the decorative dot with a supplied official product mark, while retaining the eyebrow text as the label.
+
+Refs #196, #197.
+
+## What changed in 0.1.0-alpha.24
+
+- `header.titleRegularPrefix` renders a regular-weight product prefix with a bold suffix, including KIT product names. The complete title remains the accessible link name.
+- The HELIA hub link stays in the header while section navigation uses its dropdown, down to 42rem. Below that width it moves to the mobile sidebar when one exists; pages without a sidebar retain the header link.
+
+Refs #192, #193.
+
+## What changed in 0.1.0-alpha.23
+
+- Product footers use the supplied official blue Ambiq artwork in light mode and official white artwork in dark mode. The two SVGs share trimmed canvas bounds so they display at the same size.
+- `footer.logoLightTone` selects blue or black for light mode. Explicit fixed-color logo tones remain available.
+
+Refs #189.
+
+## What changed in 0.1.0-alpha.22
+
+- Terminal code blocks inside tab panels use compact frames without a redundant title bar. Copy controls remain available.
+- Standalone terminal headers and file titles retain their existing presentation.
+
+Refs #140.
+
+## What changed in 0.1.0-alpha.21
+
+- Mobile headers provide a section dropdown, while the sidebar lists only the selected section's pages.
+- Section switching supports keyboard navigation, Escape with focus return, outside-click dismissal and desktop breakpoint changes.
+- Narrow header spacing preserves the product title alongside the section selector.
+- Sites without header configuration retain sidebar section switching; desktop navigation is unchanged.
+
+Refs #182.
 
 ## What changed in 0.1.0-alpha.20
 

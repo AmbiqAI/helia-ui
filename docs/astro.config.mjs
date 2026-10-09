@@ -59,6 +59,7 @@ export default defineConfig({
              end to end. The bar stands in place of Starlight's header, which
              is where the social row renders, so GitHub is a link here. */
           header: {
+            titleRegularPrefix: 'helia',
             links: [
               { label: 'Foundations', href: `${basePath}foundations/` },
               { label: 'Gallery', href: `${basePath}gallery/` },
@@ -104,7 +105,8 @@ export default defineConfig({
             },
             {
               label: 'Demo guide',
-              href: `${basePath}starlight-plugin/sections/guide/`,
+              href: `${basePath}starlight-plugin/sections/guide/first-steps/`,
+              match: `${basePath}starlight-plugin/sections/guide/`,
               sidebar: [
                 {
                   label: 'First steps',
@@ -118,7 +120,8 @@ export default defineConfig({
             },
             {
               label: 'Demo reference',
-              href: `${basePath}starlight-plugin/sections/reference/`,
+              href: `${basePath}starlight-plugin/sections/reference/widget/`,
+              match: `${basePath}starlight-plugin/sections/reference/`,
               /* The generated shape: a directory, listed one level under the
                  section rather than under a group inside it. */
               sidebar: [

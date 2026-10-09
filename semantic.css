@@ -150,6 +150,7 @@
   --helia-text-subhead: clamp(1.05rem, 1.8vw, 1.35rem);
   --helia-text-heading: clamp(1.35rem, 3vw, 2rem);
   --helia-text-section: clamp(1.5rem, 3vw, 2.1rem);
+  --helia-text-hero-brand: clamp(1.75rem, 3vw, 2.4rem);
   --helia-text-page: clamp(2rem, 5vw, 3rem);
   --helia-text-display: clamp(2.6rem, 7vw, 4.8rem);
   --helia-text-hero: clamp(2.4rem, 7.5vw, 5.25rem);
