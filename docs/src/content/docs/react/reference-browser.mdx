@@ -1,0 +1,86 @@
+---
+title: Reference browser
+description: Search and filter consumer-owned reference entries without losing the complete static reference.
+---
+
+import ReferenceBrowser from '@ambiqai/helia-ui/astro/ReferenceBrowser';
+import Callout from '@ambiqai/helia-ui/astro/Callout';
+
+export const rows = Array.from({ length: 32 }, (_, i) => ({
+  id: `entry-${i}`,
+  name: `Operation ${String(i + 1).padStart(2, '0')}`,
+  kind: 'function',
+  module: 'sample',
+  group: i % 2 ? 'Arithmetic' : 'Conversion',
+  href: '#reference-details',
+  summary:
+    i % 2
+      ? 'Combines two input tensors. Check shape restrictions in the full reference.'
+      : 'Converts the input representation. Consult the documented rounding behavior.',
+  facets: { precision: [i % 3 ? 'FP32' : 'FP16'] },
+}));
+export const filters = [
+  { id: 'group', label: 'Family', values: ['Arithmetic', 'Conversion'] },
+  { id: 'precision', label: 'Precision', values: ['FP16', 'FP32'] },
+];
+
+The browser accepts rows and filter definitions from the product. It does not infer supported shapes or numerical behavior from a type label. Each entry links to its complete reference, and all rows remain available when JavaScript is disabled.
+
+<Callout title="Consumer-owned meaning">
+  Choose filter labels and values from your actual reference data. A matching
+  entry does not imply that every combination of shape and precision is
+  supported.
+</Callout>
+
+```text
+ReferenceBrowser rows={rows} filters={filters} label="Find an operation"
+```
+
+<ReferenceBrowser
+  rows={rows}
+  filters={filters}
+  label="Find an operation"
+  nameLabel="Operation"
+  itemsLabel="operations"
+/>
+
+## Reference details
+
+The destination of each row is supplied by its consumer. Existing page and section anchors remain unchanged.
+
+## Facet overrides
+
+A supplied facet value takes precedence over the display group. This preserves
+custom extractors and overlays from `buildRefIndex`. Rows without a `group`
+facet can still filter by their display group.
+
+<ReferenceBrowser
+  rows={[
+    {
+      ...rows[0],
+      id: 'override',
+      name: 'Overridden entry',
+      group: 'Display group',
+      facets: { group: ['Consumer family'] },
+    },
+    {
+      ...rows[1],
+      id: 'excluded',
+      name: 'Excluded entry',
+      group: 'Consumer family',
+      facets: { group: [] },
+    },
+  ]}
+  filters={[
+    { id: 'group', label: 'Consumer family', values: ['Consumer family'] },
+  ]}
+  label="Find an overridden entry"
+  pageSize={1}
+/>
+
+## Empty references
+
+An empty reference has no rows to browse. Enhancement controls stay hidden
+without JavaScript.
+
+<ReferenceBrowser rows={[]} label="Find an empty entry" />

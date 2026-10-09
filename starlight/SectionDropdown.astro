@@ -1,0 +1,76 @@
+---
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026, Ambiq
+interface Link {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+interface Props {
+  links: readonly Link[];
+  current?: Link;
+}
+const { links, current } = Astro.props;
+---
+
+<details class="helia-section-dropdown" data-helia-section-dropdown>
+  <summary
+    aria-label={`Current section: ${current?.label ?? 'Sections'}. Choose section`}
+  >
+    <span>{current?.label ?? 'Sections'}</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true"
+      ><path d="m7 10 5 5 5-5"></path></svg
+    >
+  </summary>
+  <nav aria-label="Choose section">
+    {
+      links.map((link) => (
+        <a
+          href={link.href}
+          aria-current={link === current ? 'page' : undefined}
+        >
+          <span>{link.label}</span>
+          {link.external && (
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 17 17 7M7 7h10v10" />
+            </svg>
+          )}
+        </a>
+      ))
+    }
+  </nav>
+</details>
+<script>
+  const closeSections = (focus = false) => {
+    document
+      .querySelectorAll<HTMLDetailsElement>(
+        '[data-helia-section-dropdown][open]',
+      )
+      .forEach((menu) => {
+        menu.open = false;
+        if (focus) menu.querySelector('summary')?.focus();
+      });
+  };
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) return;
+    if (
+      !event.target.closest('[data-helia-section-dropdown]') ||
+      event.target.closest('[data-helia-section-dropdown] a')
+    )
+      closeSections();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeSections(true);
+  });
+  document.addEventListener('focusin', (event) => {
+    if (
+      event.target instanceof Element &&
+      !event.target.closest('[data-helia-section-dropdown]')
+    )
+      closeSections();
+  });
+  matchMedia('(min-width: 62rem)').addEventListener('change', () =>
+    closeSections(),
+  );
+  document.addEventListener('astro:after-swap', () => closeSections());
+</script>

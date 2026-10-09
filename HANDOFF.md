@@ -1,70 +1,20 @@
-# AsciiTerminal: later instances on a page never animated
+# Landing polish
 
-Goal: every animated `AsciiTerminal` on a page types, replays and autoplays,
-not just the first. Issue: AmbiqAI/helia-ui#149. PR: AmbiqAI/helia-ui#150.
+Goal: shared Button icon spacing, sidebar-free landing navigation, official Hero icons.
+Issue: https://github.com/AmbiqAI/helia-ui/issues/196
+Branch: codex/landing-polish, based on origin/main alpha.24.
 
-Worktree: /Users/adam.page/Ambiq/helia/helia-ui-issue-149
-Branch: 149-terminal-late-children, off origin/main (1d477cc, v0.1.0-alpha.16
-notes). No version bump in the branch. The main checkout is untouched.
+Implemented: Button spacing; sidebar:false sections render no sidebar or hamburger; mobile section dropdown includes HELIA AI Developer Hub; narrow header hides duplicate Hub button; Hero eyebrowIcon URL replaces decorative dot while preserving text.
 
-## What is implemented
+Verified: npm run validate (275 unit tests), gallery build and assertions, 230 gallery browser tests. Derived Astro prop reference regenerated. No dependency changes.
 
-`astro/AsciiTerminal.astro` emits its behavior inline after each instance and
-defines the element in the first copy, so every instance the parser reaches
-after that was upgraded on its opening tag, before its lines existed.
-`connectedCallback` bound nothing, set `data-ready` and never retried.
+Consumers: isolated branches at /Users/adam.page/Ambiq/landing-polish/*; four KIT home TOCs disabled; six product hero marks updated. Consumer integration checks use temporary packed local package; committed pins remain immutable released tags. New shared release is needed before consumer pins and PR validation can be finalized.
 
-`connectedCallback` now decides how to reach the transcript and `setup()` holds
-the work it used to do. Children already there: set up now. None yet and the
-document still parsing: `DOMContentLoaded`, once. None yet after the parse: a
-`childList` `MutationObserver` that fires when a `[data-line]` appears, for an
-element a script connects empty and fills a tick later.
+Next: review shared PR, release via RELEASE.md, pin consumers, complete product rendered validation and PRs. GitHub CLI writes failed with empty/server responses; authenticated REST succeeded for issues. No merge authorized for this follow-up yet.
 
-Readiness is an instance field and a promise rather than the `data-ready`
-attribute, which a `cloneNode(true)` copies: guarding on the attribute left a
-clone of a set-up terminal permanently inert.
+PR: https://github.com/AmbiqAI/helia-ui/pull/197
+Two independent reviews found and resolved headerless section navigation and false data-attribute Hub hiding. Plugin prose updated; headerless middleware regression tests added. Release notes for alpha.25 included.
 
-`play()` is a method on the element. It awaits readiness before running, so a
-consumer's own load listener registered before the component's can call it, and
-resolves when the run ends.
+Final verification: latest shared docs build and 230 browser tests pass at 77794a1. All ten consumer draft PRs are attached to this chat. Four existing KIT browser tabs refreshed. Shared CI browser job still pending at last check; consumer pins await shared publication.
 
-## Consumer-visible
-
-These belong in the release note.
-
-- Second and later animated terminals on a page replay and autoplay. A site
-  carrying a workaround, such as re-inserting a clone before playing, should
-  drop it rather than stack it on this.
-- A clone of a set-up terminal sets itself up when it is connected.
-- `play()` is new on the element and is the way to start a transcript without
-  the replay control. It resolves when the run ends.
-- No prop, markup or styling change. The default static form still ships
-  nothing, and a page with one terminal behaves as it did.
-- Semver: a fix plus an additive element method. Which pre-release carries it,
-  and whether it earns a release note, is the owner's call.
-
-## Verified
-
-`npm ci` in both trees, `npm run validate`, `npm run docs:build`,
-`npm run docs:test`. `docs/tests/ascii-terminal.spec.ts` drives the transcripts
-on `/code/` by caption, and was proven to fail against the unfixed component:
-the second transcript reached 0 of 7 visible lines on scroll and a replay click
-left `data-playing` unset. `docs/src/content/docs/code.mdx` carries two more
-animated transcripts, one of them `autoplay={false}`, which is what the suite
-drives.
-
-## Gotchas
-
-- `astro/CodeTabs.astro`, `astro/DataTable.astro` and `astro/MediaEmbed.astro`
-  carry the same inline-per-instance shape and the same `data-ready` guard.
-  They were not touched here, and whether they are exposed depends on whether
-  their children are read at connection.
-- The retry observer watches `subtree` because the lines sit two levels down.
-  An element filled a node at a time could still be set up on a partial
-  transcript; a script that appends the frame whole cannot.
-- `npm ci` flips six `scripts/*.mjs` to mode 755 through bin linking. Keep that
-  out of commits; stage by path.
-
-## Next
-
-Owner sign-off on #150, then merge. No release cut in this branch.
+User follow-up: shared dropdown Hub label shortened to HELIA AI DEV Hub with a decorative external-site arrow. Applies to all ten consumers via the shared release.

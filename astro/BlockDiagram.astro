@@ -5,11 +5,9 @@
  * The canvas a set of `Block`s is drawn on: a figure, an optional caption, and
  * the arrangement of the blocks directly inside it.
  *
- * It draws no arrows and no connectors. What a block diagram on a product page
- * is asked for is the shape of a thing -- what it is made of, and what those
- * pieces are made of -- and containment carries that without a line between
- * any two boxes. A page that needs a sequence with branches wants a mermaid
- * fence instead; see the diagrams page.
+ * Containment is the default. `flow="sequence"` adds directional connectors
+ * between ordered stages, stacking them on narrow screens. Branches and loops
+ * belong in a mermaid diagram instead.
  *
  * The recursion is in `Block`, which holds a set of its own. This part is the
  * outermost set and the caption over it, so a diagram is one figure however
@@ -25,8 +23,8 @@ interface Props extends HTMLAttributes<'figure'> {
   title?: string;
   /** A sentence under the title. What the diagram is of, not what it shows. */
   caption?: string;
-  /** How the top-level blocks are laid out. A row stacks below 42rem. */
-  flow?: 'row' | 'column' | 'grid';
+  /** Top-level layout. Row and sequence stack below 42rem; sequence adds ordered stages and connectors. */
+  flow?: 'row' | 'column' | 'grid' | 'sequence';
   /** Columns at the wide end of the `grid` flow. Halves at 62rem, stacks at 42rem. */
   columns?: 2 | 3 | 4 | 5;
   /** The gap between the top-level blocks, and the tighter one inside them. */
@@ -50,6 +48,7 @@ const {
 } = Astro.props;
 
 const named = Boolean(title || caption);
+const Set = flow === 'sequence' ? 'ol' : 'ul';
 ---
 
 <figure
@@ -71,7 +70,7 @@ const named = Boolean(title || caption);
       </figcaption>
     )
   }
-  <ul
+  <Set
     class:list={[
       'helia-block-set',
       `helia-block-set--${flow}`,
@@ -79,5 +78,5 @@ const named = Boolean(title || caption);
     ]}
   >
     <slot />
-  </ul>
+  </Set>
 </figure>

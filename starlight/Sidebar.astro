@@ -1,35 +1,13 @@
 ---
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2026, Ambiq
-/*
- * The pane, when the site named its navigation with the `sections` option. It
- * carries two lists, one per width, because the two widths are asking
- * different questions.
- *
- * Wide: the section's own pages, under the section's name. The route
- * middleware has already cut the sidebar down to them, and a pane of links
- * with no name on it does not say which part of the site they belong to. A
- * heading rather than a first entry: it is not a destination, and it is a
- * landmark the pane's links sit under.
- *
- * Narrow: every section, each expandable to its pages. The top bar's section
- * links are gone below that width, so the button that opens this pane is the
- * only way to the rest of the site, and a pane of one section's pages would be
- * a dead end. Starlight's own sublist renders it, so a group, a badge and the
- * current page look the same here as in the pane beside it.
- *
- * Starlight's components by their own paths rather than through
- * `virtual:starlight/components/Sidebar`: that module resolves to whichever
- * component is installed under the name, which here is this one, and a
- * component that renders itself renders until the stack runs out.
- */
-import { icon } from '@fortawesome/fontawesome-svg-core';
-import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+/* Without header configuration, the mobile pane retains section switching.
+ * Configured headers expose it through the section dropdown.
+ * See AmbiqAI/helia-ui#182. */
 import Default from '@astrojs/starlight/components/Sidebar.astro';
 import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
 import config from 'virtual:helia-ui/starlight-config';
 
-import { hubLabelParts } from './header-hub';
 import { matchSection } from './sections';
 
 /*
@@ -45,17 +23,12 @@ const section = matchSection(
 
 const sectionNav = Astro.locals.heliaSectionNav;
 
-/*
- * The Dev Hub link lives at the end of the bar, which below 62rem is this
- * pane. It is the same link rather than a second definition of one: the bar
- * hides its copy at the width this one appears at.
- */
+/* Share the configured destination so narrow and wide navigation cannot diverge. */
 const hub = config.header?.hub;
-const hubParts = hub ? hubLabelParts(hub.label) : [];
 ---
 
 {
-  sectionNav && sectionNav.length > 0 && (
+  !config.header && sectionNav && sectionNav.length > 0 && (
     <div class="helia-sidebar-sections" data-helia-sidebar-sections>
       <SidebarSublist sublist={sectionNav} />
     </div>
@@ -93,18 +66,7 @@ const hubParts = hub ? hubLabelParts(hub.label) : [];
 {
   hub && (
     <a class="helia-sidebar-hub" href={hub.href} data-helia-hub-link>
-      {hubParts.map((part) =>
-        part.accent ? (
-          <span class="helia-sidebar-hub__name">{part.text}</span>
-        ) : (
-          part.text
-        ),
-      )}
-      <span
-        class="helia-hub-icon"
-        aria-hidden="true"
-        set:html={icon(faArrowUpRightFromSquare).html.join('')}
-      />
+      {hub.label}
     </a>
   )
 }

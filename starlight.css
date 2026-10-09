@@ -45,14 +45,22 @@
 
 /*
  * A terminal frame always draws a title bar, which with no title is an empty
- * strip the package's terminal part does not have. Hiding it puts back the top
+ * strip the package's terminal part does not have. Tabs already label their
+ * terminal content, so their nested frames omit this bar too. Hiding it restores the top
  * edge and the button offset the frame stylesheet gives away to the bar.
  */
-.expressive-code .frame.is-terminal:not(.has-title) > .header {
+:is(
+    .expressive-code .frame.is-terminal:not(.has-title),
+    [role='tabpanel'] .expressive-code .frame.is-terminal
+  )
+  > .header {
   display: none;
 }
 
-.expressive-code .frame.is-terminal:not(.has-title) {
+:is(
+  .expressive-code .frame.is-terminal:not(.has-title),
+  [role='tabpanel'] .expressive-code .frame.is-terminal
+) {
   --button-spacing: 0.4rem;
 }
 
@@ -60,7 +68,11 @@
  * `--header-border-radius` is the frame's own `--helia-radius-md` plus its
  * border width, which is what the untitled corners have to match.
  */
-.expressive-code .frame.is-terminal:not(.has-title) pre {
+:is(
+    .expressive-code .frame.is-terminal:not(.has-title),
+    [role='tabpanel'] .expressive-code .frame.is-terminal
+  )
+  pre {
   border-start-end-radius: var(--header-border-radius);
   border-start-start-radius: var(--header-border-radius);
   border-top: 1px solid var(--helia-surface-border);
@@ -235,10 +247,6 @@
   margin-top: calc(var(--helia-space-6) * 2);
 }
 
-.sl-markdown-content > p {
-  max-width: 48rem;
-}
-
 .hero .tagline {
   max-width: 48rem;
 }
@@ -306,6 +314,10 @@
   white-space: nowrap;
 }
 
+.helia-site-header__prefix {
+  font-weight: var(--helia-weight-regular);
+}
+
 .helia-site-header__nav {
   align-items: center;
   display: flex;
@@ -340,70 +352,56 @@
   margin-inline-start: auto;
 }
 
-/*
- * The Dev Hub link at the end of the bar. It names a place the reader is not,
- * so it is quiet: label weight, muted ink, and the family's name in the
- * product accent, which is the one word doing the work. The glyph says the
- * link leaves this site.
- */
+/* The hub is a destination link, with the same outline treatment in both navigation layouts. */
 .helia-site-header__hub,
 .helia-sidebar-hub {
   align-items: center;
-  color: var(--sl-color-gray-2);
-  display: flex;
+  border: 1px solid currentColor;
+  border-radius: var(--helia-radius);
+  color: var(--sl-color-text);
+  display: inline-flex;
   font-size: var(--helia-text-small);
+  font-weight: var(--helia-weight-semibold);
   gap: var(--helia-space-2);
+  min-height: var(--helia-control-md);
+  padding: var(--helia-space-2) var(--helia-space-3);
   text-decoration: none;
   white-space: nowrap;
 }
 
+/* The desktop outline follows the neighboring links' text and padding. */
+.helia-site-header__hub {
+  line-height: 1;
+  min-height: calc(var(--helia-text-small) + 2 * var(--helia-space-2));
+  padding-block: calc(var(--helia-space-2) - 1px);
+}
+
 .helia-site-header__hub:hover,
+.helia-sidebar-hub:hover {
+  background: var(--sl-color-bg-sidebar);
+  border-color: var(--sl-color-text);
+}
+
 .helia-site-header__hub:focus-visible,
-.helia-sidebar-hub:hover,
 .helia-sidebar-hub:focus-visible {
-  color: var(--sl-color-white);
+  outline: 2px solid var(--sl-color-text-accent);
+  outline-offset: 2px;
 }
 
-/*
- * The accent is mixed for a card's ground and for body sizes; the bar's ground
- * is the canvas and this line is the small step, where the slate an unaccented
- * site falls back to reads at 3.8:1 in the dark theme. One step further toward
- * the ink the theme adapts to -- paper on the dark canvas, ink on light -- is
- * what clears AA without taking the word off the product's hue.
- */
-.helia-site-header__hub-name,
-.helia-sidebar-hub__name {
-  color: color-mix(
-    in oklab,
-    var(--helia-product-accent) 80%,
-    var(--helia-ink-adaptive)
-  );
-  font-weight: var(--helia-weight-semibold);
-}
-
-.helia-hub-icon {
-  display: inline-flex;
-  flex: none;
-  height: 1em;
-  width: 1em;
-}
-
-.helia-hub-icon svg {
-  display: block;
-  fill: currentColor;
-  height: 100%;
-  stroke: none;
-  width: 100%;
-}
-
-/* One link, two places: the bar above the collapse point, the menu below it. */
+/* Keep the hub in the bar after section links collapse, until the bar itself gets tight. */
 .helia-sidebar-hub {
-  border-top: 1px solid var(--sl-color-gray-6);
-  padding-block: var(--helia-space-3);
+  margin-top: var(--helia-space-3);
 }
 
-@media (width >= 62rem) {
+@media (width >= 42rem) {
   .helia-sidebar-hub {
+    display: none;
+  }
+}
+
+@media (width < 42rem) {
+  html[data-has-sidebar] .helia-site-header__hub,
+  .helia-site-header[data-helia-hub-in-dropdown] .helia-site-header__hub {
     display: none;
   }
 }
@@ -442,8 +440,7 @@
     display: flex;
   }
 
-  .helia-site-header__nav,
-  .helia-site-header__hub {
+  .helia-site-header__nav {
     display: none;
   }
 }
@@ -663,27 +660,24 @@
   justify-content: space-between;
 }
 
-/*
- * The negative inline margin is the hover padding given back, so the eyebrow
- * and the title still start on the content measure rather than inset from it.
- */
 .pagination-links a {
-  align-items: end;
-  border: 0;
-  border-radius: var(--helia-radius-sm);
+  align-items: center;
+  border: 1px solid var(--helia-surface-border);
+  border-radius: var(--helia-radius-md);
   box-shadow: none;
   color: var(--helia-ink-muted);
   display: flex;
   flex: 0 1 auto;
   gap: var(--helia-space-2);
   justify-content: flex-start;
-  margin-inline: calc(var(--helia-space-3) * -1);
+  margin-inline: 0;
+  min-height: var(--helia-control-lg);
   max-width: 48%;
   overflow-wrap: anywhere;
-  padding: var(--helia-space-2) var(--helia-space-3);
+  padding: var(--helia-space-4);
   text-decoration: none;
   transition: background-color var(--helia-motion-fast) var(--helia-ease-out);
-  width: auto;
+  width: 20rem;
 }
 
 /* The auto margin is what holds the end edge when there is no previous link. */
@@ -754,6 +748,93 @@
 
   .pagination-links a[rel='next'] {
     align-self: end;
-    margin-inline-start: calc(var(--helia-space-3) * -1);
+    margin-inline-start: auto;
+  }
+}
+
+/* Standalone figures join prose rhythm; nested layout components keep theirs. */
+:is(.sl-markdown-content, .helia-band__inner, .helia-landing > section)
+  > :is(.helia-chart, .helia-chart-group, .helia-block-diagram):not(
+    :first-child
+  ) {
+  margin-block-start: var(--sl-content-gap-y);
+}
+
+.helia-section-dropdown {
+  display: none;
+  position: relative;
+  min-width: 0;
+}
+.helia-section-dropdown summary {
+  display: flex;
+  align-items: center;
+  gap: var(--helia-space-2);
+  padding: var(--helia-space-2);
+  border-radius: var(--helia-radius-md);
+  background: var(--helia-surface-card-muted);
+  color: var(--helia-ink-primary);
+  font-size: var(--helia-text-label);
+  cursor: pointer;
+  list-style: none;
+}
+.helia-section-dropdown summary::-webkit-details-marker {
+  display: none;
+}
+.helia-section-dropdown summary span {
+  max-width: 10rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.helia-section-dropdown svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+.helia-section-dropdown nav {
+  position: absolute;
+  inset-block-start: calc(100% + var(--helia-space-2));
+  inset-inline-start: 0;
+  min-width: 12rem;
+  max-width: calc(100vw - var(--helia-space-8));
+  padding: var(--helia-space-2);
+  border: 1px solid var(--helia-surface-border);
+  border-radius: var(--helia-radius-md);
+  background: var(--helia-surface-canvas);
+  z-index: var(--helia-layer-menu);
+}
+.helia-section-dropdown nav a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--helia-space-3);
+  padding: var(--helia-space-2) var(--helia-space-3);
+  border-radius: var(--helia-radius-sm);
+  color: var(--helia-ink-primary);
+  font-size: var(--helia-text-label);
+  text-decoration: none;
+}
+.helia-section-dropdown nav a:hover,
+.helia-section-dropdown nav a[aria-current='page'] {
+  background: var(--helia-surface-hover);
+}
+@media (width < 62rem) {
+  .helia-section-dropdown {
+    display: block;
+  }
+}
+@media (width < 42rem) {
+  .helia-site-header {
+    gap: var(--helia-space-2);
+  }
+  .helia-site-header__title {
+    flex-shrink: 0;
+    max-width: 35%;
+  }
+  .helia-section-dropdown summary span {
+    max-width: 6rem;
   }
 }
