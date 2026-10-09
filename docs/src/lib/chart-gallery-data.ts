@@ -13,39 +13,39 @@
  * chart.
  */
 
-export interface TrafficPoint {
+export type TrafficPoint = {
   /** Week of the quarter, 1-12. */
   week: number;
   /** Page views that week. */
   views: number;
   /** Which section of the site. */
   section: string;
-}
+};
 
-export interface BuildPoint {
+export type BuildPoint = {
   /** Build stage. */
   stage: string;
   /** Wall-clock seconds for the stage. */
   seconds: number;
   /** Which build profile. */
   profile: string;
-}
+};
 
-export interface PagePoint {
+export type PagePoint = {
   /** Week of the quarter, 1-12. */
   week: number;
   /** Pages published to that point. */
   pages: number;
-}
+};
 
-export interface WeightPoint {
+export type WeightPoint = {
   /** Transferred bytes, in kilobytes. */
   transferKb: number;
   /** Lighthouse performance score. */
   score: number;
   /** Which page template. */
   template: string;
-}
+};
 
 /** Two sections over a quarter. The line chart, and the first of the group. */
 export const trafficSeries: TrafficPoint[] = [

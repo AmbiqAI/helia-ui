@@ -26,12 +26,13 @@ jobs:
   prepare:
     name: Open the version bump pull request
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
-    # The narrowest pair that can push a branch and open a pull request. No job
-    # here may create a tag or a release; that is `release-publish.yml` alone.
+    # Dispatch CI explicitly because a PR opened with GITHUB_TOKEN does not trigger it.
     permissions:
       contents: write
       pull-requests: write
+      actions: write
 
     env:
       GH_TOKEN: ${{ github.token }}
@@ -77,6 +78,9 @@ jobs:
             package-lock.json
             docs/package-lock.json
 
+      - name: Use the pinned npm
+        run: npm install --global npm@11.19.0
+
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
@@ -119,7 +123,7 @@ jobs:
           set -euo pipefail
           git switch -c "release/v${VERSION}"
           git add package.json package-lock.json docs/package-lock.json RELEASE.md
-          git commit -m "Prepare helia-ui ${VERSION}"
+          git commit -m "chore: prepare helia-ui ${VERSION}"
           git push --set-upstream origin "release/v${VERSION}"
 
       - name: Open the pull request
@@ -128,10 +132,13 @@ jobs:
           gh pr create \
             --base main \
             --head "release/v${VERSION}" \
-            --title "Prepare helia-ui ${VERSION}" \
+            --title "chore: prepare helia-ui ${VERSION}" \
             --body "$(printf '%s\n' \
               "Version, both lockfiles and the release manifest's facts table set to ${VERSION}." \
               "" \
               "The notes for this version are the \`What changed in ${VERSION}\` section of RELEASE.md, already on main." \
               "" \
               "No tag exists yet. Merge this, then run \`Publish release\` from main with the same version to cut \`v${VERSION}\`.")"
+
+      - name: Run CI on the version bump branch
+        run: gh workflow run ci.yml --ref "release/v${VERSION}"

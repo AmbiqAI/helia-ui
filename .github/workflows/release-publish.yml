@@ -98,8 +98,7 @@ jobs:
     needs: verify
     runs-on: ubuntu-latest
 
-    # The only write grant in this repository's workflows, and it ends here:
-    # no `pull-requests`, no `packages`, no `id-token`.
+    # Publication needs repository contents only.
     permissions:
       contents: write
 
