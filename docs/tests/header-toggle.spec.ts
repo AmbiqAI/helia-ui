@@ -120,3 +120,33 @@ for (const viewport of viewports) {
     }
   });
 }
+
+test('native popover dismissal clears the shared menu state', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto(`${base}/gallery/`);
+  const toggle = page.locator('[data-helia-sidebar-toggle]');
+  const pane = page.locator('#starlight__sidebar');
+  await toggle.click();
+  await expect(pane).toBeVisible();
+  await expect(pane).toHaveJSProperty('popover', 'auto');
+  expect(await pane.evaluate((node) => node.matches(':popover-open'))).toBe(
+    true,
+  );
+  await pane.evaluate((node) => (node as HTMLElement).hidePopover());
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(page.locator('body')).not.toHaveAttribute(
+    'data-mobile-menu-expanded',
+    /.*/,
+  );
+  await expect(page.locator('.main-frame')).not.toHaveAttribute('inert', /.*/);
+  await toggle.click();
+  await expect(pane).toBeVisible();
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await expect(page.locator('body')).not.toHaveAttribute(
+    'data-mobile-menu-expanded',
+    /.*/,
+  );
+  await expect(page.locator('.main-frame')).not.toHaveAttribute('inert', /.*/);
+});
