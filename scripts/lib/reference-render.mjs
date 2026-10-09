@@ -20,7 +20,13 @@
  * no process, so the CLI and the tests exercise the same code.
  */
 
-import { escapeMdx, mapOutsideCode, mapProse, table } from './markdown.mjs';
+import {
+  escapeMdx,
+  mapOutsideCode,
+  mapProse,
+  stripInlineMarkup,
+  table,
+} from './markdown.mjs';
 
 /** The schema identifier the artifacts carry. Mirrors `reference-model.ts`. */
 export const REFERENCE_MODEL_SCHEMA =
@@ -267,8 +273,7 @@ const yamlString = (value) =>
 
 /** A summary trimmed to fit a `<meta name="description">`. */
 function metaDescription(summary) {
-  const plain = String(summary ?? '')
-    .replace(/[*`_]/g, '')
+  const plain = stripInlineMarkup(String(summary ?? ''))
     .replace(/\s+/g, ' ')
     .trim();
   return plain.length > DESCRIPTION_LIMIT

@@ -38,6 +38,7 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
+import { stripInlineMarkup } from './markdown.mjs';
 import { child, children, descendants, parseXml, textOf } from './xml.mjs';
 
 /** The Doxygen release this reader was written against. */
@@ -575,10 +576,9 @@ function document(node, context) {
 
 /** The first sentence of a description, for the member index and frontmatter. */
 export function summarize(text) {
-  const plain = collapse(String(text ?? '').split(/\n\s*\n/)[0])
-    .replace(/^#+\s*/, '')
-    .replace(/[*`_]/g, '')
-    .trim();
+  const plain = stripInlineMarkup(
+    collapse(String(text ?? '').split(/\n\s*\n/)[0]).replace(/^#+\s*/, ''),
+  ).trim();
   const sentence = /^(.*?[.!?])(\s|$)/.exec(plain)?.[1] ?? plain;
   return sentence.length > DESCRIPTION_LIMIT
     ? `${sentence.slice(0, DESCRIPTION_LIMIT - 1).trimEnd()}…`

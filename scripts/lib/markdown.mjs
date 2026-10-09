@@ -32,6 +32,30 @@ export function mapOutsideCode(text, fn) {
 }
 
 /*
+ * Inline Markdown reduced to its text, for a summary or a meta description.
+ *
+ * Only delimiters that pair are removed. An underscore between word characters
+ * is part of an identifier (`ARM_MATH_AUTOVECTORIZE`), not emphasis, and
+ * CommonMark does not read it as emphasis either. Code spans are unwrapped
+ * before emphasis is looked for, so an identifier inside one survives intact.
+ */
+export function stripInlineMarkup(text) {
+  const emphasis = (part) =>
+    part
+      .replace(/(\*{1,3})(?=\S)(.+?)(?<=\S)\1/g, '$2')
+      .replace(/(?<!\w)(_{1,3})(?=\S)(.+?)(?<=\S)\1(?!\w)/g, '$2');
+  const span = /(?<!`)(`+)(?!`)(.+?)(?<!`)\1(?!`)/g;
+  let out = '';
+  let last = 0;
+  for (const match of text.matchAll(span)) {
+    out += emphasis(text.slice(last, match.index));
+    out += match[2].replace(/^ (.*[^ ].*) $/, '$1');
+    last = match.index + match[0].length;
+  }
+  return out + emphasis(text.slice(last));
+}
+
+/*
  * A `<` only means a tag if what follows it names one. Prose in these pages
  * writes things like `<prefix>` and `<N>` meaning "substitute a value here",
  * and MDX would read those as components that are never closed.
