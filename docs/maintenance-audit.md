@@ -81,5 +81,5 @@ Fresh root and gallery installs passed with npm 11.19.0. Package validation pass
 errors, warnings or hints. The gallery build and all 232 browser tests passed.
 A tarball installed into an isolated consumer passed export, relative-import and
 CLI verification (150 shipped files and 11 commands). Workflow YAML and shell
-syntax checks passed; gate checks rejected failed, cancelled and skipped jobs.
+syntax checks passed; gate checks rejected failed, canceled and skipped jobs.
 GitHub workflow execution and settings enforcement remain unverified until publication.
