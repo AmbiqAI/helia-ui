@@ -12,7 +12,7 @@ import config from 'virtual:helia-ui/starlight-config';
 
 import AmbiqLogo from './AmbiqLogo.astro';
 
-const { links, logo, tagline } = config.footer;
+const { links, logo, logoLightTone, tagline } = config.footer;
 const year = new Date().getFullYear();
 ---
 
@@ -33,7 +33,7 @@ const year = new Date().getFullYear();
             href="https://ambiq.com/"
             aria-label="Ambiq home"
           >
-            <AmbiqLogo tone="adaptive" />
+            <AmbiqLogo tone="adaptive" lightTone={logoLightTone} />
           </a>
         )
       }

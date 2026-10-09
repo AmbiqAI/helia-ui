@@ -122,3 +122,72 @@ test('the side column stacks under the lede on a narrow viewport', async ({
   );
   expect(Math.abs(narrowSide!.x - narrowLede!.x)).toBeLessThanOrEqual(1);
 });
+
+test('product eyebrow icon replaces the decorative dot', async ({ page }) => {
+  await page.goto('/helia-ui/landing/');
+  const label = page.locator('.helia-hero__eyebrow--icon');
+  await expect(label).toHaveText('Official product mark');
+  const image = label.locator('img');
+  await expect(image).toHaveAttribute('alt', '');
+  expect(
+    await image.evaluate(
+      (element: HTMLImageElement) =>
+        element.complete && element.naturalWidth > 0,
+    ),
+  ).toBe(true);
+  expect(
+    await label.evaluate(
+      (element) => getComputedStyle(element, '::before').content,
+    ),
+  ).toBe('none');
+});
+
+test('buttons separate labels from trailing icons', async ({ page }) => {
+  await page.goto('/helia-ui/starlight-plugin/hero-page/');
+  const button = page.locator('.helia-hero__actions .helia-button').first();
+  expect(
+    await button.evaluate((element) =>
+      parseFloat(getComputedStyle(element).columnGap),
+    ),
+  ).toBeGreaterThanOrEqual(8);
+});
+
+for (const theme of ['light', 'dark']) {
+  test(`brand eyebrows follow the responsive identity scale in ${theme}`, async ({
+    page,
+  }) => {
+    await page.goto('/helia-ui/landing/');
+    await page.evaluate((value) => {
+      document.documentElement.dataset.theme = value;
+    }, theme);
+    const brand = page.locator('.helia-hero__brand');
+    for (const [width, fontSize] of [
+      [390, 28],
+      [1280, 38.4],
+    ]) {
+      await page.setViewportSize({ width, height: 900 });
+      const dimensions = await brand.evaluate((element) => ({
+        fontSize: parseFloat(getComputedStyle(element).fontSize),
+        iconWidth: element.querySelector('img')!.getBoundingClientRect().width,
+        iconHeight: element.querySelector('img')!.getBoundingClientRect()
+          .height,
+        scrollWidth: element.scrollWidth,
+        width: element.getBoundingClientRect().width,
+      }));
+      expect(dimensions.fontSize).toBeCloseTo(fontSize, 1);
+      expect(dimensions.iconWidth).toBe(32);
+      expect(dimensions.iconHeight).toBe(32);
+      expect(dimensions.scrollWidth).toBeLessThanOrEqual(
+        Math.ceil(dimensions.width),
+      );
+    }
+    await page.goto(gallery);
+    const label = page.locator(`${contrast} .helia-hero__eyebrow`);
+    await expect(label).not.toHaveClass(/helia-hero__brand/);
+    expect(
+      await label.evaluate((element) =>
+        parseFloat(getComputedStyle(element).fontSize),
+      ),
+    ).toBeLessThan(20);
+  });
+}
