@@ -3,6 +3,7 @@ title: Code
 description: Code samples, command output, diffs, and language tabs.
 ---
 
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 import CodeBlock from '@ambiqai/helia-ui/astro/CodeBlock';
 import CodeTabs from '@ambiqai/helia-ui/astro/CodeTabs';
 import AsciiTerminal from '@ambiqai/helia-ui/astro/AsciiTerminal';
@@ -155,6 +156,21 @@ script, so ask for them deliberately.
   ]}
 />
 
+A transcript that shows commands and their output can still hand the reader
+just the commands. `copy="commands"` copies the `command` lines alone, without
+prompts, so what lands in the shell is what the page told them to run.
+
+<AsciiTerminal
+  title="Install the CLI"
+  copy="commands"
+  lines={[
+    { kind: 'command', text: 'npm install --global @ambiqai/helia-cli' },
+    { kind: 'muted', text: 'added 42 packages in 3s' },
+    { kind: 'command', text: 'helia --version' },
+    { kind: 'output', text: '1.4.0' },
+  ]}
+/>
+
 A page can carry as many animated transcripts as the explanation needs. The
 second and later frames replay and autoplay like the first, each one following
 its own `autoplay` setting.
@@ -227,3 +243,34 @@ themes, so it and a fenced block on the same page are the same object.
 page pays no JavaScript for highlighting and the copy button is the only script
 either one ships. `AsciiTerminal` is not highlighted at all and ships nothing
 unless asked.
+
+## Terminals inside tabs
+
+The tab labels the terminal, so its nested frame omits the title bar and keeps
+the copy control. Standalone terminals and file examples retain their framing.
+
+<Tabs>
+<TabItem label="Install">
+
+```bash title="Terminal"
+npm install example-package
+```
+
+</TabItem>
+
+  <TabItem label="Source">
+    <CodeBlock
+      variant="terminal"
+      label="Terminal"
+      language="bash"
+      code="git clone https://example.com/project.git"
+    />
+  </TabItem>
+  <TabItem label="Configuration">
+    <CodeBlock
+      filename="config.json"
+      language="json"
+      code={'{"enabled": true}'}
+    />
+  </TabItem>
+</Tabs>

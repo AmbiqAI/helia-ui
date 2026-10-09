@@ -119,3 +119,33 @@ test('a reference rule is drawn, named once, and labeled bars', async ({
   });
   expect(await values.count()).toBeGreaterThanOrEqual(28);
 });
+
+for (const width of [1440, 764, 390])
+  for (const theme of ['light', 'dark'] as const) {
+    test(`standalone charts keep prose spacing at ${width} in ${theme}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(gallery);
+      await page.evaluate(
+        (theme) => (document.documentElement.dataset.theme = theme),
+        theme,
+      );
+      const plot = page.locator('[data-example="prose-chart"]');
+      const gap = await plot.evaluate(
+        (node) =>
+          node.getBoundingClientRect().top -
+          node.previousElementSibling!.getBoundingClientRect().bottom,
+      );
+      expect(gap).toBeGreaterThanOrEqual(16);
+      const group = page.locator('[data-example="prose-chart-group"]');
+      expect(
+        await group.evaluate((node) =>
+          parseFloat(getComputedStyle(node).marginTop),
+        ),
+      ).toBeGreaterThanOrEqual(16);
+      for (const figure of await group.locator('.helia-chart').all()) {
+        await expect(figure).toHaveCSS('margin-top', '0px');
+      }
+    });
+  }

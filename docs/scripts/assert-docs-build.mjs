@@ -25,6 +25,12 @@
  *    written as: a card's link and title, a transcript's lines, and none of
  *    the props or comments those were authored in. The gallery is where every
  *    one of those shapes is on a page, so it is where the claim is provable.
+ *
+ * 5. A part's content reaches the rendition even when the source never held
+ *    it. The gallery's "from a model" examples take their transcript, their
+ *    card text and their button label from a record it imports, so the only
+ *    way those strings can be in the page's Markdown twin is the sidecar each
+ *    part writes into the built HTML. See AmbiqAI/helia-ui#167.
  */
 
 import { existsSync, readFileSync } from 'node:fs';
@@ -230,8 +236,22 @@ const RENDITION_CLAIMS = [
       /- \[The card parts]\(\S+\/cards\/\): What each part owns/,
       /- \[Tokens and scales]\(\S+\/foundations\/\): The spacing, radius/,
       /```text\n\$ npm run build\n/,
+      /* The "from a model" examples: none of this text is in gallery.mdx. */
+      /```text\n\$ npm run docs:build\nReading what the parts stated\n {2}ROUTES {4}26\nrenditions written\n```/,
+      /- \[Cards from a model]\(\S+\/cards\/\): Every word of this card comes from a record the page imports\./,
+      /- \[Foundations from a model]\(\S+\/foundations\/\)/,
+      /\[Read the discoverability guide]\(\S+\/starlight-plugin\/discoverability\/\)/,
     ],
-    ['<LinkCard', '<AsciiTerminal', "{ kind: 'command'", 'titleAs='],
+    [
+      '<LinkCard',
+      '<AsciiTerminal',
+      "{ kind: 'command'",
+      'titleAs=',
+      /* The sidecar is markup the page states its markdown in, and no reader
+         of the rendition may be handed it. */
+      'data-helia-rendition',
+      '<script',
+    ],
   ],
   /* Generated pages open with a comment naming the script that wrote them.
      A comment renders nothing, so a rendition must not carry one. */

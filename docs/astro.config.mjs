@@ -59,6 +59,7 @@ export default defineConfig({
              end to end. The bar stands in place of Starlight's header, which
              is where the social row renders, so GitHub is a link here. */
           header: {
+            titleRegularPrefix: 'helia',
             links: [
               { label: 'Foundations', href: `${basePath}foundations/` },
               { label: 'Gallery', href: `${basePath}gallery/` },
@@ -104,7 +105,8 @@ export default defineConfig({
             },
             {
               label: 'Demo guide',
-              href: `${basePath}starlight-plugin/sections/guide/`,
+              href: `${basePath}starlight-plugin/sections/guide/first-steps/`,
+              match: `${basePath}starlight-plugin/sections/guide/`,
               sidebar: [
                 {
                   label: 'First steps',
@@ -118,7 +120,8 @@ export default defineConfig({
             },
             {
               label: 'Demo reference',
-              href: `${basePath}starlight-plugin/sections/reference/`,
+              href: `${basePath}starlight-plugin/sections/reference/widget/`,
+              match: `${basePath}starlight-plugin/sections/reference/`,
               /* The generated shape: a directory, listed one level under the
                  section rather than under a group inside it. */
               sidebar: [
@@ -218,6 +221,7 @@ export default defineConfig({
             { label: 'Diagrams', slug: 'diagrams' },
             { label: 'Block diagrams', slug: 'block-diagrams' },
             { label: 'Layout', slug: 'layout' },
+            { label: 'Landing pages', slug: 'landing' },
           ],
         },
         {
@@ -244,6 +248,7 @@ export default defineConfig({
             { label: 'Overlays', slug: 'react/overlays' },
             { label: 'Feedback', slug: 'react/feedback' },
             { label: 'Data display', slug: 'react/data-display' },
+            { label: 'Reference browser', slug: 'react/reference-browser' },
             { label: 'Navigation', slug: 'react/navigation' },
             { label: 'Versioning', slug: 'react/versioning' },
             /* A decision page rather than a reference one, so it sits with
