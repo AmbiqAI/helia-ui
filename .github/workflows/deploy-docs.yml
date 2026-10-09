@@ -56,7 +56,7 @@ jobs:
       # tar has to be re-uploaded here. It is a transport step and not a rebuild:
       # the bytes are the ones CI produced, uncompressed and unopened.
       - name: Re-upload it as this run's Pages artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: github-pages
           path: ${{ runner.temp }}/pages/artifact.tar
