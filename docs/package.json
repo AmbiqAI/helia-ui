@@ -51,7 +51,7 @@
     "@mui/material": "^9.4.0",
     "@mui/x-charts": "^9.14.0",
     "@observablehq/plot": "^0.6.17",
-    "@playwright/test": "^1.62.1",
+    "@playwright/test": "^1.64.0",
     "echarts": "^6.1.0",
     "playwright": "^1.62.1",
     "typescript": "^5.9.3"
